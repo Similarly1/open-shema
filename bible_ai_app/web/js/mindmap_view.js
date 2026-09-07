@@ -598,9 +598,9 @@ const MindMapView = {
     if (!outlineEl || !this.tree) return;
 
     let html = `
-      <div class="mm-outline-wrapper">
-        <!-- Barre d'actions du Plan -->
-        <div class="mm-outline-toolbar">
+      <!-- Barre d'actions du Plan : collée en haut, pleine largeur -->
+      <div class="mm-outline-toolbar">
+        <div class="mm-outline-toolbar-inner">
           <div class="mm-outline-toolbar-left">
             <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-expand-all" title="Déplier toutes les branches">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
@@ -626,30 +626,35 @@ const MindMapView = {
             </button>
           </div>
         </div>
+      </div>
 
-        <!-- Feuille de document Outliner -->
-        <div class="mm-outline-sheet">
-          <!-- Titre Noyau Central -->
-          <div class="mm-outline-root-header">
-            <div class="mm-outline-root-badge">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
+      <!-- Zone de défilement indépendante -->
+      <div class="mm-outline-scroll-area">
+        <div class="mm-outline-wrapper">
+          <!-- Feuille de document Outliner -->
+          <div class="mm-outline-sheet">
+            <!-- Titre Noyau Central -->
+            <div class="mm-outline-root-header">
+              <div class="mm-outline-root-badge">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
+              </div>
+              <div class="mm-outline-root-title" data-id="root" title="Cliquer pour modifier le concept central">
+                ${this.escapeHtml(this.tree.text)}
+              </div>
+              <div class="mm-outline-actions root-actions" style="opacity: 1;">
+                <button type="button" class="btn-icon-subtle" data-action="edit-node" data-id="root" title="Modifier le titre">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                </button>
+                <button type="button" class="btn-icon-subtle" data-action="add-child" data-id="root" title="Ajouter une idée directrice (BOI)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+              </div>
             </div>
-            <div class="mm-outline-root-title" data-id="root" title="Cliquer pour modifier le concept central">
-              ${this.escapeHtml(this.tree.text)}
-            </div>
-            <div class="mm-outline-actions root-actions" style="opacity: 1;">
-              <button type="button" class="btn-icon-subtle" data-action="edit-node" data-id="root" title="Modifier le titre">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-              </button>
-              <button type="button" class="btn-icon-subtle" data-action="add-child" data-id="root" title="Ajouter une idée directrice (BOI)">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              </button>
-            </div>
-          </div>
 
-          <!-- Arborescence des branches -->
-          <div class="mm-outline-tree">
-            ${(this.tree.children || []).map((boi, idx) => this.renderOutlineBoi(boi, idx)).join('')}
+            <!-- Arborescence des branches -->
+            <div class="mm-outline-tree">
+              ${(this.tree.children || []).map((boi, idx) => this.renderOutlineBoi(boi, idx)).join('')}
+            </div>
           </div>
         </div>
       </div>
@@ -1959,92 +1964,45 @@ const MindMapView = {
   },
 
   // =========================================================================
-  // BOÎTE DE DIALOGUE : ASSOCIER UN VERSET BIBLIQUE
+  // SÉLECTION D'UN PASSAGE / VERSET BIBLIQUE (Style Sélecteur Logos / BookPicker)
   // =========================================================================
 
   promptScriptureRef(nodeId) {
     const node = this.findNode(nodeId);
     if (!node) return;
 
-    const overlay = document.createElement('div');
-    overlay.className = 'mm-prompt-overlay';
-    overlay.innerHTML = `
-      <div class="mm-prompt-dialog" style="width: 400px;">
-        <div class="mm-prompt-header">
-          <div class="mm-prompt-header-left">
-            <div class="mm-prompt-icon-badge">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            </div>
-            <div class="mm-prompt-title">
-              <span>Référence biblique</span>
-              <span class="mm-prompt-target-tag" style="background: ${node.color || '#3b82f6'}22; color: ${node.color || 'var(--accent-blue)'}; border: 1px solid ${node.color || '#3b82f6'}44;">${this.escapeHtml(node.text)}</span>
-            </div>
-          </div>
-          <button type="button" class="mm-prompt-close-btn" id="mm-prompt-x-close" title="Fermer (Échap)">×</button>
-        </div>
+    let initialBook = 'Gen';
+    let initialChapter = 1;
 
-        <p class="mm-prompt-desc">La référence s'affichera sous forme de pastille interactive cliquable à côté du mot-clé :</p>
-        <input type="text" class="mm-prompt-input" id="mm-scripture-input" placeholder="Ex: Jean 3:16, Romains 8:28..." value="${this.escapeHtml(node.ref || '')}">
-
-        <div class="mm-prompt-hint">
-          <kbd>Entrée</kbd> pour valider &nbsp;•&nbsp; <kbd>Échap</kbd> pour fermer
-        </div>
-
-        <div class="mm-prompt-actions-row">
-          <div>
-            ${node.ref ? `
-              <button type="button" class="btn-danger-subtle" id="mm-prompt-remove" title="Supprimer la référence biblique">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                <span>Retirer</span>
-              </button>
-            ` : ''}
-          </div>
-          <div class="mm-prompt-actions-right">
-            <button type="button" class="btn-secondary" id="mm-prompt-cancel">Annuler</button>
-            <button type="button" class="btn-primary" id="mm-prompt-save">Enregistrer</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-    const input = overlay.querySelector('#mm-scripture-input');
-    input.focus();
-    input.select();
-
-    const closeDialog = () => overlay.remove();
-
-    overlay.querySelector('#mm-prompt-x-close')?.addEventListener('click', closeDialog);
-    overlay.querySelector('#mm-prompt-cancel')?.addEventListener('click', closeDialog);
-    overlay.querySelector('#mm-prompt-remove')?.addEventListener('click', () => {
-      node.ref = '';
-      this.refreshView();
-      this.syncAndAutoSave();
-      closeDialog();
-    });
-
-    const saveRef = () => {
-      const val = input.value.trim();
-      node.ref = val;
-      this.refreshView();
-      this.syncAndAutoSave();
-      closeDialog();
-    };
-
-    overlay.querySelector('#mm-prompt-save')?.addEventListener('click', saveRef);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        saveRef();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        closeDialog();
+    if (node.ref && typeof BookPicker !== 'undefined' && typeof BookPicker.parseQuickPassage === 'function') {
+      const parsed = BookPicker.parseQuickPassage(node.ref);
+      if (parsed && parsed.bookCode) {
+        initialBook = parsed.bookCode;
+        if (parsed.chapter) initialChapter = parsed.chapter;
       }
-    });
+    } else if (typeof BibleReader !== 'undefined' && BibleReader.currentBook) {
+      initialBook = BibleReader.currentBook;
+      initialChapter = BibleReader.currentChapter || 1;
+    }
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeDialog();
-    });
+    if (typeof BookPicker !== 'undefined') {
+      BookPicker.open(initialBook, initialChapter, (bCode, chNum, vNum = null) => {
+        if (!bCode) {
+          node.ref = '';
+        } else {
+          const book = (BookPicker.booksData || []).find(b => b.code.toLowerCase() === bCode.toLowerCase());
+          const bookName = book ? book.name : bCode;
+          node.ref = vNum ? `${bookName} ${chNum}:${vNum}` : `${bookName} ${chNum}`;
+        }
+        this.refreshView();
+        this.syncAndAutoSave();
+      }, {
+        center: true,
+        allowClear: !!node.ref,
+        targetLabel: node.text,
+        initialQuery: node.ref || ''
+      });
+    }
   },
 
   // =========================================================================

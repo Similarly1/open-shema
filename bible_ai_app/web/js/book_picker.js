@@ -106,6 +106,10 @@ const BookPicker = {
 
     // Événements
     this.backdropEl?.addEventListener('click', () => this.close());
+    document.getElementById('btn-close-book-picker')?.addEventListener('click', () => this.close());
+    document.getElementById('btn-clear-picker-ref')?.addEventListener('click', () => {
+      this.confirmSelection(null, null, null);
+    });
     this.searchInput?.addEventListener('input', (e) => this.filterBooks(e.target.value));
     
     this.searchInput?.addEventListener('keydown', (e) => {
@@ -136,14 +140,14 @@ const BookPicker = {
     const q = (query || '').trim().toLowerCase();
     if (!q) return null;
 
-    // Capture: [livre / abréviation] [chapitre optionnel] [séparateur :., ou espace + verset optionnel]
-    const m = q.match(/^([1-3]?\s*[a-zA-ZÀ-ÿ]+)(?:\s*([0-9]{1,3}))?(?:[:.,\s]+([0-9]{1,3}))?$/);
+    // Capture: [livre / abréviation] [chapitre optionnel] [séparateur :., ou espace + verset optionnel (ex: 16, 16-18, 16a)]
+    const m = q.match(/^([1-3]?\s*[a-zA-ZÀ-ÿ]+)(?:\s*([0-9]{1,3}))?(?:[:.,\s]+([0-9]{1,3}(?:[-–][0-9]{1,3})?[a-z]?))?$/);
     if (!m) return null;
 
     const bookPart = m[1].replace(/\s+/g, ' ').trim();
     const rawBookNorm = bookPart.replace(/\s+/g, '');
     const chapter = m[2] ? parseInt(m[2], 10) : null;
-    const verse = m[3] ? parseInt(m[3], 10) : null;
+    const verse = m[3] ? m[3].trim() : null;
 
     let matchedCode = null;
 
@@ -174,9 +178,12 @@ const BookPicker = {
   },
 
   activeCallback: null,
+  currentOptions: null,
 
-  open(currentBookCode, currentChapter, customCallback = null) {
+  open(currentBookCode, currentChapter, customCallback = null, options = {}) {
     this.activeCallback = customCallback;
+    this.currentOptions = options || {};
+
     let targetBook = this.booksData.find(b => b.code.toLowerCase() === (currentBookCode || '').toLowerCase());
     if (!targetBook) {
       const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) ? BibleReader.currentBible1 : null;
@@ -190,19 +197,67 @@ const BookPicker = {
     this.pendingTargetChapter = null;
     this.pendingTargetVerse = null;
 
-    if (this.searchInput) this.searchInput.value = '';
-    this.renderBooks();
+    // Centrage plein écran pour modal MindMap
+    if (this.currentOptions.center && this.popoverEl) {
+      this.popoverEl.style.position = 'fixed';
+      this.popoverEl.style.top = '50%';
+      this.popoverEl.style.left = '50%';
+      this.popoverEl.style.transform = 'translate(-50%, -50%)';
+      this.popoverEl.style.margin = '0';
+      this.popoverEl.style.zIndex = '1001';
+      if (this.backdropEl) this.backdropEl.style.zIndex = '1000';
+    }
+
+    // Gestion du bouton de suppression de référence
+    const clearBtn = document.getElementById('btn-clear-picker-ref');
+    if (clearBtn) {
+      if (this.currentOptions.allowClear) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+    }
+
+    // Gestion de l'indicateur de cible (nom de la branche MindMap)
+    const targetInfo = document.getElementById('picker-target-info');
+    if (targetInfo) {
+      if (this.currentOptions.targetLabel) {
+        targetInfo.innerHTML = `<span>Branche cible :</span> <strong style="color: var(--accent-orange, #f59e0b);">${this.currentOptions.targetLabel}</strong>`;
+        targetInfo.classList.remove('hidden');
+      } else {
+        targetInfo.classList.add('hidden');
+      }
+    }
+
+    const query = this.currentOptions.initialQuery || '';
+    if (this.searchInput) this.searchInput.value = query;
+    this.renderBooks(query);
     this.renderChapters();
 
     this.popoverEl?.classList.remove('hidden');
     this.backdropEl?.classList.remove('hidden');
     this.searchInput?.focus();
+    if (query) this.searchInput?.select();
   },
 
   close() {
     this.popoverEl?.classList.add('hidden');
     this.backdropEl?.classList.add('hidden');
+    if (this.popoverEl) {
+      this.popoverEl.style.position = '';
+      this.popoverEl.style.top = '';
+      this.popoverEl.style.left = '';
+      this.popoverEl.style.transform = '';
+      this.popoverEl.style.margin = '';
+      this.popoverEl.style.zIndex = '';
+    }
+    if (this.backdropEl) {
+      this.backdropEl.style.zIndex = '';
+    }
+    document.getElementById('btn-clear-picker-ref')?.classList.add('hidden');
+    document.getElementById('picker-target-info')?.classList.add('hidden');
     this.activeCallback = null;
+    this.currentOptions = null;
   },
 
   toggle(currentBookCode, currentChapter, customCallback = null) {

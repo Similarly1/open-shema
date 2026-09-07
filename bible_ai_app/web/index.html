@@ -7388,7 +7388,15 @@
     
     <div class="book-picker-popover hidden" id="book-picker-popover">
       <div class="popover-header">
-        <input type="text" id="picker-search-input" placeholder="Filtrer les livres (ex: Gen, Jean, Rom)..." autocomplete="off">
+        <div class="popover-header-row" style="display: flex; align-items: center; gap: 8px;">
+          <input type="text" id="picker-search-input" placeholder="Filtrer les livres (ex: Gen, Jean, Rom)..." autocomplete="off" style="flex: 1;">
+          <button type="button" class="btn-clear-picker-ref hidden" id="btn-clear-picker-ref" title="Supprimer la référence biblique">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Retirer</span>
+          </button>
+          <button type="button" class="popover-close-btn" id="btn-close-book-picker" title="Fermer (Échap)">✕</button>
+        </div>
+        <div class="picker-target-info hidden" id="picker-target-info" style="font-size: 11px; color: var(--text-muted); margin-top: 5px; display: flex; align-items: center; gap: 6px;"></div>
       </div>
       
       <div class="popover-columns">
