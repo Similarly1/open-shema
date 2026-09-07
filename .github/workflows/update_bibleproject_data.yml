@@ -9,6 +9,8 @@ on:
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout du dépôt
@@ -32,8 +34,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action [BibleProject Sync]"
-          if [ -n "$(git status --porcelain bible_ai_app/data/bibleproject_fr.json data/bibleproject_fr.json)" ]; then
-            git add bible_ai_app/data/bibleproject_fr.json data/bibleproject_fr.json || true
+          if [ -n "$(git status --porcelain bible_ai_app/data/bibleproject_fr.json)" ]; then
+            git add bible_ai_app/data/bibleproject_fr.json
             git commit -m "chore(data): actualisation automatique du mapping BibleProject (FR)"
             git push
           else
