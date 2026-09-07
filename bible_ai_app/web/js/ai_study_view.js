@@ -760,6 +760,11 @@ const AIStudyView = {
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                     <span>Enregistrer</span>
                   </button>
+
+                  <button class="ai-footer-action-btn btn-export-mindmap" title="Convertir cette étude en Mind Map radiante (Buzan)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
+                    <span>Mind Map</span>
+                  </button>
                   
                   <button class="ai-footer-action-btn btn-pin-conclusion tooltip" data-tooltip="Épingler dans la mémoire de l'assistant pour le long-terme">
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
@@ -1707,6 +1712,11 @@ const AIStudyView = {
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
               <span>Enregistrer</span>
             </button>
+
+            <button class="ai-footer-action-btn btn-export-mindmap" title="Convertir cette étude en Mind Map radiante (Buzan)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
+              <span>Mind Map</span>
+            </button>
             
             <!-- Pin conclusion button -->
             <button class="ai-footer-action-btn btn-pin-conclusion tooltip" data-tooltip="Épingler dans la mémoire de l'assistant pour le long-terme">
@@ -2451,6 +2461,12 @@ const AIStudyView = {
       }
     });
 
+    // 2.1 Bouton Convertir en Mind Map (.md)
+    const exportMindmapBtn = messageEl.querySelector('.btn-export-mindmap');
+    exportMindmapBtn?.addEventListener('click', async () => {
+      await this.exportAnswerToMindmap(rawAnswer, passageRef, userQuestion);
+    });
+
     // 2.5 Bouton Épingler Conclusion
     const pinConclusionBtn = messageEl.querySelector('.btn-pin-conclusion');
     pinConclusionBtn?.addEventListener('click', async () => {
@@ -2486,6 +2502,117 @@ const AIStudyView = {
         }
       });
     });
+  },
+
+  async exportAnswerToMindmap(rawAnswer, passageRef, userQuestion) {
+    if (!rawAnswer) return;
+
+    // 1. Détermination du concept central
+    let centralConcept = (passageRef || userQuestion || 'SYNTHÈSE').trim();
+    if (centralConcept.length > 35) {
+      centralConcept = centralConcept.slice(0, 32).trim() + '...';
+    }
+    centralConcept = centralConcept.toUpperCase();
+
+    // 2. Extraction des BOIs et sous-branches selon les règles de Buzan
+    const lines = rawAnswer.split(/\r?\n/);
+    const treeBois = [];
+    let currentBoi = null;
+
+    const cleanKeyword = (str) => {
+      let cleaned = str.replace(/[*_#`]/g, '').trim();
+      // Retirer la numérotation initiale (ex: "1. ", "A. ")
+      cleaned = cleaned.replace(/^([0-9]+|[A-Z])[\.\)]\s*/, '');
+      // Garder les mots clés significatifs (max 3-4 mots)
+      const words = cleaned.split(/\s+/).filter(w => w.length > 1);
+      return words.slice(0, 3).join(' ').toUpperCase();
+    };
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line) continue;
+
+      // Détection d'un titre de section majeur (BOI)
+      if (line.startsWith('#') || line.match(/^\*\*[0-9IVXLCDM]+\./) || line.match(/^[0-9]+\.\s+\*\*/)) {
+        const titleText = cleanKeyword(line);
+        if (titleText && titleText.length > 1) {
+          currentBoi = { title: titleText, children: [] };
+          treeBois.push(currentBoi);
+        }
+        continue;
+      }
+
+      // Détection d'une sous-branche (puce ou numéro)
+      if (line.match(/^[-*+]\s+/) || line.match(/^[0-9]+\.\s+/)) {
+        let text = cleanKeyword(line);
+        let ref = '';
+
+        // Détection de référence biblique
+        const refMatch = line.match(/\[([A-Za-z0-9À-ÿ\s:]+)\]/) || line.match(/\(([A-Za-z0-9À-ÿ\s:]+)\)/);
+        if (refMatch) {
+          ref = refMatch[1].trim();
+        }
+
+        if (text && text.length > 1) {
+          if (!currentBoi) {
+            currentBoi = { title: 'POINTS CLÉS', children: [] };
+            treeBois.push(currentBoi);
+          }
+          currentBoi.children.push({ text, ref });
+        }
+      }
+    }
+
+    // Fallback si la réponse ne comportait pas de titres de sections explicites
+    if (treeBois.length === 0) {
+      const paragraphs = rawAnswer.split(/\n\s*\n/).filter(p => p.trim().length > 10);
+      paragraphs.slice(0, 4).forEach((p, idx) => {
+        const words = p.replace(/[*_#`]/g, '').split(/\s+/).filter(w => w.length > 2);
+        const boiTitle = words.slice(0, 2).join(' ').toUpperCase() || `POINT ${idx + 1}`;
+        const subWord = words.slice(2, 4).join(' ').toUpperCase() || 'DÉTAIL';
+        treeBois.push({
+          title: boiTitle,
+          children: [{ text: subWord, ref: '' }]
+        });
+      });
+    }
+
+    // 3. Construction du Markdown indenté pur
+    let mdContent = '';
+    for (const boi of treeBois.slice(0, 6)) { // Limite à 6 BOIs (Loi de Miller 7 ± 2)
+      mdContent += `- ${boi.title}\n`;
+      for (const child of (boi.children || []).slice(0, 5)) {
+        const refPart = child.ref ? ` [${child.ref}]` : '';
+        mdContent += `  - ${child.text}${refPart}\n`;
+      }
+    }
+
+    const noteTitle = `Mind Map — ${centralConcept}`;
+    const noteData = {
+      title: noteTitle,
+      reference: passageRef || '',
+      tags: 'mindmap, étude-ia',
+      type: 'mindmap',
+      icon: 'brain',
+      palette: 'nature',
+      include_in_ai: true,
+      content: mdContent
+    };
+
+    try {
+      const saved = await API.call('save_note', noteData);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast(`Mind Map créée : « ${noteTitle} »`);
+      }
+      if (typeof NotesView !== 'undefined') {
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('notes');
+        }
+        await NotesView.loadNotes(saved?.id);
+      }
+    } catch (e) {
+      alert(`Erreur création Mind Map : ${e}`);
+    }
   },
 
   formatCurrentTime() {

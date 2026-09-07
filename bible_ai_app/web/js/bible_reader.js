@@ -3224,7 +3224,7 @@ const LexiconViewer = {
         <div class="lexicon-empty-suggestions-label">Termes clés pour ${frenchName} ${ch} :</div>
         <div class="lexicon-empty-suggestions">
           ${keywords.map(k => `
-            <button type="button" class="lexicon-empty-hint-tag" onclick="BibleReader.lookupWordInLexicon('${k.word.replace(/'/g, "\\'")}', '${k.strong}')">
+            <button type="button" class="lexicon-empty-hint-tag" data-word="${this.escapeHtml(k.word)}" data-strong="${this.escapeHtml(k.strong)}">
               <span class="lex-sug-word">${k.word}</span>
               <span class="lex-sug-sep">•</span>
               <span class="lex-sug-root">${k.root} (${k.strong})</span>
@@ -3233,6 +3233,14 @@ const LexiconViewer = {
         </div>
       </div>
     `;
+
+    container.querySelectorAll('.lexicon-empty-hint-tag').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const w = btn.getAttribute('data-word');
+        const s = btn.getAttribute('data-strong');
+        BibleReader.lookupWordInLexicon(w, s);
+      });
+    });
   },
 
   async load(word, strongCode = null) {
@@ -3696,8 +3704,8 @@ const LexiconViewer = {
     }
 
     const pillsHtml = uniqueTokens.slice(0, 12).map(tok => `
-      <span class="strong-semantic-pill" onclick="LexiconViewer.searchStrongOccurrences('${tok.replace(/'/g, "\\'")}', '${tok.replace(/'/g, "\\'")}')">
-        ${typeof BibleProjectView !== 'undefined' && BibleProjectView.escapeHtml ? BibleProjectView.escapeHtml(tok) : tok}
+      <span class="strong-semantic-pill" data-token="${this.escapeHtml(tok)}">
+        ${this.escapeHtml(tok)}
       </span>
     `).join('');
 
@@ -3730,7 +3738,7 @@ const LexiconViewer = {
             <div class="strong-french-lemma">« ${frenchLemma} »</div>
 
             <!-- Bouton Prononciation Audio -->
-            <button type="button" class="strong-audio-play-btn" id="btn-play-strong-audio" onclick="LexiconViewer.playPronunciation('${wordToPronounce.replace(/'/g, "\\'")}', '${isHebrew ? 'he' : 'el'}', '${strongCode}')" title="Écouter la prononciation vocale">
+            <button type="button" class="strong-audio-play-btn" id="btn-play-strong-audio" data-word="${this.escapeHtml(wordToPronounce)}" data-lang="${isHebrew ? 'he' : 'el'}" data-strong="${this.escapeHtml(strongCode)}" title="Écouter la prononciation vocale">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -3822,11 +3830,11 @@ const LexiconViewer = {
 
           <!-- Barre d'Actions Rapides -->
           <div class="strong-actions-footer">
-            <button type="button" class="btn-primary strong-btn-occurrences" onclick="LexiconViewer.searchStrongOccurrences('${strongCode}', '${frenchLemma.replace(/'/g, "\\'")}')">
+            <button type="button" class="btn-primary strong-btn-occurrences" data-strong="${this.escapeHtml(strongCode)}" data-lemma="${this.escapeHtml(frenchLemma)}">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <span>Occurrences de ${strongCode} dans la Bible</span>
             </button>
-            <button type="button" class="btn-secondary strong-btn-copy" onclick="LexiconViewer.copyStrongReference('${frenchLemma.replace(/'/g, "\\'")}', '${originalScript}', '${strongCode}')" title="Copier la référence dans le presse-papier">
+            <button type="button" class="btn-secondary strong-btn-copy" data-lemma="${this.escapeHtml(frenchLemma)}" data-original="${this.escapeHtml(originalScript)}" data-strong="${this.escapeHtml(strongCode)}" title="Copier la référence dans le presse-papier">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copier</span>
             </button>
@@ -3839,6 +3847,39 @@ const LexiconViewer = {
   renderStrongCard(container, match, bpVideoCardHtml = '') {
     if (!container) return;
     container.innerHTML = this.buildStrongCardHtml(match, bpVideoCardHtml);
+
+    container.querySelectorAll('.strong-btn-occurrences').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sc = btn.getAttribute('data-strong');
+        const lem = btn.getAttribute('data-lemma');
+        LexiconViewer.searchStrongOccurrences(sc, lem);
+      });
+    });
+
+    container.querySelectorAll('.strong-btn-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lem = btn.getAttribute('data-lemma');
+        const orig = btn.getAttribute('data-original');
+        const sc = btn.getAttribute('data-strong');
+        LexiconViewer.copyStrongReference(lem, orig, sc);
+      });
+    });
+
+    container.querySelectorAll('.strong-audio-play-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const w = btn.getAttribute('data-word');
+        const lang = btn.getAttribute('data-lang');
+        const sc = btn.getAttribute('data-strong');
+        LexiconViewer.playPronunciation(w, lang, sc);
+      });
+    });
+
+    container.querySelectorAll('.strong-semantic-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const tok = pill.getAttribute('data-token');
+        LexiconViewer.searchStrongOccurrences(tok, tok);
+      });
+    });
   },
 
   renderDictionaryMatch(container, match) {

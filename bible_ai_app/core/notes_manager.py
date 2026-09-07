@@ -136,6 +136,9 @@ class NotesManager:
             "reference": str(metadata.get("reference", "")).strip(),
             "tags": str(tags).strip(),
             "include_in_ai": bool(metadata.get("include_in_ai", True)),
+            "type": str(metadata.get("type", "text")).strip().lower(),
+            "icon": str(metadata.get("icon", "")).strip(),
+            "palette": str(metadata.get("palette", "nature")).strip().lower(),
             "content": clean_body.strip(),
             "updated_at": updated_at
         }
@@ -200,11 +203,18 @@ class NotesManager:
         filename = existing_filename or cls._slugify_filename(title, note_id)
         file_path = os.path.join(target_dir, filename)
 
+        doc_type = str(note.get("type", "text")).strip().lower()
+        icon = str(note.get("icon", "")).strip()
+        palette = str(note.get("palette", "nature")).strip().lower()
+
         frontmatter = {
             "id": note_id,
             "title": title,
             "reference": reference,
             "tags": tags_list,
+            "type": doc_type,
+            "icon": icon,
+            "palette": palette,
             "include_in_ai": include_in_ai,
             "updated_at": updated_at
         }
@@ -223,6 +233,9 @@ class NotesManager:
             "title": title,
             "reference": reference,
             "tags": ", ".join(tags_list),
+            "type": doc_type,
+            "icon": icon,
+            "palette": palette,
             "include_in_ai": include_in_ai,
             "content": content,
             "updated_at": updated_at

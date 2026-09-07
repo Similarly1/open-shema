@@ -53,6 +53,22 @@ const NotesView = {
       this.createNewNote();
     });
 
+    document.getElementById('btn-new-mindmap')?.addEventListener('click', () => {
+      this.createNewMindMap();
+    });
+
+    document.getElementById('btn-toggle-mindmap-mode')?.addEventListener('click', () => {
+      if (typeof MindMapView !== 'undefined') {
+        MindMapView.toggleViewMode();
+      }
+    });
+
+    document.getElementById('btn-export-mindmap-outline')?.addEventListener('click', () => {
+      if (typeof MindMapView !== 'undefined') {
+        MindMapView.exportToTextNote();
+      }
+    });
+
     document.getElementById('btn-open-notes-folder')?.addEventListener('click', async () => {
       try {
         const res = await API.call('open_notes_folder');
@@ -571,6 +587,11 @@ const NotesView = {
 
     // Détecter le clic droit sur la vue notes complète ou dans le tiroir latéral
     const handleContextMenu = (e) => {
+      // Si le clic droit provient du conteneur de la Mind Map, laisser la Mind Map gérer son propre menu
+      if (e.target.closest('#note-mindmap-container, .mindmap-wrapper, .mindmap-svg-canvas')) {
+        return;
+      }
+
       const target = e.target.closest('#note-edit-content, input[type="text"], textarea') || this.contentInput;
       this.activeTargetInput = target;
 
@@ -1453,24 +1474,36 @@ const NotesView = {
 
     filtered.forEach(note => {
       const item = document.createElement('div');
-      item.className = `note-list-item ${this.currentNote?.id === note.id ? 'active' : ''}`;
+      const isMindmap = note.type === 'mindmap';
+      item.className = `note-list-item ${this.currentNote?.id === note.id ? 'active' : ''} ${isMindmap ? 'item-mindmap' : ''}`;
       item.setAttribute('data-note-id', note.id || '');
       
       const aiBadge = (isGlobalAiEnabled && note.include_in_ai !== false) 
         ? '<span title="Prise en compte par l\'IA" style="display:inline-flex; align-items:center; margin-left: 4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1 1.3-1.3Z"/></svg></span>' 
         : '';
+
+      const mindmapBadge = isMindmap
+        ? '<span class="note-badge-mindmap" title="Mind Map radiante (Buzan)"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg></span>'
+        : '';
       
-      const safeTitle = this.escapeHtml(note.title || 'Note sans titre');
+      const safeTitle = this.escapeHtml(note.title || (isMindmap ? 'Mind Map sans titre' : 'Note sans titre'));
       const safeRef = note.reference ? this.escapeHtml(note.reference) : '';
       const safeDate = this.escapeHtml(note.updated_at || '');
+
+      let metaRefHtml = '';
+      if (isMindmap) {
+        metaRefHtml = `<span class="note-ref-badge" style="background: rgba(37,99,235,0.12); color: var(--accent-blue); font-weight: 700;">Mind Map${safeRef ? ' • ' + safeRef : ''}</span>`;
+      } else {
+        metaRefHtml = safeRef ? `<span class="note-ref-badge">${safeRef}</span>` : '<span style="font-size: 10px; color: var(--text-muted);">Générale</span>';
+      }
 
       item.innerHTML = `
         <div class="note-list-item-body">
           <div class="note-item-title" title="${safeTitle}">
-            <span class="note-item-title-text">${safeTitle}</span> ${aiBadge}
+            <span class="note-item-title-text">${safeTitle}</span> ${mindmapBadge} ${aiBadge}
           </div>
           <div class="note-item-meta">
-            ${safeRef ? `<span class="note-ref-badge">${safeRef}</span>` : '<span style="font-size: 10px; color: var(--text-muted);">Générale</span>'}
+            ${metaRefHtml}
             <span class="note-item-date">${safeDate}</span>
           </div>
         </div>
@@ -1702,14 +1735,47 @@ const NotesView = {
     }
 
     this.currentNote = note;
+    const isMindmap = note.type === 'mindmap';
+
     if (this.titleInput) this.titleInput.value = note.title || '';
     if (this.refInput) this.refInput.value = note.reference || '';
     if (this.tagsInput) this.tagsInput.value = note.tags || '';
     if (this.aiToggle) this.aiToggle.checked = note.include_in_ai !== false;
 
-    // Injection dans l'éditeur WYSIWYG
-    if (this.contentInput) {
-      this.contentInput.innerHTML = this.markdownToRichHtml(note.content || '');
+    // Bascule d'affichage entre Éditeur texte et Mind Map SVG
+    const mmContainer = document.getElementById('note-mindmap-container');
+    const previewBtn = document.getElementById('btn-toggle-note-preview');
+    const exportOutlineBtn = document.getElementById('btn-export-mindmap-outline');
+    const toggleModeBtn = document.getElementById('btn-toggle-mindmap-mode');
+
+    if (isMindmap) {
+      this.contentInput?.classList.add('hidden');
+      this.previewContainer?.classList.add('hidden');
+      previewBtn?.classList.add('hidden');
+      toggleModeBtn?.classList.remove('hidden');
+      exportOutlineBtn?.classList.remove('hidden');
+
+      if (mmContainer) {
+        mmContainer.classList.remove('hidden');
+        if (typeof MindMapView !== 'undefined') {
+          MindMapView.render(note);
+        }
+      }
+    } else {
+      mmContainer?.classList.add('hidden');
+      toggleModeBtn?.classList.add('hidden');
+      exportOutlineBtn?.classList.add('hidden');
+      previewBtn?.classList.remove('hidden');
+      this.contentInput?.classList.remove('hidden');
+
+      // Injection dans l'éditeur WYSIWYG
+      if (this.contentInput) {
+        this.contentInput.innerHTML = this.markdownToRichHtml(note.content || '');
+      }
+
+      if (this.isPreviewMode) {
+        this.renderPreview();
+      }
     }
 
     // Réinitialiser la pile d'historique pour cette note
@@ -1720,10 +1786,6 @@ const NotesView = {
     this.lastSavedSignature = this.computeCurrentSignature();
     this.updateAutoSaveIndicator('saved');
     this.updateAiToggleVisibility();
-
-    if (this.isPreviewMode) {
-      this.renderPreview();
-    }
 
     this.renderList();
   },
@@ -1738,6 +1800,7 @@ const NotesView = {
       title: initialTitle || 'Nouvelle Note',
       reference: defaultRef,
       tags: '',
+      type: 'text',
       include_in_ai: true,
       content: '',
       updated_at: 'À l\'instant'
@@ -1745,6 +1808,28 @@ const NotesView = {
     this.currentNote = newNote;
     await this.selectNote(newNote);
     if (this.isPreviewMode) this.togglePreview();
+    this.titleInput?.focus();
+  },
+
+  async createNewMindMap(initialRef = null, initialTitle = null) {
+    if (this.currentNote) {
+      await this.saveCurrentNote(true);
+    }
+    const defaultRef = initialRef || '';
+    const newNote = {
+      id: null,
+      title: initialTitle || 'NOUVELLE CARTE',
+      reference: defaultRef,
+      tags: 'mindmap',
+      type: 'mindmap',
+      icon: 'brain',
+      palette: 'nature',
+      include_in_ai: true,
+      content: `- IDÉE 1\n  - DÉTAIL A\n  - DÉTAIL B\n- IDÉE 2\n  - POINT CLÉ\n- IDÉE 3\n  - EXEMPLE\n`,
+      updated_at: 'À l\'instant'
+    };
+    this.currentNote = newNote;
+    await this.selectNote(newNote);
     this.titleInput?.focus();
   },
 
@@ -2215,8 +2300,9 @@ const NotesView = {
     const ref = this.refInput?.value.trim() || '';
     const tags = this.tagsInput?.value.trim() || '';
     const ai = this.aiToggle?.checked !== false;
-    const content = this.contentInput?.innerHTML || '';
-    return `${title}__${ref}__${tags}__${ai}__${content}`;
+    const type = this.currentNote?.type || 'text';
+    const content = type === 'mindmap' ? (this.currentNote?.content || '') : (this.contentInput?.innerHTML || '');
+    return `${title}__${ref}__${tags}__${ai}__${type}__${content}`;
   },
 
   async saveCurrentNote(silent = true) {
@@ -2227,7 +2313,8 @@ const NotesView = {
 
     if (!this.currentNote) return;
 
-    const rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    const isMindmap = this.currentNote.type === 'mindmap';
+    const rawMarkdown = isMindmap ? (this.currentNote.content || '') : this.richHtmlToMarkdown(this.contentInput);
     const titleVal = this.titleInput?.value.trim() || '';
     const refVal = this.refInput?.value.trim() || '';
     const tagsVal = this.tagsInput?.value.trim() || '';
@@ -2247,9 +2334,12 @@ const NotesView = {
 
     const noteToSave = {
       id: this.currentNote.id,
-      title: titleVal || 'Note sans titre',
+      title: titleVal || (isMindmap ? 'Mind Map sans titre' : 'Note sans titre'),
       reference: refVal,
       tags: tagsVal,
+      type: this.currentNote.type || 'text',
+      icon: this.currentNote.icon || '',
+      palette: this.currentNote.palette || 'nature',
       include_in_ai: aiVal,
       content: rawMarkdown
     };
@@ -2264,6 +2354,9 @@ const NotesView = {
         this.currentNote.title = noteToSave.title;
         this.currentNote.reference = noteToSave.reference;
         this.currentNote.tags = noteToSave.tags;
+        this.currentNote.type = saved.type || noteToSave.type;
+        this.currentNote.icon = saved.icon || noteToSave.icon;
+        this.currentNote.palette = saved.palette || noteToSave.palette;
         this.currentNote.include_in_ai = noteToSave.include_in_ai;
         this.currentNote.content = noteToSave.content;
         this.currentNote.updated_at = saved.updated_at || 'À l\'instant';
@@ -2281,7 +2374,7 @@ const NotesView = {
 
       this.updateAutoSaveIndicator('saved');
       if (!silent) {
-        App.showToast('Note enregistrée !');
+        App.showToast(isMindmap ? 'Mind Map enregistrée !' : 'Note enregistrée !');
       }
     } catch (e) {
       console.error('Erreur sauvegarde note automatique:', e);

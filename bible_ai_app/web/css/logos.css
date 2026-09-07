@@ -31488,7 +31488,1448 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
   color: var(--text-secondary);
 }
 
+/* ==========================================================================
+   OPEN SHEMA — MIND MAPPING NATIF (TONY BUZAN)
+   ========================================================================== */
 
+/* Bouton création Mind Map dans la barre latérale des notes */
+.btn-new-mindmap-compact {
+  padding: 0 10px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.note-mindmap-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-reading, var(--bg-app, #1c1815));
+}
+
+.note-mindmap-container.paper-mode {
+  background: #ffffff !important;
+}
+
+.note-mindmap-container.paper-mode .mm-branch-text {
+  fill: #0f172a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-root-rect {
+  fill: #ffffff !important;
+  stroke: #2563eb !important;
+}
+
+.note-mindmap-container.paper-mode .mm-root-text {
+  fill: #0f172a !important;
+}
+
+.mindmap-wrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+.mindmap-svg-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+
+.mindmap-svg-canvas:active {
+  cursor: grabbing;
+}
+
+/* Nœuds & Branches */
+.mm-branch-path {
+  transition: stroke-width 0.15s ease, stroke 0.2s ease;
+}
+
+.mm-root-rect {
+  fill: var(--bg-card, #ffffff);
+  stroke: var(--accent-blue, #2563eb);
+  stroke-width: 2.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mm-node-g.selected .mm-root-rect {
+  stroke: #3b82f6;
+  stroke-width: 3.5px;
+}
+
+.mm-root-text {
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 13px;
+  font-weight: 800;
+  fill: var(--text-primary, #1e293b);
+  letter-spacing: 0.8px;
+  cursor: pointer;
+}
+
+body.theme-dark .mm-root-text,
+body[class*="palette-dark"] .mm-root-text {
+  fill: #f8fafc;
+}
+
+body.theme-dark .mm-root-rect,
+body[class*="palette-dark"] .mm-root-rect {
+  fill: var(--bg-card, #1e293b);
+}
+
+.mm-branch-text {
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: fill 0.15s ease;
+  fill: var(--text-primary, #1e293b);
+}
+
+body.theme-dark .mm-branch-text,
+body[class*="palette-dark"] .mm-branch-text {
+  fill: #f8fafc;
+}
+
+.mm-node-g:hover .mm-branch-text {
+  fill: var(--accent-blue, #2563eb);
+}
+
+/* Boutons contextuels de branche (visibles au survol ET maintenus au clic/sélection) */
+.mm-node-actions {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.mm-node-g:hover .mm-node-actions,
+.mm-node-g.selected .mm-node-actions,
+.mm-root-node:hover .mm-root-plus,
+.mm-root-node.selected .mm-root-plus {
+  opacity: 1 !important;
+  pointer-events: all !important;
+}
+
+.mm-root-plus {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.mm-action-btn {
+  cursor: pointer;
+}
+
+.mm-action-circle {
+  fill: var(--bg-card, #ffffff);
+  stroke: var(--border-color, #cbd5e1);
+  stroke-width: 1.2px;
+  transition: all 0.15s ease;
+}
+
+body.theme-dark .mm-action-circle,
+body[class*="palette-dark"] .mm-action-circle {
+  fill: #334155;
+  stroke: #475569;
+}
+
+.mm-action-btn:hover .mm-action-circle {
+  fill: var(--accent-blue, #2563eb);
+  stroke: var(--accent-blue, #2563eb);
+}
+
+.mm-action-text {
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--text-secondary, #64748b);
+  pointer-events: none;
+}
+
+.mm-action-btn:hover .mm-action-text {
+  fill: #ffffff;
+}
+
+.mm-action-btn.danger:hover .mm-action-circle {
+  fill: #ef4444;
+  stroke: #ef4444;
+}
+
+.mm-action-btn.danger:hover .mm-action-text {
+  fill: #ffffff;
+}
+
+/* Pastilles Scripturaires */
+.mm-scripture-pill {
+  cursor: pointer;
+}
+
+.mm-scripture-pill rect {
+  transition: opacity 0.15s ease, stroke 0.15s ease;
+}
+
+.mm-scripture-pill:hover rect {
+  opacity: 0.38 !important;
+}
+
+/* Éditeur inline flottant sur branche */
+.mm-node-g.editing .mm-branch-text,
+.mm-node-g.editing .mm-root-text,
+.mm-node-g.editing .mm-node-actions,
+.mm-node-g.editing .mm-root-plus {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.mm-inline-editor {
+  position: absolute;
+  z-index: 1000;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  border: 1.5px solid var(--accent-blue, #2563eb);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+body.theme-dark .mm-inline-editor,
+body[class*="palette-dark"] .mm-inline-editor {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #3b82f6;
+}
+
+/* Dock flottant minimaliste en bas */
+.mindmap-dock {
+  position: absolute;
+  bottom: 18px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 24px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+
+body.theme-dark .mindmap-dock,
+body[class*="palette-dark"] .mindmap-dock {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: #334155;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.mm-dock-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mm-dock-btn:hover {
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #0f172a);
+}
+
+body.theme-dark .mm-dock-btn:hover,
+body[class*="palette-dark"] .mm-dock-btn:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+.mm-dock-separator {
+  width: 1px;
+  height: 16px;
+  background: var(--border-color, #e2e8f0);
+  margin: 0 2px;
+}
+
+body.theme-dark .mm-dock-separator,
+body[class*="palette-dark"] .mm-dock-separator {
+  background: #334155;
+}
+
+/* Tiroir d'aide raccourcis clavier */
+.mindmap-help-drawer {
+  position: absolute;
+  bottom: 60px;
+  right: 24px;
+  width: 320px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  padding: 14px 16px;
+  z-index: 60;
+  animation: mmFadeIn 0.2s ease-out;
+}
+
+body.theme-dark .mindmap-help-drawer,
+body[class*="palette-dark"] .mindmap-help-drawer {
+  background: var(--bg-card, #1e293b);
+  border-color: #334155;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes mmFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mm-help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+body.theme-dark .mm-help-header,
+body[class*="palette-dark"] .mm-help-header {
+  border-color: #334155;
+}
+
+.mm-help-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mm-help-table {
+  width: 100%;
+  font-size: 11px;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.mm-help-table td {
+  padding: 4px 4px;
+  color: var(--text-secondary);
+}
+
+.mm-help-table kbd {
+  display: inline-block;
+  padding: 1.5px 5px;
+  font-size: 10px;
+  font-family: monospace;
+  border-radius: 4px;
+  background: var(--bg-secondary, #f1f5f9);
+  border: 1px solid var(--border-color, #cbd5e1);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+body.theme-dark .mm-help-table kbd,
+body[class*="palette-dark"] .mm-help-table kbd {
+  background: #334155;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.mm-help-tip {
+  margin-top: 10px;
+  padding: 7px 9px;
+  font-size: 10px;
+  border-radius: 6px;
+  background: var(--bg-secondary, #f8fafc);
+  border-left: 3px solid var(--accent-blue, #2563eb);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+body.theme-dark .mm-help-tip,
+body[class*="palette-dark"] .mm-help-tip {
+  background: rgba(51, 65, 85, 0.4);
+  color: #cbd5e1;
+}
+
+.badge-mini {
+  display: inline-block;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-weight: 700;
+}
+
+/* Badge dans la liste latérale des notes */
+.note-badge-mindmap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+body.theme-dark .note-badge-mindmap,
+body[class*="palette-dark"] .note-badge-mindmap {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+/* ==========================================================================
+   MENU CONTEXTUEL CLIC DROIT MIND MAP (Organique & Efficace)
+   ========================================================================== */
+.mm-context-menu {
+  position: fixed;
+  z-index: 99999;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: 5px;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(12px);
+  animation: mmFadeIn 0.12s ease-out;
+  user-select: none;
+}
+
+body.theme-dark .mm-context-menu,
+body[class*="palette-dark"] .mm-context-menu {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #334155;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+.mm-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  position: relative;
+}
+
+body.theme-dark .mm-ctx-item,
+body[class*="palette-dark"] .mm-ctx-item {
+  color: #e2e8f0;
+}
+
+.mm-ctx-item:hover {
+  background: var(--bg-hover, #f1f5f9);
+  color: var(--accent-blue, #2563eb);
+}
+
+body.theme-dark .mm-ctx-item:hover,
+body[class*="palette-dark"] .mm-ctx-item:hover {
+  background: #334155;
+  color: #60a5fa;
+}
+
+.mm-ctx-item.danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.mm-ctx-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary, #64748b);
+  flex-shrink: 0;
+}
+
+.mm-ctx-item:hover .mm-ctx-icon {
+  color: inherit;
+}
+
+.mm-ctx-label {
+  flex: 1;
+}
+
+.mm-ctx-shortcut {
+  font-size: 11px;
+  color: var(--text-muted, #94a3b8);
+  font-family: inherit;
+  margin-left: 12px;
+}
+
+.mm-ctx-divider {
+  height: 1px;
+  background: var(--border-subtle, #e2e8f0);
+  margin: 4px 2px;
+}
+
+body.theme-dark .mm-ctx-divider,
+body[class*="palette-dark"] .mm-ctx-divider {
+  background: #334155;
+}
+
+/* Mini dialogue d'association de verset biblique */
+.mm-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: mmFadeIn 0.15s ease-out;
+}
+
+.mm-prompt-dialog {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  padding: 18px 20px 16px 20px;
+  width: 440px;
+  max-width: 92vw;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: mmFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.theme-dark .mm-prompt-dialog,
+body[class*="palette-dark"] .mm-prompt-dialog {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+}
+
+.mm-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+}
+
+body.theme-dark .mm-prompt-header,
+body[class*="palette-dark"] .mm-prompt-header {
+  border-color: #334155;
+}
+
+.mm-prompt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mm-prompt-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+  flex-shrink: 0;
+}
+
+body.theme-dark .mm-prompt-icon-badge,
+body[class*="palette-dark"] .mm-prompt-icon-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.mm-prompt-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-prompt-target-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.mm-prompt-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 19px;
+  line-height: 1;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 5px;
+  transition: all 0.15s ease;
+}
+
+.mm-prompt-close-btn:hover {
+  background: var(--bg-hover, #f1f5f9);
+  color: var(--text-primary);
+}
+
+body.theme-dark .mm-prompt-close-btn:hover,
+body[class*="palette-dark"] .mm-prompt-close-btn:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+.mm-prompt-desc {
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 12px;
+  line-height: 1.45;
+}
+
+body.theme-dark .mm-prompt-desc,
+body[class*="palette-dark"] .mm-prompt-desc {
+  color: #94a3b8;
+}
+
+.mm-prompt-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.theme-dark .mm-prompt-input,
+body[class*="palette-dark"] .mm-prompt-input {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.mm-prompt-input:focus {
+  border-color: var(--accent-blue, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Boutons stylisés pour les boîtes de dialogue */
+.btn-danger-subtle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-danger-subtle:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+body.theme-dark .btn-danger-subtle,
+body[class*="palette-dark"] .btn-danger-subtle {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+body.theme-dark .btn-danger-subtle:hover,
+body[class*="palette-dark"] .btn-danger-subtle:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+
+.mm-prompt-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.mm-prompt-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.mm-prompt-hint {
+  font-size: 11px;
+  color: var(--text-muted, #94a3b8);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mm-prompt-hint kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: monospace;
+  border-radius: 3px;
+  background: var(--bg-secondary, #f1f5f9);
+  border: 1px solid var(--border-color, #cbd5e1);
+  color: var(--text-primary);
+}
+
+body.theme-dark .mm-prompt-hint kbd,
+body[class*="palette-dark"] .mm-prompt-hint kbd {
+  background: #334155;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+/* Pastille de note de sujet / Topic Note */
+.mm-note-pill {
+  cursor: pointer;
+}
+
+.mm-note-pill circle {
+  transition: stroke-width 0.15s ease, filter 0.15s ease;
+}
+
+.mm-note-pill:hover circle {
+  stroke-width: 2.2px !important;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.mm-prompt-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 95px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+body.theme-dark .mm-prompt-textarea,
+body[class*="palette-dark"] .mm-prompt-textarea {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.mm-prompt-textarea:focus {
+  border-color: var(--accent-blue, #2563eb);
+}
+
+/* Infobulle flottante instantanée pour Mind Map (Versets & Notes) */
+.mm-floating-tooltip {
+  position: fixed;
+  z-index: 100000;
+  display: none;
+  pointer-events: none;
+  max-width: 330px;
+  min-width: 160px;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+  animation: mmTooltipFade 0.12s ease-out;
+}
+
+body.theme-dark .mm-floating-tooltip,
+body[class*="palette-dark"] .mm-floating-tooltip {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes mmTooltipFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mm-tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--accent-blue, #2563eb);
+  margin-bottom: 4px;
+}
+
+body.theme-dark .mm-tooltip-header,
+body[class*="palette-dark"] .mm-tooltip-header {
+  color: #60a5fa;
+}
+
+.mm-tooltip-ref {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.mm-tooltip-verse-text {
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--text-secondary, #475569);
+  margin: 6px 0 4px 0;
+  padding: 5px 8px;
+  background: var(--bg-secondary, #f1f5f9);
+  border-left: 2.5px solid var(--accent-blue, #2563eb);
+  border-radius: 4px;
+}
+
+body.theme-dark .mm-tooltip-verse-text,
+body[class*="palette-dark"] .mm-tooltip-verse-text {
+  background: rgba(15, 23, 42, 0.6);
+  color: #cbd5e1;
+  border-color: #3b82f6;
+}
+
+.mm-tooltip-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.mm-tooltip-hint {
+  font-size: 10px;
+  color: var(--text-muted, #94a3b8);
+  margin-top: 6px;
+  border-top: 1px solid var(--border-subtle, #e2e8f0);
+  padding-top: 4px;
+}
+
+body.theme-dark .mm-tooltip-hint,
+body[class*="palette-dark"] .mm-tooltip-hint {
+  border-color: #334155;
+  color: #64748b;
+}
+
+/* ==========================================================================
+   VUE PLAN / OUTLINER INTERACTIVE — MIND MAP BUZAN (Style XMind)
+   ========================================================================== */
+
+.mindmap-outline-container {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 24px 90px 24px;
+  box-sizing: border-box;
+  background: var(--bg-primary, #f8fafc);
+  scroll-behavior: smooth;
+  z-index: 10;
+}
+
+body.theme-dark .mindmap-outline-container,
+body[class*="palette-dark"] .mindmap-outline-container {
+  background: #0f172a;
+}
+
+.note-mindmap-container.paper-mode .mindmap-outline-container {
+  background: #fcf9f2 !important;
+}
+
+.mm-outline-wrapper {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 1. Barre d'outils supérieure du Plan */
+.mm-outline-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+}
+
+body.theme-dark .mm-outline-toolbar,
+body[class*="palette-dark"] .mm-outline-toolbar {
+  background: rgba(30, 41, 59, 0.94);
+  border-color: #334155;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.note-mindmap-container.paper-mode .mm-outline-toolbar {
+  background: #ffffff;
+  border-color: #e2dcd2;
+}
+
+.mm-outline-toolbar-left,
+.mm-outline-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mm-outline-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+body.theme-dark .mm-outline-tool-btn,
+body[class*="palette-dark"] .mm-outline-tool-btn {
+  color: #94a3b8;
+}
+
+.mm-outline-tool-btn:hover {
+  background: var(--bg-hover, #f1f5f9);
+  color: var(--text-primary);
+  border-color: var(--border-subtle, #e2e8f0);
+}
+
+body.theme-dark .mm-outline-tool-btn:hover,
+body[class*="palette-dark"] .mm-outline-tool-btn:hover {
+  background: #334155;
+  color: #f8fafc;
+  border-color: #475569;
+}
+
+.mm-outline-tool-btn.primary {
+  color: var(--accent-blue, #2563eb);
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.mm-outline-tool-btn.primary:hover {
+  background: rgba(37, 99, 235, 0.16);
+  border-color: var(--accent-blue, #2563eb);
+}
+
+body.theme-dark .mm-outline-tool-btn.primary,
+body[class*="palette-dark"] .mm-outline-tool-btn.primary {
+  color: #60a5fa;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.mm-outline-tool-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border-subtle, #e2e8f0);
+  margin: 0 4px;
+}
+
+body.theme-dark .mm-outline-tool-sep,
+body[class*="palette-dark"] .mm-outline-tool-sep {
+  background: #334155;
+}
+
+/* 2. Feuille de document */
+.mm-outline-sheet {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  min-height: 480px;
+}
+
+body.theme-dark .mm-outline-sheet,
+body[class*="palette-dark"] .mm-outline-sheet {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.note-mindmap-container.paper-mode .mm-outline-sheet {
+  background: #ffffff;
+  border-color: #e5dfd5;
+}
+
+/* 3. Concept Central (Noyau) */
+.mm-outline-root-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-subtle, #e2e8f0);
+}
+
+body.theme-dark .mm-outline-root-header,
+body[class*="palette-dark"] .mm-outline-root-header {
+  border-color: #334155;
+}
+
+.mm-outline-root-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+body.theme-dark .mm-outline-root-badge,
+body[class*="palette-dark"] .mm-outline-root-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.mm-outline-root-title {
+  flex: 1;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 8px;
+  transition: background 0.15s ease;
+  min-width: 0;
+}
+
+.mm-outline-root-title:hover {
+  background: var(--bg-hover, #f1f5f9);
+}
+
+body.theme-dark .mm-outline-root-title:hover,
+body[class*="palette-dark"] .mm-outline-root-title:hover {
+  background: #334155;
+}
+
+/* 4. Arborescence et Blocs BOI */
+.mm-outline-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mm-outline-boi-block {
+  border-radius: 10px;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-left: 4px solid var(--boi-color, #3b82f6);
+  padding: 2px 4px 6px 4px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+body.theme-dark .mm-outline-boi-block,
+body[class*="palette-dark"] .mm-outline-boi-block {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: #334155;
+}
+
+.mm-outline-boi-block:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.note-mindmap-container.paper-mode .mm-outline-boi-block {
+  background: #f9f7f2;
+  border-color: #e8e3d9;
+}
+
+/* 5. Ligne de nœud (Row) */
+.mm-outline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  gap: 8px;
+  min-height: 34px;
+  border-radius: 6px;
+  transition: background 0.12s ease;
+}
+
+.mm-outline-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+body.theme-dark .mm-outline-row:hover,
+body[class*="palette-dark"] .mm-outline-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mm-outline-left-col {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.mm-outline-chevron {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  transition: transform 0.18s ease, color 0.12s ease, background 0.12s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.mm-outline-chevron:hover {
+  background: var(--bg-hover, #e2e8f0);
+  color: var(--text-primary);
+}
+
+body.theme-dark .mm-outline-chevron:hover,
+body[class*="palette-dark"] .mm-outline-chevron:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+.mm-outline-chevron.collapsed {
+  transform: rotate(-90deg);
+}
+
+.mm-outline-dot-bullet {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin: 0 6px;
+}
+
+.mm-outline-sub-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-muted, #94a3b8);
+  flex-shrink: 0;
+  margin: 0 7px;
+}
+
+.mm-outline-text {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.12s ease;
+  word-break: break-word;
+}
+
+.mm-outline-text:hover {
+  background: var(--bg-hover, #e2e8f0);
+}
+
+body.theme-dark .mm-outline-text:hover,
+body[class*="palette-dark"] .mm-outline-text:hover {
+  background: #334155;
+}
+
+.mm-outline-text.boi-text {
+  font-size: 14.5px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+}
+
+.mm-outline-text.sub-text {
+  font-weight: 600;
+}
+
+/* 6. Badges (Versets & Notes) dans le plan */
+.mm-outline-ref-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue, #2563eb);
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.mm-outline-ref-pill:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: var(--accent-blue, #2563eb);
+  transform: translateY(-1px);
+}
+
+body.theme-dark .mm-outline-ref-pill,
+body[class*="palette-dark"] .mm-outline-ref-pill {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.mm-outline-note-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mm-outline-note-badge:hover {
+  background: rgba(245, 158, 11, 0.25);
+  transform: scale(1.08);
+}
+
+body.theme-dark .mm-outline-note-badge,
+body[class*="palette-dark"] .mm-outline-note-badge {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+/* Encart de note de branche déplié */
+.mm-outline-note-card {
+  margin: 4px 8px 8px 30px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid #f59e0b;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.mm-outline-note-card:hover {
+  background: rgba(245, 158, 11, 0.16);
+}
+
+body.theme-dark .mm-outline-note-card,
+body[class*="palette-dark"] .mm-outline-note-card {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fde68a;
+  border-color: #f59e0b;
+}
+
+.mm-outline-note-card svg {
+  color: #d97706;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+body.theme-dark .mm-outline-note-card svg,
+body[class*="palette-dark"] .mm-outline-note-card svg {
+  color: #fbbf24;
+}
+
+.mm-outline-note-text {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 7. Boutons d'actions contextuelles au survol */
+.mm-outline-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.mm-outline-row:hover .mm-outline-actions {
+  opacity: 1;
+}
+
+.mm-outline-actions .btn-icon-subtle {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  transition: all 0.12s ease;
+  padding: 0;
+}
+
+.mm-outline-actions .btn-icon-subtle:hover {
+  background: var(--bg-hover, #e2e8f0);
+  color: var(--text-primary);
+}
+
+body.theme-dark .mm-outline-actions .btn-icon-subtle:hover,
+body[class*="palette-dark"] .mm-outline-actions .btn-icon-subtle:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+.mm-outline-actions .btn-icon-subtle.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* 8. Sous-branches hiérarchiques et lignes guides */
+.mm-outline-children {
+  padding-left: 18px;
+  margin-left: 10px;
+  border-left: 1.5px solid var(--border-subtle, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+body.theme-dark .mm-outline-children,
+body[class*="palette-dark"] .mm-outline-children {
+  border-left-color: #334155;
+}
+
+.mm-outline-sub-block {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 9. Champ d'édition en ligne */
+.mm-outline-inline-input {
+  border: 1.5px solid var(--accent-blue, #2563eb);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  outline: none;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  width: 220px;
+  max-width: 90%;
+  box-sizing: border-box;
+}
+
+body.theme-dark .mm-outline-inline-input,
+body[class*="palette-dark"] .mm-outline-inline-input {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+/* 10. Impression */
+@media print {
+  .mm-outline-toolbar,
+  .mm-outline-actions,
+  .mindmap-dock,
+  .notes-sidebar,
+  .notes-header,
+  .app-sidebar {
+    display: none !important;
+  }
+  .mindmap-outline-container {
+    position: static !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  .mm-outline-sheet {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}
 
 
 
