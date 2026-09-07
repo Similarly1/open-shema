@@ -120,8 +120,8 @@ function initScrollAnimations() {
   if (!revealElements.length) return;
 
   const observerOptions = {
-    threshold: 0.12,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.01,
+    rootMargin: '0px 0px 60px 0px'
   };
 
   const observer = new IntersectionObserver((entries, obs) => {
@@ -142,21 +142,96 @@ function initScrollAnimations() {
 function initStickySplitScroll() {
   const featureCards = Array.from(document.querySelectorAll('.split-feature-card'));
   const visualSlides = Array.from(document.querySelectorAll('.sticky-visual-slide'));
+  const mobileTabs = Array.from(document.querySelectorAll('.deep-dive-tab-pill'));
+  const prevBtn = document.getElementById('deep-dive-prev-btn');
+  const nextBtn = document.getElementById('deep-dive-next-btn');
+  const currStepEl = document.getElementById('deep-dive-curr-step');
 
   if (!featureCards.length || !visualSlides.length) return;
 
-  function setActiveSlide(slideIndex) {
+  function setActiveSlide(slideIndex, isUserInitiated = false) {
     if (!slideIndex) return;
+    
     featureCards.forEach(c => {
       c.classList.toggle('active', c.getAttribute('data-slide-index') === slideIndex);
     });
     visualSlides.forEach(slide => {
       slide.classList.toggle('active', slide.getAttribute('data-slide-target') === slideIndex);
     });
+
+    mobileTabs.forEach(tab => {
+      const isActive = tab.getAttribute('data-tab-target') === slideIndex;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      if (isActive && isUserInitiated && window.innerWidth <= 880) {
+        tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+
+    const numericIdx = parseInt(slideIndex, 10);
+    if (currStepEl) {
+      currStepEl.textContent = slideIndex;
+    }
+    if (prevBtn) {
+      prevBtn.disabled = numericIdx <= 1;
+    }
+    if (nextBtn) {
+      nextBtn.disabled = numericIdx >= featureCards.length;
+    }
   }
+
+  // Écouteurs de clics sur les onglets mobile
+  mobileTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.getAttribute('data-tab-target');
+      setActiveSlide(target, true);
+    });
+  });
+
+  // Écouteurs de navigation Précédent / Suivant
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      const activeCard = document.querySelector('.split-feature-card.active');
+      const curr = activeCard ? parseInt(activeCard.getAttribute('data-slide-index'), 10) : 1;
+      if (curr > 1) {
+        setActiveSlide(String(curr - 1), true);
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const activeCard = document.querySelector('.split-feature-card.active');
+      const curr = activeCard ? parseInt(activeCard.getAttribute('data-slide-index'), 10) : 1;
+      if (curr < featureCards.length) {
+        setActiveSlide(String(curr + 1), true);
+      }
+    });
+  }
+
+  // Écouteur toggle des détails exégétiques sur mobile
+  document.querySelectorAll('.feature-details-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.split-feature-card');
+      const list = card ? card.querySelector('.feature-highlights-list') : null;
+      if (list) {
+        const isOpen = list.classList.toggle('is-open');
+        btn.classList.toggle('active', isOpen);
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        const span = btn.querySelector('span');
+        if (span) {
+          span.textContent = isOpen ? 'Masquer les points clés' : 'Points clés exégétiques';
+        }
+      }
+    });
+  });
 
   let ticking = false;
   function checkVisibleCard() {
+    // Sur mobile, le défilement est contrôlé par les onglets et la pagination
+    if (window.innerWidth <= 880) return;
+
     const triggerY = window.innerHeight * 0.45;
     let closestCard = null;
     let minDistance = Infinity;
@@ -177,7 +252,7 @@ function initStickySplitScroll() {
 
     if (closestCard) {
       const index = closestCard.getAttribute('data-slide-index');
-      setActiveSlide(index);
+      setActiveSlide(index, false);
     }
   }
 
@@ -191,7 +266,10 @@ function initStickySplitScroll() {
     }
   }, { passive: true });
 
-  window.addEventListener('resize', checkVisibleCard, { passive: true });
+  window.addEventListener('resize', () => {
+    checkVisibleCard();
+  }, { passive: true });
+
   checkVisibleCard();
 }
 
@@ -469,6 +547,34 @@ function initLightboxModal() {
     if (e.key === 'ArrowRight') showImage(currentIndex + 1);
     if (e.key === 'z' || e.key === 'Z') setZoom(!isZoomed);
   });
+
+  // Mobile Touch Swipe Navigation
+  let touchStartX = 0;
+  let touchStartY = 0;
+  if (stage) {
+    stage.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    stage.addEventListener('touchend', (e) => {
+      if (isZoomed) return; // Allow natural panning when zoomed
+      if (e.changedTouches.length === 1) {
+        const diffX = e.changedTouches[0].clientX - touchStartX;
+        const diffY = e.changedTouches[0].clientY - touchStartY;
+        // Require horizontal swipe of at least 45px with predominantly horizontal movement
+        if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.4) {
+          if (diffX < 0) {
+            showImage(currentIndex + 1); // Swipe left -> Next
+          } else {
+            showImage(currentIndex - 1); // Swipe right -> Prev
+          }
+        }
+      }
+    }, { passive: true });
+  }
 
   // Category Filters
   filterBtns.forEach(btn => {
@@ -1398,4 +1504,62 @@ function initCommentariesInteractions() {
       setTimeout(() => { btnNote.innerHTML = orig; }, 2000);
     });
   }
+
+  // Support du tap tactile / clic sur les renvois bibliques (infobulles)
+  if (bodyText) {
+    bodyText.addEventListener('click', (e) => {
+      const pill = e.target.closest('.comm-ref-pill');
+      if (pill) {
+        e.stopPropagation();
+        e.preventDefault();
+        const wrapper = pill.closest('.comm-ref-wrapper');
+        if (wrapper) {
+          const wasOpen = wrapper.classList.contains('is-open');
+          bodyText.querySelectorAll('.comm-ref-wrapper.is-open').forEach(w => w.classList.remove('is-open'));
+          if (!wasOpen) {
+            wrapper.classList.add('is-open');
+          }
+        }
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.comm-ref-wrapper')) {
+        bodyText.querySelectorAll('.comm-ref-wrapper.is-open').forEach(w => w.classList.remove('is-open'));
+      }
+    });
+  }
 }
+
+/* ==========================================================================
+   8. MOBILE NAVIGATION MENU
+   ========================================================================== */
+function initMobileMenu() {
+  const toggleBtn = document.getElementById('mobile-menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  if (!toggleBtn || !navLinks) return;
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = navLinks.classList.toggle('is-mobile-open');
+    toggleBtn.textContent = isOpen ? '✕' : '☰';
+    toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  navLinks.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('is-mobile-open');
+      toggleBtn.textContent = '☰';
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!toggleBtn.contains(e.target) && !navLinks.contains(e.target)) {
+      navLinks.classList.remove('is-mobile-open');
+      toggleBtn.textContent = '☰';
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
