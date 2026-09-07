@@ -602,11 +602,6 @@ const MindMapView = {
         <!-- Barre d'actions du Plan -->
         <div class="mm-outline-toolbar">
           <div class="mm-outline-toolbar-left">
-            <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-back-map" title="Basculer en Vue Carte Mind Map (Alt+P)">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
-              <span>Vue Carte</span>
-            </button>
-            <div class="mm-outline-tool-sep"></div>
             <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-expand-all" title="Déplier toutes les branches">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
               <span>Tout déplier</span>
@@ -619,7 +614,7 @@ const MindMapView = {
           <div class="mm-outline-toolbar-right">
             <button type="button" class="mm-outline-tool-btn primary" id="mm-ot-btn-add-boi" title="Ajouter une idée maîtresse (BOI)">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>+ Idée directrice</span>
+              <span>Idée directrice</span>
             </button>
             <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-copy-md" title="Copier le plan en Markdown">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -788,7 +783,6 @@ const MindMapView = {
 
   bindOutlineEvents(outlineEl) {
     // Toolbar actions
-    outlineEl.querySelector('#mm-ot-btn-back-map')?.addEventListener('click', () => this.toggleViewMode('map'));
     outlineEl.querySelector('#mm-ot-btn-expand-all')?.addEventListener('click', () => this.expandAllNodes());
     outlineEl.querySelector('#mm-ot-btn-collapse-all')?.addEventListener('click', () => this.collapseAllNodes());
     outlineEl.querySelector('#mm-ot-btn-add-boi')?.addEventListener('click', () => this.addChildToNode(this.tree));
@@ -800,7 +794,7 @@ const MindMapView = {
         });
       }
     });
-    outlineEl.querySelector('#mm-ot-btn-print')?.addEventListener('click', () => window.print());
+    outlineEl.querySelector('#mm-ot-btn-print')?.addEventListener('click', () => this.printOutline());
 
     // Clic sur chevron replier/déplier
     outlineEl.querySelectorAll('[data-action="toggle-collapse"]').forEach(btn => {
@@ -865,6 +859,215 @@ const MindMapView = {
       pill.addEventListener('mousemove', (e) => this.moveTooltip(e));
       pill.addEventListener('mouseleave', () => this.hideTooltip());
     });
+  },
+
+  printOutline() {
+    const sheet = document.querySelector('#mindmap-outline-view .mm-outline-sheet');
+    if (!sheet) {
+      window.print();
+      return;
+    }
+
+    document.getElementById('mm-print-iframe')?.remove();
+
+    const printClone = sheet.cloneNode(true);
+
+    // Déplier toutes les branches pour l'impression complète
+    printClone.querySelectorAll('.mm-outline-children.hidden').forEach(el => el.classList.remove('hidden'));
+    printClone.querySelectorAll('.is-collapsed').forEach(el => el.classList.remove('is-collapsed'));
+
+    // Supprimer les éléments interactifs d'interface
+    printClone.querySelectorAll('.mm-outline-actions, .mm-outline-chevron, button, .btn-icon-subtle, .root-actions').forEach(el => el.remove());
+
+    const titleText = this.tree?.text || this.currentNote?.title || 'PLAN';
+    const noteRef = this.currentNote?.reference 
+      ? `<div style="font-size: 11pt; color: #475569; margin-top: 4px; font-weight: 500;">Passage lié : <strong style="color: #0f172a;">${this.escapeHtml(this.currentNote.reference)}</strong></div>` 
+      : '';
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'mm-print-iframe';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html lang="fr">
+        <head>
+          <meta charset="UTF-8">
+          <title>${this.escapeHtml(titleText)} — Open Shema</title>
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 18mm 16mm;
+            }
+            * {
+              box-sizing: border-box;
+            }
+            body {
+              background: #ffffff !important;
+              color: #0f172a !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            .mm-outline-sheet {
+              background: transparent !important;
+              border: none !important;
+              box-shadow: none !important;
+              padding: 0 !important;
+              margin: 0 !important;
+            }
+            .mm-outline-root-header {
+              display: flex;
+              align-items: center;
+              gap: 14px;
+              padding-bottom: 14px;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #cbd5e1;
+            }
+            .mm-outline-root-badge {
+              width: 32px;
+              height: 32px;
+              border-radius: 8px;
+              background: #eff6ff !important;
+              color: #2563eb !important;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+            }
+            .mm-outline-root-title {
+              font-size: 18pt;
+              font-weight: 800;
+              color: #0f172a;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .mm-outline-tree {
+              display: flex;
+              flex-direction: column;
+              gap: 14px;
+            }
+            .mm-outline-boi-block {
+              background: transparent !important;
+              border: none !important;
+              border-left: 3.5px solid var(--boi-color, #2563eb) !important;
+              padding: 2px 0 6px 14px !important;
+              page-break-inside: avoid;
+            }
+            .mm-outline-row {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              min-height: 24px;
+            }
+            .mm-outline-left-col {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              flex-wrap: wrap;
+            }
+            .mm-outline-text.boi-text {
+              font-size: 13pt;
+              font-weight: 750;
+              color: #0f172a;
+            }
+            .mm-outline-text.sub-text {
+              font-size: 11pt;
+              font-weight: 600;
+              color: #1e293b;
+            }
+            .mm-outline-dot-bullet {
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              margin: 0 4px;
+              background: currentColor;
+            }
+            .mm-outline-sub-bullet {
+              width: 5px;
+              height: 5px;
+              border-radius: 50%;
+              background: #64748b;
+              margin: 0 5px;
+            }
+            .mm-outline-children {
+              padding-left: 16px;
+              margin-left: 6px;
+              border-left: 1.5px solid #e2e8f0;
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+              margin-top: 4px;
+            }
+            .mm-outline-sub-block {
+              page-break-inside: avoid;
+            }
+            .mm-outline-ref-pill {
+              display: inline-flex;
+              align-items: center;
+              gap: 4px;
+              padding: 1px 7px;
+              border-radius: 4px;
+              font-size: 9.5pt;
+              font-weight: 600;
+              background: #eff6ff !important;
+              color: #1e40af !important;
+              border: 1px solid #bfdbfe !important;
+            }
+            .mm-outline-ref-pill svg {
+              display: none;
+            }
+            .mm-outline-note-badge {
+              display: none;
+            }
+            .mm-outline-note-card {
+              margin: 4px 0 6px 14px;
+              padding: 6px 10px;
+              border-radius: 5px;
+              background: #fffbeb !important;
+              border-left: 3px solid #f59e0b !important;
+              font-size: 10pt;
+              line-height: 1.45;
+              color: #78350f !important;
+            }
+            .mm-outline-note-card svg {
+              color: #d97706;
+              width: 12px;
+              height: 12px;
+              flex-shrink: 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="mm-outline-sheet">
+            ${noteRef ? `<div style="margin-bottom: 12px;">${noteRef}</div>` : ''}
+            ${printClone.innerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    setTimeout(() => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (err) {
+        console.error("Erreur impression iframe :", err);
+      }
+      setTimeout(() => iframe.remove(), 2500);
+    }, 250);
   },
 
   toggleCollapseNode(nodeId) {

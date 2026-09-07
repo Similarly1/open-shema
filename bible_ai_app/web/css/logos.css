@@ -32911,23 +32911,81 @@ body[class*="palette-dark"] .mm-outline-inline-input {
 
 /* 10. Impression */
 @media print {
+  #app-window-titlebar,
+  .app-window-titlebar,
+  #sidebar,
+  .sidebar,
+  .notes-sidebar,
+  .notes-editor-header,
+  .notes-editor-subbar,
   .mm-outline-toolbar,
   .mm-outline-actions,
+  .mm-outline-chevron,
   .mindmap-dock,
-  .notes-sidebar,
-  .notes-header,
-  .app-sidebar {
+  .btn-mindmap-mode-toggle,
+  .mindmap-status-bar,
+  .modal-overlay,
+  .quick-search-modal {
     display: none !important;
   }
+
+  body, html {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .app-container,
+  .app-main-layout,
+  .app-view,
+  #view-notes,
+  .notes-workspace-layout,
+  .notes-editor-pane,
+  .notes-editor-body {
+    display: block !important;
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
   .mindmap-outline-container {
     position: static !important;
     padding: 0 !important;
     background: transparent !important;
+    overflow: visible !important;
+    height: auto !important;
   }
+
   .mm-outline-sheet {
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    background: transparent !important;
+  }
+
+  .mm-outline-boi-block {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-left: 3.5px solid var(--boi-color, #2563eb) !important;
+    padding: 4px 0 6px 12px !important;
+    margin-bottom: 12px !important;
+    page-break-inside: avoid;
+  }
+
+  .mm-outline-sub-block {
+    page-break-inside: avoid;
   }
 }
 
