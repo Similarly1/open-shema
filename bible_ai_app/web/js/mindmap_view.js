@@ -560,6 +560,15 @@ const MindMapView = {
   updateViewModeUI() {
     const isOutline = this.viewMode === 'outline';
 
+    // Niveau 2 : Affichage des outils du plan dans la sous-barre
+    const subbarActions = document.getElementById('notes-subbar-outline-actions');
+    if (subbarActions) {
+      subbarActions.classList.toggle('hidden', !isOutline);
+      if (isOutline) {
+        this.bindOutlineToolbarEvents();
+      }
+    }
+
     // 1. Bouton en-tête des notes
     const headerBtn = document.getElementById('btn-toggle-mindmap-mode');
     const headerLabel = document.getElementById('label-mm-mode');
@@ -589,6 +598,25 @@ const MindMapView = {
     }
   },
 
+  bindOutlineToolbarEvents() {
+    const subbar = document.getElementById('notes-subbar-outline-actions');
+    if (!subbar || subbar.dataset.eventsBound === 'true') return;
+    subbar.dataset.eventsBound = 'true';
+
+    subbar.querySelector('#mm-ot-btn-expand-all')?.addEventListener('click', () => this.expandAllNodes());
+    subbar.querySelector('#mm-ot-btn-collapse-all')?.addEventListener('click', () => this.collapseAllNodes());
+    subbar.querySelector('#mm-ot-btn-add-boi')?.addEventListener('click', () => this.addChildToNode(this.tree));
+    subbar.querySelector('#mm-ot-btn-copy-md')?.addEventListener('click', () => {
+      const md = this.treeToMarkdown(this.tree);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(md).then(() => {
+          if (typeof App !== 'undefined' && App.showToast) App.showToast('Plan Markdown copié dans le presse-papier');
+        });
+      }
+    });
+    subbar.querySelector('#mm-ot-btn-print')?.addEventListener('click', () => this.printOutline());
+  },
+
   // =========================================================================
   // RENDU VUE PLAN / OUTLINER (Option 1 — XMind Interactive Outliner)
   // =========================================================================
@@ -598,36 +626,6 @@ const MindMapView = {
     if (!outlineEl || !this.tree) return;
 
     let html = `
-      <!-- Barre d'actions du Plan : collée en haut, pleine largeur -->
-      <div class="mm-outline-toolbar">
-        <div class="mm-outline-toolbar-inner">
-          <div class="mm-outline-toolbar-left">
-            <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-expand-all" title="Déplier toutes les branches">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
-              <span>Tout déplier</span>
-            </button>
-            <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-collapse-all" title="Replier toutes les branches">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
-              <span>Tout replier</span>
-            </button>
-          </div>
-          <div class="mm-outline-toolbar-right">
-            <button type="button" class="mm-outline-tool-btn primary" id="mm-ot-btn-add-boi" title="Ajouter une idée maîtresse (BOI)">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>Idée directrice</span>
-            </button>
-            <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-copy-md" title="Copier le plan en Markdown">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <span>Copier</span>
-            </button>
-            <button type="button" class="mm-outline-tool-btn" id="mm-ot-btn-print" title="Imprimer le plan structuré">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-              <span>Imprimer</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Zone de défilement indépendante -->
       <div class="mm-outline-scroll-area">
         <div class="mm-outline-wrapper">
@@ -787,20 +785,6 @@ const MindMapView = {
   },
 
   bindOutlineEvents(outlineEl) {
-    // Toolbar actions
-    outlineEl.querySelector('#mm-ot-btn-expand-all')?.addEventListener('click', () => this.expandAllNodes());
-    outlineEl.querySelector('#mm-ot-btn-collapse-all')?.addEventListener('click', () => this.collapseAllNodes());
-    outlineEl.querySelector('#mm-ot-btn-add-boi')?.addEventListener('click', () => this.addChildToNode(this.tree));
-    outlineEl.querySelector('#mm-ot-btn-copy-md')?.addEventListener('click', () => {
-      const md = this.treeToMarkdown(this.tree);
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(md).then(() => {
-          if (typeof App !== 'undefined' && App.showToast) App.showToast('Plan Markdown copié dans le presse-papier');
-        });
-      }
-    });
-    outlineEl.querySelector('#mm-ot-btn-print')?.addEventListener('click', () => this.printOutline());
-
     // Clic sur chevron replier/déplier
     outlineEl.querySelectorAll('[data-action="toggle-collapse"]').forEach(btn => {
       btn.addEventListener('click', (e) => {

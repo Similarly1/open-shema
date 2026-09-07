@@ -9659,11 +9659,45 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   color: var(--text-primary);
 }
 .notes-editor-subbar {
-  padding: 8px 20px;
+  padding: 6px 20px;
   background-color: var(--bg-subtle);
   border-bottom: 1px solid var(--border-color);
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.notes-subbar-meta {
+  display: flex;
+  align-items: center;
   gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notes-subbar-outline-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.notes-subbar-outline-actions.hidden {
+  display: none !important;
+}
+
+.mm-outline-tool-sep {
+  width: 1px;
+  height: 18px;
+  background-color: var(--border-color, #e2e8f0);
+  margin: 0 4px;
+}
+
+body.theme-dark .mm-outline-tool-sep {
+  background-color: #334155;
 }
 .notes-editor-body {
   flex: 1;
@@ -32435,46 +32469,7 @@ body[class*="palette-dark"] .mindmap-outline-container {
   background: #fcf9f2 !important;
 }
 
-/* 1. Barre d'outils supérieure du Plan : collée en haut, pleine largeur, opaque */
-.mm-outline-toolbar {
-  flex-shrink: 0;
-  width: 100%;
-  padding: 8px 24px;
-  box-sizing: border-box;
-  background: #ffffff;
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  border-radius: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  z-index: 30;
-  position: relative;
-}
-
-body.theme-dark .mm-outline-toolbar,
-body[class*="palette-dark"] .mm-outline-toolbar {
-  background: #182234;
-  border-color: #273549;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.note-mindmap-container.paper-mode .mm-outline-toolbar {
-  background: #fdfbf7;
-  border-color: #e6dfd3;
-}
-
-.mm-outline-toolbar-inner {
-  max-width: 860px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-/* 2. Zone de défilement indépendante */
+/* 1. Zone de défilement du Plan (occupant tout l'espace sous le Niveau 2) */
 .mm-outline-scroll-area {
   flex: 1;
   overflow-y: auto;
