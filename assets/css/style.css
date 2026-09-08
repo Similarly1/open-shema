@@ -1677,6 +1677,136 @@ h1, h2, h3, h4, .font-title {
   background: rgba(16, 185, 129, 0.08);
 }
 
+/* Boîte Charte d'Intégrité Homilétique */
+.ai-integrity-box {
+  background: var(--bg-card);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.integrity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #F59E0B;
+  margin-bottom: 12px;
+}
+
+.integrity-title {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  line-height: 1.35;
+}
+
+.integrity-intro {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  max-width: 900px;
+}
+
+.integrity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.integrity-col {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: 24px 22px;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+}
+
+.integrity-col.refusal {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.integrity-col.affirmation {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.integrity-col-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.integrity-col.refusal .integrity-col-header {
+  border-bottom-color: rgba(239, 68, 68, 0.2);
+}
+
+.integrity-col.affirmation .integrity-col-header {
+  border-bottom-color: rgba(16, 185, 129, 0.2);
+}
+
+.integrity-col-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.integrity-col.refusal .integrity-col-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+}
+
+.integrity-col.affirmation .integrity-col-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+}
+
+.integrity-col-header h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.integrity-col-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+}
+
+.integrity-col-list li {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.integrity-col-list li strong {
+  color: var(--text-main);
+}
+
 /* Boîte Stratégie Hybride */
 .ai-strategy-box {
   background: var(--bg-card);
@@ -5963,40 +6093,11 @@ html:not([data-theme="light"]) .comm-body-box {
     color: var(--text-secondary);
   }
 
-  /* Bouton toggle détails et liste repliée par défaut */
-  .feature-details-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 9px;
-    border-radius: 6px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    color: var(--accent-cyan);
-    font-size: 0.74rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 2px;
-    transition: all var(--transition-fast);
-  }
-
-  .feature-details-btn svg {
-    transition: transform 0.2s ease;
-  }
-
-  .feature-details-btn.active svg {
-    transform: rotate(180deg);
-  }
-
   .feature-highlights-list {
-    display: none;
+    display: flex;
+    flex-direction: column;
     gap: 6px;
     margin-top: 8px;
-  }
-
-  .feature-highlights-list.is-open {
-    display: flex;
-    animation: ddFadeIn 0.2s ease forwards;
   }
 
   .feature-highlight-item {
@@ -6934,4 +7035,33 @@ html:not([data-theme="light"]) .comm-body-box {
   .btn-mobile-email:hover {
     filter: brightness(1.1);
   }
+
+  /* Charte d'Intégrité sur Mobile */
+  .ai-integrity-box {
+    padding: 24px 16px;
+    margin-bottom: 28px;
+  }
+  .integrity-title {
+    font-size: 1.18rem;
+    line-height: 1.35;
+  }
+  .integrity-intro {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .integrity-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .integrity-col {
+    padding: 18px 14px;
+  }
+  .integrity-col-header h4 {
+    font-size: 0.95rem;
+  }
+  .integrity-col-list li {
+    font-size: 0.82rem;
+  }
 }
+
