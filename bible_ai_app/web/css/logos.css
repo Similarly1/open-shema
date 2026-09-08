@@ -33033,16 +33033,17 @@ body[class*="palette-dark"] .mm-inline-editor.paper-mode {
 .mm-root-rect {
   fill: var(--bg-card, #ffffff);
   stroke: var(--accent-blue, #2563eb);
-  stroke-width: 2.5px;
+  stroke-width: 3.2px;
   cursor: pointer;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.16));
   transition: all 0.2s ease;
 }
 
 /* Illumination & Mise en valeur subtile de l'élément sélectionné */
 .mm-node-g.selected .mm-root-rect {
   stroke: var(--node-color, var(--accent-blue, #3b82f6)) !important;
-  stroke-width: 3.5px !important;
-  filter: drop-shadow(0 0 14px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.5)) !important;
+  stroke-width: 4px !important;
+  filter: drop-shadow(0 0 16px rgba(59, 130, 246, 0.75)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -33095,8 +33096,8 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-node-g.
 
 .mm-root-text {
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 900;
   fill: var(--text-primary, #1e293b);
   letter-spacing: 0.8px;
   cursor: pointer;
@@ -33122,9 +33123,9 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-re
   fill: var(--text-primary, #1e293b);
 }
 
-/* Hiérarchie de Buzan : Niveau 1 (BOIs) plus gros et imposant */
+/* Hiérarchie de Buzan : Niveaux décroissants bien marqués */
 .mm-node-g.mm-level-1 .mm-branch-text {
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   font-weight: 800 !important;
   letter-spacing: 0.6px;
 }
@@ -33132,13 +33133,15 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-re
 .mm-node-g.mm-level-2 .mm-branch-text {
   font-size: 11.5px !important;
   font-weight: 700 !important;
+  letter-spacing: 0.3px;
 }
 
 .mm-node-g.mm-level-3 .mm-branch-text,
 .mm-node-g.mm-level-4 .mm-branch-text,
 .mm-node-g.mm-level-5 .mm-branch-text {
-  font-size: 10.5px !important;
+  font-size: 10px !important;
   font-weight: 600 !important;
+  letter-spacing: 0.2px;
 }
 
 body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-branch-text,
@@ -36084,14 +36087,22 @@ body[class*="palette-dark"] .mm-marker-clear-btn:hover {
   border-color: #7f1d1d;
 }
 
-/* 2. Badge Marqueur SVG sur les branches */
+/* 2. Badge Marqueur SVG sur les branches — Stabilisation sans saccade/oscillation */
 .mm-node-marker-badge {
-  transition: transform 0.12s ease;
+  cursor: pointer;
 }
 
-.mm-node-marker-badge:hover {
-  transform: scale(1.18);
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25));
+.mm-node-marker-badge circle,
+.mm-node-marker-badge rect {
+  transition: transform 0.15s ease, filter 0.15s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mm-node-marker-badge:hover circle,
+.mm-node-marker-badge:hover rect {
+  transform: scale(1.15);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35)) brightness(1.12);
 }
 
 /* 3. Badge Marqueur dans la Vue Plan (Outliner) */

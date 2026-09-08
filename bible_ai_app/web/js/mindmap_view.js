@@ -1595,14 +1595,15 @@ const MindMapView = {
       node.width = Math.max(92, node.contentWidth + 32);
       node.height = 32;
     } else if (node.level === 0) {
-      const textW = this.getTextWidth(node.text, 14, '800');
+      // NIVEAU 0 (Thème général / Noyau central dominant)
+      const textW = this.getTextWidth(node.text, 16, '900');
       node.textWidth = textW;
       node.markerWidth = 0;
-      node.width = Math.max(120, textW + 48);
-      node.height = 46;
+      node.width = Math.max(130, textW + 56);
+      node.height = 52;
     } else if (node.level === 1) {
-      // NIVEAU 1 (BOIs - Règles de Buzan : plus gros, majuscules, autoritaire)
-      const textW = this.getTextWidth(node.text, 13.5, '800');
+      // NIVEAU 1 (BOIs - Règles de Buzan : mots-clés forces, affirmé et contrasté)
+      const textW = this.getTextWidth(node.text, 14, '800');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1633,10 +1634,10 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(90, node.contentWidth + 34);
-      node.height = 34; // Plus gros que les niveaux inférieurs (34px vs 28px/24px)
+      node.width = Math.max(96, node.contentWidth + 36);
+      node.height = 36; // Plus imposant que les niveaux inférieurs (36px vs 28px/24px)
     } else if (node.level === 2) {
-      // NIVEAU 2 (Sous-branches)
+      // NIVEAU 2 (Sous-branches subordonnées)
       const textW = this.getTextWidth(node.text, 11.5, '700');
       node.textWidth = textW;
 
@@ -1668,11 +1669,11 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(76, node.contentWidth + 30);
+      node.width = Math.max(82, node.contentWidth + 30);
       node.height = 28;
     } else {
-      // NIVEAU 3+ (Détails fins)
-      const textW = this.getTextWidth(node.text, 10.5, '600');
+      // NIVEAU 3+ (Détails fins légers)
+      const textW = this.getTextWidth(node.text, 10, '600');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1732,13 +1733,13 @@ const MindMapView = {
 
   measureTopDown(node) {
     if (node.level === 0) {
-      const textW = this.getTextWidth(node.text, 14, '800');
+      const textW = this.getTextWidth(node.text, 16, '900');
       node.textWidth = textW;
       node.markerWidth = 0;
-      node.width = Math.max(120, textW + 48);
-      node.height = 46;
+      node.width = Math.max(130, textW + 56);
+      node.height = 52;
     } else if (node.level === 1) {
-      const textW = this.getTextWidth(node.text, 13.5, '800');
+      const textW = this.getTextWidth(node.text, 14, '800');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1769,8 +1770,8 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(90, node.contentWidth + 34);
-      node.height = 34;
+      node.width = Math.max(96, node.contentWidth + 36);
+      node.height = 36;
     } else if (node.level === 2) {
       const textW = this.getTextWidth(node.text, 11.5, '700');
       node.textWidth = textW;
@@ -1803,10 +1804,10 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(76, node.contentWidth + 30);
+      node.width = Math.max(82, node.contentWidth + 30);
       node.height = 28;
     } else {
-      const textW = this.getTextWidth(node.text, 10.5, '600');
+      const textW = this.getTextWidth(node.text, 10, '600');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -2800,19 +2801,42 @@ const MindMapView = {
 
           if (isRoot) {
             isTapered = true;
-            const w1 = 1.4;
-            const w2 = 4.2;
-            const leftX1 = (x1 - w1 / 2).toFixed(2);
-            const rightX1 = (x1 + w1 / 2).toFixed(2);
-            const leftX2 = (x2 - w2 / 2).toFixed(2);
-            const rightX2 = (x2 + w2 / 2).toFixed(2);
+            const w1 = 3.6;
+            const wm = 6.2;
+            const w2 = 2.6;
+            const xm = (x1 + x2) / 2;
+            const ym = (y1 + y2) / 2;
 
-            const leftCx1 = (cx1 - w1 / 2).toFixed(2);
-            const rightCx1 = (cx1 + w1 / 2).toFixed(2);
-            const leftCx2 = (cx2 - w2 / 2).toFixed(2);
-            const rightCx2 = (cx2 + w2 / 2).toFixed(2);
+            // Vecteur tangent et normale pour top-down
+            const tx = 1.5 * (x2 - x1);
+            const ty = 0.9 * (y2 - y1);
+            const lenT = Math.sqrt(tx * tx + ty * ty) || 1;
+            const nx = ty / lenT;
+            const ny = -tx / lenT;
 
-            pathD = `M ${leftX1} ${y1.toFixed(2)} C ${leftCx1} ${cy1.toFixed(2)}, ${leftCx2} ${cy2.toFixed(2)}, ${leftX2} ${y2.toFixed(2)} L ${rightX2} ${y2.toFixed(2)} C ${rightCx2} ${cy2.toFixed(2)}, ${rightCx1} ${cy1.toFixed(2)}, ${rightX1} ${y1.toFixed(2)} Z`;
+            const p1Left = { x: x1 - w1 / 2, y: y1 };
+            const p1Right = { x: x1 + w1 / 2, y: y1 };
+            const pmLeft = { x: xm - nx * (wm / 2), y: ym - ny * (wm / 2) };
+            const pmRight = { x: xm + nx * (wm / 2), y: ym + ny * (wm / 2) };
+            const p2Left = { x: x2 - w2 / 2, y: y2 };
+            const p2Right = { x: x2 + w2 / 2, y: y2 };
+
+            const c1aLeft = { x: x1 - w1 / 2, y: y1 + dy * 0.22 };
+            const c1bLeft = { x: pmLeft.x - (tx / lenT) * (dy * 0.14), y: pmLeft.y - (ty / lenT) * (dy * 0.14) };
+            const c1aRight = { x: x1 + w1 / 2, y: y1 + dy * 0.22 };
+            const c1bRight = { x: pmRight.x - (tx / lenT) * (dy * 0.14), y: pmRight.y - (ty / lenT) * (dy * 0.14) };
+
+            const c2aLeft = { x: pmLeft.x + (tx / lenT) * (dy * 0.14), y: pmLeft.y + (ty / lenT) * (dy * 0.14) };
+            const c2bLeft = { x: x2 - w2 / 2, y: y2 - dy * 0.22 };
+            const c2aRight = { x: pmRight.x + (tx / lenT) * (dy * 0.14), y: pmRight.y + (ty / lenT) * (dy * 0.14) };
+            const c2bRight = { x: x2 + w2 / 2, y: y2 - dy * 0.22 };
+
+            pathD = `M ${p1Left.x.toFixed(2)} ${p1Left.y.toFixed(2)} ` +
+              `C ${c1aLeft.x.toFixed(2)} ${c1aLeft.y.toFixed(2)}, ${c1bLeft.x.toFixed(2)} ${c1bLeft.y.toFixed(2)}, ${pmLeft.x.toFixed(2)} ${pmLeft.y.toFixed(2)} ` +
+              `C ${c2aLeft.x.toFixed(2)} ${c2aLeft.y.toFixed(2)}, ${c2bLeft.x.toFixed(2)} ${c2bLeft.y.toFixed(2)}, ${p2Left.x.toFixed(2)} ${p2Left.y.toFixed(2)} ` +
+              `L ${p2Right.x.toFixed(2)} ${p2Right.y.toFixed(2)} ` +
+              `C ${c2bRight.x.toFixed(2)} ${c2bRight.y.toFixed(2)}, ${c2aRight.x.toFixed(2)} ${c2aRight.y.toFixed(2)}, ${pmRight.x.toFixed(2)} ${pmRight.y.toFixed(2)} ` +
+              `C ${c1bRight.x.toFixed(2)} ${c1bRight.y.toFixed(2)}, ${c1aRight.x.toFixed(2)} ${c1aRight.y.toFixed(2)}, ${p1Right.x.toFixed(2)} ${p1Right.y.toFixed(2)} Z`;
           } else {
             pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
           }
@@ -2906,9 +2930,22 @@ const MindMapView = {
         if (connStyle === 'straight') {
           if (isRoot) {
             isTapered = true;
-            const w1 = 1.4;
-            const w2 = 4.2;
-            pathD = `M ${x1.toFixed(2)} ${(y1 - w1 / 2).toFixed(2)} L ${x2.toFixed(2)} ${(y2 - w2 / 2).toFixed(2)} L ${x2.toFixed(2)} ${(y2 + w2 / 2).toFixed(2)} L ${x1.toFixed(2)} ${(y1 + w1 / 2).toFixed(2)} Z`;
+            const w1 = 3.6;
+            const wm = 6.2;
+            const w2 = 2.6;
+            const xm = (x1 + x2) / 2;
+            const ym = (y1 + y2) / 2;
+            const dxS = x2 - x1;
+            const dyS = y2 - y1;
+            const lenS = Math.sqrt(dxS * dxS + dyS * dyS) || 1;
+            const nxS = -dyS / lenS;
+            const nyS = dxS / lenS;
+            pathD = `M ${(x1 - nxS * (w1 / 2)).toFixed(2)} ${(y1 - nyS * (w1 / 2)).toFixed(2)} ` +
+              `L ${(xm - nxS * (wm / 2)).toFixed(2)} ${(ym - nyS * (wm / 2)).toFixed(2)} ` +
+              `L ${(x2 - nxS * (w2 / 2)).toFixed(2)} ${(y2 - nyS * (w2 / 2)).toFixed(2)} ` +
+              `L ${(x2 + nxS * (w2 / 2)).toFixed(2)} ${(y2 + nyS * (w2 / 2)).toFixed(2)} ` +
+              `L ${(xm + nxS * (wm / 2)).toFixed(2)} ${(ym + nyS * (wm / 2)).toFixed(2)} ` +
+              `L ${(x1 + nxS * (w1 / 2)).toFixed(2)} ${(y1 + nyS * (w1 / 2)).toFixed(2)} Z`;
           } else {
             pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
           }
@@ -2935,21 +2972,51 @@ const MindMapView = {
           const cy2 = y2;
 
           if (isRoot) {
-            // Effet d'effilement Tony Buzan : liaison fine à la racine (1.4px) puis s'épaississant vers le niveau 1 (4.2px)
+            // Effet d'effilement Tony Buzan (mots-clés forces) :
+            // La branche maîtresse part avec une assise solide (3.6px),
+            // atteint son épaisseur maximale à la moitié de la longueur (6.2px),
+            // puis s'affine harmonieusement pour se raccorder au nœud de niveau 1 (2.6px).
             isTapered = true;
-            const w1 = 1.4;
-            const w2 = 4.2;
-            const topY1 = (y1 - w1 / 2).toFixed(2);
-            const botY1 = (y1 + w1 / 2).toFixed(2);
-            const topY2 = (y2 - w2 / 2).toFixed(2);
-            const botY2 = (y2 + w2 / 2).toFixed(2);
+            const w1 = 3.6;
+            const wm = 6.2;
+            const w2 = 2.6;
 
-            const topCy1 = (cy1 - w1 / 2).toFixed(2);
-            const botCy1 = (cy1 + w1 / 2).toFixed(2);
-            const topCy2 = (cy2 - w2 / 2).toFixed(2);
-            const botCy2 = (cy2 + w2 / 2).toFixed(2);
+            const xm = (x1 + x2) / 2;
+            const ym = (y1 + y2) / 2;
 
-            pathD = `M ${x1.toFixed(2)} ${topY1} C ${cx1.toFixed(2)} ${topCy1}, ${cx2.toFixed(2)} ${topCy2}, ${x2.toFixed(2)} ${topY2} L ${x2.toFixed(2)} ${botY2} C ${cx2.toFixed(2)} ${botCy2}, ${cx1.toFixed(2)} ${botCy1}, ${x1.toFixed(2)} ${botY1} Z`;
+            // Vecteur tangent et normale au milieu de la courbe
+            const tx = 0.9 * (x2 - x1);
+            const ty = 1.5 * (y2 - y1);
+            const lenT = Math.sqrt(tx * tx + ty * ty) || 1;
+            const nx = -ty / lenT;
+            const ny = tx / lenT;
+
+            // Points extrêmes et médians
+            const p1Top = { x: x1, y: y1 - w1 / 2 };
+            const p1Bot = { x: x1, y: y1 + w1 / 2 };
+            const pmTop = { x: xm - nx * (wm / 2), y: ym - ny * (wm / 2) };
+            const pmBot = { x: xm + nx * (wm / 2), y: ym + ny * (wm / 2) };
+            const p2Top = { x: x2, y: y2 - w2 / 2 };
+            const p2Bot = { x: x2, y: y2 + w2 / 2 };
+
+            // Points de contrôle de la moitié amont (Root -> Milieu)
+            const c1aTop = { x: x1 + dir * dx * 0.22, y: y1 - w1 / 2 };
+            const c1bTop = { x: pmTop.x - (tx / lenT) * (dx * 0.14), y: pmTop.y - (ty / lenT) * (dx * 0.14) };
+            const c1aBot = { x: x1 + dir * dx * 0.22, y: y1 + w1 / 2 };
+            const c1bBot = { x: pmBot.x - (tx / lenT) * (dx * 0.14), y: pmBot.y - (ty / lenT) * (dx * 0.14) };
+
+            // Points de contrôle de la moitié aval (Milieu -> Niveau 1)
+            const c2aTop = { x: pmTop.x + (tx / lenT) * (dx * 0.14), y: pmTop.y + (ty / lenT) * (dx * 0.14) };
+            const c2bTop = { x: x2 - dir * dx * 0.22, y: y2 - w2 / 2 };
+            const c2aBot = { x: pmBot.x + (tx / lenT) * (dx * 0.14), y: pmBot.y + (ty / lenT) * (dx * 0.14) };
+            const c2bBot = { x: x2 - dir * dx * 0.22, y: y2 + w2 / 2 };
+
+            pathD = `M ${p1Top.x.toFixed(2)} ${p1Top.y.toFixed(2)} ` +
+              `C ${c1aTop.x.toFixed(2)} ${c1aTop.y.toFixed(2)}, ${c1bTop.x.toFixed(2)} ${c1bTop.y.toFixed(2)}, ${pmTop.x.toFixed(2)} ${pmTop.y.toFixed(2)} ` +
+              `C ${c2aTop.x.toFixed(2)} ${c2aTop.y.toFixed(2)}, ${c2bTop.x.toFixed(2)} ${c2bTop.y.toFixed(2)}, ${p2Top.x.toFixed(2)} ${p2Top.y.toFixed(2)} ` +
+              `L ${p2Bot.x.toFixed(2)} ${p2Bot.y.toFixed(2)} ` +
+              `C ${c2bBot.x.toFixed(2)} ${c2bBot.y.toFixed(2)}, ${c2aBot.x.toFixed(2)} ${c2aBot.y.toFixed(2)}, ${pmBot.x.toFixed(2)} ${pmBot.y.toFixed(2)} ` +
+              `C ${c1bBot.x.toFixed(2)} ${c1bBot.y.toFixed(2)}, ${c1aBot.x.toFixed(2)} ${c1aBot.y.toFixed(2)}, ${p1Bot.x.toFixed(2)} ${p1Bot.y.toFixed(2)} Z`;
           } else {
             pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
           }
@@ -3012,7 +3079,7 @@ const MindMapView = {
       rect.setAttribute('y', -node.height / 2);
       rect.setAttribute('width', node.width);
       rect.setAttribute('height', node.height);
-      rect.setAttribute('rx', 23);
+      rect.setAttribute('rx', node.height / 2);
       rect.setAttribute('class', 'mm-root-rect');
       rect.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'url(#mm-glow)');
       g.appendChild(rect);
@@ -3036,10 +3103,10 @@ const MindMapView = {
     } else {
       const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
       const isPill = node.isFloating || this.nodeShape === 'pill';
-      const rx = isPill ? (isLvl1 ? 17 : 14) : (isLvl1 ? 8 : 5);
+      const rx = isPill ? (isLvl1 ? 18 : (isLvl2 ? 14 : 12)) : (isLvl1 ? 9 : (isLvl2 ? 6 : 4));
       const boxW = node.width;
-      const boxH = node.height || (isLvl1 ? 34 : 28);
-      const strokeW = node.isFloating ? '2' : (isLvl1 ? '2.2' : (isLvl2 ? '1.6' : '1.2'));
+      const boxH = node.height || (isLvl1 ? 36 : (isLvl2 ? 28 : 24));
+      const strokeW = node.isFloating ? '2' : (isLvl1 ? '2.4' : (isLvl2 ? '1.5' : '1.1'));
 
       if (isBox) {
         // Boîte d'arrière-plan avec bordure colorée (Style XMind & Buzan : Niveau 1 plus imposant)
@@ -3064,7 +3131,7 @@ const MindMapView = {
         tintRect.setAttribute('height', boxH);
         tintRect.setAttribute('rx', rx);
         tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
-        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.10' : '0.07'));
+        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.14' : (isLvl2 ? '0.07' : '0.05')));
         g.appendChild(tintRect);
       } else {
         // Mode souligné (underline) : halo d'illumination discret visible uniquement à la sélection
@@ -3099,15 +3166,17 @@ const MindMapView = {
       text.setAttribute('class', 'mm-branch-text');
       text.setAttribute('fill', 'var(--text-primary)');
       if (isLvl1) {
-        text.setAttribute('font-size', '13.5px');
+        text.setAttribute('font-size', '14px');
         text.setAttribute('font-weight', '800');
-        text.setAttribute('letter-spacing', '0.5px');
+        text.setAttribute('letter-spacing', '0.6px');
       } else if (isLvl2) {
         text.setAttribute('font-size', '11.5px');
         text.setAttribute('font-weight', '700');
+        text.setAttribute('letter-spacing', '0.3px');
       } else {
-        text.setAttribute('font-size', '10.5px');
+        text.setAttribute('font-size', '10px');
         text.setAttribute('font-weight', '600');
+        text.setAttribute('letter-spacing', '0.2px');
       }
       text.textContent = node.text;
 
@@ -3116,7 +3185,7 @@ const MindMapView = {
       let noteX = null;
       let textX = 0;
 
-      const baseFontSize = node.isFloating ? 12 : (isLvl1 ? 13.5 : (isLvl2 ? 11.5 : 10.5));
+      const baseFontSize = node.isFloating ? 12 : (isLvl1 ? 14 : (isLvl2 ? 11.5 : 10));
       const baseFontWeight = node.isFloating || isLvl1 ? '800' : (isLvl2 ? '700' : '600');
       const textW = node.textWidth || this.getTextWidth(node.text, baseFontSize, baseFontWeight);
       const isWideMarker = node.marker && String(node.marker).toLowerCase().startsWith('p');
@@ -3223,6 +3292,12 @@ const MindMapView = {
           markerG.setAttribute('style', 'cursor: pointer;');
           markerG.setAttribute('title', `Marqueur : ${def.label} (Cliquer pour faire défiler)`);
 
+          // Zone tactile de survol stable
+          const mHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          mHit.setAttribute('r', def.isWide ? 14 : 12);
+          mHit.setAttribute('fill', 'transparent');
+          markerG.appendChild(mHit);
+
           if (def.isWide) {
             const mRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             mRect.setAttribute('x', -11);
@@ -3245,6 +3320,7 @@ const MindMapView = {
           mText.setAttribute('font-size', def.isWide ? '9px' : '9.5px');
           mText.setAttribute('font-weight', '800');
           mText.setAttribute('fill', def.text);
+          mText.setAttribute('pointer-events', 'none');
           mText.textContent = def.label;
           markerG.appendChild(mText);
 
