@@ -517,7 +517,7 @@ const PassageOverviewDrawer = {
     const apjCount = (data.pastoral_qa || []).length;
     const notesCount = ((data.user_notes || []).length) + ((data.user_highlights || []).length);
     const mapsCount = (data.maps || []).length;
-    const bpCount = ((data.bibleproject?.current_videos || []).length) + ((data.bibleproject?.current_posters || []).length);
+    const bpCount = ((data.bibleproject?.current_videos || []).length) + ((data.bibleproject?.current_posters || []).length) + ((data.bibleproject?.related_themes || []).length);
 
     const isSecondaryWindow = !!document.getElementById('comm-win-titlebar');
 
@@ -671,10 +671,10 @@ const PassageOverviewDrawer = {
     const apjCount = stats.pastoral_qa_count || 0;
     const notesCount = (stats.notes_count || 0) + (stats.highlights_count || 0);
     const mapsCount = stats.maps_count || 0;
-    const bpCount = (stats.bibleproject_videos_count || 0) + (stats.bibleproject_posters_count || 0);
+    const bpCount = (stats.bibleproject_videos_count || 0) + (stats.bibleproject_posters_count || 0) + (stats.bibleproject_themes_count || 0);
 
     chipsBar.innerHTML = `
-      <button class="overview-chip ${bpCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-bibleproject" title="${bpCount} panorama(s) vidéo et poster(s) BibleProject">
+      <button class="overview-chip ${bpCount > 0 ? 'has-items' : 'is-empty'}" data-scroll-sec="sec-bibleproject" title="${bpCount} média(s) BibleProject (vidéos, affiches & thèmes)">
         <span class="chip-svg">${this.icons.video}</span>
         <span class="chip-count">${bpCount}</span>
       </button>
@@ -738,8 +738,9 @@ const PassageOverviewDrawer = {
     const bp = data.bibleproject || {};
     const videos = bp.current_videos || bp.all_videos || [];
     const posters = bp.current_posters || bp.all_posters || [];
+    const relatedThemes = bp.related_themes || [];
     const isCollapsed = this.collapsedSections['sec-bibleproject'] || false;
-    const totalMedia = videos.length + posters.length;
+    const totalMedia = videos.length + posters.length + relatedThemes.length;
 
     let bodyHtml = '';
     if (totalMedia === 0) {
@@ -806,10 +807,46 @@ const PassageOverviewDrawer = {
         `;
       });
 
+      // 3. Séries théologiques & Thèmes associés au livre (ex: Les 10 Commandements pour Exode)
+      if (relatedThemes.length > 0) {
+        bodyHtml += `
+          <div style="margin: 8px 0 4px; padding: 0 4px; font-size: 11px; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Séries &amp; Thèmes associés (${relatedThemes.length})</span>
+          </div>
+        `;
+        relatedThemes.slice(0, 4).forEach((th) => {
+          const thumbUrl = th.thumbnail || `https://i.ytimg.com/vi/${th.yt_id}/hqdefault.jpg`;
+          bodyHtml += `
+            <div class="overview-bp-video-item"
+                 data-action="open-bp-video"
+                 data-yt-id="${th.yt_id}"
+                 data-title="${this.escapeHtml(th.title)}"
+                 data-desc="${this.escapeHtml(th.description || '')}"
+                 data-tt-category="BibleProject (Thème)"
+                 data-tt-title="${this.escapeHtml(th.title)}"
+                 data-tt-image="${thumbUrl}"
+                 data-tt-excerpt="${this.escapeHtml(th.description || 'Série thématique BibleProject')}">
+              <div class="bp-preview-thumb">
+                <img src="${thumbUrl}" alt="${this.escapeHtml(th.title)}" loading="lazy">
+                <div class="bp-preview-play-icon">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </div>
+                <span class="bp-preview-badge" style="background: rgba(217, 119, 6, 0.85);">${th.duration || 'Thème'}</span>
+              </div>
+              <div class="bp-preview-info">
+                <span class="bp-preview-title">${this.escapeHtml(th.title)}</span>
+                <span class="bp-preview-desc">${this.escapeHtml(th.description || 'Série thématique BibleProject')}</span>
+              </div>
+            </div>
+          `;
+        });
+      }
+
       bodyHtml += `
         <div style="padding: 4px 2px 2px 2px;">
           <button type="button" class="overview-link-btn" data-action="open-media-tab" style="width: 100%; justify-content: center;">
-            <span>Espace BibleProject (${videos.length} vidéo(s), ${posters.length} affiche(s))</span>
+            <span>Espace BibleProject (${videos.length} panorama(s), ${posters.length} affiche(s)${relatedThemes.length > 0 ? `, ${relatedThemes.length} thème(s)` : ''})</span>
             ${this.icons.arrowRight}
           </button>
         </div>

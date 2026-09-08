@@ -1518,6 +1518,7 @@ CONSIGNES STRICTES :
                 "strongs_count": len(key_lemmas),
                 "bibleproject_videos_count": len(bp_media.get("current_videos", [])),
                 "bibleproject_posters_count": len(bp_media.get("current_posters", [])),
+                "bibleproject_themes_count": len(bp_media.get("related_themes", [])),
                 "pastoral_qa_count": len(pastoral_qa)
             },
             "commentaries": verse_commentaries,

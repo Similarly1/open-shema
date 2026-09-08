@@ -12,6 +12,7 @@ const BibleProjectView = {
   currentData: null,
   activeSubTab: 'overviews', // 'overviews' | 'posters' | 'words' | 'themes'
   wordsFilterQuery: '',
+  themesFilterQuery: '',
   currentPlayingYtId: null,
   isLoading: false,
 
@@ -349,40 +350,86 @@ const BibleProjectView = {
 
   renderThemesList(root) {
     const themes = this.currentData.all_themes || [];
+    const q = (this.themesFilterQuery || '').trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    let filteredThemes = themes;
+    if (q) {
+      filteredThemes = themes.filter(th => {
+        const tNorm = (th.title || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const dNorm = (th.description || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return tNorm.includes(q) || dNorm.includes(q);
+      });
+    }
+
+    // Trier pour mettre les thèmes liés au livre courant en tête
+    const sortedThemes = [...filteredThemes].sort((a, b) => {
+      const aRel = (a.related_books || []).includes(this.currentBook) ? 1 : 0;
+      const bRel = (b.related_books || []).includes(this.currentBook) ? 1 : 0;
+      return bRel - aRel;
+    });
 
     let html = `
-      <div class="bp-section-title-row">
-        <span class="bp-sec-title">Thèmes Majeurs de la Théologie Biblique</span>
-        <span class="bp-sec-count">${themes.length} vidéo(s)</span>
+      <div class="bp-section-title-row" style="flex-direction: column; align-items: stretch; gap: 10px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span class="bp-sec-title">Thèmes Majeurs &amp; Séries Théologiques</span>
+          <span class="bp-sec-count">${sortedThemes.length} vidéo(s)</span>
+        </div>
+        <div class="bp-words-search-wrap">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="bp-words-search-input" id="bp-themes-search-input" placeholder="Filtrer par thème (ex: 10 commandements, alliance, grâce, sagesse...)" value="${this.escapeHtml(this.themesFilterQuery)}">
+          ${this.themesFilterQuery ? `<button class="bp-words-search-clear" onclick="BibleProjectView.clearThemesFilter()">✕</button>` : ''}
+        </div>
       </div>
       <div class="bp-themes-grid">
     `;
 
-    themes.forEach(th => {
-      const isRelated = (th.related_books || []).includes(this.currentBook);
-      const thumbUrl = th.thumbnail || `https://i.ytimg.com/vi/${th.yt_id}/hqdefault.jpg`;
-      const isPlaying = this.currentPlayingYtId === th.yt_id;
-
+    if (sortedThemes.length === 0) {
       html += `
-        <div class="bp-theme-card ${isRelated ? 'is-related-theme' : ''} ${isPlaying ? 'is-playing' : ''}">
-          <div class="bp-theme-thumb-wrap" onclick="BibleProjectView.playVideo('${th.yt_id}', '${this.escapeHtml(th.title)}', '${this.escapeHtml(th.description)}')">
-            <img src="${thumbUrl}" class="bp-theme-thumb-img" alt="${this.escapeHtml(th.title)}" loading="lazy">
-            <div class="bp-play-badge">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </div>
-            <span class="bp-video-duration">${th.duration || 'Thème'}</span>
-            ${isRelated ? `<span class="bp-related-badge">Lié à ${this.currentBook}</span>` : ''}
-          </div>
-          <div class="bp-theme-meta">
-            <div class="bp-theme-title" onclick="BibleProjectView.playVideo('${th.yt_id}', '${this.escapeHtml(th.title)}', '${this.escapeHtml(th.description)}')">${this.escapeHtml(th.title)}</div>
-            <div class="bp-theme-desc">${this.escapeHtml(th.description || '')}</div>
-          </div>
+        <div class="bp-empty-box" style="grid-column: 1 / -1; padding: 24px 12px; text-align: center; color: var(--text-muted);">
+          <p>Aucun thème ne correspond à « ${this.escapeHtml(this.themesFilterQuery)} ».</p>
         </div>
       `;
-    });
+    } else {
+      sortedThemes.forEach(th => {
+        const isRelated = (th.related_books || []).includes(this.currentBook);
+        const thumbUrl = th.thumbnail || `https://i.ytimg.com/vi/${th.yt_id}/hqdefault.jpg`;
+        const isPlaying = this.currentPlayingYtId === th.yt_id;
+
+        html += `
+          <div class="bp-theme-card ${isRelated ? 'is-related-theme' : ''} ${isPlaying ? 'is-playing' : ''}">
+            <div class="bp-theme-thumb-wrap" onclick="BibleProjectView.playVideo('${th.yt_id}', '${this.escapeHtml(th.title)}', '${this.escapeHtml(th.description)}')">
+              <img src="${thumbUrl}" class="bp-theme-thumb-img" alt="${this.escapeHtml(th.title)}" loading="lazy">
+              <div class="bp-play-badge">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <span class="bp-video-duration">${th.duration || 'Thème'}</span>
+              ${isRelated ? `<span class="bp-related-badge">Lié à ${this.currentBook}</span>` : ''}
+            </div>
+            <div class="bp-theme-meta">
+              <div class="bp-theme-title" onclick="BibleProjectView.playVideo('${th.yt_id}', '${this.escapeHtml(th.title)}', '${this.escapeHtml(th.description)}')">${this.escapeHtml(th.title)}</div>
+              <div class="bp-theme-desc">${this.escapeHtml(th.description || '')}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
 
     html += `</div>`;
     root.innerHTML = html;
+
+    const searchInput = document.getElementById('bp-themes-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.themesFilterQuery = e.target.value;
+        this.renderThemesList(root);
+      });
+    }
+  },
+
+  clearThemesFilter() {
+    this.themesFilterQuery = '';
+    const root = document.getElementById('bp-media-lists-container');
+    if (root) this.renderThemesList(root);
   },
 
 
