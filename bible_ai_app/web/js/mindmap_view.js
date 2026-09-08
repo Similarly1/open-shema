@@ -21,6 +21,8 @@ const MindMapView = {
   clipboardNode: null,
   viewMode: 'map', // 'map' (Mind Map SVG) ou 'outline' (Plan outliner)
   treeStructure: 'radiant', // 'radiant' | 'right-tree' | 'top-down'
+  connectorStyle: 'curve', // 'curve' | 'orthogonal' | 'straight'
+  nodeShape: 'underline', // 'underline' | 'rounded-rect' | 'pill'
   collapsedNodes: new Set(),
   relationships: [], // [ { id, fromId, toId, label, color, customControl } ]
   connectingSourceId: null, // ID du nœud source en cours de liaison
@@ -118,6 +120,9 @@ const MindMapView = {
           <button type="button" class="mm-dock-btn" id="mm-btn-structure" title="Squelette de mise en page : Radiante, Arbre droit, Organigramme (Alt+S)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
           </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-styles" title="Styles de connecteurs et formes de nœuds (Alt+T)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><circle cx="7" cy="12" r="3"/><path d="M10 12h5"/><rect x="15" y="9" width="6" height="6" rx="1.5"/></svg>
+          </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-reorganize" title="Réorganiser harmonieusement la carte (Alt+R)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
           </button>
@@ -181,6 +186,85 @@ const MindMapView = {
           </div>
         </div>
 
+        <!-- Popover de styles de connecteurs et formes de nœuds (style XMind) -->
+        <div class="mm-styles-popover hidden" id="mm-styles-popover">
+          <div class="mm-styles-header">
+            <span class="mm-styles-title">Styles & Connecteurs</span>
+            <span class="mm-styles-badge">Alt+T</span>
+          </div>
+
+          <!-- Section 1 : Style des branches (Connecteurs) -->
+          <div class="mm-styles-section-label">Connecteurs des branches</div>
+          <div class="mm-styles-grid">
+            <div class="mm-style-card active" data-style-type="connector" data-value="curve" title="Courbe fluide de Bézier">
+              <div class="mm-style-card-icon">
+                <svg viewBox="0 0 32 20" width="28" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M 3 16 C 12 16, 20 4, 29 4"/>
+                </svg>
+              </div>
+              <span class="mm-style-card-name">Courbe</span>
+              <span class="mm-style-check" data-connector-for="curve">✓</span>
+            </div>
+
+            <div class="mm-style-card" data-style-type="connector" data-value="orthogonal" title="Ligne à angle droit avec coudes arrondis">
+              <div class="mm-style-card-icon">
+                <svg viewBox="0 0 32 20" width="28" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M 3 16 L 12 16 Q 16 16, 16 12 L 16 8 Q 16 4, 20 4 L 29 4"/>
+                </svg>
+              </div>
+              <span class="mm-style-card-name">Équerre</span>
+              <span class="mm-style-check hidden" data-connector-for="orthogonal">✓</span>
+            </div>
+
+            <div class="mm-style-card" data-style-type="connector" data-value="straight" title="Ligne droite directe">
+              <div class="mm-style-card-icon">
+                <svg viewBox="0 0 32 20" width="28" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <line x1="3" y1="16" x2="29" y2="4"/>
+                </svg>
+              </div>
+              <span class="mm-style-card-name">Droite</span>
+              <span class="mm-style-check hidden" data-connector-for="straight">✓</span>
+            </div>
+          </div>
+
+          <!-- Section 2 : Forme des nœuds -->
+          <div class="mm-styles-section-label" style="margin-top: 10px;">Forme des nœuds</div>
+          <div class="mm-styles-grid">
+            <div class="mm-style-card active" data-style-type="shape" data-value="underline" title="Texte souligné sur la branche (épuré)">
+              <div class="mm-style-card-icon">
+                <svg viewBox="0 0 32 20" width="28" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <text x="16" y="11" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">ABC</text>
+                  <line x1="4" y1="15" x2="28" y2="15" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="mm-style-card-name">Souligné</span>
+              <span class="mm-style-check" data-shape-for="underline">✓</span>
+            </div>
+
+            <div class="mm-style-card" data-style-type="shape" data-value="rounded-rect" title="Rectangle arrondi moderne">
+              <div class="mm-style-card-icon">
+                <svg viewBox="0 0 32 20" width="28" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="3" y="3" width="26" height="14" rx="4" fill="currentColor" fill-opacity="0.12"/>
+                  <text x="16" y="12" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">ABC</text>
+                </svg>
+              </div>
+              <span class="mm-style-card-name">Rectangle</span>
+              <span class="mm-style-check hidden" data-shape-for="rounded-rect">✓</span>
+            </div>
+
+            <div class="mm-style-card" data-style-type="shape" data-value="pill" title="Capsule / Pilule">
+              <div class="mm-style-card-icon">
+                <svg viewBox="0 0 32 20" width="28" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="2" y="3" width="28" height="14" rx="7" fill="currentColor" fill-opacity="0.12"/>
+                  <text x="16" y="12" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">ABC</text>
+                </svg>
+              </div>
+              <span class="mm-style-card-name">Pilule</span>
+              <span class="mm-style-check hidden" data-shape-for="pill">✓</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Tiroir d'aide aux raccourcis clavier -->
         <div class="mindmap-help-drawer hidden" id="mindmap-help-drawer">
           <div class="mm-help-header">
@@ -194,6 +278,7 @@ const MindMapView = {
             <table class="mm-help-table">
               <tr><td><kbd>Alt+P</kbd></td><td><strong>Basculer entre Vue Carte et Vue Plan</strong></td></tr>
               <tr><td><kbd>Alt+S</kbd></td><td><strong>Changer de squelette de mise en page</strong></td></tr>
+              <tr><td><kbd>Alt+T</kbd></td><td><strong>Styles de connecteurs & formes de nœuds</strong></td></tr>
               <tr><td><kbd>Alt+R</kbd></td><td><strong>Réorganiser harmonieusement la carte</strong></td></tr>
               <tr><td><kbd>Ctrl+L</kbd></td><td><strong>Créer une liaison transversale (Relation)</strong></td></tr>
               <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
@@ -357,6 +442,10 @@ const MindMapView = {
       e.stopPropagation();
       this.toggleStructurePopover();
     });
+    document.getElementById('mm-btn-styles')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleStylesPopover();
+    });
     document.getElementById('mm-btn-reorganize')?.addEventListener('click', () => this.autoReorganize());
     document.getElementById('mm-btn-relationship')?.addEventListener('click', () => {
       if (this.selectedNodeId) {
@@ -386,10 +475,27 @@ const MindMapView = {
       });
     });
 
-    // Fermer le popover de structure lors d'un clic extérieur
+    // Options du popover de styles & connecteurs (style XMind)
+    document.getElementById('mm-styles-popover')?.addEventListener('click', (e) => {
+      const card = e.target.closest('.mm-style-card');
+      if (!card) return;
+      e.stopPropagation();
+      const type = card.getAttribute('data-style-type');
+      const val = card.getAttribute('data-value');
+      if (type === 'connector') {
+        this.setConnectorStyle(val);
+      } else if (type === 'shape') {
+        this.setNodeShape(val);
+      }
+    });
+
+    // Fermer les popovers lors d'un clic extérieur
     window.addEventListener('click', (e) => {
       if (!e.target.closest('#mm-structure-popover') && !e.target.closest('#mm-btn-structure')) {
         this.toggleStructurePopover(false);
+      }
+      if (!e.target.closest('#mm-styles-popover') && !e.target.closest('#mm-btn-styles')) {
+        this.toggleStylesPopover(false);
       }
     });
 
@@ -417,6 +523,13 @@ const MindMapView = {
       if (e.altKey && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         this.cycleStructure();
+        return;
+      }
+
+      // Styles de connecteurs & formes de nœuds (Alt+T)
+      if (e.altKey && (e.key === 't' || e.key === 'T')) {
+        e.preventDefault();
+        this.toggleStylesPopover();
         return;
       }
 
@@ -524,6 +637,9 @@ const MindMapView = {
   parseMarkdownToTree(title, markdownContent) {
     // Détection de la directive de structure <!-- mindmap-layout: radiant|right-tree|top-down -->
     let structure = 'radiant';
+    let connector = 'curve';
+    let shape = 'underline';
+
     if (markdownContent) {
       const structMatch = markdownContent.match(/<!--\s*mindmap-layout:\s*(radiant|right-tree|top-down)\s*-->/i);
       if (structMatch) {
@@ -531,10 +647,18 @@ const MindMapView = {
       } else if (this.currentNote && this.currentNote.structure) {
         structure = this.currentNote.structure;
       }
+
+      const connMatch = markdownContent.match(/<!--\s*mindmap-connector:\s*(curve|orthogonal|straight)\s*-->/i);
+      if (connMatch) connector = connMatch[1].toLowerCase();
+
+      const shapeMatch = markdownContent.match(/<!--\s*mindmap-node-shape:\s*(underline|rounded-rect|pill)\s*-->/i);
+      if (shapeMatch) shape = shapeMatch[1].toLowerCase();
     } else if (this.currentNote && this.currentNote.structure) {
       structure = this.currentNote.structure;
     }
     this.treeStructure = structure;
+    this.connectorStyle = connector;
+    this.nodeShape = shape;
 
     const root = {
       id: 'root',
@@ -561,7 +685,7 @@ const MindMapView = {
 
     for (const rawLine of lines) {
       const line = rawLine.trimEnd();
-      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-rel:') || line.trim().startsWith('<!-- mindmap-pos:')) continue;
+      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-connector:') || line.trim().startsWith('<!-- mindmap-node-shape:') || line.trim().startsWith('<!-- mindmap-rel:') || line.trim().startsWith('<!-- mindmap-pos:')) continue;
 
       // Détection de l'indentation
       const match = line.match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
@@ -665,6 +789,12 @@ const MindMapView = {
     let md = '';
     if (this.treeStructure && this.treeStructure !== 'radiant') {
       md += `<!-- mindmap-layout: ${this.treeStructure} -->\n`;
+    }
+    if (this.connectorStyle && this.connectorStyle !== 'curve') {
+      md += `<!-- mindmap-connector: ${this.connectorStyle} -->\n`;
+    }
+    if (this.nodeShape && this.nodeShape !== 'underline') {
+      md += `<!-- mindmap-node-shape: ${this.nodeShape} -->\n`;
     }
     const serializeChildren = (node, indentLevel) => {
       if (!node.children) return;
@@ -998,6 +1128,7 @@ const MindMapView = {
     }
     this.updateViewModeUI();
     this.updateStructureUI();
+    this.updateStylesUI();
   },
 
   refreshView() {
@@ -1672,82 +1803,128 @@ const MindMapView = {
   drawBranches(node) {
     if (!node.children) return;
 
+    const isBox = this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
+    const connStyle = this.connectorStyle || 'curve';
+
     node.children.forEach(child => {
       const isRoot = node.level === 0;
 
       if (this.treeStructure === 'top-down') {
         const x1 = node.x;
-        const y1 = isRoot ? node.y + node.height / 2 : node.y + 10;
+        const y1 = isRoot ? node.y + node.height / 2 : (isBox ? node.y + (node.height || 28) / 2 : node.y + 10);
         const x2 = child.x;
-        const y2 = child.y + 10;
-
-        const dy = Math.abs(y2 - y1);
-        const cx1 = x1;
-        const cy1 = y1 + dy * 0.5;
-        const cx2 = x2;
-        const cy2 = y2 - dy * 0.5;
+        const y2 = isBox ? child.y - (child.height || 28) / 2 : child.y + 10;
 
         const strokeWidth = isRoot ? 5.2 : Math.max(2, 4.0 - child.level * 0.6);
+        const strokeColor = child.color || 'var(--text-secondary)';
+
+        let pathD = '';
+        if (connStyle === 'straight') {
+          pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+        } else if (connStyle === 'orthogonal') {
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          if (Math.abs(dx) < 2) {
+            pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+          } else {
+            const yMid = y1 + dy * 0.5;
+            const dirX = dx > 0 ? 1 : -1;
+            const r = Math.min(10, Math.abs(dx) / 2, Math.abs(dy) / 2);
+            pathD = `M ${x1} ${y1} L ${x1} ${yMid - r} Q ${x1} ${yMid}, ${x1 + dirX * r} ${yMid} L ${x2 - dirX * r} ${yMid} Q ${x2} ${yMid}, ${x2} ${yMid + r} L ${x2} ${y2}`;
+          }
+        } else {
+          // 'curve' (Bézier cubique)
+          const dy = Math.abs(y2 - y1);
+          const cx1 = x1;
+          const cy1 = y1 + dy * 0.5;
+          const cx2 = x2;
+          const cy2 = y2 - dy * 0.5;
+          pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+        }
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`);
+        path.setAttribute('d', pathD);
         path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', child.color || 'var(--text-secondary)');
+        path.setAttribute('stroke', strokeColor);
         path.setAttribute('stroke-width', strokeWidth);
         path.setAttribute('stroke-linecap', 'round');
         path.classList.add('mm-branch-path');
         this.viewportG.appendChild(path);
 
-        // Trait de soulignement sous le mot (centré horizontalement sous le mot-clé)
-        const underX1 = child.x - child.width / 2;
-        const underX2 = child.x + child.width / 2;
-        const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        underline.setAttribute('x1', underX1);
-        underline.setAttribute('y1', child.y + 10);
-        underline.setAttribute('x2', underX2);
-        underline.setAttribute('y2', child.y + 10);
-        underline.setAttribute('stroke', child.color || 'var(--text-secondary)');
-        underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
-        underline.setAttribute('stroke-linecap', 'round');
-        this.viewportG.appendChild(underline);
+        if (!isBox) {
+          // Trait de soulignement sous le mot (centré horizontalement sous le mot-clé)
+          const underX1 = child.x - child.width / 2;
+          const underX2 = child.x + child.width / 2;
+          const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          underline.setAttribute('x1', underX1);
+          underline.setAttribute('y1', child.y + 10);
+          underline.setAttribute('x2', underX2);
+          underline.setAttribute('y2', child.y + 10);
+          underline.setAttribute('stroke', strokeColor);
+          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
+          underline.setAttribute('stroke-linecap', 'round');
+          this.viewportG.appendChild(underline);
+        }
 
       } else {
-        const x1 = isRoot ? (child.side === 'right' ? node.width / 2 : -node.width / 2) : (child.side === 'right' ? node.x + node.width / 2 : node.x - node.width / 2);
-        const y1 = node.y;
+        const x1 = isRoot 
+          ? (child.side === 'right' ? node.width / 2 : -node.width / 2) 
+          : (child.side === 'right' ? node.x + node.width / 2 : node.x - node.width / 2);
+        const y1 = isRoot ? node.y : (isBox ? node.y : node.y + 10);
 
         const x2 = child.side === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
-        const y2 = child.y;
+        const y2 = isBox ? child.y : child.y + 10;
 
-        // Courbe de Bézier cubique organique
-        const dx = Math.abs(x2 - x1);
-        const cx1 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
-        const cy1 = y1;
-        const cx2 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
-        const cy2 = y2;
-
-        // Épaisseur dégressive selon la loi de Buzan
         const strokeWidth = isRoot ? 5.5 : Math.max(2, 4.0 - child.level * 0.6);
+        const strokeColor = child.color || 'var(--text-secondary)';
+
+        let pathD = '';
+        if (connStyle === 'straight') {
+          pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+        } else if (connStyle === 'orthogonal') {
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          if (Math.abs(dy) < 2) {
+            pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+          } else {
+            const xMid = x1 + dx * 0.5;
+            const dirX = dx > 0 ? 1 : -1;
+            const dirY = dy > 0 ? 1 : -1;
+            const r = Math.min(10, Math.abs(dx) / 2, Math.abs(dy) / 2);
+            pathD = `M ${x1} ${y1} L ${xMid - dirX * r} ${y1} Q ${xMid} ${y1}, ${xMid} ${y1 + dirY * r} L ${xMid} ${y2 - dirY * r} Q ${xMid} ${y2}, ${xMid + dirX * r} ${y2} L ${x2} ${y2}`;
+          }
+        } else {
+          // Courbe de Bézier cubique organique
+          const dx = Math.abs(x2 - x1);
+          const cx1 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
+          const cy1 = y1;
+          const cx2 = cx1;
+          const cy2 = y2;
+          pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+        }
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`);
+        path.setAttribute('d', pathD);
         path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', child.color || 'var(--text-secondary)');
+        path.setAttribute('stroke', strokeColor);
         path.setAttribute('stroke-width', strokeWidth);
         path.setAttribute('stroke-linecap', 'round');
         path.classList.add('mm-branch-path');
         this.viewportG.appendChild(path);
 
-        // Trait de soulignement sous le mot (Loi 7 : longueur branche = mot)
-        const underX2 = child.side === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
-        const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        underline.setAttribute('x1', x2);
-        underline.setAttribute('y1', y2 + 10);
-        underline.setAttribute('x2', underX2);
-        underline.setAttribute('y2', y2 + 10);
-        underline.setAttribute('stroke', child.color || 'var(--text-secondary)');
-        underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
-        underline.setAttribute('stroke-linecap', 'round');
-        this.viewportG.appendChild(underline);
+        if (!isBox) {
+          // Trait de soulignement sous le mot (Loi 7 : longueur branche = mot)
+          const underX2 = child.side === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
+          const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          underline.setAttribute('x1', x2);
+          underline.setAttribute('y1', y2);
+          underline.setAttribute('x2', underX2);
+          underline.setAttribute('y2', y2);
+          underline.setAttribute('stroke', strokeColor);
+          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
+          underline.setAttribute('stroke-linecap', 'round');
+          this.viewportG.appendChild(underline);
+        }
       }
 
       this.drawBranches(child);
@@ -1794,22 +1971,56 @@ const MindMapView = {
       g.appendChild(plusBtn);
 
     } else {
-      // Zone réceptive continue invisible (évite la disparition des boutons entre le mot et les boutons)
+      const isBox = this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
+      const rx = this.nodeShape === 'pill' ? 14 : 7;
+      const boxW = node.width;
+      const boxH = node.height || 28;
+
+      if (isBox) {
+        // Boîte d'arrière-plan avec bordure colorée (Style XMind)
+        const boxRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        boxRect.setAttribute('x', -boxW / 2);
+        boxRect.setAttribute('y', -boxH / 2);
+        boxRect.setAttribute('width', boxW);
+        boxRect.setAttribute('height', boxH);
+        boxRect.setAttribute('rx', rx);
+        boxRect.setAttribute('class', `mm-branch-box ${this.nodeShape}`);
+        boxRect.setAttribute('fill', 'var(--bg-card, #ffffff)');
+        boxRect.setAttribute('stroke', node.color || 'var(--accent-blue)');
+        boxRect.setAttribute('stroke-width', '1.6');
+        if (isSelected) {
+          boxRect.setAttribute('filter', 'url(#mm-select-glow)');
+        }
+        g.appendChild(boxRect);
+
+        // Fond teinté translucide assorti à la couleur de la branche
+        const tintRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        tintRect.setAttribute('x', -boxW / 2);
+        tintRect.setAttribute('y', -boxH / 2);
+        tintRect.setAttribute('width', boxW);
+        tintRect.setAttribute('height', boxH);
+        tintRect.setAttribute('rx', rx);
+        tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
+        tintRect.setAttribute('opacity', '0.08');
+        g.appendChild(tintRect);
+      }
+
+      // Zone réceptive continue invisible
       const hitRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       const hitW = node.width + 65;
       const hitX = isTopDown ? -node.width / 2 - 5 : (node.side === 'right' ? -node.width / 2 - 5 : -node.width / 2 - 55);
       hitRect.setAttribute('x', hitX);
-      hitRect.setAttribute('y', -18);
+      hitRect.setAttribute('y', isBox ? -boxH / 2 - 4 : -18);
       hitRect.setAttribute('width', hitW);
-      hitRect.setAttribute('height', 36);
+      hitRect.setAttribute('height', isBox ? boxH + 8 : 36);
       hitRect.setAttribute('fill', 'transparent');
       hitRect.setAttribute('style', 'cursor: pointer;');
       g.appendChild(hitRect);
 
-      // Nœud de branche : Mot-clé épuré au-dessus du fil
+      // Nœud de branche : Mot-clé
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('dominant-baseline', 'bottom');
-      text.setAttribute('y', 5);
+      text.setAttribute('dominant-baseline', isBox ? 'central' : 'bottom');
+      text.setAttribute('y', isBox ? 0 : 5);
       text.setAttribute('class', 'mm-branch-text');
       text.setAttribute('fill', 'var(--text-primary)');
       text.textContent = node.text;
@@ -1846,12 +2057,12 @@ const MindMapView = {
         }
 
         const refG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        refG.setAttribute('transform', `translate(${refX}, 3)`);
+        refG.setAttribute('transform', `translate(${refX}, ${isBox ? 0 : 3})`);
         refG.setAttribute('class', 'mm-scripture-pill');
 
         const refRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         refRect.setAttribute('x', -pillW / 2);
-        refRect.setAttribute('y', -10);
+        refRect.setAttribute('y', -8);
         refRect.setAttribute('width', pillW);
         refRect.setAttribute('height', 16);
         refRect.setAttribute('rx', 4);
@@ -1890,7 +2101,7 @@ const MindMapView = {
         }
 
         const noteG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        noteG.setAttribute('transform', `translate(${noteX}, 3)`);
+        noteG.setAttribute('transform', `translate(${noteX}, ${isBox ? 0 : 3})`);
         noteG.setAttribute('class', 'mm-note-pill');
 
         const noteCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -1924,12 +2135,13 @@ const MindMapView = {
       const actionsG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       actionsG.setAttribute('class', 'mm-node-actions');
 
+      const actionY = isBox ? 0 : 3;
       const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 14 : -node.width / 2 - 14;
-      const addSubBtn = this.createActionButton('+', endX, 3, () => this.addChildToNode(node));
+      const addSubBtn = this.createActionButton('+', endX, actionY, () => this.addChildToNode(node));
       addSubBtn.setAttribute('title', 'Ajouter une sous-branche');
 
       const delX = (isTopDown || node.side === 'right') ? node.width / 2 + 34 : -node.width / 2 - 34;
-      const delBtn = this.createActionButton('×', delX, 3, () => this.deleteNode(node.id), true);
+      const delBtn = this.createActionButton('×', delX, actionY, () => this.deleteNode(node.id), true);
       delBtn.setAttribute('title', 'Supprimer la branche');
 
       actionsG.appendChild(addSubBtn);
@@ -3279,6 +3491,13 @@ const MindMapView = {
           <span class="mm-ctx-label">Organigramme descendant</span>
           ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
         </div>
+        <div class="mm-ctx-item" data-action="open-styles">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><circle cx="7" cy="12" r="3"/><path d="M10 12h5"/><rect x="15" y="9" width="6" height="6" rx="1.5"/></svg>
+          </span>
+          <span class="mm-ctx-label">Styles & Connecteurs...</span>
+          <span class="mm-ctx-shortcut">Alt+T</span>
+        </div>
         <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="reorganize">
           <span class="mm-ctx-icon">
@@ -3369,6 +3588,9 @@ const MindMapView = {
             break;
           case 'structure-top-down':
             this.setStructure('top-down');
+            break;
+          case 'open-styles':
+            this.toggleStylesPopover(true);
             break;
           case 'add-child':
             if (node) this.addChildToNode(node);
@@ -3503,6 +3725,80 @@ const MindMapView = {
         const isActive = optStruct === struct;
         opt.classList.toggle('active', isActive);
         const check = opt.querySelector('.mm-struct-check');
+        if (check) check.classList.toggle('hidden', !isActive);
+      });
+    }
+  },
+
+  setConnectorStyle(styleName) {
+    if (!['curve', 'orthogonal', 'straight'].includes(styleName)) return;
+    this.connectorStyle = styleName;
+    if (this.viewMode === 'map') {
+      this.draw();
+    }
+    this.updateStylesUI();
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      const labels = {
+        'curve': 'Branches : Courbes fluides de Bézier',
+        'orthogonal': 'Branches : Angles droits (Équerre)',
+        'straight': 'Branches : Lignes droites'
+      };
+      App.showToast(labels[styleName] || `Connecteur : ${styleName}`);
+    }
+  },
+
+  setNodeShape(shapeName) {
+    if (!['underline', 'rounded-rect', 'pill'].includes(shapeName)) return;
+    this.nodeShape = shapeName;
+    this.layoutTree();
+    if (this.viewMode === 'map') {
+      this.draw();
+    }
+    this.updateStylesUI();
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      const labels = {
+        'underline': 'Forme des nœuds : Souligné épuré',
+        'rounded-rect': 'Forme des nœuds : Rectangle arrondi',
+        'pill': 'Forme des nœuds : Capsule / Pilule'
+      };
+      App.showToast(labels[shapeName] || `Forme : ${shapeName}`);
+    }
+  },
+
+  toggleStylesPopover(force = null) {
+    const popover = document.getElementById('mm-styles-popover');
+    if (!popover) return;
+    const isHidden = popover.classList.contains('hidden');
+    const shouldOpen = force !== null ? force : isHidden;
+    popover.classList.toggle('hidden', !shouldOpen);
+    if (shouldOpen) {
+      // Fermer les autres popovers pour éviter les superpositions
+      document.getElementById('mm-structure-popover')?.classList.add('hidden');
+      document.getElementById('mindmap-help-drawer')?.classList.add('hidden');
+      this.updateStylesUI();
+    }
+  },
+
+  updateStylesUI() {
+    const conn = this.connectorStyle || 'curve';
+    const shape = this.nodeShape || 'underline';
+
+    const popover = document.getElementById('mm-styles-popover');
+    if (popover) {
+      popover.querySelectorAll('[data-style-type="connector"]').forEach(card => {
+        const isActive = card.getAttribute('data-value') === conn;
+        card.classList.toggle('active', isActive);
+        const check = card.querySelector('.mm-style-check');
+        if (check) check.classList.toggle('hidden', !isActive);
+      });
+      popover.querySelectorAll('[data-style-type="shape"]').forEach(card => {
+        const isActive = card.getAttribute('data-value') === shape;
+        card.classList.toggle('active', isActive);
+        const check = card.querySelector('.mm-style-check');
         if (check) check.classList.toggle('hidden', !isActive);
       });
     }

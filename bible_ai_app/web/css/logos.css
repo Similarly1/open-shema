@@ -33920,3 +33920,171 @@ body[class*="palette-dark"] .mm-node-drag-ghost {
   cursor: grabbing;
   stroke-width: 2.5;
 }
+
+/* ==========================================================================
+   Styles de connecteurs & Formes de nœuds (XMind)
+   ========================================================================== */
+.mm-styles-popover {
+  position: absolute;
+  bottom: 58px;
+  right: 64px;
+  width: 290px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  padding: 12px 14px;
+  z-index: 60;
+  animation: mmFadeIn 0.16s ease-out;
+  user-select: none;
+}
+
+body.theme-dark .mm-styles-popover,
+body[class*="palette-dark"] .mm-styles-popover {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+
+.mm-styles-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+}
+
+body.theme-dark .mm-styles-header,
+body[class*="palette-dark"] .mm-styles-header {
+  border-color: #334155;
+}
+
+.mm-styles-title {
+  font-size: 11.5px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary, #64748b);
+}
+
+.mm-styles-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-secondary, #64748b);
+}
+
+body.theme-dark .mm-styles-badge,
+body[class*="palette-dark"] .mm-styles-badge {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.mm-styles-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.mm-styles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.mm-style-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+body.theme-dark .mm-style-card,
+body[class*="palette-dark"] .mm-style-card {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.mm-style-card:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+body.theme-dark .mm-style-card:hover,
+body[class*="palette-dark"] .mm-style-card:hover {
+  border-color: #3b82f6;
+  color: #60a5fa;
+  background: #1e293b;
+}
+
+.mm-style-card.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+body.theme-dark .mm-style-card.active,
+body[class*="palette-dark"] .mm-style-card.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+}
+
+.mm-style-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+}
+
+.mm-style-card-name {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.mm-style-check {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+body.theme-dark .mm-style-check,
+body[class*="palette-dark"] .mm-style-check {
+  color: #60a5fa;
+}
+
+/* Boîtes et formes de nœuds SVG */
+.mm-branch-box {
+  transition: stroke 0.15s ease, filter 0.15s ease;
+}
+
+.mm-node-g:hover .mm-branch-box {
+  stroke-width: 2.2px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
+}
+
+body.theme-dark .mm-branch-box {
+  fill: #1e293b !important;
+}
+
