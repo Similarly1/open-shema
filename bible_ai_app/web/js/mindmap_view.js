@@ -2566,8 +2566,16 @@ const MindMapView = {
         const strokeColor = child.color || 'var(--text-secondary)';
 
         let pathD = '';
+        let isTapered = false;
         if (connStyle === 'straight') {
-          pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+          if (isRoot) {
+            isTapered = true;
+            const w1 = 1.4;
+            const w2 = 4.2;
+            pathD = `M ${(x1 - w1 / 2).toFixed(2)} ${y1.toFixed(2)} L ${(x2 - w2 / 2).toFixed(2)} ${y2.toFixed(2)} L ${(x2 + w2 / 2).toFixed(2)} ${y2.toFixed(2)} L ${(x1 + w1 / 2).toFixed(2)} ${y1.toFixed(2)} Z`;
+          } else {
+            pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+          }
         } else if (connStyle === 'orthogonal') {
           const dx = x2 - x1;
           const dy = y2 - y1;
@@ -2587,15 +2595,38 @@ const MindMapView = {
           const cy1 = y1 + dy * factor;
           const cx2 = x2;
           const cy2 = y2 - dy * factor;
-          pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+
+          if (isRoot) {
+            isTapered = true;
+            const w1 = 1.4;
+            const w2 = 4.2;
+            const leftX1 = (x1 - w1 / 2).toFixed(2);
+            const rightX1 = (x1 + w1 / 2).toFixed(2);
+            const leftX2 = (x2 - w2 / 2).toFixed(2);
+            const rightX2 = (x2 + w2 / 2).toFixed(2);
+
+            const leftCx1 = (cx1 - w1 / 2).toFixed(2);
+            const rightCx1 = (cx1 + w1 / 2).toFixed(2);
+            const leftCx2 = (cx2 - w2 / 2).toFixed(2);
+            const rightCx2 = (cx2 + w2 / 2).toFixed(2);
+
+            pathD = `M ${leftX1} ${y1.toFixed(2)} C ${leftCx1} ${cy1.toFixed(2)}, ${leftCx2} ${cy2.toFixed(2)}, ${leftX2} ${y2.toFixed(2)} L ${rightX2} ${y2.toFixed(2)} C ${rightCx2} ${cy2.toFixed(2)}, ${rightCx1} ${cy1.toFixed(2)}, ${rightX1} ${y1.toFixed(2)} Z`;
+          } else {
+            pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+          }
         }
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', pathD);
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', strokeColor);
-        path.setAttribute('stroke-width', strokeWidth);
-        path.setAttribute('stroke-linecap', 'round');
+        if (isTapered) {
+          path.setAttribute('fill', strokeColor);
+          path.setAttribute('stroke', 'none');
+        } else {
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', strokeColor);
+          path.setAttribute('stroke-width', strokeWidth);
+          path.setAttribute('stroke-linecap', 'round');
+        }
         path.classList.add('mm-branch-path');
         this.viewportG.appendChild(path);
 
@@ -2669,8 +2700,16 @@ const MindMapView = {
         const strokeColor = child.color || 'var(--text-secondary)';
 
         let pathD = '';
+        let isTapered = false;
         if (connStyle === 'straight') {
-          pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+          if (isRoot) {
+            isTapered = true;
+            const w1 = 1.4;
+            const w2 = 4.2;
+            pathD = `M ${x1.toFixed(2)} ${(y1 - w1 / 2).toFixed(2)} L ${x2.toFixed(2)} ${(y2 - w2 / 2).toFixed(2)} L ${x2.toFixed(2)} ${(y2 + w2 / 2).toFixed(2)} L ${x1.toFixed(2)} ${(y1 + w1 / 2).toFixed(2)} Z`;
+          } else {
+            pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+          }
         } else if (connStyle === 'orthogonal') {
           const dx = x2 - x1;
           const dy = y2 - y1;
@@ -2692,15 +2731,39 @@ const MindMapView = {
           const cy1 = y1;
           const cx2 = x2 - dir * dx * factor;
           const cy2 = y2;
-          pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+
+          if (isRoot) {
+            // Effet d'effilement Tony Buzan : liaison fine à la racine (1.4px) puis s'épaississant vers le niveau 1 (4.2px)
+            isTapered = true;
+            const w1 = 1.4;
+            const w2 = 4.2;
+            const topY1 = (y1 - w1 / 2).toFixed(2);
+            const botY1 = (y1 + w1 / 2).toFixed(2);
+            const topY2 = (y2 - w2 / 2).toFixed(2);
+            const botY2 = (y2 + w2 / 2).toFixed(2);
+
+            const topCy1 = (cy1 - w1 / 2).toFixed(2);
+            const botCy1 = (cy1 + w1 / 2).toFixed(2);
+            const topCy2 = (cy2 - w2 / 2).toFixed(2);
+            const botCy2 = (cy2 + w2 / 2).toFixed(2);
+
+            pathD = `M ${x1.toFixed(2)} ${topY1} C ${cx1.toFixed(2)} ${topCy1}, ${cx2.toFixed(2)} ${topCy2}, ${x2.toFixed(2)} ${topY2} L ${x2.toFixed(2)} ${botY2} C ${cx2.toFixed(2)} ${botCy2}, ${cx1.toFixed(2)} ${botCy1}, ${x1.toFixed(2)} ${botY1} Z`;
+          } else {
+            pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+          }
         }
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', pathD);
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', strokeColor);
-        path.setAttribute('stroke-width', strokeWidth);
-        path.setAttribute('stroke-linecap', 'round');
+        if (isTapered) {
+          path.setAttribute('fill', strokeColor);
+          path.setAttribute('stroke', 'none');
+        } else {
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', strokeColor);
+          path.setAttribute('stroke-width', strokeWidth);
+          path.setAttribute('stroke-linecap', 'round');
+        }
         path.classList.add('mm-branch-path');
         this.viewportG.appendChild(path);
 
