@@ -356,6 +356,10 @@ class ArticlesFeedScraper:
         for tag in soup(["script", "style", "nav", "footer", "form", "iframe", "noscript", "svg", "header"]):
             tag.decompose()
 
+        # Supprimer systématiquement les widgets et blocs audio ElevenLabs / AudioNative
+        for audio_el in soup.select("#elevenlabs-audionative-widget, [id*='elevenlabs'], [class*='elevenlabs'], [id*='audionative'], [class*='audionative'], [data-playerurl*='elevenlabs'], .wp-block-audio, audio"):
+            audio_el.decompose()
+
         for meta_el in soup.select(".entry-meta, .post-meta, .entry-header, .post-header, .article-header, .breadcrumb, .social-share, .jp-relatedposts, .wp-block-post-date, .wp-block-post-author, .author-info, .single-header, .single-meta, .single-footer, .single-related"):
             meta_el.decompose()
 
@@ -432,11 +436,19 @@ class ArticlesFeedScraper:
                 bq_paragraphs = []
                 for p in element.find_all(["p", "div"]):
                     pt = self._format_inline(p).strip()
-                    if pt:
+                    if pt and not re.search(r'elevenlabs|audionative', pt, re.I):
                         bq_paragraphs.append(pt)
+                
+                # Récupérer l'éventuelle citation / référence biblique (<cite> ou <footer>)
+                cite_el = element.find(["cite", "footer"])
+                if cite_el:
+                    cite_text = self._format_inline(cite_el).strip()
+                    if cite_text:
+                        bq_paragraphs.append(f"— {cite_text}")
+
                 if not bq_paragraphs:
                     bq_text = self._format_inline(element).strip()
-                    if bq_text:
+                    if bq_text and not re.search(r'elevenlabs|audionative', bq_text, re.I):
                         bq_paragraphs = [bq_text]
                 
                 quoted = "\n>\n".join("\n".join(f"> {l}" for l in bp.splitlines() if l.strip()) for bp in bq_paragraphs)
@@ -490,12 +502,13 @@ class ArticlesFeedScraper:
                 if inline.strip():
                     lines.append(inline)
 
-        # Nettoyage des sauts de ligne multiples et résidus
+        # Nettoyage des résidus de lecteur Elevenlabs audio et sauts de ligne multiples
         result = "\n".join(lines)
-        result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs\s+Text\s+to\s+Speech[\r\n\s]*AudioNative\s+Player[\.\u2026]*\n*', '', result)
-        result = re.sub(r'(?i)Loading\s+the\s*[\r\n\s]*Elevenlabs[^\n]*\n*', '', result)
-        result = re.sub(r'(?i)AudioNative\s+Player[\.\u2026]*\n*', '', result)
+        result = re.sub(r'(?i)(?:^|\n)\s*(?:>\s*)*(?:Loading\s+the\s*(?:\[[^\]]*Elevenlabs[^\]]*\]\([^)]+\)|Elevenlabs[^\n.]*)|AudioNative\s+Player[\.\u2026]*)[^\n]*(?:>\s*)*(?=\n|$)', '', result)
+        result = re.sub(r'(?i)Loading\s+the\s*(?:\[[^\]]*Elevenlabs[^\]]*\]\([^)]+\)|Elevenlabs[^\n.]*)', '', result)
+        result = re.sub(r'(?i)AudioNative\s+Player[\.\u2026]*', '', result)
         result = re.sub(r'↩\s*\d+\s*▶\s*↩\s*\d+\s*[\d:]+\s*[\d:]+', '', result)
+        result = re.sub(r'(?m)^\s*(?:>\s*)+$', '', result)
 
         # Nettoyage de l'en-tête répété "Publié le ... Podcast ..."
         result = re.sub(r'(?i)^\s*(?:\*\*)?Publié\s+le(?:\*\*)?\s+[^\n]+\n*', '', result)

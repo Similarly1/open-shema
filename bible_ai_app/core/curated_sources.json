@@ -22,6 +22,9 @@
         "nav.post-navigation",
         ".comments-area",
         ".elevenlabs-player",
+        "#elevenlabs-audionative-widget",
+        "[id*='elevenlabs']",
+        "[id*='audionative']",
         "#audionative",
         ".audionative-player",
         ".wp-block-audio"

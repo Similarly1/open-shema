@@ -3,6 +3,18 @@
  * Gère la communication asynchrone entre le Frontend Web et le Backend Python (pywebview).
  */
 
+// Utilitaire global d'échappement HTML pour sécuriser les templates et éviter les erreurs 'escapeHtml is not a function'
+if (typeof window !== 'undefined' && !window.escapeHtml) {
+  window.escapeHtml = function(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  };
+}
+
 const API = {
   // Attendre que pywebview soit réellement prêt avec ses méthodes
   isReady: false,
@@ -261,6 +273,10 @@ const API = {
 
   async reorganizeSermonWithAI(currentSections, newStructure, sermonMetadata = null) {
     return await this.call('reorganize_sermon_sections_ai', currentSections, newStructure, sermonMetadata);
+  },
+
+  async evaluateSermonWithAI(sermonData, options = null) {
+    return await this.call('evaluate_sermon_with_ai', sermonData, options);
   },
 
   async getPassageOverviewBundle(bookCode, chapter, verse = 1, bibleName = "LSG") {

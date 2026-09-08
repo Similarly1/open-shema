@@ -143,6 +143,8 @@ class SermonsManager:
                 "words_per_minute": wpm
             }),
             "delivery_history": metadata.get("delivery_history", []),
+            "evaluation": metadata.get("evaluation", None),
+            "checklist": metadata.get("checklist", {}),
             "word_count": word_count,
             "estimated_minutes": est_minutes,
             "body": body,
@@ -256,6 +258,8 @@ class SermonsManager:
                 "words_per_minute": 135
             }),
             "delivery_history": sermon.get("delivery_history", []),
+            "evaluation": sermon.get("evaluation", None),
+            "checklist": sermon.get("checklist", {}),
             "created_at": sermon.get("created_at") or datetime.datetime.now().isoformat(),
             "updated_at": datetime.datetime.now().isoformat(),
         }

@@ -196,10 +196,10 @@ const App = {
       setTimeout(updateTabsScrollState, 350);
     });
 
-    document.querySelectorAll('.drawer-tab').forEach(tabBtn => {
+    document.querySelectorAll('#drawer-tabs-bar .drawer-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
-        document.querySelectorAll('.drawer-tab').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.drawer-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('#drawer-tabs-bar .drawer-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#right-drawer .drawer-content').forEach(c => c.classList.remove('active'));
 
         tabBtn.classList.add('active');
         tabBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
@@ -615,11 +615,7 @@ const App = {
     body.classList.remove('reading-bg-white', 'reading-bg-sepia', 'reading-bg-dark');
 
     let effective = theme || 'dark';
-    if (palette && palette.includes('dark')) {
-      effective = 'dark';
-    } else if (palette && palette.includes('light')) {
-      effective = 'light';
-    } else if (effective === 'system') {
+    if (effective === 'system') {
       effective = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     }
 
@@ -629,12 +625,19 @@ const App = {
       body.classList.add('theme-light');
     }
 
-    // Palette active
-    if (palette) {
-      body.classList.add(palette.startsWith('palette-') ? palette : `palette-${palette}`);
+    // Palette active harmonisée avec le mode (clair ou sombre)
+    let effectivePalette = palette;
+    if (effective === 'dark') {
+      if (!effectivePalette || !effectivePalette.includes('dark')) {
+        effectivePalette = 'dark-slate';
+      }
     } else {
-      body.classList.add(effective === 'dark' ? 'palette-dark-slate' : 'palette-light-clean');
+      if (!effectivePalette || !effectivePalette.includes('light')) {
+        effectivePalette = 'light-clean';
+      }
     }
+
+    body.classList.add(effectivePalette.startsWith('palette-') ? effectivePalette : `palette-${effectivePalette}`);
 
     // Teinte indépendante du canevas de lecture
     if (readingBg && readingBg !== 'auto') {

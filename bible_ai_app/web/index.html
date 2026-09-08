@@ -3151,6 +3151,81 @@
                   </div>
                 </div>
 
+                <!-- Bloc 8 : Évaluation & Audit Homilétique de Prédication -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="m9 11 2 2 4-4"/></svg>
+                      <span>8. Évaluation &amp; Audit Homilétique (Post-Rédaction)</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Prédication</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-sermon-evaluation-model">Modèle principal (Audit &amp; Évaluation) :</label>
+                      <select id="cfg-sermon-evaluation-model" class="select-field full-w ai-model-select" data-pair="sermon-evaluation">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé, Haute précision)</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-large-latest">Mistral Large (Approfondi)</option>
+                          <option value="mistral-small-latest">Mistral Small (Rapide)</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-sermon-evaluation-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-sermon-evaluation-fallback-model" class="select-field full-w ai-model-select" data-pair="sermon-evaluation">
+                        <optgroup label="── Google Gemini ──">
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                        </optgroup>
+                        <optgroup label="── Mistral AI ──">
+                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="mistral-small-latest">Mistral Small</option>
+                          <option value="open-mistral-nemo">Mistral Nemo</option>
+                          <option value="codestral-latest">Mistral Codestral</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
+                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
+                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
+                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
+                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
+                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               
               <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
@@ -3522,7 +3597,7 @@
                       <strong class="prompt-card-title">Évaluation &amp; Audit Homilétique (Post-Rédaction)</strong>
                       <span class="prompt-status-badge is-default" id="badge-sermon-evaluation-status">Par défaut</span>
                     </div>
-                    <p class="prompt-card-desc">Grille d'audit homilétique bienveillante en 5 axes (fidélité textuelle, clarté PMT/PMS, équilibre Loi/Grâce, applications, progrès 1 Tm 4.15) sans jamais réécrire le sermon.</p>
+                    <p class="prompt-card-desc">Grille d'audit homilétique objective et méthodologique en 5 axes (fidélité textuelle, clarté PMT/PMS, équilibre Loi/Grâce, applications, synthèse méthodologique) sans jamais réécrire le sermon.</p>
                   </div>
                   <div class="prompt-card-actions">
                     <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-sermon-evaluation-prompt">
@@ -9044,19 +9119,19 @@
   <div id="app-toast-container"></div>
 
   <!-- Scripts -->
-  <script src="js/api.js"></script>
+  <script src="js/api.js?v=5.1"></script>
   <script src="js/notification_manager.js"></script>
   <script src="js/task_manager.js"></script>
   <script src="js/multiwindow_sync.js"></script>
   <script src="js/book_picker.js"></script>
   <script src="js/theology_view.js"></script>
-  <script src="js/bible_reader.js"></script>
-  <script src="js/commentaries_view.js"></script>
+  <script src="js/bible_reader.js?v=5.2"></script>
+  <script src="js/commentaries_view.js?v=5.2"></script>
   <script src="js/import_modal.js"></script>
   <script src="js/open_shema_store_modal.js"></script>
   <script src="js/report_typo_modal.js"></script>
   <script src="js/library_view.js"></script>
-  <script src="js/settings_view.js"></script>
+  <script src="js/settings_view.js?v=5.2"></script>
   <script src="js/search_view.js"></script>
   <script src="js/ai_study_view.js"></script>
   <script src="js/mindmap_view.js"></script>
@@ -9064,7 +9139,7 @@
   <script src="js/dict_view.js?v=3.3"></script>
   <script src="js/leaflet.js"></script>
   <script src="js/maps_view.js"></script>
-  <script src="js/passage_study_view.js"></script>
+  <script src="js/passage_study_view.js?v=5.1"></script>
   <script src="js/selection_context_menu.js"></script>
   <script src="js/highlighter.js"></script>
   <script src="js/theological_profile_modal.js"></script>
@@ -9076,6 +9151,6 @@
   <script src="js/illustrations_view.js?v=2.0"></script>
   <script src="js/first_run_wizard.js"></script>
   <script src="js/updater.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=5.2"></script>
 </body>
 </html>

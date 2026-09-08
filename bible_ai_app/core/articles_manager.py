@@ -57,8 +57,8 @@ class ArticlesManager:
                     "excludes": [
                         ".single-header", ".single-meta", ".single-footer", ".single-related",
                         ".sharedaddy", ".jp-relatedposts", ".newsletter-box", ".social-share",
-                        "nav.post-navigation", ".comments-area", ".elevenlabs-player", "#audionative",
-                        ".audionative-player", ".wp-block-audio"
+                        "nav.post-navigation", ".comments-area", ".elevenlabs-player", "#elevenlabs-audionative-widget",
+                        "[id*='elevenlabs']", "[id*='audionative']", "#audionative", ".audionative-player", ".wp-block-audio"
                     ]
                 }
             },

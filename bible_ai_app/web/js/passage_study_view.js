@@ -1406,14 +1406,18 @@ const PassageStudyView = {
     // 1. Rendu immédiat synchrone avec les données locales
     let cardHtml = '';
     if (typeof LexiconViewer !== 'undefined' && LexiconViewer.buildStrongCardHtml) {
-      cardHtml = LexiconViewer.buildStrongCardHtml({
-        title: title,
-        french_lemma: frenchPrimaryTerm,
-        lemma: wordData.lemma || wordData.text || '',
-        strong: strongCode,
-        dict_name: isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)',
-        full_text: rawDef || wordData.gloss || ''
-      }, '', '0');
+      try {
+        cardHtml = LexiconViewer.buildStrongCardHtml({
+          title: title,
+          french_lemma: frenchPrimaryTerm,
+          lemma: wordData.lemma || wordData.text || '',
+          strong: strongCode,
+          dict_name: isHebrew ? 'Hébreu Biblique (A.T.)' : 'Grec Koinè (N.T.)',
+          full_text: rawDef || wordData.gloss || ''
+        }, '', '0');
+      } catch (err) {
+        console.warn('[PassageStudyView] Erreur LexiconViewer.buildStrongCardHtml:', err);
+      }
     }
 
     pane.innerHTML = cardHtml || `

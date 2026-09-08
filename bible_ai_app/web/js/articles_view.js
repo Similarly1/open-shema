@@ -1596,31 +1596,61 @@ const ArticlesView = {
     
     let text = this.fixMojibake(md).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-    // 1. Nettoyer les résidus de lecteur ElevenLabs audio sans déborder sur le texte
+    // 1. Nettoyer tout résidu du lecteur ElevenLabs audio / AudioNative (y compris s'il est préfixé ou entouré de chevrons >)
+    text = text.replace(/(?:^|\n)\s*(?:>\s*)*(?:Loading\s+the\s*(?:\[[^\]]*Elevenlabs[^\]]*\]\([^)]+\)|Elevenlabs[^\n.]*)|AudioNative\s+Player[\.\u2026]*)[^\n]*(?:>\s*)*(?=\n|$)/gi, '');
     text = text.replace(/Loading\s+the\s*(?:\[[^\]]*Elevenlabs[^\]]*\]\([^)]+\)|Elevenlabs[^\n.]*)/gi, '');
     text = text.replace(/AudioNative\s+Player[\.\u2026]*/gi, '');
 
+    // 1a. Nettoyer les lignes de citation vides ou orphelines (ex: "> >", ">", ">   ")
+    text = text.replace(/(?:^|\n)\s*(?:>\s*)+(?=\n|$)/g, '\n');
+
     // 1b-1. Convertir les blockquotes Markdown (> Citation [– Auteur]) AVANT le découpage de phrases
-    text = text.replace(/(?:^|\n)>\s*([^\n]+(?:\n(?!>|[#\n]|---)[^\n]+)*)/g, (match, bqContent) => {
-      let content = bqContent.replace(/\n>\s*/g, ' ').replace(/\n/g, ' ').trim();
-      
-      const authorMatch = content.match(/^([\s\S]+?)\s+([—–\u2013\u2014-]\s*[A-ZÀ-ÖØ-ß][^\n]*?\*(?:\[[^\]]+\]\([^)]+\)|[^*]+)\*[.,\s]*)(?:\s+([A-ZÀ-ÿ«][\s\S]*))?$/);
-      if (authorMatch) {
-        const quoteText = authorMatch[1].trim();
-        const quoteAuthor = authorMatch[2].trim();
-        const nextParagraph = authorMatch[3] ? `\n\n${authorMatch[3].trim()}` : '';
-        return `\n\n<blockquote class="article-bible-quote"><p>${quoteText}</p><footer class="article-quote-author">${quoteAuthor}</footer></blockquote>${nextParagraph}\n\n`;
+    // On regroupe toutes les lignes consécutives de citation
+    text = text.replace(/(?:^|\n)((?:>[^\n]*(?:\n|$))+)/g, (match, bqBlock) => {
+      const lines = bqBlock.split('\n').map(l => l.replace(/^>\s?/, '').trim());
+      const paragraphs = [];
+      let currentPara = [];
+
+      for (const line of lines) {
+        if (!line) {
+          if (currentPara.length > 0) {
+            paragraphs.push(currentPara.join(' '));
+            currentPara = [];
+          }
+        } else {
+          currentPara.push(line);
+        }
       }
-      
-      const simpleAuthorMatch = content.match(/^([\s\S]+?)\s+([—–\u2013\u2014-]\s*[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ.]*(?:\s+[A-ZÀ-ÖØ-ß][a-zà-öø-ÿ.]*){1,4}[.,\s]*)(?:\s+([A-ZÀ-ÿ«][\s\S]*))?$/);
-      if (simpleAuthorMatch) {
-        const quoteText = simpleAuthorMatch[1].trim();
-        const quoteAuthor = simpleAuthorMatch[2].trim();
-        const nextParagraph = simpleAuthorMatch[3] ? `\n\n${simpleAuthorMatch[3].trim()}` : '';
-        return `\n\n<blockquote class="article-bible-quote"><p>${quoteText}</p><footer class="article-quote-author">${quoteAuthor}</footer></blockquote>${nextParagraph}\n\n`;
+      if (currentPara.length > 0) {
+        paragraphs.push(currentPara.join(' '));
       }
 
-      return `\n\n<blockquote class="article-bible-quote"><p>${content}</p></blockquote>\n\n`;
+      if (paragraphs.length === 0) return '';
+
+      // Ne jamais créer de blockquote sans texte alphanumérique réel
+      const validParagraphs = paragraphs.filter(p => /[a-zA-Z0-9À-ÿ]/.test(p));
+      if (validParagraphs.length === 0) return '';
+
+      // Vérifier si le dernier paragraphe est une attribution d'auteur ou référence scripturaire
+      // Ex: "— 1 Jean 2.15-17", "– 1 Jn 5.19", "— Jean Calvin, Institution...", "– Nancy Guthrie"
+      let authorHtml = '';
+      const lastIdx = validParagraphs.length - 1;
+      let lastPara = validParagraphs[lastIdx];
+
+      const standaloneAuthorMatch = lastPara.match(/^[—–\u2013\u2014-]\s*([A-Z0-9À-ÿ][\s\S]*)$/);
+      if (standaloneAuthorMatch && validParagraphs.length > 1) {
+        authorHtml = `<footer class="article-quote-author">${lastPara}</footer>`;
+        validParagraphs.pop();
+      } else {
+        const inlineAuthorMatch = lastPara.match(/^([\s\S]+?)\s+([—–\u2013\u2014-]\s*(?:[0-9]{1,2}\s*)?[A-ZÀ-ÖØ-ß][^\n]*)$/);
+        if (inlineAuthorMatch && /[a-zA-Z0-9À-ÿ]/.test(inlineAuthorMatch[1])) {
+          validParagraphs[lastIdx] = inlineAuthorMatch[1].trim();
+          authorHtml = `<footer class="article-quote-author">${inlineAuthorMatch[2].trim()}</footer>`;
+        }
+      }
+
+      const contentHtml = validParagraphs.map(p => `<p>${p}</p>`).join('');
+      return `\n\n<blockquote class="article-bible-quote">${contentHtml}${authorHtml}</blockquote>\n\n`;
     });
 
     // 1b-2. Structurer "Transcription de la prédication" et son avertissement
@@ -1899,10 +1929,11 @@ const ArticlesView = {
       return tableHtml;
     });
 
-    // 8. Convertir les blockquotes consécutifs
+    // 8. Convertir les blockquotes consécutifs résiduels (avec garde-fou anti-citation vide)
     text = text.replace(/((?:^>[^\n]*\r?\n?)+)/gm, (match) => {
       const bqLines = match.split('\n').map(l => l.replace(/^>\s?/, '').trim()).filter(l => l.length > 0);
       const bqContent = bqLines.join(' ');
+      if (!/[a-zA-Z0-9À-ÿ]/.test(bqContent)) return '';
       return `\n<blockquote class="article-bible-quote"><p>${bqContent}</p></blockquote>\n\n`;
     });
 
@@ -1942,13 +1973,15 @@ const ArticlesView = {
     }
 
     // Nettoyage des balises <p> et <br> autour des blocs structurés
-    html = html
+    let bodyContent = `<p>${html}</p>`
       .replace(/<p>\s*(<(?:div|blockquote|h1|h2|h3|h4|section)[\s\S]*?<\/(?:div|blockquote|h1|h2|h3|h4|section)>)\s*<\/p>/gi, '$1')
+      .replace(/<p>\s*(<(?:div|blockquote|h1|h2|h3|h4|section))/gi, '$1')
+      .replace(/(<\/(?:div|blockquote|h1|h2|h3|h4|section)>)\s*<\/p>/gi, '$1')
       .replace(/<p>\s*<\/p>/gi, '')
       .replace(/(?:<br\s*\/?>\s*)+(<\/?div)/gi, '$1')
       .replace(/(<\/div>)\s*(?:<br\s*\/?>\s*)+/gi, '$1');
 
-    return `<div class="article-markdown-body"><p>${html}</p></div>`;
+    return `<div class="article-markdown-body">${bodyContent}</div>`;
   },
 
   async loadDrawerArticles(bookCode, chapter) {

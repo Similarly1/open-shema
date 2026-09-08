@@ -119,15 +119,19 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 ### 🎙️ 5. Studio de Prédication & Banque d'Illustrations
 
-> 🛡️ **Règle Fondamentale de Non-Délégation** :  
-> Open Shema a été délibérément calibré pour **ne jamais rédiger de prédications toutes faites** ni se substituer au prédicateur. L'IA n'est pas là pour penser, méditer ou prier à votre place. Elle intervient exclusivement comme un **assistant de laboratoire et un sparring-partner** : elle fournit la matière première exégétique brute, aide à clarifier la syntaxe du texte, stimule la recherche de la Proposition Centrale du Texte (PCT) et éprouve la cohérence de votre plan, tout en laissant 100% de la réflexion spirituelle, doctrinale et pastorale entre vos mains.
+> 🛡️ **Règle Fondamentale de Non-Délégation & Respect de la Patte Humaine** :  
+> Open Shema a été délibérément calibré pour **ne jamais rédiger de prédications toutes faites** ni se substituer au prédicateur. L'IA n'est pas là pour penser, méditer ou prier à votre place. La prédication vivante n'est pas une récitation lisse et aseptisée générée par un modèle statistique : c'est la Parole de Dieu proclamée par un serviteur imparfait, dépendant de la puissance du Saint-Esprit opérant dans la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9). L'IA intervient exclusivement comme **assistant de laboratoire et sparring-partner maïeutique** : elle fournit la matière brute exégétique, éprouve votre proposition centrale et vous accompagne sans jamais voler votre voix.
 
-* **Atelier Homilétique Structuré** :
-  * Rédigez et organisez vos messages selon un canevas éprouvé : *Titre, Passage source, Thème, Proposition Centrale du Texte (PCT / Big Idea), Plan détaillé en points logiques, Pistes d'application concrètes*.
-* **Banque d'Illustrations Thématiques** :
-  * Base de données d'illustrations de prédication classées par catégories et indexées sur les passages bibliques pour nourrir vos réflexions.
-* **Gestionnaire d'Archives Pastorales** :
-  * Classez, retrouvez et réexploitez facilement vos séries de messages et carnets de prédications passés.
+* **Atelier Homilétique Structuré & Matrice à Double Rive** :
+  * Rédigez selon la méthode d'homilétique textuelle (David Helm, John Stott, Haddon Robinson) : *Passage source, Histoire du Salut en 8 étapes, PMT (Pensée Maîtresse du Texte - Rive 1), Le Pont (Tension Contemporaine), PMS (Pensée Maîtresse du Sermon - Rive 2), Objectif pastoral de transformation*.
+* **🔍 Évaluation & Audit Homilétique IA (Post-Rédaction)** :
+  * Soumettez votre propre sermon rédigé à un audit bienveillant et exigeant en 5 axes (*Fidélité au texte source, Clarté de la Proposition Centrale, Équilibre Loi/Grâce & Christocentrisme, Pertinence des applications pour le cœur, Forces et pistes de progrès*) sans que l'IA ne réécrive votre texte.
+* **📋 Grille d'Auto-Évaluation Pastorale (1 Timothée 4.15)** :
+  * Examen de conscience personnel avant de monter en chaire (Prière & humilité, Ancrage textuel, Clarté, Grâce, Visée du cœur, Patte humaine) mémorisé dans chaque sermon.
+* **Banque d'Illustrations Thématiques & Canevas Réels** :
+  * Plus de 4 200 illustrations pastorales indexées et canevas homilétiques issus de prédications réelles.
+* **Mode Pupitre Live & Gestionnaire d'Archives** :
+  * Présentation plein écran avec chronomètre discret pour la chaire, sans générer de diaporamas superficiels.
 
 ---
 

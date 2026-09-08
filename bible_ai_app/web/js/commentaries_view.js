@@ -383,8 +383,8 @@ const CommentariesView = {
 
   setReadingBackground(bg) {
     this.readingBg = bg || 'auto';
-    const currentTheme = document.getElementById('cfg-theme')?.value || 'dark';
-    const currentPalette = document.getElementById('cfg-theme-palette')?.value || 'palette-dark-slate';
+    const currentTheme = document.body.classList.contains('theme-light') ? 'light' : 'dark';
+    const currentPalette = document.body.className.match(/palette-([a-z-]+)/)?.[1] || (currentTheme === 'light' ? 'light-clean' : 'dark-slate');
 
     if (typeof App !== 'undefined' && App.applyTheme) {
       App.applyTheme(currentTheme, currentPalette, this.readingBg);

@@ -179,6 +179,125 @@ class AiMixin:
 
         return {"success": True, "sections": normalized, "used_model": used_model}
 
+    def evaluate_sermon_with_ai(self, sermon_data: Dict[str, Any], options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Évalue une prédication déjà rédigée selon la grille d'audit homilétique en 5 axes (méthode d'exposition textuelle et biblique),
+        sans jamais réécrire le sermon à la place du prédicateur.
+        """
+        self.config = load_config()
+        opts = options or {}
+        from core.config import DEFAULT_SERMON_EVALUATION_SYSTEM_PROMPT
+
+        sys_prompt = self.config.get("prompt_sermon_evaluation") or DEFAULT_SERMON_EVALUATION_SYSTEM_PROMPT
+        
+        # Déterminer les modèles
+        primary_model = opts.get("model") or self.config.get("sermon_evaluation_model") or self.config.get("chat_model", "gemini-3.7-flash")
+        fallback_model = self.config.get("sermon_evaluation_fallback_model") or self.config.get("chat_fallback_model", "gemini-3.5-flash-lite")
+        models_to_try = [primary_model]
+        if fallback_model and fallback_model != primary_model:
+            models_to_try.append(fallback_model)
+
+        # Préparer les données du sermon
+        title = sermon_data.get("title", "Prédication sans titre")
+        passage_obj = sermon_data.get("passage", {})
+        passage_ref = passage_obj.get("reference", "") if isinstance(passage_obj, dict) else str(passage_obj or "")
+        church = sermon_data.get("church", "")
+        era = sermon_data.get("redemptive_era", "")
+        pmt = sermon_data.get("pmt") or sermon_data.get("big_idea") or ""
+        tension = sermon_data.get("contemporary_tension", "")
+        pms = sermon_data.get("pms", "")
+        goal = sermon_data.get("goal", "")
+        sections = sermon_data.get("sections", [])
+
+        meta_parts = [f"# {title}"]
+        if passage_ref:
+            meta_parts.append(f"**Passage biblique d'ancrage :** {passage_ref}")
+        if church:
+            meta_parts.append(f"**Contexte d'Église / Auditoire :** {church}")
+        if era:
+            meta_parts.append(f"**Étape dans l'Histoire du Salut :** {era}")
+        if pmt:
+            meta_parts.append(f"**Pensée Maîtresse du Texte (PMT - Rive 1) :** {pmt}")
+        if tension:
+            meta_parts.append(f"**Le Pont / Tension Contemporaine :** {tension}")
+        if pms:
+            meta_parts.append(f"**Pensée Maîtresse du Sermon (PMS - Rive 2) :** {pms}")
+        if goal:
+            meta_parts.append(f"**Objectif de transformation pour l'auditeur :** {goal}")
+
+        meta_str = "\n".join(meta_parts)
+
+        # Extraction des sections rédigées
+        sections_parts = []
+        for idx, sec in enumerate(sections):
+            sec_type = sec.get("type", "point")
+            sec_title = sec.get("title", f"Section {idx + 1}")
+            sec_content = sec.get("contentHtml") or sec.get("content") or ""
+            clean_content = re.sub(r'</?(?:p|div|span|strong|em|b|i|ul|ol|li|h[1-6]|blockquote)[^>]*>', ' ', sec_content)
+            clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+            sections_parts.append(f"### Section {idx + 1} [{sec_type.upper()}] : {sec_title}\n{clean_content}")
+
+        sections_str = "\n\n".join(sections_parts) if sections_parts else "*(Aucune section de sermon rédigée pour l'instant)*"
+
+        user_prompt = (
+            f"Voici les données du projet de prédication à auditer :\n\n"
+            f"{meta_str}\n\n"
+            f"--- CONTENU DU PROJET DE PRÉDICATION ---\n"
+            f"{sections_str}\n\n"
+            f"--- FIN DU CONTENU ---\n\n"
+            f"CONSIGNE IMPÉRATIVE D'AUDIT HOMILÉTIQUE (NEUTRALITÉ STRICTE) :\n"
+            f"1. COMMENCEZ DIRECTEMENT par le rapport d'audit (titre Markdown ou Axe 1). N'écrivez AUCUNE formule d'accueil (aucun 'Bonjour', aucun 'Bonjour cher collègue', aucune salutation, aucun préambule personnel).\n"
+            f"2. STYLE PUREMENT OBJECTIF ET NEUTRE : Aucun tutoiement ('tu', 'ton', 'toi'). Utilisez un style d'analyse impersonnel, technique et dépassionné (ou le vouvoiement sobre si nécessaire).\n"
+            f"3. AUCUNE BÉNÉDICTION NI ENVOLÉE PIEUSE : Ne terminez par aucun souhait pieux, ni bénédiction de chaire (aucun 'que l'Esprit souffle', etc.).\n"
+            f"4. Suivez rigoureusement la grille en 5 axes (1. Fidélité textuelle, 2. Clarté PMT/PMS, 3. Équilibre Loi/Grâce, 4. Pertinence des applications, 5. Synthèse : Points forts & Axes d'amélioration prioritaires).\n"
+            f"5. Ne réécrivez pas le sermon à la place de l'auteur : fournissez un diagnostic lucide, précis et constructif."
+        )
+
+        from ai.llm_client import LLMClient
+        import datetime
+
+        last_err = None
+        evaluation_text = None
+        used_model = None
+
+        for cur_model in models_to_try:
+            lower_m = cur_model.lower()
+            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
+                token = self.config.get("infomaniak_token", "")
+                pid = self.config.get("infomaniak_product_id", "251")
+                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
+                api_key = self.config.get("mistral_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+            else:
+                api_key = self.config.get("gemini_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+
+            try:
+                out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
+                if out and not str(out).startswith("Erreur"):
+                    evaluation_text = str(out).strip()
+                    used_model = cur_model
+                    break
+                else:
+                    last_err = out
+            except Exception as e:
+                last_err = str(e)
+                logger.warning("Échec évaluation homilétique avec %s: %s", cur_model, e)
+
+        if not evaluation_text:
+            return {
+                "success": False,
+                "error": last_err or "Impossible de générer l'évaluation homilétique. Vérifiez votre clé API dans les Paramètres."
+            }
+
+        return {
+            "success": True,
+            "evaluation": evaluation_text,
+            "used_model": used_model,
+            "evaluated_at": datetime.datetime.now().isoformat()
+        }
+
     def ask_study_ai(self, messages_history: list, mode: str = "exegesis", passage_ref: str = "", options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Génère une étude théologique ou exégétique complète avec extraction multi-sources (Bibles, Commentaires, Dicos, Notes),

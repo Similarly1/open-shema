@@ -1264,7 +1264,7 @@ const AIStudyView = {
         {
           svg: this.ICONS.notes,
           label: 'Prédication : Sainteté de Dieu',
-          prompt: "Rédige un plan homilétique percutant sur la Sainteté de Dieu basé sur Ésaïe 6.",
+          prompt: "Quelles sont les tensions et la dynamique théologique de la sainteté de Dieu dans Ésaïe 6 ?",
           targetMode: 'sermon'
         },
         {
@@ -1314,31 +1314,31 @@ const AIStudyView = {
     } else {
       const ref = passageLabel;
       
-      // Mode Prédication spécialisé avec les 5 piliers homilétiques
+      // Mode Prédication spécialisé avec les 5 piliers homilétiques maïeutiques (David Helm / Homilétique textuelle)
       if (this.currentMode === 'sermon') {
         return [
           {
             svg: this.ICONS.sparkles,
-            label: `Proposition Centrale (PC) de ${ref}`,
-            prompt: `Dégage le sujet précis et formule la Proposition Centrale (Big Idea / thèse homilétique) pour ${ref} en une phrase claire et percutante.`,
+            label: `Proposition Centrale de ${ref}`,
+            prompt: `Quels éléments textuels et théologiques permettent de dégager le sujet et la proposition centrale (Big Idea) de ${ref} ?`,
             targetMode: 'sermon'
           },
           {
             svg: this.ICONS.notes,
-            label: `Plan Expositif de ${ref}`,
-            prompt: `Construis un plan expositif fidèle en 2 à 4 points pour ${ref} selon la méthode découper-décrire-homogénéiser.`,
+            label: `Articulations logiques de ${ref}`,
+            prompt: `Quelles sont les articulations logiques, transitions et mouvements naturels du texte de ${ref} pour guider ma propre structure ?`,
             targetMode: 'sermon'
           },
           {
             svg: this.ICONS.book,
-            label: `Pistes d'Illustrations sur ${ref}`,
-            prompt: `Propose 3 illustrations pertinentes (historiques, bibliques ou contemporaines) pour illuminer le message de ${ref}.`,
+            label: `Pistes d'Illustrations pour ${ref}`,
+            prompt: `Quels contextes historiques, récits bibliques ou analogies concrètes peuvent illuminer la dynamique centrale de ${ref} ?`,
             targetMode: 'sermon'
           },
           {
             svg: this.ICONS.scales,
-            label: `4 Axes d'Applications pour ${ref}`,
-            prompt: `Formule des applications pastorales concrètes pour ${ref} selon les 4 axes : Cœur, Pensée, Action et Communauté, ancrées dans la grâce.`,
+            label: `Viser le Cœur : Applications de ${ref}`,
+            prompt: `Quelles questions ce passage (${ref}) pose-t-il au cœur, aux affections et aux luttes concrètes de nos contemporains ?`,
             targetMode: 'sermon'
           },
           {
@@ -1359,8 +1359,8 @@ const AIStudyView = {
         },
         {
           svg: this.ICONS.notes,
-          label: `Plan de sermon sur ${ref}`,
-          prompt: `Propose un plan d'enseignement détaillé et des applications pastorales concrètes pour ${ref}.`,
+          label: `Pistes homilétiques sur ${ref}`,
+          prompt: `Quels sont les défis pastoraux et les questions directrices pour bâtir une prédication fidèle sur ${ref} ?`,
           targetMode: 'sermon'
         },
         {

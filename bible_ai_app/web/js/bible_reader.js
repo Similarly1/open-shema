@@ -585,10 +585,15 @@ const DisplayOptions = {
 
         const cfg = await API.getSettings() || {};
         cfg.reading_bg = bgKey;
+        const currentTheme = document.body.classList.contains('theme-light') ? 'light' : (cfg.theme || 'dark');
+        const currentPalette = document.body.className.match(/palette-([a-z-]+)/)?.[1] || cfg.theme_palette || (currentTheme === 'light' ? 'light-clean' : 'dark-slate');
+        cfg.theme = currentTheme;
+        cfg.theme_palette = currentPalette;
+
         const bgHiddenInput = document.getElementById('cfg-reading-bg');
         if (bgHiddenInput) bgHiddenInput.value = bgKey;
 
-        App.applyTheme(cfg.theme, cfg.theme_palette, bgKey);
+        App.applyTheme(currentTheme, currentPalette, bgKey);
         await API.call('save_settings', cfg);
         popover.classList.add('hidden');
       });
@@ -3063,6 +3068,15 @@ const LexiconViewer = {
   currentMatches: [],
   activeSourceIndex: 0,
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  },
+
   getPassageKeywords(book, chapter) {
     const b = (book || (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'GEN').toUpperCase();
     const ch = parseInt(chapter || (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1, 10);
@@ -3197,6 +3211,7 @@ const LexiconViewer = {
   },
 
   renderEmptyState(book, chapter) {
+    const esc = (s) => (this && typeof this.escapeHtml === 'function' ? this.escapeHtml(s) : (typeof LexiconViewer !== 'undefined' && typeof LexiconViewer.escapeHtml === 'function' ? LexiconViewer.escapeHtml(s) : (typeof window !== 'undefined' && window.escapeHtml ? window.escapeHtml(s) : String(s || ''))));
     const container = document.getElementById('lexicon-details');
     if (!container) return;
 
@@ -3224,7 +3239,7 @@ const LexiconViewer = {
         <div class="lexicon-empty-suggestions-label">Termes clés pour ${frenchName} ${ch} :</div>
         <div class="lexicon-empty-suggestions">
           ${keywords.map(k => `
-            <button type="button" class="lexicon-empty-hint-tag" data-word="${this.escapeHtml(k.word)}" data-strong="${this.escapeHtml(k.strong)}">
+            <button type="button" class="lexicon-empty-hint-tag" data-word="${esc(k.word)}" data-strong="${esc(k.strong)}">
               <span class="lex-sug-word">${k.word}</span>
               <span class="lex-sug-sep">•</span>
               <span class="lex-sug-root">${k.root} (${k.strong})</span>
@@ -3647,6 +3662,7 @@ const LexiconViewer = {
   },
 
   buildStrongCardHtml(match, bpVideoCardHtml = '', padding = '16px') {
+    const esc = (s) => (this && typeof this.escapeHtml === 'function' ? this.escapeHtml(s) : (typeof LexiconViewer !== 'undefined' && typeof LexiconViewer.escapeHtml === 'function' ? LexiconViewer.escapeHtml(s) : (typeof window !== 'undefined' && window.escapeHtml ? window.escapeHtml(s) : String(s || ''))));
     const rawTitle = match.title || this.currentTerm || '';
     let frenchLemma = match.french_lemma || rawTitle;
     let originalScript = match.lemma || '';
@@ -3704,8 +3720,8 @@ const LexiconViewer = {
     }
 
     const pillsHtml = uniqueTokens.slice(0, 12).map(tok => `
-      <span class="strong-semantic-pill" data-token="${this.escapeHtml(tok)}">
-        ${this.escapeHtml(tok)}
+      <span class="strong-semantic-pill" data-token="${esc(tok)}">
+        ${esc(tok)}
       </span>
     `).join('');
 
@@ -3738,7 +3754,7 @@ const LexiconViewer = {
             <div class="strong-french-lemma">« ${frenchLemma} »</div>
 
             <!-- Bouton Prononciation Audio -->
-            <button type="button" class="strong-audio-play-btn" id="btn-play-strong-audio" data-word="${this.escapeHtml(wordToPronounce)}" data-lang="${isHebrew ? 'he' : 'el'}" data-strong="${this.escapeHtml(strongCode)}" title="Écouter la prononciation vocale">
+            <button type="button" class="strong-audio-play-btn" id="btn-play-strong-audio" data-word="${esc(wordToPronounce)}" data-lang="${isHebrew ? 'he' : 'el'}" data-strong="${esc(strongCode)}" title="Écouter la prononciation vocale">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -3830,11 +3846,11 @@ const LexiconViewer = {
 
           <!-- Barre d'Actions Rapides -->
           <div class="strong-actions-footer">
-            <button type="button" class="btn-primary strong-btn-occurrences" data-strong="${this.escapeHtml(strongCode)}" data-lemma="${this.escapeHtml(frenchLemma)}">
+            <button type="button" class="btn-primary strong-btn-occurrences" data-strong="${esc(strongCode)}" data-lemma="${esc(frenchLemma)}">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <span>Occurrences de ${strongCode} dans la Bible</span>
             </button>
-            <button type="button" class="btn-secondary strong-btn-copy" data-lemma="${this.escapeHtml(frenchLemma)}" data-original="${this.escapeHtml(originalScript)}" data-strong="${this.escapeHtml(strongCode)}" title="Copier la référence dans le presse-papier">
+            <button type="button" class="btn-secondary strong-btn-copy" data-lemma="${esc(frenchLemma)}" data-original="${esc(originalScript)}" data-strong="${esc(strongCode)}" title="Copier la référence dans le presse-papier">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copier</span>
             </button>

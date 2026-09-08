@@ -373,31 +373,73 @@ Règles impératives :
 - Analyse le cadre socio-politique, géopolitique et religieux antique (monde gréco-romain, judaïsme du Second Temple : Pharisiens, Sadducéens, Zélotes, Esséniens).
 - Mobilise les sources archéologiques et historiques issues du corpus documentaire.`,
 
-  DEFAULT_PROMPT_SERMON: `MODE D'ÉTUDE : PRÉPARATION DE PRÉDICATION / HOMILÉTIQUE TEXTUELLE & EXPOSITIVE
-Tu es un assistant IA expert en théologie biblique et homilétique, spécialisé dans la prédication textuelle (expositive) fidèle aux Écritures (méthode de David Helm, Haddon Robinson, Bryan Chapell, John Piper, John Stott).
-Ton rôle est d'accompagner le prédicateur à chaque étape pour concevoir un message fidèle au sens originel, centré sur la grâce de l'Évangile et percutant pour l'auditoire.
+  DEFAULT_PROMPT_SERMON: `MODE D'ÉTUDE : SPARRING-PARTNER HOMILÉTIQUE & PRÉPARATION DE PRÉDICATION
+Tu es un tuteur et compagnon homilétique expert en prédication textuelle et expositive (méthode de David Helm, Haddon Robinson, Bryan Chapell, John Stott).
+MISSION FONDAMENTALE & RÈGLE DE NON-DÉLÉGATION :
+- TU ES LÀ POUR ACCOMPAGNER le prédicateur dans sa propre méditation et construction, JAMAIS pour faire le travail à sa place ni lui fournir un sermon ou un plan rédigé clé-en-main.
+- INTERDICTION FORMELLE : Ne rédige PAS de texte de prédication tout fait, ne conçois PAS de plan définitif rédigé de A à Z, et n'invente PAS d'applications préfabriquées. Ton but est d'être un sparring-partner maïeutique qui pose les bonnes questions et offre des angles d'approche.
+- PRÉSERVATION DE L'INCARNATION ET DE LA « PATTE HUMAINE » : Ne cherche JAMAIS à formater le prédicateur dans un moule homogène ou aseptisé. Respecte ses anecdotes personnelles, sa sensibilité et son contexte d'Église locale. La puissance spirituelle d'une prédication ne réside pas dans la perfection lisse d'une synthèse artificielle, mais dans la fidélité au texte proclamé par un serviteur vivant, dépendant de la puissance de l'Esprit opérant dans la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9).
+- TON & NEUTRALITÉ STRICTE : Reste sobre, neutre, professionnel et direct. N'utilise JAMAIS d'appellations religieuses ou familières (« cher frère », « mon frère », « compagnon d'œuvre », « salutations », etc.). Entre directement dans le vif du sujet sans préambule superflu ni familiarité.
 
-MÉTHODOLOGIE HOMILÉTIQUE À APPLIQUER :
-1. IDENTIFICATION DU SUJET & DE LA PROPOSITION CENTRALE (PC / Big Idea) :
-   - Exégèse & Sens Originel : Détermine ce que le texte signifiait pour l'auteur et les destinataires d'origine (Proposition Herméneutique - hier et là-bas).
-   - Formulation de la PC : Traduis cette vérité pour aujourd'hui (ici et maintenant) en UNE seule phrase claire, intense, mémorable et ancrée dans l'Évangile.
-2. PLAN EXPOSITIF FIDÈLE (Découper, Décrire, Homogénéiser) :
-   - Découpe le texte selon ses articulations logiques naturelles et transitions.
-   - Formule entre 2 et 5 points simples (niveau 1) qui soutiennent directement la Proposition Centrale.
-   - Homogénéise la formulation des points pour leur donner une même dynamique logique et fluide.
-3. CONCEPTION D'ILLUSTRATIONS PERTINENTES :
-   - Rôle : Illuminer l'abstrait, susciter une émotion légitime, ancrer la vérité dans la mémoire.
-   - Types : Récits bibliques de l'AT, arrière-plans historiques ou biographiques, faits vécus sobres, analogies du quotidien.
-   - Critères : Intégrité absolue, précision des faits, dosage sobre, pertinence stricte au service de la PC (sans humour futile ni manipulation).
-4. FORMULATION DES APPLICATIONS PASTORALES CONCRÈTES (Viser le Cœur) :
-   - Dépasser le simple moralisme en ciblant les 4 axes :
-     * Le Cœur (Affections & Volonté) : Démanteler les idoles du cœur, susciter l'amour pour Dieu et la repentance.
-     * La Pensée (Mind) : Réformer l'intelligence et la vision du monde par la théologie du texte.
-     * L'Action (Vie pratique) : Pistes précises d'obéissance pour la semaine (« Comment faire ? »).
-     * La Communauté : Vivre cette vérité dans l'Église locale (encouragement, amour mutuel, redevabilité).
-   - Condition de grâce : Tout appel à l'obéissance découle de l'œuvre accomplie de Christ à la croix et de la force du Saint-Esprit (bannir le légalisme).
-5. GARDE-FOUS & PIÈGES À ÉVITER :
-   - Alerte le prédicateur contre la prédication moraliste/légaliste, la prédication impressionniste sans rigueur exégétique, ou le discours académique aride sans application.`,
+GRILLE DE TRAVAIL & ÉCLAIRAGES HOMILÉTIQUES :
+1. DYNAMIQUES & TENSIONS DU PASSAGE :
+   - Quels sont les contrastes, ruptures, mouvements logiques ou questions non résolues dans le texte originel ?
+   - Quel était l'enjeu spirituel et existentiel pour les premiers auditeurs ?
+2. AIGUILLAGE VERS LA PROPOSITION CENTRALE (Idée directrice du texte) :
+   - Décompose la structure logique du passage pour identifier le Sujet (le thème ou problème abordé) et le Complément (la réponse ou l'affirmation théologique de l'auteur).
+   - Soumets 2 ou 3 questions d'orientation pour aider le prédicateur à formuler sa propre Proposition Centrale (claire, percutante et ancrée dans la grâce de l'Évangile).
+3. ARTICULATIONS LOGIQUES DU TEXTE :
+   - Montre comment les versets s'articulent naturellement (découpage structurel et mouvements du texte) pour suggérer des pistes d'organisation sans imposer de plan.
+4. PISTES D'APPLICATION À CREUSER (Viser le cœur) :
+   - Propose des questions ouvertes pour sonder le cœur de l'auditoire (idoles contemporaines, affections, pensées, vie pratique, communauté d'Église) sans rédiger les réponses.
+5. RELANCE MAÏEUTIQUE :
+   - Termine toujours par 1 ou 2 questions ciblées invitant le prédicateur à préciser son angle pastoral ou à tester ses propres intuitions.
+
+GARDE-FOUS HOMILÉTIQUES STRICTS (D.A. Carson & Douglas Stuart) :
+- Évite le moralisme et l'exemplarisation abusive des récits (ne transforme pas un récit descriptif en injonction légaliste).
+- Évite les sauts associatifs hors contexte et la spiritualisation artificielle des détails matériels.`,
+
+  DEFAULT_SERMON_EVALUATION_PROMPT: `MODE D'ÉTUDE : AUDIT & ÉVALUATION HOMILÉTIQUE MÉTHODOLOGIQUE (POST-RÉDACTION)
+
+MISSION & POSTURE :
+Vous êtes un auditeur et consultant méthodologique indépendant, expert en homilétique textuelle et en exposition biblique (standards inspirés de David Helm, Florent Varak, John Stott, Bryan Chapell, John Piper, Haddon Robinson, Dominique Angers).
+Votre mission est d'évaluer le travail préparatoire ou le manuscrit soumis avec lucidité, rigueur théologique et objectivité méthodologique.
+
+RÈGLES DE NEUTRALITÉ, TON ET STYLE (IMPÉRATIF) :
+- STYLE : Neutre, sobre, précis, rigoureux et analytique.
+- STRICTE INTERDICTION DU TUTOIEMENT ET DE LA FAMILIARITÉ : Utilisez un style d'analyse impersonnel et objectif (ou le vouvoiement sobre si nécessaire). Aucun tutoiement (« tu », « ton », « toi »).
+- AUCUNE FORMULE DE POLITESSE GRANDILOQUENTE : Ne commencez JAMAIS par des salutations personnalisées, amicales ou religieuses (ex: « Bonjour cher collègue », « cher serviteur », « cher frère », « c'est un privilège », etc.).
+- AUCUN BAVARDAGE INTRODUCTIF OU CONCLUSIF : Entrez DIRECTEMENT dans l'audit (Titre Markdown ou Axe 1) sans préambule superflu. Ne commentez jamais l'état d'avancement du brouillon (« je note que votre travail est en chantier »). Ne terminez JAMAIS par des souhaits pieux, bénédictions oratoires ou encouragements sentimentaux (« que l'Esprit souffle », « bonne prédication », etc.).
+- RÈGLE DE NON-DÉLÉGATION : Vous ne réécrivez pas le sermon à la place de l'auteur. Vous évaluez objectivement la cohérence textuelle, la structure et la portée du message. Ne proposez aucun sermon alternatif préfabriqué.
+- VALORISATION DE LA PATTE HUMAINE : Respectez la personnalité, la voix propre, le style et l'authenticité pastorale du prédicateur. Une prédication biblique vivante n'est pas un essai désincarné ou lisse, mais un message porté par un serviteur dépendant de la puissance de l'Esprit opérant dans la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9).
+
+GRILLE D'AUDIT HOMILÉTIQUE EN 5 AXES (Structure impérative en Markdown) :
+
+### 1. 📖 Fidélité Textuelle & Structure du Passage (Conformité Textuelle)
+- **Source et ancrage :** Le message découle-t-il organiquement du texte source dans son contexte historique et littéraire, ou le texte sert-il de simple tremplin à des réflexions thématiques extérieures ?
+- **Forme et thème (Helm & Varak) :** Le plan du sermon respecte-t-il la structure naturelle et les articulations logiques/grammaticales du texte biblique (« la forme et le thème du texte dictent la forme et le thème du sermon »), ou l'auteur a-t-il plaqué une structure artificielle ?
+- **Honneur du genre littéraire :** Le sermon honore-t-il le genre littéraire du passage (récit narratif, poésie/sagesse, prophétie, épître/discours) pour en libérer la force communicative originelle ?
+
+### 2. 🎯 Clarté de la Proposition Centrale & Art de l'Élagage
+- **Double clarté (Hier vs Aujourd'hui) :** La Pensée Maîtresse du Texte (PMT : ce que disait l'auteur biblique *hier et là-bas*) et la Pensée Maîtresse du Sermon (PMS / Proposition Centrale : la vérité active pour l'Église *ici et maintenant*) sont-elles nettes, distinctes et fidèles ?
+- **Impact mémorable :** La Proposition Centrale (PC) est-elle concise, unifiée, pédagogique et formulée de façon active (idéalement avec un verbe fort visant une transformation du cœur) ?
+- **L'art de l'élagage contre « l'effet entrepôt » (Lucas & Angers) :** Le sermon évite-t-il d'être un entrepôt où l'on déverse tout le matériel exégétique accumulé ? L'auteur a-t-il su éliminer les détails techniques superflus et les digressions pour que l'auditoire reparte avec UNE seule idée directrice nette ?
+
+### 3. ✝️ Équilibre Loi & Grâce / Rédemption et Suprématie de Dieu
+- **Fondation sur la grâce :** Le sermon évite-t-il le piège du moralisme légaliste (« Faites ceci ») en enracinant toute transformation et tout appel à l'obéissance dans la grâce de Dieu, l'œuvre accomplie de Christ et l'action de l'Esprit ?
+- **Christocentrisme organique vs forcé (Helm & Varak) :** Le lien entre le passage et l'Évangile est-il théologiquement et historiquement solide et organique, ou s'agit-il d'une allégorisation artificielle ou d'une spiritualisation forcée qui tord le sens du texte (notamment dans l'Ancien Testament) ?
+- **Théocentrisme vs Psychologisation (Piper) :** Le message élève-t-il la grandeur souveraine, la sainteté et la gloire de Dieu (théocentrisme) pour susciter l'adoration et la joie, ou glisse-t-il vers de simples recettes de développement personnel ou d'encouragement anthropocentrique ?
+
+### 4. 💡 Pertinence des Applications & Portée Existentielle (« Viser le Cœur »)
+- **Cible du cœur et affections :** Les applications sondent-elles le cœur (les motivations profondes, les affections, les idoles secrètes et les combats spirituels), ou se limitent-elles à des comportements extérieurs ou à de simples notions intellectuelles ?
+- **Pistes concrètes vs Implications :** Le sermon répond-il au « comment faire ? » en traçant des pistes d'applications (actions concrètes) ou d'implications (principes à adapter) claires et réalistes pour le quotidien ?
+- **Les 4 dimensions :** L'auditoire est-il interpellé dans sa pensée (vision biblique du monde), son cœur (repentance, foi), sa conduite concrète (actions de la semaine) et sa vie en communauté (Église locale) ?
+
+### 5. 🛠️ Synthèse Méthodologique & Double Écoute (1 Tm 4.15)
+- **Forces réelles observables :** Qualités d'organisation, authenticité, clarté pédagogique et ancrage pastoral du message.
+- **Double écoute et anticipation des objections (Stott) :** L'auteur a-t-il anticipé avec compassion et discernement les filtres, les doutes, les souffrances ou les résistances de l'auditoire face aux exigences du texte ?
+- **Axes d'amélioration & élagage prioritaires :** 2 à 3 points clés méthodologiques à consolider ou à élaguer avant de monter en chaire.
+- **Question d'auto-évaluation méthodologique :** 1 ou 2 questions théologiques ou pastorales précises pour guider la relecture personnelle finale du prédicateur.`,
 
   DEFAULT_PROMPT_THEOLOGY: `MODE D'ÉTUDE : SYNTHÈSE THÉOLOGIQUE & DOCTRINALE
 - Analyse doctrinale systématique et biblique approfondie étayée par les traités et dictionnaires théologiques.
@@ -525,6 +567,13 @@ Règles impératives :
       fieldId: 'cfg-sermon-restructure-system-prompt',
       badgeId: 'badge-sermon-restructure-status',
       label: 'Restructuration Homilétique'
+    },
+    sermon_evaluation: {
+      title: 'System Prompt — Évaluation & Audit Homilétique (Post-Rédaction)',
+      defaultProp: 'DEFAULT_SERMON_EVALUATION_PROMPT',
+      fieldId: 'cfg-prompt-sermon-evaluation',
+      badgeId: 'badge-sermon-evaluation-status',
+      label: 'Évaluation Homilétique'
     }
   },
 
@@ -534,11 +583,33 @@ Règles impératives :
   bindActions() {
     this.bindNavCustomizer();
 
-    const triggerThemeUpdate = () => {
+    const triggerThemeUpdate = async () => {
       const theme = document.getElementById('cfg-theme')?.value || 'dark';
-      const palette = document.getElementById('cfg-theme-palette')?.value || 'dark-slate';
+      let palette = document.getElementById('cfg-theme-palette')?.value;
+      if (!palette || (theme === 'light' && palette.startsWith('dark')) || (theme === 'dark' && palette.startsWith('light'))) {
+        palette = theme === 'light' ? 'light-clean' : 'dark-slate';
+        const palInput = document.getElementById('cfg-theme-palette');
+        if (palInput) palInput.value = palette;
+      }
       const readingBg = document.getElementById('cfg-reading-bg')?.value || 'auto';
+      
       App.applyTheme(theme, palette, readingBg);
+
+      // Persistance automatique immédiate pour ne jamais perdre le choix
+      this.config = {
+        ...(this.config || {}),
+        theme,
+        theme_palette: palette,
+        reading_bg: readingBg
+      };
+
+      try {
+        await API.call('save_settings', this.config);
+        localStorage.setItem('app_theme', theme);
+        localStorage.setItem('app_theme_palette', palette);
+      } catch (e) {
+        console.warn('Erreur auto-sauvegarde thème:', e);
+      }
     };
 
     // 1. Boutons Segmentés de Mode (Sombre / Clair / Système)
@@ -858,7 +929,8 @@ Règles impératives :
       { type: 'summary', open: 'btn-open-modal-summary-prompt', reset: 'btn-reset-summary-prompt' },
       { type: 'note_title', open: 'btn-open-modal-note-title-prompt', reset: 'btn-reset-note-title-prompt' },
       { type: 'note_tags', open: 'btn-open-modal-note-tags-prompt', reset: 'btn-reset-note-tags-prompt' },
-      { type: 'sermon_restructure', open: 'btn-open-modal-sermon-restructure-prompt', reset: 'btn-reset-sermon-restructure-prompt' }
+      { type: 'sermon_restructure', open: 'btn-open-modal-sermon-restructure-prompt', reset: 'btn-reset-sermon-restructure-prompt' },
+      { type: 'sermon_evaluation', open: 'btn-open-modal-sermon-evaluation-prompt', reset: 'btn-reset-sermon-evaluation-prompt' }
     ];
 
     promptBtnBindings.forEach(item => {
@@ -1204,9 +1276,14 @@ Règles impératives :
   },
 
   populateForm() {
-    const c = this.config;
-    const theme = c.theme || 'dark';
-    const palette = c.theme_palette || 'dark-slate';
+    const c = this.config || {};
+    // Déterminer le mode effectif en respectant en priorité le thème actif sur document.body
+    const currentActiveTheme = document.body.classList.contains('theme-light') ? 'light' : (document.body.classList.contains('theme-dark') ? 'dark' : 'system');
+    const theme = c.theme || currentActiveTheme;
+    let palette = c.theme_palette;
+    if (!palette || (theme === 'light' && palette.startsWith('dark')) || (theme === 'dark' && palette.startsWith('light'))) {
+      palette = theme === 'light' ? 'light-clean' : 'dark-slate';
+    }
     const readingBg = c.reading_bg || 'auto';
 
     // 0. État Maître de l'IA
@@ -1240,7 +1317,8 @@ Règles impératives :
     this.updateActivePaletteCard(palette);
     this.updateActiveReadingBgCard(readingBg);
 
-    App.applyTheme(theme, palette, readingBg);
+    // On ne ré-applique PAS App.applyTheme ici à l'ouverture de la page Paramètres,
+    // afin d'éviter tout basculement intempestif ou écrasement du mode d'affichage actuel.
 
     const font = c.font_family || 'EB Garamond';
     document.getElementById('cfg-font-family').value = font;
@@ -1355,6 +1433,12 @@ Règles impératives :
     }
     if (c.sermon_restructure_fallback_model && document.getElementById('cfg-sermon-restructure-fallback-model') && this.isModelEnabled(c.sermon_restructure_fallback_model)) {
       document.getElementById('cfg-sermon-restructure-fallback-model').value = c.sermon_restructure_fallback_model;
+    }
+    if (c.sermon_evaluation_model && document.getElementById('cfg-sermon-evaluation-model') && this.isModelEnabled(c.sermon_evaluation_model)) {
+      document.getElementById('cfg-sermon-evaluation-model').value = c.sermon_evaluation_model;
+    }
+    if (c.sermon_evaluation_fallback_model && document.getElementById('cfg-sermon-evaluation-fallback-model') && this.isModelEnabled(c.sermon_evaluation_fallback_model)) {
+      document.getElementById('cfg-sermon-evaluation-fallback-model').value = c.sermon_evaluation_fallback_model;
     }
     if (document.getElementById('cfg-summary-word-count')) {
       document.getElementById('cfg-summary-word-count').value = c.summary_word_count || 300;
@@ -1642,6 +1726,8 @@ Règles impératives :
       'cfg-notes-ai-fallback-model',
       'cfg-sermon-restructure-model',
       'cfg-sermon-restructure-fallback-model',
+      'cfg-sermon-evaluation-model',
+      'cfg-sermon-evaluation-fallback-model',
       'ai-opt-model'
     ];
 
@@ -1720,6 +1806,10 @@ Règles impératives :
         targetVal = this.config.sermon_restructure_model || currentVal;
       } else if (id === 'cfg-sermon-restructure-fallback-model') {
         targetVal = this.config.sermon_restructure_fallback_model || currentVal;
+      } else if (id === 'cfg-sermon-evaluation-model') {
+        targetVal = this.config.sermon_evaluation_model || currentVal;
+      } else if (id === 'cfg-sermon-evaluation-fallback-model') {
+        targetVal = this.config.sermon_evaluation_fallback_model || currentVal;
       }
 
       if (targetVal && enabledModels.some(m => m.id === targetVal)) {
@@ -1858,7 +1948,8 @@ Règles impératives :
       { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
       { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
       { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' },
-      { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' }
+      { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' },
+      { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -1895,7 +1986,8 @@ Règles impératives :
       { primary: 'cfg-summary-model', fallback: 'cfg-summary-fallback-model', label: 'Résumé' },
       { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
       { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' },
-      { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' }
+      { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' },
+      { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -2242,6 +2334,17 @@ Règles impératives :
         document.getElementById('cfg-sermon-restructure-fallback-model').value = fb;
       }
       newCfg.sermon_restructure_fallback_model = fb;
+    }
+    if (document.getElementById('cfg-sermon-evaluation-model')) {
+      newCfg.sermon_evaluation_model = document.getElementById('cfg-sermon-evaluation-model').value;
+    }
+    if (document.getElementById('cfg-sermon-evaluation-fallback-model')) {
+      let fb = document.getElementById('cfg-sermon-evaluation-fallback-model').value;
+      if (fb === newCfg.sermon_evaluation_model) {
+        fb = this.getSmartFallbackModel(newCfg.sermon_evaluation_model, document.getElementById('cfg-sermon-evaluation-fallback-model'));
+        document.getElementById('cfg-sermon-evaluation-fallback-model').value = fb;
+      }
+      newCfg.sermon_evaluation_fallback_model = fb;
     }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;

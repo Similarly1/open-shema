@@ -85,6 +85,7 @@ const SermonsView = {
     this.initDrawerWidth();
     this.initIllustrationPickerModal();
     this.bindEvents();
+    this.setupTabsScroll();
   },
 
   initDrawerWidth() {
@@ -119,6 +120,7 @@ const SermonsView = {
       } else {
         this.toggleOutlinePanel(true);
       }
+      setTimeout(() => this.updateTabsScrollState?.(), 200);
     });
 
     if (!resizer || !drawer) return;
@@ -152,7 +154,62 @@ const SermonsView = {
       document.body.style.userSelect = '';
       const finalWidth = drawer.offsetWidth;
       localStorage.setItem('sermon_drawer_width', finalWidth);
+      setTimeout(() => this.updateTabsScrollState?.(), 50);
     });
+  },
+
+  setupTabsScroll() {
+    const scrollArea = document.getElementById('sermon-tabs-scroll-area');
+    const tabsBar = document.getElementById('sermon-drawer-tabs-bar');
+    const btnScrollLeft = document.getElementById('btn-scroll-sermon-tabs-left');
+    const btnScrollRight = document.getElementById('btn-scroll-sermon-tabs-right');
+
+    const updateScrollState = () => {
+      if (!tabsBar || !scrollArea) return;
+      const scrollLeft = tabsBar.scrollLeft;
+      const maxScroll = tabsBar.scrollWidth - tabsBar.clientWidth;
+
+      if (maxScroll > 4) {
+        if (scrollLeft > 6) {
+          btnScrollLeft?.classList.remove('hidden');
+          scrollArea.classList.add('has-overflow-left');
+        } else {
+          btnScrollLeft?.classList.add('hidden');
+          scrollArea.classList.remove('has-overflow-left');
+        }
+
+        if (scrollLeft < maxScroll - 6) {
+          btnScrollRight?.classList.remove('hidden');
+          scrollArea.classList.add('has-overflow-right');
+        } else {
+          btnScrollRight?.classList.add('hidden');
+          scrollArea.classList.remove('has-overflow-right');
+        }
+      } else {
+        btnScrollLeft?.classList.add('hidden');
+        btnScrollRight?.classList.add('hidden');
+        scrollArea.classList.remove('has-overflow-left', 'has-overflow-right');
+      }
+    };
+
+    this.updateTabsScrollState = updateScrollState;
+
+    tabsBar?.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState, { passive: true });
+
+    btnScrollLeft?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabsBar?.scrollBy({ left: -140, behavior: 'smooth' });
+      setTimeout(updateScrollState, 350);
+    });
+
+    btnScrollRight?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabsBar?.scrollBy({ left: 140, behavior: 'smooth' });
+      setTimeout(updateScrollState, 350);
+    });
+
+    setTimeout(updateScrollState, 250);
   },
 
   getDefaultSermonTemplate() {
@@ -268,9 +325,29 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       this.toggleResourcesDrawer(true);
       this.activeDrawerTab = 'metadata';
       document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(b => {
-        b.classList.toggle('active', b.dataset.drawerTab === 'metadata');
+        const isActive = b.dataset.drawerTab === 'metadata';
+        b.classList.toggle('active', isActive);
+        if (isActive) {
+          b.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
       });
       this.renderDrawerContent();
+      setTimeout(() => this.updateTabsScrollState?.(), 300);
+    });
+
+    // Clic sur le bouton d'évaluation homilétique (barre d'outils)
+    document.getElementById('btn-sermon-evaluate-ai')?.addEventListener('click', () => {
+      this.toggleResourcesDrawer(true);
+      this.activeDrawerTab = 'evaluation';
+      document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(b => {
+        const isActive = b.dataset.drawerTab === 'evaluation';
+        b.classList.toggle('active', isActive);
+        if (isActive) {
+          b.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      });
+      this.renderDrawerContent();
+      setTimeout(() => this.updateTabsScrollState?.(), 300);
     });
 
     // 5. Onglets du tiroir
@@ -278,8 +355,10 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       tabBtn.addEventListener('click', () => {
         document.querySelectorAll('#sermon-drawer-tabs-bar .drawer-tab').forEach(b => b.classList.remove('active'));
         tabBtn.classList.add('active');
+        tabBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         this.activeDrawerTab = tabBtn.dataset.drawerTab || 'overview';
         this.renderDrawerContent();
+        setTimeout(() => this.updateTabsScrollState?.(), 300);
       });
     });
 
@@ -1927,6 +2006,11 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       toggleBtn.classList.toggle('active', willOpen);
     }
 
+    if (willOpen) {
+      setTimeout(() => this.updateTabsScrollState?.(), 100);
+      setTimeout(() => this.updateTabsScrollState?.(), 300);
+    }
+
     // Lorsque le volet droit s'ouvre -> replier automatiquement le menu principal à gauche (exactement comme pour la page Bible)
     if (typeof App !== 'undefined' && App.setSidebarCollapsed) {
       if (willOpen) {
@@ -1988,7 +2072,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
                   <div class="meta-popover-title">Passage Biblique & Péricope</div>
-                  <div class="meta-popover-author">Florent Varak (IBG) • David Helm</div>
+                  <div class="meta-popover-author">Homilétique textuelle • David Helm</div>
                   <div class="meta-popover-body">Le passage détermine les limites de votre prédication. Choisissez une unité littéraire complète (un paragraphe, une histoire, un argument).</div>
                   <div class="meta-popover-tip">Règle d'or : Laissez le texte imposer son ordre et sa dynamique au sermon.</div>
                 </div>
@@ -2029,7 +2113,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
                   <div class="meta-popover-title">Pensée Maîtresse du Texte (Sujet + Complément)</div>
-                  <div class="meta-popover-author">Florent Varak & Philippe Viguier (IBG)</div>
+                  <div class="meta-popover-author">Homilétique textuelle • Exposition biblique</div>
                   <div class="meta-popover-body">La vérité originelle que l'auteur biblique déclarait à ses premiers destinataires dans leur contexte historique.</div>
                   <div class="meta-popover-tip">Formule : Sujet précis + Complément (Ce que l'auteur en dit).</div>
                 </div>
@@ -2066,7 +2150,7 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <div class="sermon-meta-popover">
                   <div class="meta-popover-title">Pensée Maîtresse du Sermon (La Grande Idée)</div>
-                  <div class="meta-popover-author">Florent Varak (IBG) • John Stott • Haddon Robinson</div>
+                  <div class="meta-popover-author">John Stott • Haddon Robinson • David Helm</div>
                   <div class="meta-popover-body">La proposition centrale active et percutante que chaque membre de l'assemblée doit retenir et emporter chez lui.</div>
                   <div class="meta-popover-tip">Règle d'or : Une seule phrase mémorisable et orientée vers l'action.</div>
                 </div>
@@ -2281,11 +2365,325 @@ Synthèse de la pensée maîtresse et application pour la semaine...`
       return;
     }
 
+    if (this.activeDrawerTab === 'evaluation') {
+      this.renderEvaluationTabContent();
+      return;
+    }
+
     this.drawerContent.innerHTML = `
       <div style="padding: 12px 6px; font-size: 12px; color: var(--text-muted);">
         Contenu de l'onglet en cours de chargement...
       </div>
     `;
+  },
+
+  renderEvaluationTabContent() {
+    if (!this.drawerContent) return;
+    const s = this.currentSermon || {};
+    const evalData = s.evaluation || null;
+    const evaluatedAt = s.evaluated_at || '';
+    const evaluatedModel = s.evaluated_model || '';
+    const configuredModel = (typeof SettingsView !== 'undefined' && SettingsView.config?.sermon_evaluation_model) || 'gemini-3.7-flash';
+    const checklist = s.checklist || {};
+
+    const formattedDate = evaluatedAt ? new Date(evaluatedAt).toLocaleString('fr-FR', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) : '';
+
+    const checklistItems = [
+      {
+        id: 'prayer',
+        title: '1. Prière & Dépendance de l\'Esprit',
+        desc: 'J\'ai prié pour mon auditoire et confessé ma propre faiblesse (1 Co 2.1-5, 2 Co 12.9).'
+      },
+      {
+        id: 'text',
+        title: '2. Fidélité au Texte & Contexte',
+        desc: 'Le sermon découle organiquement du passage sans forcer le sens ni spiritualiser.'
+      },
+      {
+        id: 'pms',
+        title: '3. Clarté de la Grande Idée (PMS)',
+        desc: 'L\'auditoire peut résumer la vérité maîtresse du message en une seule phrase active.'
+      },
+      {
+        id: 'grace',
+        title: '4. Centré sur l\'Évangile & la Grâce',
+        desc: 'Toute obéissance découle de l\'œuvre accomplie de Christ (zéro moralisme légaliste).'
+      },
+      {
+        id: 'heart',
+        title: '5. Viser le Cœur & le Quotidien',
+        desc: 'Les applications sondent les motivations profondes, les idoles et les luttes réelles.'
+      },
+      {
+        id: 'voice',
+        title: '6. Authenticité & Patte Humaine',
+        desc: 'Je prêche avec mon parcours, ma voix et mon amour pastoral pour cette église (1 Tm 4.15).'
+      }
+    ];
+
+    const checklistHtml = checklistItems.map(item => {
+      const checked = !!checklist[item.id];
+      return `
+        <label class="sermon-eval-check-item ${checked ? 'is-checked' : ''}">
+          <input type="checkbox" class="sermon-eval-checkbox" data-check-id="${item.id}" ${checked ? 'checked' : ''}>
+          <div class="sermon-eval-check-text">
+            <strong class="sermon-eval-check-title">${item.title}</strong>
+            <span class="sermon-eval-check-desc">${item.desc}</span>
+          </div>
+        </label>
+      `;
+    }).join('');
+
+    let evalReportHtml = '';
+    if (evalData) {
+      const renderedContent = this.formatMarkdownSimple(evalData);
+      evalReportHtml = `
+        <div class="sermon-eval-report-card">
+          <div class="sermon-eval-report-header">
+            <div class="sermon-eval-report-meta">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>Évalué le ${formattedDate}${evaluatedModel ? ` (${this.escapeHtml(evaluatedModel)})` : ''}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <button class="btn-icon-subtle" id="btn-copy-sermon-evaluation" title="Copier le compte-rendu d'évaluation" style="padding: 2px 6px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="sermon-eval-markdown-body">
+            ${renderedContent}
+          </div>
+        </div>
+      `;
+    }
+
+    this.drawerContent.innerHTML = `
+      <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 14px;">
+        <!-- Bannière éthique & homilétique -->
+        <div class="sermon-eval-ethical-banner">
+          <div class="sermon-eval-ethical-banner-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="color: inherit;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <strong>L'IA comme Miroir Critique</strong>
+          </div>
+          <p>
+            <em>La prédication vivante ne réside pas dans la perfection lisse d'une synthèse artificielle, mais dans la fidélité au texte proclamé dans la dépendance de l'Esprit et la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9).</em>
+          </p>
+        </div>
+
+        <!-- Section 1 : Auto-évaluation pastorale (1 Tm 4.15) -->
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Auto-Évaluation (1 Tm 4.15)</span>
+            </div>
+            <span style="font-size: 10px; color: var(--text-muted);">Avant la chaire</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            ${checklistHtml}
+          </div>
+        </div>
+
+        <div style="height: 1px; background: var(--border-color); margin: 2px 0;"></div>
+
+        <!-- Section 2 : Audit Méthodologique IA -->
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-blue, #3b82f6); display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="m9 11 2 2 4-4"/></svg>
+              <span>Audit Homilétique IA (5 Axes)</span>
+            </div>
+            <button type="button" class="btn-ghost btn-xs" id="btn-open-sermon-eval-settings" title="Configurer le modèle IA et le system prompt d'audit" style="display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; padding: 2px 6px; color: var(--text-muted); cursor: pointer; border-radius: 4px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Paramètres IA</span>
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 10.5px; color: var(--text-muted);">
+            <span>Modèle actif : <strong style="color: var(--text-primary); font-family: monospace;">${this.escapeHtml(configuredModel)}</strong></span>
+            <span>Grille 5 Axes</span>
+          </div>
+          <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.45; margin: 0 0 10px 0;">
+            Soumettez votre projet de prédication à un audit méthodologique objectif (Fidélité au texte, Clarté PMT/PMS, Christocentrisme, Applications, Pistes d'amélioration).
+          </p>
+
+          <button type="button" class="btn-primary" id="btn-run-sermon-evaluation" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; border-radius: 6px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="m9 11 2 2 4-4"/></svg>
+            <span>${evalData ? 'Relancer l\'audit du sermon' : 'Lancer l\'audit homilétique'}</span>
+          </button>
+
+          <!-- Indicateur de progression IA -->
+          <div id="sermon-eval-loading-indicator" class="sermon-ai-thinking-box" style="display: none; margin-top: 10px;">
+            <div class="sermon-ai-thinking-header">
+              <div class="sermon-ai-orb-wrap">
+                <div class="sermon-ai-orb-ring"></div>
+                <div class="sermon-ai-orb-glow"></div>
+                <div class="sermon-ai-orb-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="m9 11 2 2 4-4"/></svg>
+                </div>
+              </div>
+              <div class="sermon-ai-thinking-texts">
+                <div class="sermon-ai-thinking-title">
+                  <span>Relecture critique &amp; audit homilétique...</span>
+                </div>
+                <div id="sermon-eval-thinking-step-text" class="sermon-ai-thinking-sub">
+                  Analyse du texte d'ancrage et cohérence du message...
+                </div>
+              </div>
+            </div>
+            <div class="sermon-ai-progress-track">
+              <div class="sermon-ai-progress-bar"></div>
+            </div>
+          </div>
+
+          <!-- Rapport d'évaluation -->
+          <div id="sermon-eval-report-wrapper">
+            ${evalReportHtml}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Écouteurs de la checklist
+    this.drawerContent.querySelectorAll('.sermon-eval-checkbox').forEach(chk => {
+      chk.addEventListener('change', (e) => {
+        const id = e.target.getAttribute('data-check-id');
+        if (!this.currentSermon) return;
+        this.currentSermon.checklist = this.currentSermon.checklist || {};
+        this.currentSermon.checklist[id] = e.target.checked;
+        const parentLabel = e.target.closest('.sermon-eval-check-item');
+        if (parentLabel) {
+          parentLabel.classList.toggle('is-checked', e.target.checked);
+        }
+        this.debouncedAutoSave();
+      });
+    });
+
+    // Écouteur du raccourci vers les Paramètres IA
+    document.getElementById('btn-open-sermon-eval-settings')?.addEventListener('click', () => {
+      if (typeof App !== 'undefined' && App.switchView) {
+        App.switchView('settings');
+        setTimeout(() => {
+          if (typeof SettingsView !== 'undefined' && SettingsView.switchToSection) {
+            SettingsView.switchToSection('ai', 'cfg-sermon-evaluation-model');
+          }
+        }, 150);
+      }
+    });
+
+    // Écouteur du bouton Copier
+    document.getElementById('btn-copy-sermon-evaluation')?.addEventListener('click', () => {
+      if (!evalData) return;
+      navigator.clipboard.writeText(evalData).then(() => {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Compte-rendu d\'évaluation copié dans le presse-papiers !');
+        }
+      }).catch(() => {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Impossible de copier.');
+        }
+      });
+    });
+
+    // Écouteur du bouton Lancer / Relancer
+    document.getElementById('btn-run-sermon-evaluation')?.addEventListener('click', () => {
+      this.runSermonEvaluation();
+    });
+  },
+
+  async runSermonEvaluation() {
+    this.ensureCurrentSermon();
+    if (!this.currentSermon) return;
+
+    // Synchroniser les sections actuelles
+    this.currentSermon.sections = this.sections;
+
+    // Vérifier s'il y a du contenu rédigé
+    const hasContent = (this.sections || []).some(s => {
+      const text = (s.contentHtml || s.content || '').replace(/<[^>]*>/g, '').trim();
+      return text.length > 30;
+    });
+
+    if (!hasContent) {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Veuillez d'abord rédiger au moins quelques paragraphes dans votre sermon avant de solliciter une évaluation homilétique.", 4500);
+      }
+      return;
+    }
+
+    const loader = document.getElementById('sermon-eval-loading-indicator');
+    const stepText = document.getElementById('sermon-eval-thinking-step-text');
+    const runBtn = document.getElementById('btn-run-sermon-evaluation');
+
+    if (runBtn) runBtn.style.display = 'none';
+    if (loader) loader.style.display = 'flex';
+
+    const steps = [
+      "Analyse du passage d'ancrage et de la logique textuelle...",
+      "Évaluation de la Pensée Maîtresse (PMT) et du Pont (PMS)...",
+      "Contrôle de l'équilibre Loi/Grâce & Christocentrisme...",
+      "Examen de la pertinence des applications pratiques...",
+      "Synthèse des points forts et axes d'amélioration méthodologiques..."
+    ];
+    let currentStep = 0;
+    const stepInterval = setInterval(() => {
+      currentStep = (currentStep + 1) % steps.length;
+      if (stepText) {
+        stepText.style.opacity = '0';
+        setTimeout(() => {
+          if (stepText) {
+            stepText.textContent = steps[currentStep];
+            stepText.style.opacity = '1';
+          }
+        }, 200);
+      }
+    }, 2400);
+
+    try {
+      const resp = await API.evaluateSermonWithAI(this.currentSermon);
+      clearInterval(stepInterval);
+
+      if (resp && resp.success) {
+        this.currentSermon.evaluation = resp.evaluation;
+        this.currentSermon.evaluated_at = resp.evaluated_at;
+        this.currentSermon.evaluated_model = resp.used_model;
+        this.debouncedAutoSave();
+        this.renderEvaluationTabContent();
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast("Évaluation homilétique générée avec succès !");
+        }
+      } else {
+        if (loader) loader.style.display = 'none';
+        if (runBtn) runBtn.style.display = 'flex';
+        const err = resp?.error || "Erreur inconnue lors de l'évaluation.";
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast(`Échec de l'évaluation : ${err}`, 5000);
+        }
+      }
+    } catch (e) {
+      clearInterval(stepInterval);
+      if (loader) loader.style.display = 'none';
+      if (runBtn) runBtn.style.display = 'flex';
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast(`Erreur technique : ${e}`, 5000);
+      }
+    }
+  },
+
+  formatMarkdownSimple(md) {
+    if (!md) return '';
+    let text = md;
+    text = text.replace(/^### (.*$)/gim, '<h4>$1</h4>');
+    text = text.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+    text = text.replace(/^# (.*$)/gim, '<h2>$1</h2>');
+    text = text.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+    text = text.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+    text = text.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+    text = text.replace(/^\- (.*$)/gim, '<li>$1</li>');
+    text = text.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
+    text = text.replace(/\n\n+/g, '<div style="height: 8px;"></div>');
+    return text;
   },
 
   insertHomileticOutline(type) {
