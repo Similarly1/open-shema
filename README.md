@@ -120,7 +120,7 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 ### 🎙️ 5. Studio de Prédication & Banque d'Illustrations
 
 > 🛡️ **Règle Fondamentale de Non-Délégation & Respect de la Patte Humaine** :  
-> Open Shema a été délibérément calibré pour **ne jamais rédiger de prédications toutes faites** ni se substituer au prédicateur. L'IA n'est pas là pour penser, méditer ou prier à votre place. La prédication vivante n'est pas une récitation lisse et aseptisée générée par un modèle statistique : c'est la Parole de Dieu proclamée par un serviteur imparfait, dépendant de la puissance du Saint-Esprit opérant dans la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9). L'IA intervient exclusivement comme **assistant de laboratoire et sparring-partner maïeutique** : elle fournit la matière brute exégétique, éprouve votre proposition centrale et vous accompagne sans jamais voler votre voix.
+> Open Shema a été délibérément calibré pour **ne jamais rédiger de prédications toutes faites** ni se substituer au prédicateur. L'IA n'est pas là pour penser, méditer ou prier à votre place. La prédication vivante n'est pas une récitation lisse et aseptisée générée par un modèle statistique : c'est la Parole de Dieu proclamée par un serviteur imparfait, dépendant de la puissance du Saint-Esprit opérant dans la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9). L'IA intervient exclusivement comme **assistant de laboratoire et miroir critique maïeutique** : elle fournit la matière brute exégétique, éprouve votre proposition centrale et vous accompagne sans jamais voler votre voix.
 
 * **Atelier Homilétique Structuré & Matrice à Double Rive** :
   * Rédigez selon la méthode d'homilétique textuelle (David Helm, John Stott, Haddon Robinson) : *Passage source, Histoire du Salut en 8 étapes, PMT (Pensée Maîtresse du Texte - Rive 1), Le Pont (Tension Contemporaine), PMS (Pensée Maîtresse du Sermon - Rive 2), Objectif pastoral de transformation*.
@@ -184,7 +184,7 @@ Open Shema intègre un questionnaire d'alignement guidé en **4 étapes** permet
 1. **Ministère & Cadre d'utilisation** : Adaptez la pédagogie de l'IA selon votre mission (*Prédication pastorale & homilétique*, *Enseignement & Groupes de maison*, *Étude personnelle & piété*, *Recherche académique & exégèse critique*).
 2. **Préférences Textuelles & Langues Originales** : Choisissez vos versions de référence et définissez le niveau technique souhaité en grec et en hébreu (*Débutant*, *Intermédiaire avec Strong*, ou *Avancé avec syntaxe critique et Septante*).
 3. **Posture & Ton de l'Assistant** :
-   - *🎙️ Pastoral & Sparring-Partner (Recommandé)* : Chaleureux et encourageant, mais teste la rigueur de vos arguments, pointe les contre-arguments et anticipe les objections contemporaines.
+   - *🎙️ Pastoral & Miroir Critique (Recommandé)* : Chaleureux et encourageant, mais teste la rigueur de vos arguments, pointe les contre-arguments et anticipe les objections contemporaines.
    - *❤️ Pastoral & Équilibré* : Centré sur l'édification de la foi, la grâce et la transformation du cœur.
    - *🏛️ Académique & Scientifique* : Ton neutre, factuel et rigoureusement historique.
    - *💡 Pédagogique & Didactique* : Clair, structuré et progressif, idéal pour transmettre à d'autres.

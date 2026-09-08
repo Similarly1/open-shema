@@ -418,7 +418,7 @@ const AIStudyView = {
       const flyoutSummary = document.getElementById('flyout-profile-summary-text');
       if (flyoutSummary) {
         const country = profile.country_culture || "France";
-        const posture = profile.ai_posture === 'pastoral_sparring' ? 'Pastoral & Sparring' : (profile.ai_posture || 'Pastoral');
+        const posture = profile.ai_posture === 'pastoral_sparring' ? 'Pastoral & Miroir critique' : (profile.ai_posture || 'Pastoral');
         flyoutSummary.innerHTML = `<strong>${roleShort}</strong> • Posture : <em>${posture}</em><br><span style="color: var(--text-muted); font-size: 11px;">Zone : ${country}</span>`;
       }
 

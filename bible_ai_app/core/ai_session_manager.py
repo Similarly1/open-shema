@@ -102,7 +102,7 @@ class AISessionManager:
         }
         
         posture_labels = {
-            "pastoral_sparring": "Pastoral & Sparring-partner (chaleureux mais challenge les arguments pour tester la cohérence)",
+            "pastoral_sparring": "Pastoral & Miroir critique (chaleureux mais challenge les arguments pour tester la cohérence)",
             "pastoral": "Pastoral & Équilibré (chaleureux, édifiant, orienté vers le cœur)",
             "academique": "Académique & Rigoureux (neutre, factuel, historique et scientifique)",
             "pedagogique": "Pédagogique (didactique, clair, vulgarisé avec structure logique)"
