@@ -9819,24 +9819,25 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .note-title-wrap {
   display: flex;
   align-items: center;
-  flex: 0 1 auto;
-  min-width: 50px;
-  max-width: 260px;
+  flex: 0 0 auto;
+  min-width: max-content;
+  max-width: none;
 }
 
 .note-title-input {
   width: auto;
   field-sizing: content;
-  min-width: 50px;
-  max-width: 260px;
+  min-width: 60px;
+  max-width: none;
   font-size: 17px;
   font-weight: 800;
   border: none;
@@ -9845,7 +9846,6 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   color: var(--text-primary);
   padding: 2px 4px;
   border-radius: 4px;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -35587,7 +35587,16 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-branch-
   gap: 6px;
   flex-wrap: nowrap;
   min-height: 26px;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.note-meta-badges::-webkit-scrollbar {
+  display: none;
 }
 
 .note-badge-group {
@@ -35596,6 +35605,19 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-branch-
   gap: 6px;
   flex-wrap: nowrap;
   flex-shrink: 0;
+}
+
+#note-passage-badge-container {
+  flex-shrink: 0;
+}
+
+#note-tags-badge-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .note-meta-sep {
@@ -35677,6 +35699,27 @@ body.theme-dark .note-badge-pill.scripture {
 
 .note-badge-pill.scripture .badge-label:hover {
   text-decoration: underline;
+}
+
+.note-badge-pill.scripture .ref-short-text {
+  display: none;
+}
+
+.note-badge-pill.scripture.is-abbreviated .ref-full-text {
+  display: none;
+}
+
+.note-badge-pill.scripture.is-abbreviated .ref-short-text {
+  display: inline;
+}
+
+@media (max-width: 1280px) {
+  .note-badge-pill.scripture .ref-full-text {
+    display: none;
+  }
+  .note-badge-pill.scripture .ref-short-text {
+    display: inline;
+  }
 }
 
 /* Pastille Tag / Mot-clé (Ambre / Ardoise) */
@@ -36050,3 +36093,347 @@ body[class*="palette-dark"] .mm-marker-clear-btn:hover {
 
 
 
+
+/* ==========================================================================
+   4. EXPORT MIND MAP (PDF, PNG, JPG) — ZERO EMOJI, 100% SVG
+   ========================================================================== */
+
+/* Menu deroulant dans la barre d'en-tete de la note */
+.mm-export-dropdown-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.mm-export-dropdown-wrap.hidden {
+  display: none !important;
+}
+
+.btn-export-mindmap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.mm-export-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 270px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.22), 0 8px 12px -6px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 1000;
+  animation: mmExportFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mm-export-menu.hidden {
+  display: none !important;
+}
+
+@keyframes mmExportFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mm-export-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.mm-export-menu-item:hover {
+  background: var(--bg-surface, rgba(0, 0, 0, 0.05));
+}
+
+.mm-export-item-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface, rgba(0, 0, 0, 0.04));
+  color: var(--accent-blue, #2563eb);
+  flex-shrink: 0;
+}
+
+.mm-export-menu-item:hover .mm-export-item-icon {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+}
+
+.mm-export-item-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.mm-export-item-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mm-export-item-sub {
+  font-size: 11px;
+  color: var(--text-muted, #64748b);
+  margin-top: 1px;
+}
+
+.mm-export-menu-divider {
+  height: 1px;
+  background: var(--border-color, #e2e8f0);
+  margin: 5px 6px;
+}
+
+/* Modale d'exportation Mind Map */
+.mm-export-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+}
+
+@media (max-width: 720px) {
+  .mm-export-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mm-export-field-group {
+  margin-bottom: 18px;
+}
+
+.mm-export-field-group:last-child {
+  margin-bottom: 0;
+}
+
+.mm-export-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 8px;
+}
+
+.mm-export-format-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mm-format-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.mm-format-tab:hover {
+  border-color: var(--accent-blue, #2563eb);
+  background: var(--bg-surface, rgba(0, 0, 0, 0.02));
+}
+
+.mm-format-tab.active {
+  border-color: var(--accent-blue, #2563eb);
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-blue, #2563eb);
+  box-shadow: 0 0 0 1px var(--accent-blue, #2563eb);
+}
+
+.mm-format-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mm-format-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+}
+
+.mm-format-tab.active .mm-format-badge {
+  color: var(--accent-blue, #2563eb);
+  font-weight: 600;
+}
+
+.mm-export-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mm-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-surface, #f8fafc);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.mm-pill-btn:hover {
+  border-color: var(--accent-blue, #2563eb);
+  background: var(--bg-card, #ffffff);
+}
+
+.mm-pill-btn.active {
+  border-color: var(--accent-blue, #2563eb);
+  background: var(--accent-blue, #2563eb);
+  color: #ffffff;
+}
+
+.mm-pill-btn.active svg circle[stroke] {
+  stroke: #ffffff;
+}
+
+.mm-pill-btn.active svg path[fill="currentColor"] {
+  fill: #ffffff;
+}
+
+.mm-export-preview-box {
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  background: var(--bg-surface, #f8fafc);
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.mm-export-preview-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 2;
+  transition: opacity 0.2s ease;
+}
+
+.mm-export-preview-loading.hidden {
+  display: none !important;
+}
+
+.mm-export-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  background: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.mm-export-preview-box.bg-theme .mm-export-preview-img {
+  background: var(--bg-card);
+}
+
+.mm-export-preview-box.bg-transparent .mm-export-preview-img {
+  background: repeating-conic-gradient(#e2e8f0 0% 25%, transparent 0% 50%) 50% / 12px 12px;
+}
+
+.mm-export-meta-info {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--bg-surface, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mm-meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+
+.mm-meta-k {
+  color: var(--text-muted, #64748b);
+}
+
+.mm-meta-v {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Thème sombre pour l'export */
+body.theme-dark .mm-export-menu,
+body[class*="palette-dark"] .mm-export-menu {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.5);
+}
+
+body.theme-dark .mm-export-item-icon,
+body[class*="palette-dark"] .mm-export-item-icon {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.theme-dark .mm-pill-btn,
+body[class*="palette-dark"] .mm-pill-btn {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.theme-dark .mm-format-tab,
+body[class*="palette-dark"] .mm-format-tab {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.theme-dark .mm-export-preview-box,
+body[class*="palette-dark"] .mm-export-preview-box {
+  background: #0f172a;
+  border-color: #334155;
+}

@@ -63,10 +63,36 @@ const NotesView = {
       }
     });
 
-    document.getElementById('btn-export-mindmap-outline')?.addEventListener('click', () => {
+    const exportMmBtn = document.getElementById('btn-export-mindmap');
+    exportMmBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (typeof MindMapView !== 'undefined') {
-        MindMapView.exportToTextNote();
+        MindMapView.toggleExportDropdown();
       }
+    });
+
+    document.querySelectorAll('#mm-export-menu .mm-export-menu-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = item.getAttribute('data-action');
+        if (typeof MindMapView === 'undefined') return;
+        if (action === 'export-pdf') MindMapView.exportDirect('pdf');
+        else if (action === 'export-png') MindMapView.exportDirect('png');
+        else if (action === 'export-jpg') MindMapView.exportDirect('jpg');
+        else if (action === 'open-modal') MindMapView.openExportModal();
+      });
+    });
+
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('#mm-export-dropdown-wrap')) {
+        if (typeof MindMapView !== 'undefined') {
+          MindMapView.closeExportDropdown();
+        }
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      this.checkHeaderCompactness();
     });
 
     document.getElementById('btn-open-notes-folder')?.addEventListener('click', async () => {
@@ -1774,7 +1800,7 @@ const NotesView = {
     // Bascule d'affichage entre Éditeur texte et Mind Map SVG
     const mmContainer = document.getElementById('note-mindmap-container');
     const previewBtn = document.getElementById('btn-toggle-note-preview');
-    const exportOutlineBtn = document.getElementById('btn-export-mindmap-outline');
+    const exportDropdownWrap = document.getElementById('mm-export-dropdown-wrap');
     const toggleModeBtn = document.getElementById('btn-toggle-mindmap-mode');
 
     if (isMindmap) {
@@ -1782,7 +1808,7 @@ const NotesView = {
       this.previewContainer?.classList.add('hidden');
       previewBtn?.classList.add('hidden');
       toggleModeBtn?.classList.remove('hidden');
-      exportOutlineBtn?.classList.remove('hidden');
+      exportDropdownWrap?.classList.remove('hidden');
 
       if (mmContainer) {
         mmContainer.classList.remove('hidden');
@@ -1793,7 +1819,10 @@ const NotesView = {
     } else {
       mmContainer?.classList.add('hidden');
       toggleModeBtn?.classList.add('hidden');
-      exportOutlineBtn?.classList.add('hidden');
+      exportDropdownWrap?.classList.add('hidden');
+      if (typeof MindMapView !== 'undefined') {
+        MindMapView.closeExportDropdown();
+      }
       document.getElementById('notes-editor-subbar')?.classList.add('hidden');
       document.getElementById('notes-subbar-outline-actions')?.classList.add('hidden');
       previewBtn?.classList.remove('hidden');
@@ -1963,13 +1992,53 @@ const NotesView = {
     }
   },
 
-  // Calcule la largeur compacte du champ titre pour laisser les badges sur la même ligne
+  // Calcule la largeur du champ titre pour toujours afficher le titre en entier
   adjustTitleWidth() {
     if (!this.titleInput) return;
     const val = this.titleInput.value || this.titleInput.placeholder || '';
     const ch = Math.max(val.length, 2);
-    const w = Math.min(260, Math.max(50, Math.round(ch * 10.5 + 14)));
+    const w = Math.max(60, Math.round(ch * 10.5 + 16));
     this.titleInput.style.width = `${w}px`;
+    this.checkHeaderCompactness();
+  },
+
+  // Table des abréviations bibliques françaises pour compacter le badge si l'espace manque
+  getAbbreviatedScriptureRef(ref) {
+    if (!ref) return '';
+    const trimmed = ref.trim();
+    const BIBLE_FR_ABBR = {
+      'Genèse': 'Gn', 'Exode': 'Ex', 'Lévitique': 'Lv', 'Nombres': 'Nb', 'Deutéronome': 'Dt',
+      'Josué': 'Jos', 'Juges': 'Jg', 'Ruth': 'Rt', '1 Samuel': '1S', '2 Samuel': '2S',
+      '1 Rois': '1R', '2 Rois': '2R', '1 Chroniques': '1Ch', '2 Chroniques': '2Ch',
+      'Esdras': 'Esd', 'Néhémie': 'Néh', 'Esther': 'Est', 'Job': 'Jb', 'Psaumes': 'Ps',
+      'Psaume': 'Ps', 'Proverbes': 'Pr', 'Ecclésiaste': 'Ec', 'Cantique': 'Ct',
+      'Ésaïe': 'És', 'Jérémie': 'Jr', 'Lamentations': 'La', 'Ézéchiel': 'Éz', 'Daniel': 'Da',
+      'Osée': 'Os', 'Joël': 'Jl', 'Amos': 'Am', 'Abdias': 'Ab', 'Jonas': 'Jon',
+      'Michée': 'Mi', 'Nahum': 'Na', 'Habacuc': 'Ha', 'Sophonie': 'So', 'Aggée': 'Ag',
+      'Zacharie': 'Za', 'Malachie': 'Ml', 'Matthieu': 'Mt', 'Marc': 'Mc', 'Luc': 'Lc',
+      'Jean': 'Jn', 'Actes': 'Ac', 'Romains': 'Rm', '1 Corinthiens': '1Co', '2 Corinthiens': '2Co',
+      'Galates': 'Ga', 'Éphésiens': 'Ép', 'Philippiens': 'Ph', 'Colossiens': 'Col',
+      '1 Thessaloniciens': '1Th', '2 Thessaloniciens': '2Th', '1 Timothée': '1Tm',
+      '2 Timothée': '2Tm', 'Tite': 'Tt', 'Philémon': 'Phm', 'Hébreux': 'Héb', 'Jacques': 'Jc',
+      '1 Pierre': '1P', '2 Pierre': '2P', '1 Jean': '1Jn', '2 Jean': '2Jn', '3 Jean': '3Jn',
+      'Jude': 'Jd', 'Apocalypse': 'Ap'
+    };
+    for (const [full, abbr] of Object.entries(BIBLE_FR_ABBR)) {
+      if (trimmed.toLowerCase().startsWith(full.toLowerCase())) {
+        return abbr + trimmed.slice(full.length);
+      }
+    }
+    return trimmed;
+  },
+
+  // Vérifie si l'en-tête gauche manque d'espace et bascule le badge de passage en mode abrégé
+  checkHeaderCompactness() {
+    const leftContainer = document.querySelector('.notes-header-left');
+    const scripturePill = document.querySelector('.note-badge-pill.scripture');
+    if (!leftContainer || !scripturePill) return;
+    const titleLen = (this.titleInput?.value || '').length;
+    const isConstrained = leftContainer.scrollWidth > leftContainer.clientWidth || titleLen > 16;
+    scripturePill.classList.toggle('is-abbreviated', isConstrained);
   },
 
   // =========================================================================
@@ -1995,14 +2064,18 @@ const NotesView = {
     // 1. SECTION PASSAGE LIÉ
     const currentRef = (this.refInput?.value || this.currentNote?.reference || '').trim();
     if (currentRef) {
+      const shortRef = this.getAbbreviatedScriptureRef(currentRef);
       const pill = document.createElement('span');
       pill.className = 'note-badge-pill scripture';
-      pill.title = 'Cliquer sur la référence pour ouvrir dans la Bible';
+      pill.title = `${currentRef} (Cliquer pour ouvrir dans la Bible)`;
       pill.innerHTML = `
         <span class="badge-icon">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </span>
-        <span class="badge-label">${this.escapeHtml(currentRef)}</span>
+        <span class="badge-label" data-full-ref="${this.escapeHtml(currentRef)}">
+          <span class="ref-full-text">${this.escapeHtml(currentRef)}</span>
+          <span class="ref-short-text">${this.escapeHtml(shortRef)}</span>
+        </span>
         <button type="button" class="badge-action-btn badge-btn-edit" title="Modifier le passage lié">
           <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </button>
@@ -2088,6 +2161,7 @@ const NotesView = {
       this.promptAddTagInline(tagsContainer, addTagBtn);
     });
     tagsContainer.appendChild(addTagBtn);
+    this.checkHeaderCompactness();
   },
 
   openPassagePicker() {
