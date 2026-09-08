@@ -32967,6 +32967,12 @@ body[class*="palette-dark"] .mm-inline-editor.paper-mode {
   fill: #ffffff !important;
 }
 
+.note-mindmap-container.paper-mode .mm-note-pill path,
+.note-mindmap-container.paper-mode .mm-note-pill polyline,
+.note-mindmap-container.paper-mode .mm-note-pill line {
+  stroke: var(--node-color, #2563eb) !important;
+}
+
 .note-mindmap-container.paper-mode .mm-action-circle {
   fill: #ffffff !important;
   stroke: #cbd5e1 !important;
@@ -33968,6 +33974,7 @@ body[class*="palette-dark"] .mm-prompt-hint kbd {
 /* Pastille de note de sujet / Topic Note */
 .mm-note-pill {
   cursor: pointer;
+  color: var(--node-color, var(--accent-blue, #2563eb));
 }
 
 .mm-note-pill circle {
@@ -33977,6 +33984,12 @@ body[class*="palette-dark"] .mm-prompt-hint kbd {
 .mm-note-pill:hover circle {
   stroke-width: 2.2px !important;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.mm-note-pill path,
+.mm-note-pill polyline,
+.mm-note-pill line {
+  stroke: var(--node-color, var(--accent-blue, #2563eb)) !important;
 }
 
 .mm-prompt-textarea {
