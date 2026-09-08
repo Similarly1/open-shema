@@ -1700,7 +1700,6 @@ const MindMapView = {
   layoutSide(bois, side) {
     if (!bois || bois.length === 0) return;
 
-    const totalHeight = bois.reduce((acc, b) => acc + b.totalHeight, 0);
     const dir = side === 'right' ? 1 : -1;
     const N = bois.length;
 
@@ -1717,29 +1716,19 @@ const MindMapView = {
       return;
     }
 
-    // Répartition radiale équilibrée : chaque BOI est exactement à la même distance du bloc central
-    const maxAngleDeg = Math.min(50, 16 + (N - 1) * 8.5);
-    const maxAngleRad = (maxAngleDeg * Math.PI) / 180;
+    // Répartition verticale stricte garantissant l'absence totale de chevauchement entre sous-arbres
+    const totalHeight = bois.reduce((acc, b) => acc + b.totalHeight, 0);
+    let currentY = -totalHeight / 2;
 
-    let cumulativeHeight = 0;
     bois.forEach(boi => {
-      const boiCenterY = cumulativeHeight + boi.totalHeight / 2;
-      const frac = totalHeight > 0 ? (boiCenterY / totalHeight) : 0.5;
-      const angle = -maxAngleRad + frac * (2 * maxAngleRad);
+      // Centrage vertical de chaque sous-arbre dans son espace alloué dédié
+      boi.y = currentY + boi.totalHeight / 2;
 
-      const cosA = Math.cos(angle);
-      const sinA = Math.sin(angle);
-
-      // Point sur le bord de l'ellipse du nœud racine
-      const rootEdgeX = dir * (rootW / 2) * cosA;
-      const rootEdgeY = (rootH / 2) * sinA;
-
-      // Position du BOI : distance constante 'uniformDist' depuis le bord du bloc principal
-      boi.x = rootEdgeX + dir * (uniformDist + boi.width / 2) * cosA;
-      boi.y = rootEdgeY + (uniformDist * 0.95 + boi.height / 2) * sinA;
+      // Position horizontale : garantit la distance uniforme par rapport au contour du médaillon central
+      boi.x = dir * (rootW / 2 + uniformDist + boi.width / 2);
 
       this.layoutChildren(boi, side);
-      cumulativeHeight += boi.totalHeight;
+      currentY += boi.totalHeight;
     });
   },
 
@@ -1747,12 +1736,12 @@ const MindMapView = {
     if (!parent.children || parent.children.length === 0) return;
 
     const dir = side === 'right' ? 1 : -1;
-    const horizGap = 110;
+    const clearHorizGap = 55; // Espace horizontal net garanti entre bord parent et bord enfant
     let currentY = parent.y - parent.totalHeight / 2;
 
     parent.children.forEach(child => {
       const centerY = currentY + child.totalHeight / 2;
-      child.x = parent.x + dir * (parent.width / 2 + horizGap);
+      child.x = parent.x + dir * (parent.width / 2 + clearHorizGap + child.width / 2);
       child.y = centerY;
 
       this.layoutChildren(child, side);
@@ -3876,6 +3865,7 @@ const MindMapView = {
       if (node.children) node.children.forEach(resetOffsets);
     };
     resetOffsets(this.tree);
+    if (this.floatingTopics) this.floatingTopics.forEach(resetOffsets);
 
     // Réinitialisation des courbures manuelles des liaisons pour un tracé automatique équilibré
     if (this.relationships) {
@@ -3885,6 +3875,34 @@ const MindMapView = {
     }
 
     this.layoutTree();
+
+    // Dégagement automatique des sujets flottants s'ils chevauchent des branches de l'arbre
+    if (this.floatingTopics && this.floatingTopics.length > 0 && this.tree) {
+      const allTreeNodes = [];
+      const collect = (n) => {
+        allTreeNodes.push(n);
+        if (n.children) n.children.forEach(collect);
+      };
+      collect(this.tree);
+
+      this.floatingTopics.forEach(ft => {
+        const ftHalfW = (ft.width || 88) / 2;
+        const ftHalfH = (ft.height || 32) / 2;
+        allTreeNodes.forEach(tn => {
+          const tnHalfW = (tn.width || 80) / 2;
+          const tnHalfH = (tn.height || 28) / 2;
+          const padX = ftHalfW + tnHalfW + 25;
+          const padY = ftHalfH + tnHalfH + 20;
+          if (Math.abs(ft.x - tn.x) < padX && Math.abs(ft.y - tn.y) < padY) {
+            if (ft.y <= tn.y) {
+              ft.y = tn.y - padY;
+            } else {
+              ft.y = tn.y + padY;
+            }
+          }
+        });
+      });
+    }
     this.draw();
     this.fitView();
     this.syncAndAutoSave();
