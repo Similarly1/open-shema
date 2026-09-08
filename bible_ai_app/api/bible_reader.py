@@ -273,7 +273,18 @@ class BibleReaderMixin:
 
     def get_chapter_data(self, bible_name: str, book_code: str, chapter: int, interlinear_version: str = "LSG") -> Dict[str, Any]:
         """Récupère les versets d'un chapitre, titre de péricope et enrichissement interlinéaire."""
-        ch_int = int(chapter)
+        try:
+            ch_int = int(chapter) if chapter is not None else 1
+            if ch_int < 1:
+                ch_int = 1
+        except (ValueError, TypeError):
+            ch_int = 1
+
+        if not book_code:
+            book_code = "GEN"
+        if not bible_name:
+            bible_name = "LSG"
+
         book_data = BibleJsonLoader.load_book(bible_name, book_code)
         french_name = get_french_book_name(book_code)
 

@@ -176,11 +176,19 @@ const API = {
   },
 
   async getChapterData(bibleName, bookCode, chapterNum, interlinearVersion = "LSG") {
-    return await this.call('get_chapter_data', bibleName, bookCode, parseInt(chapterNum), interlinearVersion);
+    const ch = parseInt(chapterNum, 10);
+    const safeCh = (!isNaN(ch) && ch >= 1) ? ch : 1;
+    const safeBook = bookCode || 'GEN';
+    const safeBible = bibleName || 'LSG';
+    return await this.call('get_chapter_data', safeBible, safeBook, safeCh, interlinearVersion || 'LSG');
   },
 
   async getCommentaries(bookCode, chapterNum, verseNum) {
-    return await this.call('get_commentaries', bookCode, parseInt(chapterNum), parseInt(verseNum));
+    const ch = parseInt(chapterNum, 10);
+    const vs = parseInt(verseNum, 10);
+    const safeCh = (!isNaN(ch) && ch >= 1) ? ch : 1;
+    const safeVs = (!isNaN(vs) && vs >= 1) ? vs : 1;
+    return await this.call('get_commentaries', bookCode || 'GEN', safeCh, safeVs);
   },
 
   async getCurrentPassage() {
@@ -188,7 +196,9 @@ const API = {
   },
 
   async getChapterCommentariesGrouped(bookCode, chapterNum) {
-    return await this.call('get_chapter_commentaries_grouped', bookCode, parseInt(chapterNum));
+    const ch = parseInt(chapterNum, 10);
+    const safeCh = (!isNaN(ch) && ch >= 1) ? ch : 1;
+    return await this.call('get_chapter_commentaries_grouped', bookCode || 'GEN', safeCh);
   },
 
   async minimizeWindow() {

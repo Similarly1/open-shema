@@ -5026,11 +5026,15 @@ const BibleReader = {
     if (!pane2Container) return;
     pane2Container.innerHTML = '';
     
-    const chaptersToLoad = this.loadedChapters.length > 0 ? this.loadedChapters : [{ book: this.currentBook, chapter: this.currentChapter }];
+    const defaultBook = this.currentBook || 'Gen';
+    const defaultCh = parseInt(this.currentChapter, 10) || 1;
+    const chaptersToLoad = this.loadedChapters.length > 0 ? this.loadedChapters : [{ book: defaultBook, chapter: defaultCh }];
 
     for (let i = 0; i < chaptersToLoad.length; i++) {
       const c = chaptersToLoad[i];
-      const data2 = await API.getChapterData(this.currentBible2, c.book, c.chapter, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
+      const bk = c.book || defaultBook;
+      const ch = parseInt(c.chapter, 10) || defaultCh;
+      const data2 = await API.getChapterData(this.currentBible2, bk, ch, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
       
       if (i > 0) {
@@ -5188,8 +5192,14 @@ const BibleReader = {
   },
 
   async navigateTo(bookCode, chapterNum, verseNum = null) {
-    let finalBookCode = bookCode;
-    let finalChapterNum = chapterNum;
+    // Si bookCode est une référence complète sans chapitre explicite (ex: "Jean 3:16", "Rom 8", "Genèse 1")
+    if (typeof bookCode === 'string' && (chapterNum === undefined || chapterNum === null) && (bookCode.includes(' ') || bookCode.includes(':') || bookCode.includes('.'))) {
+      return await this.searchPassage(bookCode);
+    }
+
+    let finalBookCode = bookCode || this.currentBook || 'Gen';
+    let parsedCh = parseInt(chapterNum, 10);
+    let finalChapterNum = (!isNaN(parsedCh) && parsedCh >= 1) ? parsedCh : (parseInt(this.currentChapter, 10) || 1);
     let finalVerseNum = verseNum;
 
     // Si le livre demandé n'existe pas dans la Bible active de la Colonne 1
@@ -5221,18 +5231,18 @@ const BibleReader = {
 
     const pane1Container = document.getElementById('pane-1-verses');
     if (pane1Container) {
-      pane1Container.innerHTML = this.getBibleLoaderHtml(info.name.toUpperCase(), chapterNum, this.currentBible1);
+      pane1Container.innerHTML = this.getBibleLoaderHtml(info.name.toUpperCase(), finalChapterNum, this.currentBible1);
     }
 
     if (this.isSplitView) {
       const pane2Container = document.getElementById('pane-2-verses');
       if (pane2Container) {
-        pane2Container.innerHTML = this.getBibleLoaderHtml(info.name.toUpperCase(), chapterNum, this.currentBible2);
+        pane2Container.innerHTML = this.getBibleLoaderHtml(info.name.toUpperCase(), finalChapterNum, this.currentBible2);
       }
       this.updatePaneHeader(2);
     }
 
-    const data1 = await API.getChapterData(this.currentBible1, bookCode, chapterNum, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
+    const data1 = await API.getChapterData(this.currentBible1, finalBookCode, finalChapterNum, this.pane1IsInterlinear ? this.pane1InterlinearVersion : null);
     const block1 = this.createChapterBlockElement(1, data1, this.currentBible1);
     if (pane1Container) {
       pane1Container.innerHTML = '';
@@ -5241,7 +5251,7 @@ const BibleReader = {
 
     if (this.isSplitView) {
       const pane2Container = document.getElementById('pane-2-verses');
-      const data2 = await API.getChapterData(this.currentBible2, bookCode, chapterNum, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
+      const data2 = await API.getChapterData(this.currentBible2, finalBookCode, finalChapterNum, this.pane2IsInterlinear ? this.pane2InterlinearVersion : null);
       const block2 = this.createChapterBlockElement(2, data2, this.currentBible2);
       if (pane2Container) {
         pane2Container.innerHTML = '';
@@ -5262,17 +5272,17 @@ const BibleReader = {
     const pane1 = document.getElementById('pane-1-content');
     if (pane1 && !targetVerse) pane1.scrollTop = 0;
 
-    TabsManager.updateActiveTab(null, bookCode, chapterNum);
+    TabsManager.updateActiveTab(null, finalBookCode, finalChapterNum);
     this.applyVintageToPanes();
 
     if (targetVerse) {
-      this.selectAndScrollToVerse(targetVerse, bookCode, chapterNum);
+      this.selectAndScrollToVerse(targetVerse, finalBookCode, finalChapterNum);
     } else {
       this.loadCommentariesForVerse(1);
     }
 
     if (typeof MultiwindowSync !== 'undefined' && MultiwindowSync.broadcastPassageNavigated) {
-      MultiwindowSync.broadcastPassageNavigated(bookCode, info.name, chapterNum, targetVerse || 1);
+      MultiwindowSync.broadcastPassageNavigated(finalBookCode, info.name, finalChapterNum, targetVerse || 1);
     }
   },
 
