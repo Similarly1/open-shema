@@ -3514,6 +3514,35 @@
                   <!-- Champ caché synchronisé -->
                   <textarea id="cfg-sermon-restructure-system-prompt" style="display: none;"></textarea>
                 </div>
+
+                <!-- Carte 7 : Évaluation & Audit Homilétique de Prédication (Florent Varak / IBG) -->
+                <div class="prompt-setting-card" id="prompt-card-sermon_evaluation" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Évaluation &amp; Audit Homilétique (Post-Rédaction)</strong>
+                      <span class="prompt-status-badge is-default" id="badge-sermon-evaluation-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Grille d'audit homilétique bienveillante en 5 axes (fidélité textuelle, clarté PMT/PMS, équilibre Loi/Grâce, applications, progrès 1 Tm 4.15) sans jamais réécrire le sermon.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-sermon-evaluation-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-sermon-evaluation-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <!-- Champ caché synchronisé -->
+                  <textarea id="cfg-prompt-sermon-evaluation" style="display: none;"></textarea>
+                </div>
               </div>
 
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
@@ -4743,6 +4772,10 @@
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 <span>Enregistré</span>
               </div>
+              <button class="btn-secondary" id="btn-sermon-evaluate-ai" title="Évaluer mon sermon avec le Sparring-Partner IA (Audit homilétique bienveillant en 5 axes)" style="color: var(--accent-blue, #3b82f6); border-color: rgba(59, 130, 246, 0.3);">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="m9 11 2 2 4-4"/></svg>
+                <span>Évaluer</span>
+              </button>
               <button class="btn-secondary" id="btn-sermon-pulpit-mode" title="Lancer le Mode Pupitre plein écran" style="color: var(--accent-orange, #f59e0b);">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
                 <span>Pupitre Live</span>
@@ -4914,6 +4947,7 @@
                   <button class="drawer-tab" data-drawer-tab="commentaries" title="Commentaires exégétiques">Commentaires</button>
                   <button class="drawer-tab" data-drawer-tab="structures" title="Structures homilétiques & Plans types">Structures</button>
                   <button class="drawer-tab" data-drawer-tab="illustrations" title="Illustrations associées">Illustrations</button>
+                  <button class="drawer-tab" data-drawer-tab="evaluation" title="Évaluation homilétique & Sparring-Partner (1 Tm 4.15)">Évaluation</button>
                 </div>
                 <div style="display: flex; align-items: center; margin-left: auto; gap: 4px;">
                   <button class="btn-icon-subtle" id="btn-expand-resources-drawer" title="Agrandir / Réduire le volet (Mode Large)" style="padding: 0 6px;">
@@ -7440,11 +7474,25 @@
         </div>
 
         <div class="chapters-column" id="chapters-column">
-          <div class="chapters-column-header">
+          <div class="chapters-column-header" id="picker-chapters-header">
             <span id="selected-book-name-title">Genèse</span>
             <span class="sub-ch-count" id="selected-book-total-ch">50 chapitres</span>
           </div>
+          <div class="chapters-column-header hidden" id="picker-verses-header">
+            <button type="button" class="btn-picker-back" id="btn-picker-back" title="Retour aux chapitres">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              <span id="picker-verse-book-title">Genèse 1</span>
+            </button>
+            <span class="sub-ch-count" id="selected-ch-total-verses">31 versets</span>
+          </div>
           <div class="chapters-grid" id="grid-chapters"></div>
+          <div class="verses-container hidden" id="picker-verses-container">
+            <button type="button" class="btn-select-whole-chapter" id="btn-select-whole-chapter">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span id="btn-select-whole-chapter-text">Tout le chapitre 1</span>
+            </button>
+            <div class="chapters-grid verses-grid" id="grid-verses"></div>
+          </div>
         </div>
       </div>
     </div>

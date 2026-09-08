@@ -74,10 +74,81 @@ const BOOK_ALIASES = {
   Rev: ['apocalypse', 'apoc', 'apo', 'ap', 'rev']
 };
 
+const BIBLE_VERSE_COUNTS = {
+  "Gen": [31, 25, 24, 26, 32, 22, 24, 22, 29, 32, 32, 20, 18, 24, 21, 16, 27, 33, 38, 18, 34, 24, 20, 67, 34, 35, 46, 22, 35, 43, 54, 33, 20, 31, 29, 43, 36, 30, 23, 23, 57, 38, 34, 34, 28, 34, 31, 22, 33, 26],
+  "Exo": [22, 25, 22, 31, 23, 30, 29, 28, 35, 29, 10, 51, 22, 31, 27, 36, 16, 27, 25, 26, 37, 30, 33, 18, 40, 37, 21, 43, 46, 38, 18, 35, 23, 35, 35, 38, 29, 31, 43, 38],
+  "Lev": [17, 16, 17, 35, 26, 23, 38, 36, 24, 20, 47, 8, 59, 57, 33, 34, 16, 30, 37, 27, 24, 33, 44, 23, 55, 46, 34],
+  "Num": [54, 34, 51, 49, 31, 27, 89, 26, 23, 36, 35, 16, 33, 45, 41, 35, 28, 32, 22, 29, 35, 41, 30, 25, 19, 65, 23, 31, 39, 17, 54, 42, 56, 29, 34, 13],
+  "Deu": [46, 37, 29, 49, 33, 25, 26, 20, 29, 22, 32, 31, 19, 29, 23, 22, 20, 22, 21, 20, 23, 29, 26, 22, 19, 19, 26, 69, 28, 20, 30, 52, 29, 12],
+  "Jos": [18, 24, 17, 24, 15, 27, 26, 35, 27, 43, 23, 24, 33, 15, 63, 10, 18, 28, 51, 9, 45, 34, 16, 33],
+  "Jdg": [36, 23, 31, 24, 31, 40, 25, 35, 57, 18, 40, 15, 25, 20, 20, 31, 13, 31, 30, 48, 25],
+  "Rut": [22, 23, 18, 22],
+  "1Sa": [28, 36, 21, 22, 12, 21, 17, 22, 27, 27, 15, 25, 23, 52, 35, 23, 58, 30, 24, 42, 16, 23, 28, 23, 44, 25, 12, 25, 11, 31, 13],
+  "2Sa": [27, 32, 39, 12, 25, 23, 29, 18, 13, 19, 27, 31, 39, 33, 37, 23, 29, 32, 44, 26, 22, 51, 39, 25],
+  "1Ki": [53, 46, 28, 20, 32, 38, 51, 66, 28, 29, 43, 33, 34, 31, 34, 34, 24, 46, 21, 43, 29, 54],
+  "2Ki": [18, 25, 27, 44, 27, 33, 20, 29, 37, 36, 20, 22, 25, 29, 38, 20, 41, 37, 37, 21, 26, 20, 37, 20, 30],
+  "1Ch": [54, 55, 24, 43, 41, 66, 40, 40, 44, 14, 47, 41, 14, 17, 29, 43, 27, 17, 19, 8, 30, 19, 32, 31, 31, 32, 34, 21, 30],
+  "2Ch": [18, 17, 17, 22, 14, 42, 22, 18, 31, 19, 23, 16, 23, 14, 19, 14, 19, 34, 11, 37, 20, 12, 21, 27, 28, 23, 9, 27, 36, 27, 21, 33, 25, 33, 27, 23],
+  "Ezr": [11, 70, 13, 24, 17, 22, 28, 36, 15, 44],
+  "Neh": [11, 20, 38, 17, 19, 19, 72, 18, 37, 40, 36, 47, 31],
+  "Est": [22, 23, 15, 17, 14, 14, 10, 17, 32, 3],
+  "Job": [22, 13, 26, 21, 27, 30, 21, 22, 35, 22, 20, 25, 28, 22, 35, 22, 16, 21, 29, 29, 34, 30, 17, 25, 6, 14, 23, 28, 25, 31, 40, 22, 33, 37, 16, 33, 24, 41, 30, 32, 26, 17],
+  "Psa": [6, 12, 9, 9, 13, 11, 18, 10, 21, 18, 7, 9, 6, 7, 5, 11, 15, 51, 15, 10, 14, 32, 6, 10, 22, 12, 14, 9, 11, 13, 25, 11, 22, 23, 28, 13, 40, 23, 14, 18, 14, 12, 5, 27, 18, 12, 10, 15, 21, 23, 21, 11, 7, 9, 24, 14, 12, 12, 18, 14, 9, 13, 12, 11, 14, 20, 8, 36, 37, 6, 24, 20, 28, 23, 11, 13, 21, 72, 13, 20, 17, 8, 19, 13, 14, 17, 7, 19, 53, 17, 16, 16, 5, 23, 11, 13, 12, 9, 9, 5, 8, 29, 22, 35, 45, 48, 43, 14, 31, 7, 10, 10, 9, 8, 18, 19, 2, 29, 176, 7, 8, 9, 4, 8, 5, 6, 5, 6, 8, 8, 3, 18, 3, 3, 21, 26, 9, 8, 24, 14, 10, 8, 12, 15, 21, 10, 20, 14, 9, 6],
+  "Pro": [33, 22, 35, 27, 23, 35, 27, 36, 18, 32, 31, 28, 25, 35, 33, 33, 28, 24, 29, 30, 31, 29, 35, 34, 28, 28, 27, 28, 27, 33, 31],
+  "Ecc": [18, 26, 22, 17, 19, 12, 29, 17, 18, 20, 10, 14],
+  "Sol": [17, 17, 11, 16, 16, 12, 14, 14],
+  "Isa": [31, 22, 26, 6, 30, 13, 25, 23, 20, 34, 16, 6, 22, 32, 9, 14, 14, 7, 25, 6, 17, 25, 18, 23, 12, 21, 13, 29, 24, 33, 9, 20, 24, 17, 10, 22, 38, 22, 8, 31, 29, 25, 28, 28, 25, 13, 15, 22, 26, 11, 23, 15, 12, 17, 13, 12, 21, 14, 21, 22, 11, 12, 19, 11, 25, 24],
+  "Jer": [19, 37, 25, 31, 31, 30, 34, 23, 25, 25, 23, 17, 27, 22, 21, 21, 27, 23, 15, 18, 14, 30, 40, 10, 38, 24, 22, 17, 32, 24, 40, 44, 26, 22, 19, 32, 21, 28, 18, 16, 18, 22, 13, 30, 5, 28, 7, 47, 39, 46, 64, 34],
+  "Lam": [22, 22, 66, 22, 22],
+  "Eze": [28, 10, 27, 17, 17, 14, 27, 18, 11, 22, 25, 28, 23, 23, 8, 63, 24, 32, 14, 44, 37, 31, 49, 27, 17, 21, 36, 26, 21, 26, 18, 32, 33, 31, 15, 38, 28, 23, 29, 49, 26, 20, 27, 31, 25, 24, 23, 35],
+  "Dan": [21, 49, 33, 34, 30, 29, 28, 27, 27, 21, 45, 13],
+  "Hos": [9, 25, 5, 19, 15, 11, 16, 14, 17, 15, 11, 15, 15, 10],
+  "Joe": [20, 27, 5],
+  "Amo": [15, 16, 15, 13, 27, 14, 17, 14, 15],
+  "Oba": [21],
+  "Jon": [16, 11, 10, 11],
+  "Mic": [16, 13, 12, 14, 14, 16, 20],
+  "Nah": [14, 14, 19],
+  "Hab": [17, 20, 19],
+  "Zep": [18, 15, 20],
+  "Hag": [15, 23],
+  "Zec": [17, 17, 10, 14, 11, 15, 14, 23, 17, 12, 17, 14, 9, 21],
+  "Mal": [14, 17, 24, 6],
+  "Mat": [25, 23, 17, 25, 48, 34, 29, 34, 38, 42, 30, 50, 58, 36, 39, 28, 27, 35, 30, 34, 46, 46, 39, 51, 46, 75, 66, 20],
+  "Mar": [45, 28, 35, 41, 43, 56, 37, 38, 50, 52, 33, 44, 37, 72, 47, 20],
+  "Luk": [80, 52, 38, 44, 39, 49, 50, 56, 62, 42, 54, 59, 35, 35, 32, 31, 37, 43, 48, 47, 38, 71, 56, 53],
+  "Joh": [51, 25, 36, 54, 47, 71, 53, 59, 41, 42, 57, 50, 38, 31, 27, 33, 26, 40, 42, 31, 25],
+  "Act": [26, 47, 26, 37, 42, 15, 60, 40, 43, 48, 30, 25, 52, 28, 41, 40, 34, 28, 41, 38, 40, 30, 35, 27, 27, 32, 44, 31],
+  "Rom": [32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 23, 33, 27],
+  "1Co": [31, 16, 23, 21, 13, 20, 40, 13, 27, 33, 34, 31, 13, 40, 58, 24],
+  "2Co": [24, 17, 18, 18, 21, 18, 16, 24, 15, 18, 33, 21, 13],
+  "Gal": [24, 21, 29, 31, 26, 18],
+  "Eph": [23, 22, 21, 32, 33, 24],
+  "Phi": [30, 30, 21, 23],
+  "Col": [29, 23, 25, 18],
+  "1Th": [10, 20, 13, 18, 28],
+  "2Th": [12, 17, 18],
+  "1Ti": [20, 15, 16, 16, 25, 21],
+  "2Ti": [18, 26, 17, 22],
+  "Tit": [16, 15, 15],
+  "Phm": [25],
+  "Heb": [14, 18, 19, 16, 14, 20, 28, 13, 28, 39, 40, 29, 25],
+  "Jam": [27, 26, 18, 17, 20],
+  "1Pe": [25, 25, 22, 19, 14],
+  "2Pe": [21, 22, 18],
+  "1Jo": [10, 29, 24, 21, 21],
+  "2Jo": [13],
+  "3Jo": [15],
+  "Jud": [25],
+  "Rev": [20, 29, 22, 11, 14, 17, 17, 13, 21, 11, 19, 18, 18, 20, 8, 21, 18, 24, 21, 15, 27, 21]
+};
+
 const BookPicker = {
   booksData: [],
   selectedBook: null,
   selectedChapter: 1,
+  selectedVerse: null,
+  viewMode: 'chapters', // 'chapters' | 'verses'
   pendingTargetChapter: null,
   pendingTargetVerse: null,
   onSelectCallback: null,
@@ -91,6 +162,15 @@ const BookPicker = {
   chaptersGridEl: null,
   bookTitleEl: null,
   totalChEl: null,
+  pickerChaptersHeader: null,
+  pickerVersesHeader: null,
+  pickerVerseBookTitle: null,
+  selectedChTotalVerses: null,
+  pickerVersesContainer: null,
+  versesGridEl: null,
+  btnSelectWholeChapter: null,
+  btnSelectWholeChapterText: null,
+  btnPickerBack: null,
 
   async init(onSelect) {
     this.onSelectCallback = onSelect;
@@ -104,11 +184,25 @@ const BookPicker = {
     this.bookTitleEl = document.getElementById('selected-book-name-title');
     this.totalChEl = document.getElementById('selected-book-total-ch');
 
+    this.pickerChaptersHeader = document.getElementById('picker-chapters-header');
+    this.pickerVersesHeader = document.getElementById('picker-verses-header');
+    this.pickerVerseBookTitle = document.getElementById('picker-verse-book-title');
+    this.selectedChTotalVerses = document.getElementById('selected-ch-total-verses');
+    this.pickerVersesContainer = document.getElementById('picker-verses-container');
+    this.versesGridEl = document.getElementById('grid-verses');
+    this.btnSelectWholeChapter = document.getElementById('btn-select-whole-chapter');
+    this.btnSelectWholeChapterText = document.getElementById('btn-select-whole-chapter-text');
+    this.btnPickerBack = document.getElementById('btn-picker-back');
+
     // Événements
     this.backdropEl?.addEventListener('click', () => this.close());
     document.getElementById('btn-close-book-picker')?.addEventListener('click', () => this.close());
     document.getElementById('btn-clear-picker-ref')?.addEventListener('click', () => {
       this.confirmSelection(null, null, null);
+    });
+    this.btnPickerBack?.addEventListener('click', () => this.showChaptersView());
+    this.btnSelectWholeChapter?.addEventListener('click', () => {
+      this.confirmSelection(this.selectedBook?.code, this.selectedChapter, null);
     });
     this.searchInput?.addEventListener('input', (e) => this.filterBooks(e.target.value));
     
@@ -232,6 +326,7 @@ const BookPicker = {
 
     const query = this.currentOptions.initialQuery || '';
     if (this.searchInput) this.searchInput.value = query;
+    this.showChaptersView();
     this.renderBooks(query);
     this.renderChapters();
 
@@ -244,6 +339,7 @@ const BookPicker = {
   close() {
     this.popoverEl?.classList.add('hidden');
     this.backdropEl?.classList.add('hidden');
+    this.showChaptersView();
     if (this.popoverEl) {
       this.popoverEl.classList.remove('centered');
       this.popoverEl.style.position = '';
@@ -328,8 +424,69 @@ const BookPicker = {
 
   selectBook(book) {
     this.selectedBook = book;
+    this.showChaptersView();
     this.renderBooks(this.searchInput ? this.searchInput.value : '');
     this.renderChapters();
+  },
+
+  getChapterVerseCount(bookCode, chNum) {
+    const chIdx = parseInt(chNum, 10) - 1;
+    if (BIBLE_VERSE_COUNTS[bookCode] && BIBLE_VERSE_COUNTS[bookCode][chIdx] > 0) {
+      return BIBLE_VERSE_COUNTS[bookCode][chIdx];
+    }
+    return 30;
+  },
+
+  showChaptersView() {
+    this.viewMode = 'chapters';
+    this.pickerChaptersHeader?.classList.remove('hidden');
+    this.chaptersGridEl?.classList.remove('hidden');
+    this.pickerVersesHeader?.classList.add('hidden');
+    this.pickerVersesContainer?.classList.add('hidden');
+  },
+
+  showVersesView(chNum) {
+    if (!this.selectedBook) return;
+    const ch = parseInt(chNum, 10);
+    this.selectedChapter = ch;
+    this.viewMode = 'verses';
+
+    this.pickerChaptersHeader?.classList.add('hidden');
+    this.chaptersGridEl?.classList.add('hidden');
+    this.pickerVersesHeader?.classList.remove('hidden');
+    this.pickerVersesContainer?.classList.remove('hidden');
+
+    if (this.pickerVerseBookTitle) {
+      this.pickerVerseBookTitle.textContent = `${this.selectedBook.name} ${ch}`;
+    }
+    if (this.btnSelectWholeChapterText) {
+      this.btnSelectWholeChapterText.textContent = `Tout le chapitre ${ch}`;
+    }
+
+    const totalVerses = this.getChapterVerseCount(this.selectedBook.code, ch);
+    if (this.selectedChTotalVerses) {
+      this.selectedChTotalVerses.textContent = `${totalVerses} versets`;
+    }
+
+    if (this.versesGridEl) {
+      this.versesGridEl.innerHTML = '';
+      const targetV = this.pendingTargetVerse ? parseInt(this.pendingTargetVerse, 10) : null;
+
+      for (let v = 1; v <= totalVerses; v++) {
+        const vBtn = document.createElement('button');
+        vBtn.className = `ch-btn ${targetV === v ? 'active' : ''}`;
+        vBtn.textContent = v;
+        vBtn.addEventListener('click', () => {
+          this.confirmSelection(this.selectedBook.code, ch, v);
+        });
+        this.versesGridEl.appendChild(vBtn);
+      }
+    }
+  },
+
+  selectChapter(chNum) {
+    this.selectedChapter = chNum;
+    this.showVersesView(chNum);
   },
 
   renderChapters() {
@@ -351,8 +508,12 @@ const BookPicker = {
       chBtn.className = `ch-btn ${this.selectedChapter === i ? 'active' : ''}`;
       chBtn.textContent = i;
       chBtn.addEventListener('click', () => {
-        const v = (this.selectedChapter === i) ? this.pendingTargetVerse : null;
-        this.confirmSelection(this.selectedBook.code, i, v);
+        if (this.currentOptions?.chapterOnly) {
+          const v = (this.selectedChapter === i) ? this.pendingTargetVerse : null;
+          this.confirmSelection(this.selectedBook.code, i, v);
+        } else {
+          this.selectChapter(i);
+        }
       });
       this.chaptersGridEl.appendChild(chBtn);
     }
