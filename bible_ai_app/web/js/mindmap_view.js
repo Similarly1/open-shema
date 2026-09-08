@@ -22,6 +22,9 @@ const MindMapView = {
   viewMode: 'map', // 'map' (Mind Map SVG) ou 'outline' (Plan outliner)
   treeStructure: 'radiant', // 'radiant' | 'right-tree' | 'top-down'
   collapsedNodes: new Set(),
+  relationships: [], // [ { id, fromId, toId, label, color } ]
+  connectingSourceId: null, // ID du nœud source en cours de liaison
+  selectedRelId: null, // ID de la liaison sélectionnée
 
   // Vue Pan & Zoom
   viewBox: { x: 0, y: 0, scale: 1 },
@@ -67,12 +70,24 @@ const MindMapView = {
             <filter id="mm-select-glow" x="-30%" y="-30%" width="160%" height="160%">
               <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#3b82f6" flood-opacity="0.5"/>
             </filter>
+            <marker id="mm-rel-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+            </marker>
           </defs>
           <g id="mindmap-viewport"></g>
         </svg>
 
         <!-- Vue Plan (Outliner hiérarchique interactif) -->
         <div id="mindmap-outline-view" class="mindmap-outline-container hidden"></div>
+
+        <!-- Bannière d'indication mode liaison -->
+        <div id="mm-connecting-banner" class="mm-connecting-banner hidden">
+          <div class="mm-connecting-badge">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
+          </div>
+          <span class="mm-connecting-text">Cliquez sur la branche cible pour créer la liaison (<kbd>Échap</kbd> pour annuler)</span>
+          <button type="button" class="btn-icon-subtle" id="mm-btn-cancel-connecting" title="Annuler (Échap)">×</button>
+        </div>
 
         <!-- Dock d'outils flottant minimaliste -->
         <div class="mindmap-dock">
@@ -81,6 +96,9 @@ const MindMapView = {
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-structure" title="Squelette de mise en page : Radiante, Arbre droit, Organigramme (Alt+S)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
+          </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-relationship" title="Créer une liaison transversale entre deux branches (Ctrl+L)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" title="Zoom avant (Ctrl + Molette)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -155,11 +173,12 @@ const MindMapView = {
             <table class="mm-help-table">
               <tr><td><kbd>Alt+P</kbd></td><td><strong>Basculer entre Vue Carte et Vue Plan</strong></td></tr>
               <tr><td><kbd>Alt+S</kbd></td><td><strong>Changer de squelette de mise en page</strong></td></tr>
+              <tr><td><kbd>Ctrl+L</kbd></td><td><strong>Créer une liaison transversale (Relation)</strong></td></tr>
               <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
               <tr><td><kbd>Entrée</kbd></td><td>Ajouter une branche voisine (Sœur)</td></tr>
               <tr><td><kbd>Espace</kbd> ou <em>Double-clic</em></td><td>Modifier le mot-clé</td></tr>
               <tr><td><kbd>F4</kbd></td><td>Ajouter / Modifier la note de branche</td></tr>
-              <tr><td><kbd>Suppr</kbd> / <kbd>Retour</kbd></td><td>Supprimer la branche sélectionnée</td></tr>
+              <tr><td><kbd>Suppr</kbd> / <kbd>Retour</kbd></td><td>Supprimer la branche ou liaison sélectionnée</td></tr>
               <tr><td><kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd></td><td>Copier / Coller une branche</td></tr>
               <tr><td><em>Clic Droit</em></td><td>Menu contextuel complet (branche ou fond)</td></tr>
               <tr><td><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></td><td>Naviguer d'une branche à l'autre</td></tr>
@@ -190,6 +209,7 @@ const MindMapView = {
         this.isPanning = true;
         this.panStart = { x: e.clientX - this.viewBox.x, y: e.clientY - this.viewBox.y };
         this.selectedNodeId = null;
+        this.selectedRelId = null;
         this.updateSelectionState();
       }
     });
@@ -231,6 +251,14 @@ const MindMapView = {
       e.stopPropagation();
       this.toggleStructurePopover();
     });
+    document.getElementById('mm-btn-relationship')?.addEventListener('click', () => {
+      if (this.selectedNodeId) {
+        this.startConnecting(this.selectedNodeId);
+      } else if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Sélectionnez d\'abord une branche à relier');
+      }
+    });
+    document.getElementById('mm-btn-cancel-connecting')?.addEventListener('click', () => this.cancelConnecting());
     document.getElementById('mm-btn-zoom-in')?.addEventListener('click', () => this.zoom(1.2));
     document.getElementById('mm-btn-zoom-out')?.addEventListener('click', () => this.zoom(0.8));
     document.getElementById('mm-btn-fit')?.addEventListener('click', () => this.fitView());
@@ -265,6 +293,13 @@ const MindMapView = {
       const mmContainer = this.container || document.getElementById('note-mindmap-container');
       if (!mmContainer || mmContainer.classList.contains('hidden')) return;
 
+      // Annulation du mode création de liaison (Échap)
+      if (e.key === 'Escape' && this.connectingSourceId) {
+        e.preventDefault();
+        this.cancelConnecting();
+        return;
+      }
+
       // Bascule universelle Carte ↔ Plan (Alt+P)
       if (e.altKey && (e.key === 'p' || e.key === 'P')) {
         e.preventDefault();
@@ -276,6 +311,17 @@ const MindMapView = {
       if (e.altKey && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         this.cycleStructure();
+        return;
+      }
+
+      // Création de liaison transversale (Ctrl+L)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === 'L')) {
+        e.preventDefault();
+        if (this.selectedNodeId) {
+          this.startConnecting(this.selectedNodeId);
+        } else if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Sélectionnez d\'abord une branche à relier');
+        }
         return;
       }
 
@@ -293,7 +339,11 @@ const MindMapView = {
         this.addSiblingToSelected();
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        this.deleteSelected();
+        if (this.selectedRelId) {
+          this.deleteRelationship(this.selectedRelId);
+        } else {
+          this.deleteSelected();
+        }
       } else if (e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
         if (this.selectedNodeId) this.startInlineEdit(this.selectedNodeId);
@@ -382,7 +432,7 @@ const MindMapView = {
 
     for (const rawLine of lines) {
       const line = rawLine.trimEnd();
-      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:')) continue;
+      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-rel:')) continue;
 
       // Détection de l'indentation
       const match = line.match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
@@ -434,6 +484,32 @@ const MindMapView = {
       ];
     }
 
+    // Extraction des liaisons transversales <!-- mindmap-rel: SOURCE -> CIBLE | label: ... | color: ... -->
+    this.relationships = [];
+    if (markdownContent) {
+      const relRegex = /<!--\s*mindmap-rel:\s*(.+?)\s*->\s*(.+?)(?:\s*\|\s*label:\s*(.*?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->/g;
+      let relMatch;
+      while ((relMatch = relRegex.exec(markdownContent)) !== null) {
+        const fromRef = relMatch[1].trim();
+        const toRef = relMatch[2].trim();
+        const label = relMatch[3] !== undefined ? relMatch[3].trim() : 'VOIR AUSSI';
+        const color = relMatch[4] !== undefined ? relMatch[4].trim() : '';
+
+        const fromNode = this.findNode(fromRef, root) || this.findNodeByText(fromRef, root);
+        const toNode = this.findNode(toRef, root) || this.findNodeByText(toRef, root);
+
+        if (fromNode && toNode && fromNode.id !== toNode.id) {
+          this.relationships.push({
+            id: `rel_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+            fromId: fromNode.id,
+            toId: toNode.id,
+            label: label || 'VOIR AUSSI',
+            color: color || ''
+          });
+        }
+      }
+    }
+
     return root;
   },
 
@@ -454,6 +530,23 @@ const MindMapView = {
     };
 
     serializeChildren(tree, 0);
+
+    // Sérialisation des liaisons transversales (Relations style XMind)
+    if (this.relationships && this.relationships.length > 0) {
+      md += '\n';
+      this.relationships.forEach(rel => {
+        const fromNode = this.findNode(rel.fromId, tree || this.tree);
+        const toNode = this.findNode(rel.toId, tree || this.tree);
+        if (fromNode && toNode) {
+          const fromText = fromNode.text.replace(/\|/g, '');
+          const toText = toNode.text.replace(/\|/g, '');
+          const labelPart = rel.label ? ` | label: ${rel.label.replace(/\|/g, '')}` : '';
+          const colorPart = rel.color ? ` | color: ${rel.color}` : '';
+          md += `<!-- mindmap-rel: ${fromText} -> ${toText}${labelPart}${colorPart} -->\n`;
+        }
+      });
+    }
+
     return md;
   },
 
@@ -884,6 +977,7 @@ const MindMapView = {
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
               </span>
             ` : ''}
+            ${this.renderOutlineRelPills(boi.id)}
           </div>
 
           <div class="mm-outline-actions">
@@ -946,6 +1040,7 @@ const MindMapView = {
                 <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
               </span>
             ` : ''}
+            ${this.renderOutlineRelPills(node.id)}
           </div>
 
           <div class="mm-outline-actions">
@@ -978,6 +1073,40 @@ const MindMapView = {
     `;
   },
 
+  renderOutlineRelPills(nodeId) {
+    if (!this.relationships || this.relationships.length === 0) return '';
+    const outgoing = this.relationships.filter(r => r.fromId === nodeId);
+    const incoming = this.relationships.filter(r => r.toId === nodeId);
+    if (outgoing.length === 0 && incoming.length === 0) return '';
+
+    let html = '';
+    outgoing.forEach(r => {
+      const target = this.findNode(r.toId);
+      if (target) {
+        html += `
+          <span class="mm-outline-rel-pill outgoing" data-action="jump-node" data-id="${target.id}" title="Liaison vers : ${this.escapeHtml(target.text)} (${this.escapeHtml(r.label || 'Liaison')})">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
+            <span>${this.escapeHtml(r.label || 'Liaison')} : <strong>${this.escapeHtml(target.text)}</strong></span>
+          </span>
+        `;
+      }
+    });
+
+    incoming.forEach(r => {
+      const source = this.findNode(r.fromId);
+      if (source) {
+        html += `
+          <span class="mm-outline-rel-pill incoming" data-action="jump-node" data-id="${source.id}" title="Liaison depuis : ${this.escapeHtml(source.text)} (${this.escapeHtml(r.label || 'Liaison')})">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 16L2 12L6 8"/><path d="M22 12H2"/></svg>
+            <span>← ${this.escapeHtml(source.text)} (${this.escapeHtml(r.label || 'Liaison')})</span>
+          </span>
+        `;
+      }
+    });
+
+    return html;
+  },
+
   bindOutlineEvents(outlineEl) {
     // Clic sur chevron replier/déplier
     outlineEl.querySelectorAll('[data-action="toggle-collapse"]').forEach(btn => {
@@ -997,11 +1126,27 @@ const MindMapView = {
       });
     });
 
+    // Clic sur une pastille de liaison transversale -> saut fluide vers le nœud relié
+    outlineEl.querySelectorAll('.mm-outline-rel-pill[data-action="jump-node"]').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const targetId = pill.getAttribute('data-id');
+        if (targetId) {
+          const targetBlock = outlineEl.querySelector(`[data-node-id="${targetId}"]`);
+          if (targetBlock) {
+            targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetBlock.classList.add('highlight-pulse');
+            setTimeout(() => targetBlock.classList.remove('highlight-pulse'), 1600);
+          }
+        }
+      });
+    });
+
     // Actions rapides (+, verset, note, couleur, supprimer, éditer)
     outlineEl.querySelectorAll('[data-action]').forEach(btn => {
       const action = btn.getAttribute('data-action');
       const nodeId = btn.getAttribute('data-id');
-      if (!nodeId || action === 'toggle-collapse') return;
+      if (!nodeId || action === 'toggle-collapse' || action === 'jump-node') return;
 
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1331,7 +1476,10 @@ const MindMapView = {
     // 1. Dessiner d'abord toutes les branches (courbes fluides sous le texte)
     this.drawBranches(this.tree);
 
-    // 2. Dessiner tous les nœuds (textes, boutons contextuels)
+    // 2. Dessiner les liaisons transversales inter-branches (Relations style XMind)
+    this.drawRelationships();
+
+    // 3. Dessiner tous les nœuds (textes, boutons contextuels)
     this.drawNodes(this.tree);
   },
 
@@ -1423,10 +1571,11 @@ const MindMapView = {
   drawNodes(node) {
     const isRoot = node.level === 0;
     const isSelected = this.selectedNodeId === node.id;
+    const isConnectingSource = this.connectingSourceId === node.id;
     const isTopDown = this.treeStructure === 'top-down';
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.setAttribute('class', `mm-node-g ${isRoot ? 'mm-root-node' : ''} ${isSelected ? 'selected' : ''}`);
+    g.setAttribute('class', `mm-node-g ${isRoot ? 'mm-root-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
     g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
     g.setAttribute('data-id', node.id);
 
@@ -1607,6 +1756,10 @@ const MindMapView = {
     // Gestion de la sélection et de l'édition directe
     g.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (this.connectingSourceId) {
+        this.finishConnecting(node.id);
+        return;
+      }
       this.selectNode(node.id);
     });
 
@@ -1691,6 +1844,18 @@ const MindMapView = {
     return null;
   },
 
+  findNodeByText(text, current = this.tree) {
+    if (!current || !text) return null;
+    const clean = text.trim().toUpperCase();
+    if (current.text && current.text.trim().toUpperCase() === clean) return current;
+    if (!current.children) return null;
+    for (const child of current.children) {
+      const found = this.findNodeByText(text, child);
+      if (found) return found;
+    }
+    return null;
+  },
+
   addChildToSelected() {
     const target = this.selectedNodeId ? this.findNode(this.selectedNodeId) : this.tree;
     if (target) this.addChildToNode(target);
@@ -1765,8 +1930,22 @@ const MindMapView = {
     const parent = this.findParent(id);
     if (!parent) return;
 
+    // Collecter les IDs du nœud et de ses descendants pour purger les liaisons rattachées
+    const deletedIds = new Set();
+    const collectIds = (n) => {
+      if (!n) return;
+      deletedIds.add(n.id);
+      if (n.children) n.children.forEach(collectIds);
+    };
+    const nodeToDelete = this.findNode(id);
+    if (nodeToDelete) collectIds(nodeToDelete);
+
     parent.children = parent.children.filter(c => c.id !== id);
     this.selectedNodeId = parent.id;
+
+    if (this.relationships && this.relationships.length > 0) {
+      this.relationships = this.relationships.filter(r => !deletedIds.has(r.fromId) && !deletedIds.has(r.toId));
+    }
 
     this.layoutTree();
     if (this.viewMode === 'outline') {
@@ -2485,6 +2664,13 @@ const MindMapView = {
           <span class="mm-ctx-label">${node?.note ? 'Modifier la note de branche' : 'Ajouter une note de branche'}</span>
           <span class="mm-ctx-shortcut">F4</span>
         </div>
+        <div class="mm-ctx-item" data-action="relationship">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
+          </span>
+          <span class="mm-ctx-label">Créer une liaison</span>
+          <span class="mm-ctx-shortcut">Ctrl+L</span>
+        </div>
         <div class="mm-ctx-item" data-action="color">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
@@ -2735,6 +2921,9 @@ const MindMapView = {
           case 'note':
             if (targetNodeId) this.promptTopicNote(targetNodeId);
             break;
+          case 'relationship':
+            if (targetNodeId) this.startConnecting(targetNodeId);
+            break;
           case 'color':
             if (targetNodeId) this.promptChangeColor(targetNodeId);
             break;
@@ -2835,5 +3024,376 @@ const MindMapView = {
         if (check) check.classList.toggle('hidden', !isActive);
       });
     }
+  },
+
+  // =========================================================================
+  // LIAISONS TRANSVERSALES (RELATIONSHIPS STYLE XMIND)
+  // =========================================================================
+
+  getNodeConnectionPoint(node, targetPoint) {
+    if (!node) return { x: 0, y: 0 };
+    if (node.id === 'root') {
+      const dx = targetPoint.x - (node.x || 0);
+      const dy = targetPoint.y - (node.y || 0);
+      if (this.treeStructure === 'top-down') {
+        return dy >= 0 ? { x: node.x || 0, y: (node.y || 0) + (node.height || 46) / 2 } : { x: node.x || 0, y: (node.y || 0) - (node.height || 46) / 2 };
+      }
+      return dx >= 0 ? { x: (node.x || 0) + (node.width || 120) / 2, y: node.y || 0 } : { x: (node.x || 0) - (node.width || 120) / 2, y: node.y || 0 };
+    }
+
+    if (this.treeStructure === 'top-down') {
+      if (targetPoint.y >= node.y) {
+        return { x: node.x, y: node.y + 12 };
+      } else {
+        return { x: node.x, y: node.y - 12 };
+      }
+    }
+
+    // Structure Radiant ou Right-tree
+    const halfW = (node.width || 80) / 2;
+    if (targetPoint.x >= node.x) {
+      return { x: node.x + halfW, y: node.y + 3 };
+    } else {
+      return { x: node.x - halfW, y: node.y + 3 };
+    }
+  },
+
+  drawRelationships() {
+    if (!this.relationships || this.relationships.length === 0 || !this.viewportG) return;
+
+    // Calque dédié pour les liaisons
+    let relsLayer = this.viewportG.querySelector('#mm-relationships-layer');
+    if (!relsLayer) {
+      relsLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      relsLayer.setAttribute('id', 'mm-relationships-layer');
+      this.viewportG.appendChild(relsLayer);
+    } else {
+      relsLayer.innerHTML = '';
+    }
+
+    this.relationships.forEach(rel => {
+      const fromNode = this.findNode(rel.fromId);
+      const toNode = this.findNode(rel.toId);
+      if (!fromNode || !toNode) return;
+
+      const p1 = this.getNodeConnectionPoint(fromNode, { x: toNode.x, y: toNode.y });
+      const p2 = this.getNodeConnectionPoint(toNode, { x: fromNode.x, y: fromNode.y });
+
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      // Normale perpendiculaire
+      const nx = -dy / dist;
+      const ny = dx / dist;
+
+      // Courbure douce et élégante
+      const curvature = Math.min(85, Math.max(30, dist * 0.2));
+      const cx = (p1.x + p2.x) / 2 + nx * curvature;
+      const cy = (p1.y + p2.y) / 2 + ny * curvature;
+
+      // Milieu exact sur la courbe quadratique de Bézier (t = 0.5)
+      const lx = 0.25 * p1.x + 0.5 * cx + 0.25 * p2.x;
+      const ly = 0.25 * p1.y + 0.5 * cy + 0.25 * p2.y;
+
+      const pathData = `M ${p1.x} ${p1.y} Q ${cx} ${cy}, ${p2.x} ${p2.y}`;
+      const isSelected = this.selectedRelId === rel.id;
+      const relColor = rel.color || fromNode.color || '#2563eb';
+
+      const relG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      relG.setAttribute('class', `mm-relationship-g ${isSelected ? 'selected' : ''}`);
+      relG.setAttribute('data-rel-id', rel.id);
+
+      // Trait transparent pour zone de clic aérée
+      const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      hitPath.setAttribute('d', pathData);
+      hitPath.setAttribute('stroke', 'transparent');
+      hitPath.setAttribute('stroke-width', '18');
+      hitPath.setAttribute('fill', 'none');
+      hitPath.setAttribute('class', 'mm-rel-hit-path');
+      relG.appendChild(hitPath);
+
+      // Courbe tiretée noble avec flèche terminale
+      const visiblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      visiblePath.setAttribute('d', pathData);
+      visiblePath.setAttribute('stroke', relColor);
+      visiblePath.setAttribute('stroke-width', isSelected ? '2.8' : '2');
+      visiblePath.setAttribute('stroke-dasharray', '6,4');
+      visiblePath.setAttribute('fill', 'none');
+      visiblePath.setAttribute('marker-end', 'url(#mm-rel-arrow)');
+      visiblePath.setAttribute('class', 'mm-rel-visible-path');
+      relG.appendChild(visiblePath);
+
+      // Étiquette flottante centrale
+      const labelText = (rel.label || 'VOIR AUSSI').toUpperCase();
+      const textW = this.getTextWidth(labelText, 9.5, '700');
+      const pillW = Math.max(54, textW + 18);
+      const pillH = 20;
+
+      const labelG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      labelG.setAttribute('transform', `translate(${lx}, ${ly})`);
+      labelG.setAttribute('class', 'mm-rel-label-g');
+
+      const pillRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      pillRect.setAttribute('x', -pillW / 2);
+      pillRect.setAttribute('y', -pillH / 2);
+      pillRect.setAttribute('width', pillW);
+      pillRect.setAttribute('height', pillH);
+      pillRect.setAttribute('rx', 10);
+      pillRect.setAttribute('class', 'mm-rel-label-rect');
+      labelG.appendChild(pillRect);
+
+      const labelT = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      labelT.setAttribute('text-anchor', 'middle');
+      labelT.setAttribute('dominant-baseline', 'central');
+      labelT.setAttribute('class', 'mm-rel-label-text');
+      labelT.textContent = labelText;
+      labelG.appendChild(labelT);
+
+      // Bouton contextuel × au survol
+      const delBtnG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      delBtnG.setAttribute('transform', `translate(${pillW / 2 + 8}, 0)`);
+      delBtnG.setAttribute('class', 'mm-rel-del-btn');
+      delBtnG.setAttribute('title', 'Supprimer cette liaison');
+
+      const delCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      delCircle.setAttribute('r', 7.5);
+      delCircle.setAttribute('class', 'mm-rel-del-circle');
+      delBtnG.appendChild(delCircle);
+
+      const delXText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      delXText.setAttribute('text-anchor', 'middle');
+      delXText.setAttribute('dominant-baseline', 'central');
+      delXText.setAttribute('class', 'mm-rel-del-text');
+      delXText.setAttribute('y', -0.5);
+      delXText.textContent = '×';
+      delBtnG.appendChild(delXText);
+
+      delBtnG.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.deleteRelationship(rel.id);
+      });
+      labelG.appendChild(delBtnG);
+
+      // Événements
+      relG.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.selectRelationship(rel.id);
+      });
+
+      labelG.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        this.promptEditRelationshipLabel(rel.id);
+      });
+
+      relG.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.selectRelationship(rel.id);
+        this.promptEditRelationshipLabel(rel.id);
+      });
+
+      relG.appendChild(labelG);
+      relsLayer.appendChild(relG);
+    });
+  },
+
+  selectRelationship(relId) {
+    this.selectedRelId = relId;
+    this.selectedNodeId = null;
+    this.updateSelectionState();
+    this.viewportG?.querySelectorAll('.mm-relationship-g').forEach(el => {
+      el.classList.toggle('selected', el.getAttribute('data-rel-id') === relId);
+    });
+  },
+
+  deleteRelationship(relId) {
+    if (!this.relationships) return;
+    this.relationships = this.relationships.filter(r => r.id !== relId);
+    if (this.selectedRelId === relId) this.selectedRelId = null;
+    this.draw();
+    this.syncAndAutoSave();
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast('Liaison supprimée');
+    }
+  },
+
+  startConnecting(sourceId) {
+    const node = this.findNode(sourceId);
+    if (!node) return;
+
+    this.connectingSourceId = sourceId;
+    this.selectedRelId = null;
+
+    const banner = document.getElementById('mm-connecting-banner');
+    if (banner) {
+      const textEl = banner.querySelector('.mm-connecting-text');
+      if (textEl) {
+        textEl.innerHTML = `Relier <strong>« ${this.escapeHtml(node.text)} »</strong> à... (<kbd>Échap</kbd> pour annuler)`;
+      }
+      banner.classList.remove('hidden');
+    }
+
+    this.svg?.classList.add('mm-connecting-mode');
+
+    // Mettre en évidence la branche source
+    this.viewportG?.querySelectorAll('.mm-node-g').forEach(el => {
+      el.classList.toggle('connecting-source', el.getAttribute('data-id') === sourceId);
+    });
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast('Cliquez sur la branche cible pour créer la liaison');
+    }
+  },
+
+  cancelConnecting() {
+    this.connectingSourceId = null;
+    const banner = document.getElementById('mm-connecting-banner');
+    if (banner) banner.classList.add('hidden');
+    this.svg?.classList.remove('mm-connecting-mode');
+    this.viewportG?.querySelectorAll('.mm-node-g').forEach(el => {
+      el.classList.remove('connecting-source');
+    });
+  },
+
+  finishConnecting(targetId) {
+    if (!this.connectingSourceId) return;
+
+    if (targetId === this.connectingSourceId) {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Impossible de relier une branche à elle-même');
+      }
+      this.cancelConnecting();
+      return;
+    }
+
+    const exists = this.relationships.some(r =>
+      (r.fromId === this.connectingSourceId && r.toId === targetId) ||
+      (r.fromId === targetId && r.toId === this.connectingSourceId)
+    );
+
+    if (exists) {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Une liaison existe déjà entre ces deux branches');
+      }
+      this.cancelConnecting();
+      return;
+    }
+
+    const fromNode = this.findNode(this.connectingSourceId);
+    const toNode = this.findNode(targetId);
+
+    const newRel = {
+      id: `rel_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      fromId: this.connectingSourceId,
+      toId: targetId,
+      label: 'VOIR AUSSI',
+      color: fromNode?.color || '#2563eb'
+    };
+
+    this.relationships.push(newRel);
+    const createdId = newRel.id;
+    this.cancelConnecting();
+    this.selectedRelId = createdId;
+    this.draw();
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Liaison créée : « ${fromNode?.text} » ➔ « ${toNode?.text} »`);
+    }
+
+    this.promptEditRelationshipLabel(createdId);
+  },
+
+  promptEditRelationshipLabel(relId) {
+    const rel = this.relationships.find(r => r.id === relId);
+    if (!rel) return;
+
+    const fromNode = this.findNode(rel.fromId);
+    const toNode = this.findNode(rel.toId);
+
+    document.getElementById('mm-rel-edit-modal')?.remove();
+
+    const presets = [
+      'VOIR AUSSI',
+      'ACCOMPLISSEMENT',
+      'TYPOLOGIE',
+      'PARALLÈLE',
+      'OPPOSITION',
+      'CHIASME',
+      'CAUSE À EFFET'
+    ];
+
+    const overlay = document.createElement('div');
+    overlay.id = 'mm-rel-edit-modal';
+    overlay.className = 'mm-rel-modal-overlay';
+    overlay.innerHTML = `
+      <div class="mm-rel-modal" role="dialog" aria-modal="true">
+        <div class="mm-rel-modal-title">
+          <span>Liaison transversale</span>
+          <button type="button" class="btn-icon-subtle" id="mm-btn-close-rel-modal">×</button>
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">
+          De <strong>${this.escapeHtml(fromNode?.text || 'Source')}</strong> vers <strong>${this.escapeHtml(toNode?.text || 'Cible')}</strong>
+        </div>
+        <div class="mm-rel-presets">
+          ${presets.map(p => `<button type="button" class="mm-rel-preset-chip" data-label="${p}">${p}</button>`).join('')}
+        </div>
+        <input type="text" class="mm-rel-modal-input" id="mm-rel-input-label" value="${this.escapeHtml(rel.label || 'VOIR AUSSI')}" placeholder="Mot-clé de la relation...">
+        <div class="mm-rel-modal-actions">
+          <button type="button" class="btn-subtle danger" id="mm-btn-del-rel" style="color: #ef4444;">Supprimer la liaison</button>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-subtle" id="mm-btn-cancel-rel">Annuler</button>
+            <button type="button" class="btn-primary" id="mm-btn-save-rel">Appliquer</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const input = document.getElementById('mm-rel-input-label');
+    input?.focus();
+    input?.select();
+
+    const close = () => {
+      overlay.remove();
+      document.removeEventListener('keydown', handleKey);
+    };
+
+    const handleKey = (e) => {
+      if (e.key === 'Escape') close();
+      if (e.key === 'Enter') save();
+    };
+
+    const save = () => {
+      const val = (input?.value || '').trim().toUpperCase() || 'LIAISON';
+      rel.label = val;
+      close();
+      this.draw();
+      this.syncAndAutoSave();
+    };
+
+    overlay.querySelectorAll('.mm-rel-preset-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const lbl = chip.getAttribute('data-label');
+        if (input) input.value = lbl;
+        save();
+      });
+    });
+
+    document.getElementById('mm-btn-close-rel-modal')?.addEventListener('click', close);
+    document.getElementById('mm-btn-cancel-rel')?.addEventListener('click', close);
+    document.getElementById('mm-btn-save-rel')?.addEventListener('click', save);
+    document.getElementById('mm-btn-del-rel')?.addEventListener('click', () => {
+      close();
+      this.deleteRelationship(relId);
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener('keydown', handleKey);
   }
 };

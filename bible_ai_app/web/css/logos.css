@@ -33135,6 +33135,367 @@ body[class*="palette-dark"] .mm-outline-inline-input {
   color: #f8fafc;
 }
 
+/* ==========================================================================
+   LIAISONS TRANSVERSALES (RELATIONSHIPS STYLE XMIND)
+   ========================================================================== */
+
+/* Bannière d'indication mode liaison active */
+.mm-connecting-banner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  border: 1.5px solid var(--accent-blue, #2563eb);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+  border-radius: 20px;
+  padding: 6px 14px 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: auto;
+  animation: mmBannerFadeIn 0.2s ease-out;
+}
+
+@keyframes mmBannerFadeIn {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.mm-connecting-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+}
+
+.mm-connecting-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+}
+
+.mm-connecting-text kbd {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-size: 10px;
+  font-family: inherit;
+}
+
+body.theme-dark .mm-connecting-banner,
+body[class*="palette-dark"] .mm-connecting-banner {
+  background: #1e293b;
+  border-color: #3b82f6;
+  color: #f8fafc;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body.theme-dark .mm-connecting-text kbd,
+body[class*="palette-dark"] .mm-connecting-text kbd {
+  background: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+/* Canevas en mode création de liaison */
+.mindmap-svg-canvas.mm-connecting-mode {
+  cursor: crosshair !important;
+}
+
+.mindmap-svg-canvas.mm-connecting-mode .mm-node-g {
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.mindmap-svg-canvas.mm-connecting-mode .mm-node-g:hover {
+  filter: drop-shadow(0 0 8px #2563eb);
+}
+
+/* Nœud source de liaison en surbrillance pulsée */
+.mm-node-g.connecting-source {
+  animation: mmSourcePulse 1.4s infinite ease-in-out;
+}
+
+@keyframes mmSourcePulse {
+  0% { filter: drop-shadow(0 0 4px #2563eb); }
+  50% { filter: drop-shadow(0 0 12px #3b82f6); }
+  100% { filter: drop-shadow(0 0 4px #2563eb); }
+}
+
+/* Courbes de liaison SVG */
+.mm-relationship-g {
+  cursor: pointer;
+}
+
+.mm-rel-hit-path {
+  pointer-events: stroke;
+}
+
+.mm-rel-visible-path {
+  pointer-events: stroke;
+  transition: stroke-width 0.2s, stroke 0.2s;
+}
+
+.mm-relationship-g:hover .mm-rel-visible-path {
+  stroke-width: 2.8px;
+  stroke: #2563eb;
+}
+
+.mm-relationship-g.selected .mm-rel-visible-path {
+  stroke-width: 3px;
+  stroke: #2563eb;
+  filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.5));
+}
+
+/* Étiquette flottante de liaison */
+.mm-rel-label-g {
+  cursor: pointer;
+  user-select: none;
+}
+
+.mm-rel-label-rect {
+  fill: var(--bg-card, #ffffff);
+  stroke: var(--border-color, #cbd5e1);
+  stroke-width: 1.2px;
+  transition: all 0.15s ease;
+}
+
+body.theme-dark .mm-rel-label-rect,
+body[class*="palette-dark"] .mm-rel-label-rect {
+  fill: #1e293b;
+  stroke: #475569;
+}
+
+.mm-rel-label-text {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--text-secondary, #475569);
+  letter-spacing: 0.3px;
+}
+
+body.theme-dark .mm-rel-label-text,
+body[class*="palette-dark"] .mm-rel-label-text {
+  fill: #94a3b8;
+}
+
+.mm-relationship-g:hover .mm-rel-label-rect,
+.mm-relationship-g.selected .mm-rel-label-rect {
+  stroke: #2563eb;
+}
+
+.mm-relationship-g:hover .mm-rel-label-text,
+.mm-relationship-g.selected .mm-rel-label-text {
+  fill: #2563eb;
+}
+
+/* Bouton supprimer sur l'étiquette de relation */
+.mm-rel-del-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+}
+
+.mm-relationship-g:hover .mm-rel-del-btn,
+.mm-relationship-g.selected .mm-rel-del-btn {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.mm-rel-del-circle {
+  fill: #ef4444;
+  transition: transform 0.15s ease;
+}
+
+.mm-rel-del-btn:hover .mm-rel-del-circle {
+  fill: #dc2626;
+  transform: scale(1.15);
+  transform-origin: center;
+}
+
+.mm-rel-del-text {
+  fill: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* Modal d'édition d'étiquette de relation */
+.mm-rel-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: mmModalFade 0.15s ease-out;
+}
+
+@keyframes mmModalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mm-rel-modal {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  width: 380px;
+  max-width: 92vw;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+body.theme-dark .mm-rel-modal,
+body[class*="palette-dark"] .mm-rel-modal {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+.mm-rel-modal-title {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mm-rel-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mm-rel-preset-chip {
+  background: var(--bg-surface-elevated, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary, #334155);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mm-rel-preset-chip:hover {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+body.theme-dark .mm-rel-preset-chip,
+body[class*="palette-dark"] .mm-rel-preset-chip {
+  background: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+body.theme-dark .mm-rel-preset-chip:hover,
+body[class*="palette-dark"] .mm-rel-preset-chip:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #60a5fa;
+  color: #93c5fd;
+}
+
+.mm-rel-modal-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-color, #cbd5e1);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  outline: none;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.mm-rel-modal-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+body.theme-dark .mm-rel-modal-input,
+body[class*="palette-dark"] .mm-rel-modal-input {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.mm-rel-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Pastille liaison dans la Vue Plan (Outliner) */
+.mm-outline-rel-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.mm-outline-rel-pill.outgoing {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue, #2563eb);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.mm-outline-rel-pill.incoming {
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--text-secondary, #64748b);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+.mm-outline-rel-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+.mm-outline-rel-pill.outgoing:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.mm-outline-rel-pill.incoming:hover {
+  background: #475569;
+  color: #ffffff;
+  border-color: #475569;
+}
+
+.highlight-pulse {
+  animation: mmHighlightRow 1.5s ease-out;
+}
+
+@keyframes mmHighlightRow {
+  0% { background-color: rgba(37, 99, 235, 0.25); }
+  100% { background-color: transparent; }
+}
+
 /* 10. Impression */
 @media print {
   #app-window-titlebar,
