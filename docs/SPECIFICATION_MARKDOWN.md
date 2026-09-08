@@ -133,13 +133,17 @@ def get_verse():
 
 ## 4. Les Cartes Mentales Radiantes (Mind Maps)
 
-Open Shema intègre un moteur de Mind Mapping organique SVG basé sur les principes de la pensée radiante (lois de Tony Buzan). La source de vérité d'une carte mentale est **100% stockée en Markdown standard**.
+Open Shema intègre un moteur de Mind Mapping organique SVG basé sur les principes de la pensée radiante (lois de Tony Buzan) combiné à l'ergonomie visuelle moderne (style XMind / Heptabase). La source de vérité d'une carte mentale est **100% stockée en Markdown standard**.
 
 ### 4.1 Différence Fondamentale : `type: mindmap`
 
 Pour qu'un fichier Markdown soit ouvert comme une carte mentale interactive dans Open Shema, son Frontmatter doit comporter la métadonnée :
 ```yaml
 type: mindmap
+```
+Vous pouvez également définir la palette chromatique active (`nature`, `ocean`, `automne`, `royal`) :
+```yaml
+palette: ocean
 ```
 
 ### 4.2 Structure Complète d'un Fichier Mind Map
@@ -165,39 +169,47 @@ updated_at: "08/09/2026 12:30"
 <!-- mindmap-connector: curve -->
 <!-- mindmap-node-shape: underline -->
 
-- DÉFINITION [Hébreux 11:1]
+- DÉFINITION [Hébreux 11:1] <!-- marker: 1 -->
   - ASSURANCE
     - DES CHOSES ESPÉRÉES
   - DÉMONSTRATION
     - DE CELLES QU'ON NE VOIT PAS
-- SOURCE [Romains 10:17] <!-- note: La foi naît de ce qu'on entend, et ce qu'on entend vient de la parole du Christ -->
-  - PAROLE DE DIEU
+- SOURCE [Romains 10:17] <!-- marker: p1 --> <!-- note: La foi naît de ce qu'on entend, et ce qu'on entend vient de la parole du Christ -->
+  - PAROLE DE DIEU <!-- marker: star -->
   - PRÉDICATION
-- FRUITS [Galates 5:6]
+- FRUITS [Galates 5:6] <!-- marker: done -->
   - AGISSANTE PAR L'AMOUR
   - PERSÉVÉRANCE
 
-<!-- mindmap-pos: DÉFINITION | x: 25 | y: -10 -->
+<!-- mindmap-pos: DÉFINITION | x: -20 | y: -10 -->
 <!-- mindmap-pos: SOURCE | x: 30 | y: 15 -->
 
+<!-- mindmap-boundary: DÉFINITION | label: FONDEMENT BIBLIQUE | color: #0284c7 -->
 <!-- mindmap-rel: DÉFINITION -> FRUITS | label: ABOUTISSEMENT | color: #059669 | cx: 280 | cy: 40 -->
+
+<!-- mindmap-floating-start: QUESTIONS EXÉGÉTIQUES | marker: p2 | x: 340 | y: 160 | color: #7c3aed -->
+  - NATURE DE L'ASSURANCE
+  - FOI ACTIVE OU PASSIVE
+<!-- mindmap-floating-end -->
+
+<!-- mindmap-floating: THÈME MAJEUR : LA GRÂCE DIVINE | marker: star | x: -350 | y: -140 | color: #d97706 -->
 ```
 
 ### 4.3 Directives de Mise en Page (Commentaires HTML)
 
 Placées en tête du corps de texte, ces directives pilotent le moteur de rendu SVG sans altérer la compatibilité avec les lecteurs Markdown externes :
 
-1. **Squelette de disposition** :
+1. **Squelette de disposition** (`Alt+S`) :
    * `<!-- mindmap-layout: radiant -->` : Pensée radiante bilatérale (équilibrée gauche/droite, par défaut).
    * `<!-- mindmap-layout: right-tree -->` : Arbre logique avec racine à gauche et arborescence à droite.
    * `<!-- mindmap-layout: top-down -->` : Organigramme descendant hiérarchique (généalogies, divisions).
 
-2. **Style des connecteurs / branches** :
+2. **Style des connecteurs / branches** (`Alt+T`) :
    * `<!-- mindmap-connector: curve -->` : Courbes de Bézier cubiques dégressives (par défaut).
    * `<!-- mindmap-connector: orthogonal -->` : Lignes en équerre à angle droit avec coudes arrondis.
    * `<!-- mindmap-connector: straight -->` : Lignes droites directes.
 
-3. **Forme des nœuds** :
+3. **Forme des nœuds** (`Alt+T`) :
    * `<!-- mindmap-node-shape: underline -->` : Texte souligné posé sur la branche (style épuré Buzan, par défaut).
    * `<!-- mindmap-node-shape: rounded-rect -->` : Rectangle aux coins arrondis.
    * `<!-- mindmap-node-shape: pill -->` : Capsule / Pilule.
@@ -211,22 +223,97 @@ Placées en tête du corps de texte, ces directives pilotent le moteur de rendu 
       - SOUS-BRANCHE NIVEAU 3
   ```
 * **Mots-clés** : Selon les règles de Buzan, les mots-clés sont écrits de préférence en lettres capitales (`MAJUSCULES`).
-* **Références bibliques liées** : Positionnées entre crochets à la fin du mot-clé : `[Jean 3:16]`. Open Shema affiche un badge interactif ouvrant directement le passage.
-* **Notes de branche** : Ajoutées à la fin de la ligne avec le commentaire `<!-- note: mon texte d'explication -->`. Au survol ou au clic sur la branche, une infobulle déplie ce texte.
+* **Références bibliques liées** : Positionnées entre crochets : `[Jean 3:16]`. Open Shema affiche un badge interactif ouvrant directement le passage dans la Bible.
+* **Notes de branche** : Ajoutées à la fin de la ligne avec le commentaire `<!-- note: mon texte d'explication -->` (raccourci `F4` ou `Alt+N`). Au survol ou au clic sur la branche, une infobulle déplie ce texte.
 
-### 4.5 Positionnement Libre dans l'Espace
+### 4.5 Marqueurs, Numérotation et Priorités
 
-Lorsque l'utilisateur réorganise visuellement une branche à la souris, Open Shema enregistre le décalage spatial à la fin du fichier :
+Open Shema supporte la numérotation ordonnée, les priorités d'urgence et les statuts visuels sous deux syntaxes équivalentes :
+
+1. **Directive de fin de ligne** :
+   * Chiffres ordonnés (Touches `1` à `9`) : `<!-- marker: 1 -->` à `<!-- marker: 9 -->`
+   * Priorités majeures : `<!-- marker: p1 -->`, `<!-- marker: p2 -->`, `<!-- marker: p3 -->`, `<!-- marker: p4 -->`
+   * Statuts & symboles : `<!-- marker: done -->` (✓), `<!-- marker: progress -->` (◐), `<!-- marker: star -->` (★), `<!-- marker: alert -->` (!)
+2. **Préfixe compatible Obsidian en début de libellé** :
+   * `- [1] MON MOT-CLÉ` ou `- (1) MON MOT-CLÉ`
+   * `- [P1] MON MOT-CLÉ` ou `- [P2] MON MOT-CLÉ`
+3. **Raccourcis Clavier** : Touches `1` à `9` pour affecter immédiatement un marqueur au nœud sélectionné, touche `0` pour effacer le marqueur, ou touche `M` pour ouvrir la palette des marqueurs.
+
+### 4.6 Clôtures & Enclos Sémantiques (Boundaries style XMind)
+
+Un enclos regroupe graphiquement une sous-branche et l'ensemble de ses sous-niveaux dans un périmètre pointillé teinté, surmonté d'une étiquette d'intitulé :
 ```markdown
-<!-- mindmap-pos: MOT-CLÉ | x: 45 | y: -20 -->
+<!-- mindmap-boundary: MOT-CLÉ_RACINE | label: TITRE DE L'ENCLOS | color: #0284c7 -->
 ```
+* **Raccourci de création** : `Ctrl+B` sur la branche sélectionnée (ou via le menu contextuel clic droit).
+* **Édition** : Clic sur le badge de l'enclos pour renommer ou modifier la couleur. Touche `Suppr` pour supprimer l'enclos.
 
-### 4.6 Liaisons Transversales (Relations style XMind)
+### 4.7 Sujets Flottants Autonomes (Floating Topics)
 
-Pour relier deux branches non directement parentes, Open Shema utilise une directive de relation avec étiquette, couleur et point de courbure :
+Les sujets flottants sont des idées indépendantes de l'arborescence centrale, positionnées librement sur le canevas SVG :
+
+1. **Sujet flottant simple (une seule ligne)** :
+   ```markdown
+   <!-- mindmap-floating: TITRE DU SUJET | marker: star | x: 250 | y: 120 | color: #d97706 -->
+   ```
+2. **Sujet flottant arborescent (avec sous-branches hiérarchiques)** :
+   ```markdown
+   <!-- mindmap-floating-start: CONTEXTE HISTORIQUE | marker: p1 | x: 320 | y: 180 | color: #7c3aed -->
+     - AUTEUR ET DESTINATAIRES
+     - DATE DE RÉDACTION [Actes 18:2]
+   <!-- mindmap-floating-end -->
+   ```
+* **Création** : `Alt+F` ou **Double-clic** sur le fond du canevas.
+
+### 4.8 Liaisons Transversales (Relations style XMind)
+
+Pour relier deux branches non directement parentes, Open Shema trace une flèche orientée personnalisable :
 ```markdown
 <!-- mindmap-rel: BRANCHE_SOURCE -> BRANCHE_CIBLE | label: VOIR AUSSI | color: #059669 | cx: 320 | cy: -95 -->
 ```
+* `label:` Intitulé affiché au milieu de la flèche.
+* `color:` Couleur hexadécimale de la liaison.
+* `cx:` / `cy:` Décalage de la poignée de contrôle de Bézier (ajustable à la souris pour courber la flèche).
+* **Création** : `Ctrl+L` ou bouton "Relier" du dock flottant.
+
+### 4.9 Déplacement Spatial Libre (Free Positioning)
+
+Lorsque l'utilisateur réorganise visuellement une branche à la souris, Open Shema enregistre le décalage spatial à la fin du fichier sans rompre l'arbre logique :
+```markdown
+<!-- mindmap-pos: MOT-CLÉ | x: 45 | y: -20 -->
+```
+* **Raccourci de réalignement automatique** : `Alt+R` rééquilibre harmonieusement l'ensemble de la carte.
+
+### 4.10 Mode Plan Outliner Synchrone (`Alt+P`)
+
+Open Shema permet de basculer instantanément entre :
+1. **La Vue Carte Graphique SVG** (vision spatiale, rayonnante, dynamique).
+2. **La Vue Plan Outliner** (mode liste textuel structuré, pliable/dépliable, avec marqueurs et notes synchronisés en temps réel).
+* **Raccourci de bascule** : `Alt+P` ou le bouton d'en-tête "Vue Plan".
+
+### 4.11 Tableau des Raccourcis Clavier
+
+| Raccourci | Action |
+| :--- | :--- |
+| <kbd>Tab</kbd> | Ajouter une sous-branche (enfant) |
+| <kbd>Entrée</kbd> | Ajouter une branche voisine (frère / sœur) |
+| <kbd>Espace</kbd> ou Double-clic | Modifier le texte du mot-clé en ligne |
+| <kbd>Suppr</kbd> / <kbd>Retour</kbd> | Supprimer le nœud, l'enclos ou la liaison sélectionné(e) |
+| <kbd>Alt+P</kbd> | Basculer entre Vue Carte et Vue Plan Outliner |
+| <kbd>Ctrl+L</kbd> | Créer une liaison transversale entre branches |
+| <kbd>Ctrl+B</kbd> | Créer ou éditer un enclos sémantique (Boundary) |
+| <kbd>Alt+F</kbd> ou Double-clic fond | Créer un sujet flottant indépendant |
+| <kbd>1</kbd> à <kbd>9</kbd> | Affecter un numéro / marqueur de priorité |
+| <kbd>0</kbd> | Effacer le marqueur de la branche |
+| <kbd>M</kbd> | Ouvrir le panneau des marqueurs et priorités |
+| <kbd>F4</kbd> ou <kbd>Alt+N</kbd> | Ajouter ou modifier la note de branche |
+| <kbd>Alt+S</kbd> | Changer le squelette (Radiant, Arbre droit, Organigramme) |
+| <kbd>Alt+T</kbd> | Ouvrir les styles de connecteurs et formes de nœuds |
+| <kbd>Alt+R</kbd> | Réorganiser automatiquement la carte |
+| <kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd> | Copier / Coller une branche et son sous-arbre |
+| <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> | Annuler / Rétablir (50 niveaux d'historique) |
+| <kbd>R</kbd> | Recentrer et ajuster la carte à l'écran |
+| <kbd>?</kbd> | Afficher le tiroir d'aide complet |
 
 ---
 

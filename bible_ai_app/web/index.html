@@ -9241,34 +9241,165 @@ Voir le passage de base en [Romains 3:21-26].
         <!-- Panneau 2 : Mind Maps Radiantes -->
         <div class="md-guide-pane hidden" id="md-pane-mindmap">
           <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 12px;">
-            Les Mind Maps d'Open Shema sont stockées dans les mêmes fichiers <code style="background: var(--bg-surface); padding: 2px 6px; border-radius: 4px;">.md</code>. La métadonnée clé est <code style="background: var(--bg-surface); padding: 2px 6px; border-radius: 4px;">type: mindmap</code> dans le Frontmatter YAML. Le corps du document est une liste indentée standard (2 espaces par niveau hiérarchique).
+            Les Mind Maps d'Open Shema sont <strong>100% stockées au format Markdown standard</strong> (<code style="background: var(--bg-surface); padding: 2px 6px; border-radius: 4px;">.md</code>). Elles respectent les 10 lois de Tony Buzan combinées aux fonctionnalités visuelles modernes (style XMind / Heptabase). La métadonnée maîtresse est <code style="background: var(--bg-surface); padding: 2px 6px; border-radius: 4px;">type: mindmap</code> dans le Frontmatter YAML. Les branches sont des listes à puces indentées (2 espaces par niveau hiérarchique). Vous pouvez basculer à tout moment entre la <strong>Vue Carte Graphique SVG</strong> et la <strong>Vue Plan Hiérarchique</strong> avec le raccourci <kbd style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; padding: 1px 5px; font-size: 11px;">Alt+P</kbd>.
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-bottom: 14px;">
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-              <strong style="color: var(--text-primary); font-size: 12.5px; display: block; margin-bottom: 4px;">Directives de Mise en Page</strong>
-              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace);">
-                &lt;!-- mindmap-layout: radiant|right-tree|top-down --&gt;<br>
+          <!-- Grille des fonctionnalités et directives -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px;">
+            
+            <!-- Carte 1 : Squelettes de mise en page -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Squelettes & Layouts</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">Alt+S</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
+                &lt;!-- mindmap-layout: radiant --&gt;<br>
+                &lt;!-- mindmap-layout: right-tree --&gt;<br>
+                &lt;!-- mindmap-layout: top-down --&gt;
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Radiant bilatéral équilibré (Buzan), Arbre logique unilatéral à droite ou Organigramme descendant.
+              </div>
+            </div>
+
+            <!-- Carte 2 : Styles de connecteurs et formes de nœuds -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Connecteurs & Formes</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">Alt+T</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
                 &lt;!-- mindmap-connector: curve|orthogonal|straight --&gt;<br>
                 &lt;!-- mindmap-node-shape: underline|rounded-rect|pill --&gt;
               </div>
-            </div>
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-              <strong style="color: var(--text-primary); font-size: 12.5px; display: block; margin-bottom: 4px;">Notes & Liens sur Branche</strong>
-              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace);">
-                - MOT-CLÉ [Jean 3:16] &lt;!-- note: Mon commentaire --&gt;
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Courbes de Bézier cubiques, angles droits ou lignes directes. Nœuds soulignés, rectangles arrondis ou pilules.
               </div>
             </div>
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-              <strong style="color: var(--text-primary); font-size: 12.5px; display: block; margin-bottom: 4px;">Relations Transversales</strong>
-              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace);">
-                &lt;!-- mindmap-rel: BRANCHE_A -&gt; BRANCHE_B | label: VOIR AUSSI --&gt;
+
+            <!-- Carte 3 : Marqueurs, numéros et priorités -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Marqueurs & Priorités</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">1 à 9 / M</span>
               </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
+                - BRANCHE &lt;!-- marker: 1 --&gt; <span style="color: var(--text-secondary);">(ou [1] BRANCHE)</span><br>
+                - BRANCHE &lt;!-- marker: p1 --&gt; <span style="color: var(--text-secondary);">(Priorités P1-P4)</span><br>
+                - BRANCHE &lt;!-- marker: done|progress|star|alert --&gt;
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Badges vectoriels colorés. Touches <kbd>1</kbd>-<kbd>9</kbd> pour numéroter, <kbd>0</kbd> pour effacer, <kbd>M</kbd> pour le menu.
+              </div>
+            </div>
+
+            <!-- Carte 4 : Enclos / Clôtures sémantiques -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Enclos Sémantiques (Boundaries)</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">Ctrl+B</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
+                &lt;!-- mindmap-boundary: MOT-CLÉ | label: TITRE | color: #0284c7 --&gt;
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Englobe visuellement une sous-branche et ses enfants dans un cadre pointillé coloré avec badge d'intitulé.
+              </div>
+            </div>
+
+            <!-- Carte 5 : Sujets flottants -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Sujets Flottants (Floating Topics)</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">Alt+F</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
+                &lt;!-- mindmap-floating: TITRE | marker: star | x: 250 | y: 120 | color: #d97706 --&gt;<br>
+                &lt;!-- mindmap-floating-start: TITRE | x: ... | y: ... --&gt;<br>
+                &nbsp;&nbsp;- SOUS-BRANCHE A<br>
+                &lt;!-- mindmap-floating-end --&gt;
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Créer un sujet autonome sur le canevas (double-clic ou <kbd>Alt+F</kbd>), avec ou sans sous-arborescence.
+              </div>
+            </div>
+
+            <!-- Carte 6 : Relations transversales -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Relations & Liaisons</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">Ctrl+L</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
+                &lt;!-- mindmap-rel: BRANCHE_A -&gt; BRANCHE_B | label: TEXTE | color: #059669 | cx: 120 | cy: -40 --&gt;
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Flèche orientée inter-branches avec étiquette, couleur thématique et poignée de courbure Bézier (<kbd>cx</kbd>/<kbd>cy</kbd>).
+              </div>
+            </div>
+
+            <!-- Carte 7 : Notes et références bibliques -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Notes & Versets Bibliques</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">F4 / Clic</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
+                - MOT-CLÉ [Jean 3:16] &lt;!-- note: Commentaire exégétique --&gt;
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Le verset entre crochets ouvre instantanément le passage dans la Bible. La note s'affiche dans une infobulle et en mode plan.
+              </div>
+            </div>
+
+            <!-- Carte 8 : Positionnement libre & Réorganisation -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: var(--text-primary); font-size: 12.5px;">Positionnement Libre</strong>
+                <span style="font-size: 10.5px; color: var(--accent-blue, #2563eb); background: rgba(37, 99, 235, 0.1); padding: 1px 6px; border-radius: 4px; font-weight: 600;">Alt+R</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono, monospace); line-height: 1.5;">
+                &lt;!-- mindmap-pos: MOT-CLÉ | x: 45 | y: -20 --&gt;
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                Glissez-déposez n'importe quelle branche à la souris. Le décalage spatial est sauvegardé. <kbd>Alt+R</kbd> réorganise la carte.
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Tableau condensé des Raccourcis Clavier -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <strong style="font-size: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Raccourcis Clavier Rapides
+              </strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Ergonomie 100% Clavier & 100% Souris</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; font-size: 11.5px; color: var(--text-secondary);">
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Tab</kbd> Sous-branche (Enfant)</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Entrée</kbd> Branche sœur (Frère)</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Espace</kbd> Modifier le mot-clé</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Suppr</kbd> Supprimer sélection</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Alt+P</kbd> Basculer Carte ↔ Plan</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Ctrl+L</kbd> Relier deux branches</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Ctrl+B</kbd> Créer / Éditer Enclos</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Alt+F</kbd> Nouveau sujet flottant</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">1-9</kbd> / <kbd>0</kbd> Numéroter / Effacer</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">M</kbd> Menu des marqueurs</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">F4</kbd> / <kbd>Alt+N</kbd> Note de branche</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Alt+S</kbd> / <kbd>Alt+T</kbd> Squelette & Styles</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Alt+R</kbd> Réorganiser la carte</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">Ctrl+Z</kbd> / <kbd>Y</kbd> Annuler / Rétablir</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">R</kbd> Recentrer la vue</div>
+              <div><kbd style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 3px; padding: 1px 5px; font-size: 10.5px;">?</kbd> Tiroir d'aide complet</div>
             </div>
           </div>
 
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Modèle de Mind Map (.md) prêt à l'emploi :</span>
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Modèle de Mind Map (.md) complet prêt à l'emploi :</span>
             <button type="button" class="btn-secondary" id="btn-copy-template-mindmap" style="padding: 4px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px;">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copier le modèle</span>
@@ -9295,23 +9426,33 @@ updated_at: "08/09/2026 12:30"
 <!-- mindmap-connector: curve -->
 <!-- mindmap-node-shape: underline -->
 
-- CONDAMNATION [Romains 1:18]
-  - GENTILS
-  - JUIFS
-- JUSTIFICATION [Romains 3:21] <!-- note: Thèse centrale : justice offerte par la foi -->
-  - PAR LA FOI
-  - PAR GRÂCE
-- SANCTIFICATION [Romains 6:1]
+- CONDAMNATION [Romains 1:18] <!-- marker: 1 -->
+  - TOUS ONT PÉCHÉ
+  - INEXCUSABLES
+- JUSTIFICATION [Romains 3:21] <!-- marker: p1 --> <!-- note: Thèse centrale : justice offerte par la foi sans les œuvres -->
+  - PAR LA FOI <!-- marker: star -->
+  - PAR GRÂCE GRATUITE
+- SANCTIFICATION [Romains 6:1] <!-- marker: 2 -->
   - UNION AU CHRIST
   - LIBÉRÉS DU PÉCHÉ
-- SÉLECTION DIVINE [Romains 9:1]
+- SÉLECTION DIVINE [Romains 9:1] <!-- marker: 3 -->
   - SOUVERAINETÉ
   - ISRAËL ET LES NATIONS
-- CONSÉCRATION PRATIQUE [Romains 12:1]
+- CONSÉCRATION PRATIQUE [Romains 12:1] <!-- marker: done -->
   - CULTE RAISONNABLE
   - SERVICE ET AMOUR MUTUEL
 
-<!-- mindmap-rel: JUSTIFICATION -> CONSÉCRATION PRATIQUE | label: FRUIT NATUREL | color: #059669 --></code></pre>
+<!-- mindmap-pos: CONDAMNATION | x: -15 | y: -10 -->
+<!-- mindmap-boundary: JUSTIFICATION | label: DOCTRINE FONDAMENTALE | color: #0284c7 -->
+<!-- mindmap-rel: CONDAMNATION -> JUSTIFICATION | label: BESOIN DU SALUT | color: #ef4444 | cx: -60 | cy: 40 -->
+<!-- mindmap-rel: JUSTIFICATION -> CONSÉCRATION PRATIQUE | label: FRUIT NATUREL | color: #059669 | cx: 140 | cy: -50 -->
+
+<!-- mindmap-floating-start: QUESTIONS EXÉGÉTIQUES | marker: p1 | x: 380 | y: 160 | color: #7c3aed -->
+  - DATE ET LIEU DE RÉDACTION [Actes 20:2-3]
+  - DESTINATAIRES À ROME
+<!-- mindmap-floating-end -->
+
+<!-- mindmap-floating: THÈME CENTRAL : LA JUSTICE DE DIEU | marker: star | x: -360 | y: -160 | color: #d97706 --></code></pre>
         </div>
 
         <!-- Panneau 3 : Prédications & Sermons -->
