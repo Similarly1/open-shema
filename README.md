@@ -218,6 +218,7 @@ Open Shema a été pensé pour que **l'utilisateur ne soit jamais prisonnier de 
   * Parce que vos données sont en clair (`.md`), vous pouvez brancher n'importe quel **agent d'IA local** (Antigravity, Claude Desktop, Cursor, scripts d'automatisation) pour analyser, indexer, enrichir ou réorganiser vos travaux sans aucune barrière technique.
 * **Interopérabilité Totale** :
   * Ouvrez, éditez et synchronisez instantanément vos notes et sermons avec **Obsidian**, **VS Code**, **Logseq**, **Typora** ou n'importe quel éditeur de votre choix.
+  * Consultez la documentation complète : [Spécification Technique des Fichiers Markdown Enrichis](https://github.com/Similarly1/open-shema/blob/main/docs/SPECIFICATION_MARKDOWN.md) pour comprendre la structure exacte des en-têtes Frontmatter, des cartes mentales radiantes et des manuscrits de prédication.
 * **Importateur Universel Multi-Formats** :
   * **Documents Word (`.docx`)** : Reconnaissance et conversion des styles et balisages bibliques.
   * **Livres numériques (`.epub`, `.pdf`)** : Découpage intelligent par chapitres, extraction des métadonnées et détection automatique des références bibliques.
