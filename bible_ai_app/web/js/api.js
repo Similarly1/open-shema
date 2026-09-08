@@ -535,6 +535,46 @@ const API = {
     return this.call('import_highlights', mode);
   },
 
+  async exportMindmapFile(dataBase64, filename, formatType = 'png', pdfOptions = {}) {
+    if (this._isBridgeAvailable() && window.pywebview?.api?.export_mindmap_file) {
+      return this.call('export_mindmap_file', dataBase64, filename, formatType, pdfOptions);
+    }
+    // Fallback téléchargement direct navigateur
+    try {
+      const ext = (formatType || 'png').toLowerCase().replace('jpeg', 'jpg');
+      const cleanName = (filename || 'mindmap').replace(/\.[^/.]+$/, '') + '.' + ext;
+      const mime = ext === 'pdf' ? 'application/pdf' : (ext === 'jpg' ? 'image/jpeg' : 'image/png');
+      
+      let blob;
+      if (dataBase64.startsWith('data:')) {
+        const parts = dataBase64.split(',');
+        const byteCharacters = atob(parts[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        blob = new Blob([new Uint8Array(byteNumbers)], { type: mime });
+      } else {
+        blob = new Blob([dataBase64], { type: mime });
+      }
+      
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = cleanName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 500);
+      return { success: true, path: cleanName, format: formatType };
+    } catch (err) {
+      console.error('Erreur fallback téléchargement export mindmap:', err);
+      return { success: false, error: err.message };
+    }
+  },
+
   async getDictionaries() {
     return this.call('get_dictionaries');
   },
