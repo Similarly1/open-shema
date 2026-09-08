@@ -769,6 +769,10 @@ const NotesView = {
   },
 
   undo() {
+    if (this.currentNote?.type === 'mindmap' && typeof MindMapView !== 'undefined') {
+      MindMapView.undo();
+      return;
+    }
     if (this.historyIndex > 0) {
       this.historyIndex--;
       this.restoreHistoryState(this.history[this.historyIndex]);
@@ -779,6 +783,10 @@ const NotesView = {
   },
 
   redo() {
+    if (this.currentNote?.type === 'mindmap' && typeof MindMapView !== 'undefined') {
+      MindMapView.redo();
+      return;
+    }
     if (this.historyIndex < this.history.length - 1) {
       this.historyIndex++;
       this.restoreHistoryState(this.history[this.historyIndex]);

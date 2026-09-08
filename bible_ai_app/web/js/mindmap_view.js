@@ -26,16 +26,25 @@ const MindMapView = {
   connectingSourceId: null, // ID du nœud source en cours de liaison
   selectedRelId: null, // ID de la liaison sélectionnée
 
+  // Pile d'historique Undo / Redo
+  history: [],
+  historyIndex: -1,
+  maxHistory: 50,
+
   // État de glisser-déposer (Drag & Drop)
   dragState: {
     active: false,
     type: null, // 'node' | 'rel-curve'
     nodeId: null,
+    node: null,
     relId: null,
     startX: 0,
     startY: 0,
-    hasMoved: false,
-    targetNodeId: null
+    startMouseSvgX: 0,
+    startMouseSvgY: 0,
+    initialOffsetX: 0,
+    initialOffsetY: 0,
+    hasMoved: false
   },
 
   // Vue Pan & Zoom
@@ -126,9 +135,6 @@ const MindMapView = {
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-palette" title="Changer la palette de couleurs">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-export-text" title="Exporter en plan de note rédigé">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-help" title="Aide raccourcis clavier (?)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -255,60 +261,34 @@ const MindMapView = {
         return;
       }
 
-      // 3. Glisser-déplacer d'un mot-clé / branche (Reparenting XMind)
+      // 3. Glisser-déplacer visuel d'un mot-clé / branche dans l'espace (Free Positioning)
       if (this.dragState.type === 'node') {
-        const dx = e.clientX - this.dragState.startX;
-        const dy = e.clientY - this.dragState.startY;
+        const dxScreen = e.clientX - this.dragState.startX;
+        const dyScreen = e.clientY - this.dragState.startY;
 
         if (!this.dragState.active) {
-          if (Math.hypot(dx, dy) > 5) {
+          if (Math.hypot(dxScreen, dyScreen) > 4) {
             this.dragState.active = true;
             this.dragState.hasMoved = true;
             document.body.classList.add('mm-dragging-node');
           }
         }
 
-        if (this.dragState.active) {
+        if (this.dragState.active && this.svg) {
           this.hideTooltip();
+          const rect = this.svg.getBoundingClientRect();
+          const currentMouseSvgX = (e.clientX - rect.left - this.viewBox.x) / this.viewBox.scale;
+          const currentMouseSvgY = (e.clientY - rect.top - this.viewBox.y) / this.viewBox.scale;
+          const deltaX = currentMouseSvgX - this.dragState.startMouseSvgX;
+          const deltaY = currentMouseSvgY - this.dragState.startMouseSvgY;
 
-          // Fantôme flottant translucide suivant le curseur
-          let ghost = document.getElementById('mm-node-drag-ghost');
-          if (!ghost) {
-            ghost = document.createElement('div');
-            ghost.id = 'mm-node-drag-ghost';
-            ghost.className = 'mm-node-drag-ghost';
-            document.body.appendChild(ghost);
+          const node = this.dragState.node || this.findNode(this.dragState.nodeId);
+          if (node) {
+            node.offsetX = this.dragState.initialOffsetX + deltaX;
+            node.offsetY = this.dragState.initialOffsetY + deltaY;
+            this.layoutTree();
+            this.draw();
           }
-          const draggedNode = this.findNode(this.dragState.nodeId);
-          const subCount = this.countDescendants(draggedNode);
-          ghost.innerHTML = `
-            <span class="mm-ghost-text">${this.escapeHtml(draggedNode ? draggedNode.text : '')}</span>
-            ${subCount > 0 ? `<span class="mm-ghost-badge">+${subCount}</span>` : ''}
-          `;
-          ghost.style.left = `${e.clientX + 14}px`;
-          ghost.style.top = `${e.clientY + 14}px`;
-          ghost.style.display = 'flex';
-
-          // Détecter la cible sous le curseur
-          let candidateTargetId = null;
-          const elUnder = document.elementFromPoint(e.clientX, e.clientY);
-          const nodeG = elUnder?.closest('.mm-node-g');
-          if (nodeG) {
-            const nid = nodeG.getAttribute('data-id');
-            // Interdiction de lâcher sur soi-même ou sur l'un de ses descendants (évite les cycles)
-            if (nid && nid !== this.dragState.nodeId && !this.isDescendant(this.dragState.nodeId, nid)) {
-              candidateTargetId = nid;
-            }
-          }
-
-          this.dragState.targetNodeId = candidateTargetId;
-
-          // Surlignage visuel du nœud parent cible
-          this.viewportG?.querySelectorAll('.mm-node-g').forEach(g => {
-            const gid = g.getAttribute('data-id');
-            g.classList.toggle('drop-target-parent', !!(candidateTargetId && gid === candidateTargetId));
-          });
-
           return;
         }
       }
@@ -331,28 +311,19 @@ const MindMapView = {
         return;
       }
 
-      // Fin de drag de branche / mot-clé
+      // Fin de drag visuel de branche / mot-clé
       if (this.dragState.type === 'node') {
         const wasActive = this.dragState.active;
-        const draggedId = this.dragState.nodeId;
-        const targetId = this.dragState.targetNodeId;
-
-        // Nettoyage visuel immédiat
-        const ghost = document.getElementById('mm-node-drag-ghost');
-        if (ghost) ghost.remove();
         document.body.classList.remove('mm-dragging-node');
-        this.viewportG?.querySelectorAll('.mm-node-g').forEach(g => {
-          g.classList.remove('drop-target-parent');
-        });
 
-        if (wasActive && draggedId && targetId) {
-          this.reparentNode(draggedId, targetId);
+        if (wasActive && this.dragState.hasMoved) {
+          this.syncAndAutoSave();
         }
 
         this.dragState.active = false;
         this.dragState.type = null;
         this.dragState.nodeId = null;
-        this.dragState.targetNodeId = null;
+        this.dragState.node = null;
         setTimeout(() => { this.dragState.hasMoved = false; }, 50);
       }
     });
@@ -395,7 +366,6 @@ const MindMapView = {
     document.getElementById('mm-btn-fit')?.addEventListener('click', () => this.fitView());
     document.getElementById('mm-btn-theme')?.addEventListener('click', () => this.togglePaperMode());
     document.getElementById('mm-btn-palette')?.addEventListener('click', () => this.cyclePalette());
-    document.getElementById('mm-btn-export-text')?.addEventListener('click', () => this.exportToTextNote());
     document.getElementById('mm-btn-help')?.addEventListener('click', () => this.toggleHelpDrawer());
     document.getElementById('mm-btn-close-help')?.addEventListener('click', () => this.toggleHelpDrawer(false));
 
@@ -459,6 +429,22 @@ const MindMapView = {
       // Si l'utilisateur est en train de taper dans un champ de saisie HTML
       const activeTag = document.activeElement?.tagName;
       if (['INPUT', 'TEXTAREA'].includes(activeTag)) return;
+
+      // Annuler (Ctrl+Z) / Rétablir (Ctrl+Y ou Ctrl+Shift+Z)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          this.redo();
+        } else {
+          this.undo();
+        }
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault();
+        this.redo();
+        return;
+      }
 
       if (e.key === 'Tab') {
         e.preventDefault();
@@ -563,7 +549,7 @@ const MindMapView = {
 
     for (const rawLine of lines) {
       const line = rawLine.trimEnd();
-      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-rel:')) continue;
+      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-rel:') || line.trim().startsWith('<!-- mindmap-pos:')) continue;
 
       // Détection de l'indentation
       const match = line.match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
@@ -613,6 +599,22 @@ const MindMapView = {
         { id: 'node_1', text: 'IDÉE 1', ref: '', note: '', children: [], level: 1 },
         { id: 'node_2', text: 'IDÉE 2', ref: '', note: '', children: [], level: 1 }
       ];
+    }
+
+    // Extraction des positions spatiales manuelles <!-- mindmap-pos: MOT-CLÉ | x: 45 | y: -20 -->
+    if (markdownContent) {
+      const posRegex = /<!--\s*mindmap-pos:\s*(.+?)\s*\|\s*x:\s*(-?\d+(?:\.\d+)?)\s*\|\s*y:\s*(-?\d+(?:\.\d+)?)\s*-->/g;
+      let posMatch;
+      while ((posMatch = posRegex.exec(markdownContent)) !== null) {
+        const nodeText = posMatch[1].trim();
+        const ox = parseFloat(posMatch[2]);
+        const oy = parseFloat(posMatch[3]);
+        const found = this.findNodeByText(nodeText, root);
+        if (found) {
+          found.offsetX = ox;
+          found.offsetY = oy;
+        }
+      }
     }
 
     // Extraction des liaisons transversales <!-- mindmap-rel: SOURCE -> CIBLE | label: ... | color: ... -->
@@ -665,6 +667,21 @@ const MindMapView = {
 
     serializeChildren(tree, 0);
 
+    // Sérialisation des positions spatiales manuelles (Free Positioning)
+    const offsets = [];
+    const collectOffsets = (node) => {
+      if (node.id !== 'root' && (Math.round(node.offsetX || 0) !== 0 || Math.round(node.offsetY || 0) !== 0)) {
+        const cleanText = node.text.replace(/\|/g, '');
+        offsets.push(`<!-- mindmap-pos: ${cleanText} | x: ${Math.round(node.offsetX)} | y: ${Math.round(node.offsetY)} -->`);
+      }
+      if (node.children) node.children.forEach(collectOffsets);
+    };
+    collectOffsets(tree);
+
+    if (offsets.length > 0) {
+      md += '\n' + offsets.join('\n') + '\n';
+    }
+
     // Sérialisation des liaisons transversales (Relations style XMind)
     if (this.relationships && this.relationships.length > 0) {
       md += '\n';
@@ -707,6 +724,7 @@ const MindMapView = {
       this.tree.x = 0;
       this.tree.y = 0;
       this.layoutSide(this.tree.children, 'right');
+      this.applyNodeOffsets(this.tree);
       return;
     }
 
@@ -719,6 +737,7 @@ const MindMapView = {
       });
       this.measureTopDown(this.tree);
       this.layoutTopDown(this.tree);
+      this.applyNodeOffsets(this.tree);
       return;
     }
 
@@ -749,6 +768,22 @@ const MindMapView = {
     this.layoutSide(rightBOIs, 'right');
     // Disposer le côté Gauche
     this.layoutSide(leftBOIs, 'left');
+
+    // Décalages spatiaux personnalisés (Free Positioning)
+    this.applyNodeOffsets(this.tree);
+  },
+
+  applyNodeOffsets(node = this.tree, inheritedDx = 0, inheritedDy = 0) {
+    if (!node) return;
+    const totalDx = inheritedDx + (node.offsetX || 0);
+    const totalDy = inheritedDy + (node.offsetY || 0);
+    if (node.id !== 'root') {
+      node.x += totalDx;
+      node.y += totalDy;
+    }
+    if (node.children) {
+      node.children.forEach(child => this.applyNodeOffsets(child, totalDx, totalDy));
+    }
   },
 
   propagateColorAndSide(node, color, side) {
@@ -930,6 +965,11 @@ const MindMapView = {
 
     this.tree = this.parseMarkdownToTree(note.title, note.content);
     this.layoutTree();
+
+    // Initialiser l'historique pour cette note
+    this.history = [];
+    this.historyIndex = -1;
+    this.pushHistory();
 
     const svgEl = document.getElementById('mindmap-svg');
     const outlineEl = document.getElementById('mindmap-outline-view');
@@ -1888,22 +1928,29 @@ const MindMapView = {
       g.appendChild(actionsG);
     }
 
-    // Initialisation du glisser-déplacer pour les branches (non-root)
+    // Initialisation du glisser-déplacer spatial pour les branches (non-root)
     if (!isRoot) {
       g.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return; // Clic gauche uniquement
         if (this.connectingSourceId) return; // Priorité au mode création de liaison
         if (e.target.closest('.mm-action-btn, .mm-scripture-pill, .mm-note-pill')) return;
 
+        const rect = this.svg.getBoundingClientRect();
+        const mouseSvgX = (e.clientX - rect.left - this.viewBox.x) / this.viewBox.scale;
+        const mouseSvgY = (e.clientY - rect.top - this.viewBox.y) / this.viewBox.scale;
+
         this.dragState = {
           active: false,
           type: 'node',
           nodeId: node.id,
-          relId: null,
+          node: node,
           startX: e.clientX,
           startY: e.clientY,
-          hasMoved: false,
-          targetNodeId: null
+          startMouseSvgX: mouseSvgX,
+          startMouseSvgY: mouseSvgY,
+          initialOffsetX: node.offsetX || 0,
+          initialOffsetY: node.offsetY || 0,
+          hasMoved: false
         };
       });
     }
@@ -2530,15 +2577,79 @@ const MindMapView = {
   // SYNCHRONISATION & EXPORT
   // =========================================================================
 
-  syncAndAutoSave() {
+  syncAndAutoSave(recordHistory = true) {
     if (!this.currentNote) return;
 
     const newMdContent = this.treeToMarkdown(this.tree);
     this.currentNote.content = newMdContent;
     this.currentNote.type = 'mindmap';
 
+    if (recordHistory) {
+      this.pushHistory();
+    }
+
     if (typeof NotesView !== 'undefined' && NotesView.triggerAutoSave) {
       NotesView.triggerAutoSave();
+    }
+  },
+
+  pushHistory() {
+    if (!this.tree) return;
+    const md = this.treeToMarkdown(this.tree);
+
+    // Éviter d'empiler des états identiques consécutifs
+    if (this.historyIndex >= 0 && this.history[this.historyIndex] === md) {
+      return;
+    }
+
+    // Si on a annulé puis fait une modification, tronquer le futur
+    if (this.historyIndex < this.history.length - 1) {
+      this.history = this.history.slice(0, this.historyIndex + 1);
+    }
+
+    this.history.push(md);
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
+    } else {
+      this.historyIndex++;
+    }
+  },
+
+  undo() {
+    if (this.historyIndex > 0) {
+      this.historyIndex--;
+      const md = this.history[this.historyIndex];
+      this.tree = this.parseMarkdownToTree(this.currentNote?.title, md);
+      this.layoutTree();
+      this.draw();
+      this.updateSelectionState();
+      this.syncAndAutoSave(false);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('↶ Annulé (Ctrl+Z)');
+      }
+    } else {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Début de l\'historique atteint');
+      }
+    }
+  },
+
+  redo() {
+    if (this.historyIndex < this.history.length - 1) {
+      this.historyIndex++;
+      const md = this.history[this.historyIndex];
+      this.tree = this.parseMarkdownToTree(this.currentNote?.title, md);
+      this.layoutTree();
+      this.draw();
+      this.updateSelectionState();
+      this.syncAndAutoSave(false);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('↷ Rétabli (Ctrl+Y)');
+      }
+    } else {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Fin de l\'historique atteinte');
+      }
     }
   },
 
@@ -2907,6 +3018,14 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Changer la couleur</span>
         </div>
+        ${(node?.offsetX || node?.offsetY) ? `
+          <div class="mm-ctx-item" data-action="reset-position">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+            </span>
+            <span class="mm-ctx-label">Réinitialiser la position</span>
+          </div>
+        ` : ''}
         <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="copy">
           <span class="mm-ctx-icon">
@@ -3157,6 +3276,18 @@ const MindMapView = {
           case 'color':
             if (targetNodeId) this.promptChangeColor(targetNodeId);
             break;
+          case 'reset-position':
+            if (node) {
+              node.offsetX = 0;
+              node.offsetY = 0;
+              this.layoutTree();
+              this.draw();
+              this.syncAndAutoSave();
+              if (typeof App !== 'undefined' && App.showToast) {
+                App.showToast('Position réinitialisée');
+              }
+            }
+            break;
           case 'copy':
             if (targetNodeId) this.copyNode(targetNodeId);
             break;
@@ -3380,45 +3511,48 @@ const MindMapView = {
       relG.appendChild(visiblePath);
 
       // Poignée de contrôle interactive de la courbure Bézier (style XMind)
-      const handleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      handleCircle.setAttribute('cx', cx);
-      handleCircle.setAttribute('cy', cy);
-      handleCircle.setAttribute('r', isSelected ? '6.5' : '5');
-      handleCircle.setAttribute('class', 'mm-rel-handle');
-      handleCircle.setAttribute('fill', relColor);
-      handleCircle.setAttribute('stroke', '#ffffff');
-      handleCircle.setAttribute('stroke-width', '2');
-      handleCircle.setAttribute('title', 'Glisser pour ajuster la courbure (Double-clic pour réinitialiser)');
+      // UNIQUEMENT visible lorsque la liaison est sélectionnée
+      if (isSelected) {
+        const handleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        handleCircle.setAttribute('cx', cx);
+        handleCircle.setAttribute('cy', cy);
+        handleCircle.setAttribute('r', '6.5');
+        handleCircle.setAttribute('class', 'mm-rel-handle');
+        handleCircle.setAttribute('fill', relColor);
+        handleCircle.setAttribute('stroke', '#ffffff');
+        handleCircle.setAttribute('stroke-width', '2');
+        handleCircle.setAttribute('title', 'Glisser pour ajuster la courbure (Double-clic pour réinitialiser)');
 
-      handleCircle.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
-        e.stopPropagation();
-        e.preventDefault();
-        this.selectRelationship(rel.id);
-        this.dragState = {
-          active: true,
-          type: 'rel-curve',
-          nodeId: null,
-          relId: rel.id,
-          startX: e.clientX,
-          startY: e.clientY,
-          hasMoved: false,
-          targetNodeId: null
-        };
-      });
+        handleCircle.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return;
+          e.stopPropagation();
+          e.preventDefault();
+          this.selectRelationship(rel.id);
+          this.dragState = {
+            active: true,
+            type: 'rel-curve',
+            nodeId: null,
+            relId: rel.id,
+            startX: e.clientX,
+            startY: e.clientY,
+            hasMoved: false,
+            targetNodeId: null
+          };
+        });
 
-      handleCircle.addEventListener('dblclick', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        rel.customControl = null;
-        this.drawRelationships();
-        this.syncAndAutoSave();
-        if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast('Courbure de la liaison réinitialisée');
-        }
-      });
+        handleCircle.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          rel.customControl = null;
+          this.drawRelationships();
+          this.syncAndAutoSave();
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Courbure de la liaison réinitialisée');
+          }
+        });
 
-      relG.appendChild(handleCircle);
+        relG.appendChild(handleCircle);
+      }
 
       // Étiquette flottante centrale
       const labelText = (rel.label || 'VOIR AUSSI').toUpperCase();

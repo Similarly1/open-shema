@@ -33801,13 +33801,18 @@ body[class*="palette-dark"] .mm-node-drag-ghost {
 
 /* Poignée de contrôle interactive de la courbure des liaisons */
 .mm-rel-handle {
+  display: none;
   cursor: grab;
   transition: r 0.15s ease, stroke-width 0.15s ease;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 
-.mm-rel-handle:hover,
 .mm-relationship-g.selected .mm-rel-handle {
+  display: block;
+}
+
+.mm-rel-handle:hover,
+.mm-relationship-g.selected .mm-rel-handle:hover {
   r: 7.5;
   cursor: grabbing;
   stroke-width: 2.5;
