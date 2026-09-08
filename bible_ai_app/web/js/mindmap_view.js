@@ -2378,21 +2378,33 @@ const MindMapView = {
   },
 
   drawBranches(node) {
-    if (!node.children) return;
+    if (!node.children || node.children.length === 0) return;
 
     const isBox = this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
     const connStyle = this.connectorStyle || 'curve';
+    const isRoot = node.level === 0;
+    const totalChildren = node.children.length;
 
     node.children.forEach(child => {
-      const isRoot = node.level === 0;
-
       if (this.treeStructure === 'top-down') {
-        const x1 = node.x;
-        const y1 = isRoot ? node.y + node.height / 2 : (isBox ? node.y + (node.height || 28) / 2 : node.y + 10);
+        let x1 = node.x;
+        let y1 = isRoot ? node.y + node.height / 2 : (isBox ? node.y + (node.height || 28) / 2 : node.y + 10);
+
+        // Si nœud central avec plusieurs branches, répartir les ancres horizontales
+        if (isRoot && totalChildren > 1) {
+          const childIdx = node.children.indexOf(child);
+          const maxSpanX = Math.min((node.width || 120) * 0.7, (totalChildren - 1) * 16);
+          const xStep = maxSpanX / (totalChildren - 1);
+          x1 = node.x - maxSpanX / 2 + childIdx * xStep;
+        }
+
         const x2 = child.x;
         const y2 = isBox ? child.y - (child.height || 28) / 2 : child.y + 10;
 
-        const strokeWidth = isRoot ? 5.2 : Math.max(2, 4.0 - child.level * 0.6);
+        // Lignes plus étroites vers le sujet central (2.0px - 2.5px max au lieu de 5.2px)
+        const strokeWidth = isRoot 
+          ? (totalChildren >= 7 ? 2.0 : (totalChildren >= 4 ? 2.3 : 2.6))
+          : Math.max(1.8, 3.0 - child.level * 0.5);
         const strokeColor = child.color || 'var(--text-secondary)';
 
         let pathD = '';
@@ -2401,7 +2413,7 @@ const MindMapView = {
         } else if (connStyle === 'orthogonal') {
           const dx = x2 - x1;
           const dy = y2 - y1;
-          if (Math.abs(dx) < 2) {
+          if (Math.abs(dy) < 2) {
             pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
           } else {
             const yMid = y1 + dy * 0.5;
@@ -2412,10 +2424,11 @@ const MindMapView = {
         } else {
           // 'curve' (Bézier cubique)
           const dy = Math.abs(y2 - y1);
+          const factor = isRoot ? 0.38 : 0.48;
           const cx1 = x1;
-          const cy1 = y1 + dy * 0.5;
+          const cy1 = y1 + dy * factor;
           const cx2 = x2;
-          const cy2 = y2 - dy * 0.5;
+          const cy2 = y2 - dy * factor;
           pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
         }
 
@@ -2438,21 +2451,42 @@ const MindMapView = {
           underline.setAttribute('x2', underX2);
           underline.setAttribute('y2', child.y + 10);
           underline.setAttribute('stroke', strokeColor);
-          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
+          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.7));
           underline.setAttribute('stroke-linecap', 'round');
           this.viewportG.appendChild(underline);
         }
 
       } else {
-        const x1 = isRoot 
-          ? (child.side === 'right' ? node.width / 2 : -node.width / 2) 
-          : (child.side === 'right' ? node.x + node.width / 2 : node.x - node.width / 2);
-        const y1 = isRoot ? node.y : (isBox ? node.y : node.y + 10);
+        // Radiant / Arbre logique (gauche / droite)
+        const childSide = child.side || 'right';
+        const sameSideChildren = isRoot 
+          ? node.children.filter(c => (c.side || 'right') === childSide)
+          : [];
+        const totalOnSide = sameSideChildren.length;
 
-        const x2 = child.side === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
+        const x1 = isRoot 
+          ? (childSide === 'right' ? node.width / 2 : -node.width / 2) 
+          : (childSide === 'right' ? node.x + node.width / 2 : node.x - node.width / 2);
+
+        let y1 = isRoot ? node.y : (isBox ? node.y : node.y + 10);
+
+        // Si nœud central avec plusieurs branches sur ce côté,
+        // répartir délicatement les ancres Y le long de la hauteur du nœud central
+        if (isRoot && totalOnSide > 1) {
+          const idxOnSide = sameSideChildren.indexOf(child);
+          const rootH = node.height || 46;
+          const maxSpanY = Math.min(rootH * 0.65, (totalOnSide - 1) * 7);
+          const yStep = maxSpanY / (totalOnSide - 1);
+          y1 = node.y - maxSpanY / 2 + idxOnSide * yStep;
+        }
+
+        const x2 = childSide === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
         const y2 = isBox ? child.y : child.y + 10;
 
-        const strokeWidth = isRoot ? 5.5 : Math.max(2, 4.0 - child.level * 0.6);
+        // Lignes plus étroites vers le sujet central (2.0px - 2.5px max au lieu de 5.5px)
+        const strokeWidth = isRoot 
+          ? (totalOnSide >= 6 ? 2.0 : (totalOnSide >= 4 ? 2.3 : 2.6))
+          : Math.max(1.8, 3.0 - child.level * 0.5);
         const strokeColor = child.color || 'var(--text-secondary)';
 
         let pathD = '';
@@ -2471,11 +2505,13 @@ const MindMapView = {
             pathD = `M ${x1} ${y1} L ${xMid - dirX * r} ${y1} Q ${xMid} ${y1}, ${xMid} ${y1 + dirY * r} L ${xMid} ${y2 - dirY * r} Q ${xMid} ${y2}, ${xMid + dirX * r} ${y2} L ${x2} ${y2}`;
           }
         } else {
-          // Courbe de Bézier cubique organique
+          // Courbe de Bézier cubique organique avec départ fluide
           const dx = Math.abs(x2 - x1);
-          const cx1 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
+          const factor = isRoot ? 0.38 : 0.48;
+          const dir = childSide === 'right' ? 1 : -1;
+          const cx1 = x1 + dir * dx * factor;
           const cy1 = y1;
-          const cx2 = cx1;
+          const cx2 = x2 - dir * dx * factor;
           const cy2 = y2;
           pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
         }
@@ -2491,14 +2527,14 @@ const MindMapView = {
 
         if (!isBox) {
           // Trait de soulignement sous le mot (Loi 7 : longueur branche = mot)
-          const underX2 = child.side === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
+          const underX2 = childSide === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
           const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
           underline.setAttribute('x1', x2);
           underline.setAttribute('y1', y2);
           underline.setAttribute('x2', underX2);
           underline.setAttribute('y2', y2);
           underline.setAttribute('stroke', strokeColor);
-          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
+          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.7));
           underline.setAttribute('stroke-linecap', 'round');
           this.viewportG.appendChild(underline);
         }
