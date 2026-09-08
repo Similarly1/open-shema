@@ -20,6 +20,7 @@ const MindMapView = {
   editingNodeId: null,
   clipboardNode: null,
   viewMode: 'map', // 'map' (Mind Map SVG) ou 'outline' (Plan outliner)
+  treeStructure: 'radiant', // 'radiant' | 'right-tree' | 'top-down'
   collapsedNodes: new Set(),
 
   // Vue Pan & Zoom
@@ -33,6 +34,13 @@ const MindMapView = {
     ocean: ['#0284c7', '#06b6d4', '#2563eb', '#0d9488', '#4f46e5', '#38bdf8', '#0891b2'],
     automne: ['#d97706', '#ea580c', '#b45309', '#059669', '#c2410c', '#854d0e', '#e11d48'],
     royal: ['#7c3aed', '#4f46e5', '#2563eb', '#9333ea', '#6366f1', '#c026d3', '#0284c7']
+  },
+
+  // Icônes de squelette / structure
+  STRUCTURE_ICONS: {
+    radiant: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>',
+    'right-tree': '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="5" height="6" rx="1.5" fill="currentColor"/><path d="M8 12h5m0-6h6m-6 6h6m-6 6h6"/><path d="M13 6v12"/></svg>',
+    'top-down': '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="5" rx="1.5" fill="currentColor"/><path d="M12 8v5m-6 0h12m-12 0v6m6-6v6m6-6v6"/></svg>'
   },
 
   // Icônes SVG vectorielles nobles (sans émojis)
@@ -71,6 +79,9 @@ const MindMapView = {
           <button type="button" class="mm-dock-btn" id="mm-btn-toggle-outline" title="Basculer entre Vue Carte et Vue Plan (Alt+P)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
           </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-structure" title="Squelette de mise en page : Radiante, Arbre droit, Organigramme (Alt+S)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
+          </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" title="Zoom avant (Ctrl + Molette)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
@@ -94,6 +105,43 @@ const MindMapView = {
           </button>
         </div>
 
+        <!-- Popover de sélection du squelette / structure -->
+        <div class="mm-structure-popover hidden" id="mm-structure-popover">
+          <div class="mm-structure-header">
+            <span class="mm-structure-title">Squelette de mise en page</span>
+            <span class="mm-structure-badge">Alt+S</span>
+          </div>
+          <div class="mm-structure-list">
+            <div class="mm-structure-option active" data-structure="radiant">
+              <div class="mm-struct-icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
+              </div>
+              <div class="mm-struct-info">
+                <div class="mm-struct-name">Pensée radiante <span class="mm-struct-check" data-for="radiant">✓</span></div>
+                <div class="mm-struct-desc">Équilibrée gauche / droite (Buzan). Idéale pour le remue-méninges et les synthèses.</div>
+              </div>
+            </div>
+            <div class="mm-structure-option" data-structure="right-tree">
+              <div class="mm-struct-icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="5" height="6" rx="1.5" fill="currentColor"/><path d="M8 12h5m0-6h6m-6 6h6m-6 6h6"/><path d="M13 6v12"/></svg>
+              </div>
+              <div class="mm-struct-info">
+                <div class="mm-struct-name">Arbre logique à droite <span class="mm-struct-check hidden" data-for="right-tree">✓</span></div>
+                <div class="mm-struct-desc">Racine à gauche, branches à droite. Parfait pour plans d'homélie et exégèse linéaire.</div>
+              </div>
+            </div>
+            <div class="mm-structure-option" data-structure="top-down">
+              <div class="mm-struct-icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="5" rx="1.5" fill="currentColor"/><path d="M12 8v5m-6 0h12m-12 0v6m6-6v6m6-6v6"/></svg>
+              </div>
+              <div class="mm-struct-info">
+                <div class="mm-struct-name">Organigramme descendant <span class="mm-struct-check hidden" data-for="top-down">✓</span></div>
+                <div class="mm-struct-desc">Hiérarchie verticale descendante. Idéal pour généalogies et divisions structurelles.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Tiroir d'aide aux raccourcis clavier -->
         <div class="mindmap-help-drawer hidden" id="mindmap-help-drawer">
           <div class="mm-help-header">
@@ -106,6 +154,7 @@ const MindMapView = {
           <div class="mm-help-content">
             <table class="mm-help-table">
               <tr><td><kbd>Alt+P</kbd></td><td><strong>Basculer entre Vue Carte et Vue Plan</strong></td></tr>
+              <tr><td><kbd>Alt+S</kbd></td><td><strong>Changer de squelette de mise en page</strong></td></tr>
               <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
               <tr><td><kbd>Entrée</kbd></td><td>Ajouter une branche voisine (Sœur)</td></tr>
               <tr><td><kbd>Espace</kbd> ou <em>Double-clic</em></td><td>Modifier le mot-clé</td></tr>
@@ -178,6 +227,10 @@ const MindMapView = {
 
     // 3. Boutons Dock
     document.getElementById('mm-btn-toggle-outline')?.addEventListener('click', () => this.toggleViewMode());
+    document.getElementById('mm-btn-structure')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleStructurePopover();
+    });
     document.getElementById('mm-btn-zoom-in')?.addEventListener('click', () => this.zoom(1.2));
     document.getElementById('mm-btn-zoom-out')?.addEventListener('click', () => this.zoom(0.8));
     document.getElementById('mm-btn-fit')?.addEventListener('click', () => this.fitView());
@@ -186,6 +239,25 @@ const MindMapView = {
     document.getElementById('mm-btn-export-text')?.addEventListener('click', () => this.exportToTextNote());
     document.getElementById('mm-btn-help')?.addEventListener('click', () => this.toggleHelpDrawer());
     document.getElementById('mm-btn-close-help')?.addEventListener('click', () => this.toggleHelpDrawer(false));
+
+    // Options du popover de structure
+    document.querySelectorAll('#mm-structure-popover .mm-structure-option').forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const struct = opt.getAttribute('data-structure');
+        if (struct) {
+          this.setStructure(struct);
+          this.toggleStructurePopover(false);
+        }
+      });
+    });
+
+    // Fermer le popover de structure lors d'un clic extérieur
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('#mm-structure-popover') && !e.target.closest('#mm-btn-structure')) {
+        this.toggleStructurePopover(false);
+      }
+    });
 
     // 4. Raccourcis Clavier
     window.addEventListener('keydown', (e) => {
@@ -197,6 +269,13 @@ const MindMapView = {
       if (e.altKey && (e.key === 'p' || e.key === 'P')) {
         e.preventDefault();
         this.toggleViewMode();
+        return;
+      }
+
+      // Changement de squelette / structure (Alt+S)
+      if (e.altKey && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        this.cycleStructure();
         return;
       }
 
@@ -264,6 +343,20 @@ const MindMapView = {
   // =========================================================================
 
   parseMarkdownToTree(title, markdownContent) {
+    // Détection de la directive de structure <!-- mindmap-layout: radiant|right-tree|top-down -->
+    let structure = 'radiant';
+    if (markdownContent) {
+      const structMatch = markdownContent.match(/<!--\s*mindmap-layout:\s*(radiant|right-tree|top-down)\s*-->/i);
+      if (structMatch) {
+        structure = structMatch[1].toLowerCase();
+      } else if (this.currentNote && this.currentNote.structure) {
+        structure = this.currentNote.structure;
+      }
+    } else if (this.currentNote && this.currentNote.structure) {
+      structure = this.currentNote.structure;
+    }
+    this.treeStructure = structure;
+
     const root = {
       id: 'root',
       text: (title || 'CONCEPT CENTRAL').toUpperCase(),
@@ -289,7 +382,7 @@ const MindMapView = {
 
     for (const rawLine of lines) {
       const line = rawLine.trimEnd();
-      if (!line.trim() || line.trim().startsWith('#')) continue;
+      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:')) continue;
 
       // Détection de l'indentation
       const match = line.match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
@@ -346,6 +439,9 @@ const MindMapView = {
 
   treeToMarkdown(tree) {
     let md = '';
+    if (this.treeStructure && this.treeStructure !== 'radiant') {
+      md += `<!-- mindmap-layout: ${this.treeStructure} -->\n`;
+    }
     const serializeChildren = (node, indentLevel) => {
       if (!node.children) return;
       for (const child of node.children) {
@@ -372,7 +468,33 @@ const MindMapView = {
     const paletteName = this.currentNote?.palette || 'nature';
     const colors = this.PALETTES[paletteName] || this.PALETTES.nature;
 
-    // Répartir les BOIs (Level 1) équitablement : Droite & Gauche
+    // 1. Structure 'right-tree' : Arbre logique unilatéral vers la droite
+    if (this.treeStructure === 'right-tree') {
+      this.tree.children.forEach((boi, index) => {
+        boi.color = colors[index % colors.length];
+        boi.side = 'right';
+        this.propagateColorAndSide(boi, boi.color, 'right');
+      });
+      this.measureNode(this.tree);
+      this.tree.x = 0;
+      this.tree.y = 0;
+      this.layoutSide(this.tree.children, 'right');
+      return;
+    }
+
+    // 2. Structure 'top-down' : Organigramme arborescent descendant
+    if (this.treeStructure === 'top-down') {
+      this.tree.children.forEach((boi, index) => {
+        boi.color = colors[index % colors.length];
+        boi.side = 'bottom';
+        this.propagateColorAndSide(boi, boi.color, 'bottom');
+      });
+      this.measureTopDown(this.tree);
+      this.layoutTopDown(this.tree);
+      return;
+    }
+
+    // 3. Structure 'radiant' (par défaut) : Pensée radiante bilatérale équilibrée (Tony Buzan)
     const rightBOIs = [];
     const leftBOIs = [];
 
@@ -465,6 +587,77 @@ const MindMapView = {
     node.totalHeight = Math.max(node.height + 18, sum);
   },
 
+  measureTopDown(node) {
+    if (node.level === 0) {
+      const textW = this.getTextWidth(node.text, 13, '800');
+      node.textWidth = textW;
+      node.width = Math.max(120, textW + 48);
+      node.height = 46;
+    } else {
+      const textW = this.getTextWidth(node.text, 11.5, '700');
+      node.textWidth = textW;
+
+      let refW = 0;
+      if (node.ref) {
+        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 9, '700');
+        node.refPillWidth = Math.max(38, Math.min(84, refTextW + 14));
+        refW = node.refPillWidth + 8;
+      } else {
+        node.refPillWidth = 0;
+      }
+
+      let noteW = 0;
+      if (node.note) {
+        node.notePillWidth = 18;
+        noteW = 18 + 8;
+      } else {
+        node.notePillWidth = 0;
+      }
+
+      node.contentWidth = textW + refW + noteW;
+      node.width = Math.max(76, node.contentWidth + 24);
+      node.height = 28;
+    }
+
+    if (!node.children || node.children.length === 0) {
+      node.totalWidth = node.width + 28; // Marge négative horizontale entre feuilles
+      return;
+    }
+
+    let sum = 0;
+    node.children.forEach(child => {
+      this.measureTopDown(child);
+      sum += child.totalWidth;
+    });
+    node.totalWidth = Math.max(node.width + 28, sum);
+  },
+
+  layoutTopDown(root) {
+    root.x = 0;
+    root.y = 0;
+    this.layoutChildrenTopDown(root);
+  },
+
+  layoutChildrenTopDown(parent) {
+    if (!parent.children || parent.children.length === 0) return;
+
+    const vertGap = parent.level === 0 ? 95 : 85;
+    const childY = parent.y + vertGap;
+
+    const totalChildrenWidth = parent.children.reduce((acc, c) => acc + c.totalWidth, 0);
+    let currentX = parent.x - totalChildrenWidth / 2;
+
+    parent.children.forEach(child => {
+      const centerX = currentX + child.totalWidth / 2;
+      child.x = centerX;
+      child.y = childY;
+      child.side = 'bottom';
+
+      this.layoutChildrenTopDown(child);
+      currentX += child.totalWidth;
+    });
+  },
+
   layoutSide(bois, side) {
     const totalHeight = bois.reduce((acc, b) => acc + b.totalHeight, 0);
     let currentY = -totalHeight / 2;
@@ -524,6 +717,7 @@ const MindMapView = {
       this.fitView();
     }
     this.updateViewModeUI();
+    this.updateStructureUI();
   },
 
   refreshView() {
@@ -1146,42 +1340,81 @@ const MindMapView = {
 
     node.children.forEach(child => {
       const isRoot = node.level === 0;
-      const x1 = isRoot ? (child.side === 'right' ? node.width / 2 : -node.width / 2) : (child.side === 'right' ? node.x + node.width / 2 : node.x - node.width / 2);
-      const y1 = node.y;
 
-      const x2 = child.side === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
-      const y2 = child.y;
+      if (this.treeStructure === 'top-down') {
+        const x1 = node.x;
+        const y1 = isRoot ? node.y + node.height / 2 : node.y + 10;
+        const x2 = child.x;
+        const y2 = child.y + 10;
 
-      // Courbe de Bézier cubique organique
-      const dx = Math.abs(x2 - x1);
-      const cx1 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
-      const cy1 = y1;
-      const cx2 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
-      const cy2 = y2;
+        const dy = Math.abs(y2 - y1);
+        const cx1 = x1;
+        const cy1 = y1 + dy * 0.5;
+        const cx2 = x2;
+        const cy2 = y2 - dy * 0.5;
 
-      // Épaisseur dégressive selon la loi de Buzan
-      const strokeWidth = isRoot ? 5.5 : Math.max(2, 4.0 - child.level * 0.6);
+        const strokeWidth = isRoot ? 5.2 : Math.max(2, 4.0 - child.level * 0.6);
 
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`);
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', child.color || 'var(--text-secondary)');
-      path.setAttribute('stroke-width', strokeWidth);
-      path.setAttribute('stroke-linecap', 'round');
-      path.classList.add('mm-branch-path');
-      this.viewportG.appendChild(path);
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', child.color || 'var(--text-secondary)');
+        path.setAttribute('stroke-width', strokeWidth);
+        path.setAttribute('stroke-linecap', 'round');
+        path.classList.add('mm-branch-path');
+        this.viewportG.appendChild(path);
 
-      // Trait de soulignement sous le mot (Loi 7 : longueur branche = mot)
-      const underX2 = child.side === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
-      const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      underline.setAttribute('x1', x2);
-      underline.setAttribute('y1', y2 + 10);
-      underline.setAttribute('x2', underX2);
-      underline.setAttribute('y2', y2 + 10);
-      underline.setAttribute('stroke', child.color || 'var(--text-secondary)');
-      underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
-      underline.setAttribute('stroke-linecap', 'round');
-      this.viewportG.appendChild(underline);
+        // Trait de soulignement sous le mot (centré horizontalement sous le mot-clé)
+        const underX1 = child.x - child.width / 2;
+        const underX2 = child.x + child.width / 2;
+        const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        underline.setAttribute('x1', underX1);
+        underline.setAttribute('y1', child.y + 10);
+        underline.setAttribute('x2', underX2);
+        underline.setAttribute('y2', child.y + 10);
+        underline.setAttribute('stroke', child.color || 'var(--text-secondary)');
+        underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
+        underline.setAttribute('stroke-linecap', 'round');
+        this.viewportG.appendChild(underline);
+
+      } else {
+        const x1 = isRoot ? (child.side === 'right' ? node.width / 2 : -node.width / 2) : (child.side === 'right' ? node.x + node.width / 2 : node.x - node.width / 2);
+        const y1 = node.y;
+
+        const x2 = child.side === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
+        const y2 = child.y;
+
+        // Courbe de Bézier cubique organique
+        const dx = Math.abs(x2 - x1);
+        const cx1 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
+        const cy1 = y1;
+        const cx2 = x1 + (child.side === 'right' ? dx * 0.5 : -dx * 0.5);
+        const cy2 = y2;
+
+        // Épaisseur dégressive selon la loi de Buzan
+        const strokeWidth = isRoot ? 5.5 : Math.max(2, 4.0 - child.level * 0.6);
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', child.color || 'var(--text-secondary)');
+        path.setAttribute('stroke-width', strokeWidth);
+        path.setAttribute('stroke-linecap', 'round');
+        path.classList.add('mm-branch-path');
+        this.viewportG.appendChild(path);
+
+        // Trait de soulignement sous le mot (Loi 7 : longueur branche = mot)
+        const underX2 = child.side === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
+        const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        underline.setAttribute('x1', x2);
+        underline.setAttribute('y1', y2 + 10);
+        underline.setAttribute('x2', underX2);
+        underline.setAttribute('y2', y2 + 10);
+        underline.setAttribute('stroke', child.color || 'var(--text-secondary)');
+        underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.6));
+        underline.setAttribute('stroke-linecap', 'round');
+        this.viewportG.appendChild(underline);
+      }
 
       this.drawBranches(child);
     });
@@ -1190,6 +1423,7 @@ const MindMapView = {
   drawNodes(node) {
     const isRoot = node.level === 0;
     const isSelected = this.selectedNodeId === node.id;
+    const isTopDown = this.treeStructure === 'top-down';
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('class', `mm-node-g ${isRoot ? 'mm-root-node' : ''} ${isSelected ? 'selected' : ''}`);
@@ -1217,7 +1451,9 @@ const MindMapView = {
       g.appendChild(text);
 
       // Bouton contextuel + pour ajouter un BOI
-      const plusBtn = this.createActionButton('+', node.width / 2 + 16, 0, () => this.addChildToNode(node));
+      const plusX = isTopDown ? 0 : node.width / 2 + 16;
+      const plusY = isTopDown ? node.height / 2 + 16 : 0;
+      const plusBtn = this.createActionButton('+', plusX, plusY, () => this.addChildToNode(node));
       plusBtn.setAttribute('title', 'Ajouter une idée directrice majeure (BOI)');
       plusBtn.classList.add('mm-root-plus');
       g.appendChild(plusBtn);
@@ -1226,7 +1462,7 @@ const MindMapView = {
       // Zone réceptive continue invisible (évite la disparition des boutons entre le mot et les boutons)
       const hitRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       const hitW = node.width + 65;
-      const hitX = node.side === 'right' ? -node.width / 2 - 5 : -node.width / 2 - 55;
+      const hitX = isTopDown ? -node.width / 2 - 5 : (node.side === 'right' ? -node.width / 2 - 5 : -node.width / 2 - 55);
       hitRect.setAttribute('x', hitX);
       hitRect.setAttribute('y', -18);
       hitRect.setAttribute('width', hitW);
@@ -1246,7 +1482,12 @@ const MindMapView = {
       let badgeX;
       const textW = node.textWidth || this.getTextWidth(node.text, 11.5, '700');
 
-      if (node.side === 'right') {
+      if (isTopDown) {
+        const startX = -(node.contentWidth || textW) / 2;
+        text.setAttribute('text-anchor', 'start');
+        text.setAttribute('x', startX);
+        badgeX = startX + textW + 8;
+      } else if (node.side === 'right') {
         const textX = -node.width / 2 + 10;
         text.setAttribute('text-anchor', 'start');
         text.setAttribute('x', textX);
@@ -1262,8 +1503,8 @@ const MindMapView = {
       // Pastille de référence biblique si présente
       if (node.ref) {
         const pillW = node.refPillWidth || 48;
-        const refX = node.side === 'right' ? badgeX + pillW / 2 : badgeX - pillW / 2;
-        if (node.side === 'right') {
+        const refX = (isTopDown || node.side === 'right') ? badgeX + pillW / 2 : badgeX - pillW / 2;
+        if (isTopDown || node.side === 'right') {
           badgeX += pillW + 6;
         } else {
           badgeX -= (pillW + 6);
@@ -1307,8 +1548,8 @@ const MindMapView = {
 
       // Pastille d'annotation / Note textuelle si présente (Topic Note XMind)
       if (node.note) {
-        const noteX = node.side === 'right' ? badgeX + 9 : badgeX - 9;
-        if (node.side === 'right') {
+        const noteX = (isTopDown || node.side === 'right') ? badgeX + 9 : badgeX - 9;
+        if (isTopDown || node.side === 'right') {
           badgeX += 18 + 6;
         } else {
           badgeX -= (18 + 6);
@@ -1350,11 +1591,11 @@ const MindMapView = {
       const actionsG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       actionsG.setAttribute('class', 'mm-node-actions');
 
-      const endX = node.side === 'right' ? node.width / 2 + 14 : -node.width / 2 - 14;
+      const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 14 : -node.width / 2 - 14;
       const addSubBtn = this.createActionButton('+', endX, 3, () => this.addChildToNode(node));
       addSubBtn.setAttribute('title', 'Ajouter une sous-branche');
 
-      const delX = node.side === 'right' ? node.width / 2 + 34 : -node.width / 2 - 34;
+      const delX = (isTopDown || node.side === 'right') ? node.width / 2 + 34 : -node.width / 2 - 34;
       const delBtn = this.createActionButton('×', delX, 3, () => this.deleteNode(node.id), true);
       delBtn.setAttribute('title', 'Supprimer la branche');
 
@@ -1571,7 +1812,12 @@ const MindMapView = {
       inputWidth = Math.max(100, node.width * scale);
     } else {
       const textW = node.textWidth || this.getTextWidth(node.text, 11.5, '700');
-      const textX = node.side === 'right' ? node.x - node.width / 2 + 10 : node.x + node.width / 2 - 10 - textW;
+      let textX;
+      if (this.treeStructure === 'top-down') {
+        textX = node.x - (node.contentWidth || textW) / 2;
+      } else {
+        textX = node.side === 'right' ? node.x - node.width / 2 + 10 : node.x + node.width / 2 - 10 - textW;
+      }
       screenX = rect.left + this.viewBox.x + textX * scale;
       screenY = rect.top + this.viewBox.y + (node.y - 14) * scale;
       inputWidth = Math.max(80, (textW + 20) * scale);
@@ -1610,6 +1856,7 @@ const MindMapView = {
         }
         this.layoutTree();
         this.draw();
+        this.selectNode(nodeId);
         this.syncAndAutoSave();
       }
     };
@@ -1640,6 +1887,28 @@ const MindMapView = {
     const current = this.findNode(this.selectedNodeId);
     const parent = this.findParent(this.selectedNodeId);
     if (!current) return;
+
+    if (this.treeStructure === 'top-down') {
+      if (key === 'ArrowDown') {
+        if (current.children && current.children.length > 0) {
+          const midIdx = Math.floor(current.children.length / 2);
+          this.selectNode(current.children[midIdx].id);
+        }
+      } else if (key === 'ArrowUp') {
+        if (parent) {
+          this.selectNode(parent.id);
+        }
+      } else if (key === 'ArrowLeft' || key === 'ArrowRight') {
+        if (parent && parent.children) {
+          const idx = parent.children.findIndex(c => c.id === current.id);
+          const nextIdx = key === 'ArrowLeft' ? idx - 1 : idx + 1;
+          if (nextIdx >= 0 && nextIdx < parent.children.length) {
+            this.selectNode(parent.children[nextIdx].id);
+          }
+        }
+      }
+      return;
+    }
 
     if (key === 'ArrowRight') {
       if (current.id === 'root') {
@@ -1697,8 +1966,16 @@ const MindMapView = {
   fitView() {
     if (!this.svg) return;
     const rect = this.svg.getBoundingClientRect();
-    this.viewBox.x = rect.width / 2;
-    this.viewBox.y = rect.height / 2;
+    if (this.treeStructure === 'top-down') {
+      this.viewBox.x = rect.width / 2;
+      this.viewBox.y = Math.max(90, rect.height * 0.22);
+    } else if (this.treeStructure === 'right-tree') {
+      this.viewBox.x = Math.max(140, rect.width * 0.22);
+      this.viewBox.y = rect.height / 2;
+    } else {
+      this.viewBox.x = rect.width / 2;
+      this.viewBox.y = rect.height / 2;
+    }
     this.viewBox.scale = 1.0;
     this.applyTransform();
   },
@@ -2282,6 +2559,23 @@ const MindMapView = {
           <span class="mm-ctx-label">${this.viewMode === 'outline' ? 'Basculer en Vue Carte' : 'Basculer en Vue Plan'}</span>
           <span class="mm-ctx-shortcut">Alt+P</span>
         </div>
+        <div class="mm-ctx-divider"></div>
+        <div class="mm-ctx-item" data-action="structure-radiant">
+          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
+          <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
+          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+        </div>
+        <div class="mm-ctx-item" data-action="structure-right-tree">
+          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
+          <span class="mm-ctx-label">Arbre logique à droite</span>
+          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+        </div>
+        <div class="mm-ctx-item" data-action="structure-top-down">
+          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
+          <span class="mm-ctx-label">Organigramme descendant</span>
+          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+        </div>
+        <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="palette">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
@@ -2323,6 +2617,23 @@ const MindMapView = {
           <span class="mm-ctx-label">${this.viewMode === 'outline' ? 'Basculer en Vue Carte' : 'Basculer en Vue Plan'}</span>
           <span class="mm-ctx-shortcut">Alt+P</span>
         </div>
+        <div class="mm-ctx-divider"></div>
+        <div class="mm-ctx-item" data-action="structure-radiant">
+          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
+          <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
+          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+        </div>
+        <div class="mm-ctx-item" data-action="structure-right-tree">
+          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
+          <span class="mm-ctx-label">Arbre logique à droite</span>
+          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+        </div>
+        <div class="mm-ctx-item" data-action="structure-top-down">
+          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
+          <span class="mm-ctx-label">Organigramme descendant</span>
+          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+        </div>
+        <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="fit">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
@@ -2397,6 +2708,15 @@ const MindMapView = {
           case 'toggle-mode':
             this.toggleViewMode();
             break;
+          case 'structure-radiant':
+            this.setStructure('radiant');
+            break;
+          case 'structure-right-tree':
+            this.setStructure('right-tree');
+            break;
+          case 'structure-top-down':
+            this.setStructure('top-down');
+            break;
           case 'add-child':
             if (node) this.addChildToNode(node);
             break;
@@ -2445,5 +2765,75 @@ const MindMapView = {
         }
       });
     });
+  },
+
+  setStructure(structureName) {
+    if (!['radiant', 'right-tree', 'top-down'].includes(structureName)) return;
+    this.treeStructure = structureName;
+    if (this.currentNote) {
+      this.currentNote.structure = structureName;
+    }
+    this.layoutTree();
+    if (this.viewMode === 'map') {
+      this.draw();
+      this.fitView();
+    }
+    this.updateStructureUI();
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      const labels = {
+        'radiant': 'Squelette : Pensée radiante (Buzan bilatérale)',
+        'right-tree': 'Squelette : Arbre logique à droite',
+        'top-down': 'Squelette : Organigramme descendant'
+      };
+      App.showToast(labels[structureName] || `Structure : ${structureName}`);
+    }
+  },
+
+  cycleStructure() {
+    const structures = ['radiant', 'right-tree', 'top-down'];
+    const curIdx = structures.indexOf(this.treeStructure || 'radiant');
+    const next = structures[(curIdx + 1) % structures.length];
+    this.setStructure(next);
+  },
+
+  toggleStructurePopover(force = null) {
+    const popover = document.getElementById('mm-structure-popover');
+    if (!popover) return;
+    const isHidden = popover.classList.contains('hidden');
+    const shouldOpen = force !== null ? force : isHidden;
+    popover.classList.toggle('hidden', !shouldOpen);
+    if (shouldOpen) {
+      this.updateStructureUI();
+    }
+  },
+
+  updateStructureUI() {
+    const struct = this.treeStructure || 'radiant';
+
+    // 1. Bouton du dock flottant
+    const dockBtn = document.getElementById('mm-btn-structure');
+    if (dockBtn) {
+      dockBtn.innerHTML = this.STRUCTURE_ICONS[struct] || this.STRUCTURE_ICONS.radiant;
+      const labels = {
+        'radiant': 'Squelette : Pensée radiante (Alt+S)',
+        'right-tree': 'Squelette : Arbre logique à droite (Alt+S)',
+        'top-down': 'Squelette : Organigramme descendant (Alt+S)'
+      };
+      dockBtn.title = labels[struct] || 'Squelette de mise en page (Alt+S)';
+    }
+
+    // 2. Options du popover
+    const popover = document.getElementById('mm-structure-popover');
+    if (popover) {
+      popover.querySelectorAll('.mm-structure-option').forEach(opt => {
+        const optStruct = opt.getAttribute('data-structure');
+        const isActive = optStruct === struct;
+        opt.classList.toggle('active', isActive);
+        const check = opt.querySelector('.mm-struct-check');
+        if (check) check.classList.toggle('hidden', !isActive);
+      });
+    }
   }
 };
