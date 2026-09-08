@@ -197,6 +197,36 @@ const NotesView = {
     });
 
     this.updateAiToggleVisibility();
+
+    // Observer le redimensionnement de l'en-tête gauche pour réajuster la largeur titre vs tags
+    const headerLeft = document.querySelector('.notes-header-left');
+    if (headerLeft && window.ResizeObserver) {
+      let lastW = 0;
+      const ro = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const w = Math.round(entry.contentRect.width);
+          if (w !== lastW && w > 0) {
+            lastW = w;
+            requestAnimationFrame(() => this.adjustTitleWidth());
+          }
+        }
+      });
+      ro.observe(headerLeft);
+    } else {
+      window.addEventListener('resize', () => {
+        this.adjustTitleWidth();
+      });
+    }
+
+    // Défilement horizontal fluide des badges et tags à la molette
+    const badgesEl = document.getElementById('note-meta-badges');
+    badgesEl?.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0 && badgesEl.scrollWidth > badgesEl.clientWidth) {
+        e.preventDefault();
+        badgesEl.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+
     this.loadNotes();
   },
 
@@ -1992,13 +2022,38 @@ const NotesView = {
     }
   },
 
-  // Calcule la largeur du champ titre pour toujours afficher le titre en entier
+  // Calcule dynamiquement la largeur optimale du champ titre pour préserver la visibilité des badges (passage & tags)
   adjustTitleWidth() {
     if (!this.titleInput) return;
     const val = this.titleInput.value || this.titleInput.placeholder || '';
+    this.titleInput.title = val; // Info-bulle avec le titre complet
+
+    const leftContainer = document.querySelector('.notes-header-left');
+    const badgesEl = document.getElementById('note-meta-badges');
+
     const ch = Math.max(val.length, 2);
-    const w = Math.max(60, Math.round(ch * 10.5 + 16));
-    this.titleInput.style.width = `${w}px`;
+    const naturalWidth = Math.round(ch * 10.5 + 16);
+
+    if (leftContainer && leftContainer.clientWidth > 0) {
+      const containerW = leftContainer.clientWidth;
+
+      // Espace réservé pour les badges (passage lié + tags)
+      // On réserve l'espace réel requis par les badges, plafonné à 55% max du conteneur pour ne pas écraser le titre,
+      // mais avec un minimum garanti de 140px pour que les tags et le passage restent toujours visibles.
+      let reservedBadges = 160;
+      if (badgesEl) {
+        const badgesScrollW = badgesEl.scrollWidth;
+        reservedBadges = Math.max(140, Math.min(badgesScrollW, Math.round(containerW * 0.55)));
+      }
+
+      // La largeur max allouée au titre préserve scrupuleusement l'espace des badges
+      const maxAllowed = Math.max(90, containerW - reservedBadges - 14);
+      const w = Math.min(naturalWidth, maxAllowed);
+      this.titleInput.style.width = `${w}px`;
+    } else {
+      this.titleInput.style.width = `${Math.min(380, naturalWidth)}px`;
+    }
+
     this.checkHeaderCompactness();
   },
 
@@ -2037,7 +2092,10 @@ const NotesView = {
     const scripturePill = document.querySelector('.note-badge-pill.scripture');
     if (!leftContainer || !scripturePill) return;
     const titleLen = (this.titleInput?.value || '').length;
-    const isConstrained = leftContainer.scrollWidth > leftContainer.clientWidth || titleLen > 16;
+    const badgesEl = document.getElementById('note-meta-badges');
+    const isConstrained = leftContainer.scrollWidth > leftContainer.clientWidth
+      || (badgesEl && badgesEl.scrollWidth > badgesEl.clientWidth)
+      || titleLen > 18;
     scripturePill.classList.toggle('is-abbreviated', isConstrained);
   },
 
@@ -2161,6 +2219,7 @@ const NotesView = {
       this.promptAddTagInline(tagsContainer, addTagBtn);
     });
     tagsContainer.appendChild(addTagBtn);
+    this.adjustTitleWidth();
     this.checkHeaderCompactness();
   },
 

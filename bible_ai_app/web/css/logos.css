@@ -9828,16 +9828,16 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 .note-title-wrap {
   display: flex;
   align-items: center;
-  flex: 0 0 auto;
-  min-width: max-content;
-  max-width: none;
+  flex: 0 1 auto;
+  min-width: 80px;
+  max-width: calc(100% - 140px);
+  overflow: hidden;
 }
 
 .note-title-input {
   width: auto;
-  field-sizing: content;
   min-width: 60px;
-  max-width: none;
+  max-width: 100%;
   font-size: 17px;
   font-weight: 800;
   border: none;
@@ -9847,6 +9847,13 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   padding: 2px 4px;
   border-radius: 4px;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.note-title-input:focus {
+  text-overflow: clip;
 }
 
 .notes-editor-subbar {
@@ -35588,7 +35595,8 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-branch-
   flex-wrap: nowrap;
   min-height: 26px;
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: 140px;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -35786,6 +35794,32 @@ body.theme-dark .note-badge-pill .badge-action-btn:hover {
 body.theme-dark .note-badge-inline-input {
   background: #0f172a;
   color: #f8fafc;
+}
+
+/* Adaptation responsive des actions de note pour maximiser l'espace titre & tags */
+.note-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1350px) {
+  #note-edit-ai-toggle-label span {
+    display: none;
+  }
+  #note-autosave-indicator span {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  #btn-notes-markdown-guide span {
+    display: none;
+  }
+  #btn-toggle-note-preview span {
+    display: none;
+  }
 }
 
 /* ==========================================================================
