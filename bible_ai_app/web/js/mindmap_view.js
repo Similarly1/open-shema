@@ -29,6 +29,7 @@ const MindMapView = {
   selectedRelId: null, // ID de la liaison sélectionnée
   boundaries: [], // [ { id, rootId, label, color } ] Clôtures / Enclos style XMind
   selectedBoundaryId: null, // ID de l'enclos sélectionné
+  floatingTopics: [], // [ { id, text, x, y, color, ref, note, children, isFloating } ] Sujets Flottants style XMind
 
   // Pile d'historique Undo / Redo
   history: [],
@@ -48,8 +49,11 @@ const MindMapView = {
     startMouseSvgY: 0,
     initialOffsetX: 0,
     initialOffsetY: 0,
+    initialX: 0,
+    initialY: 0,
     hasMoved: false
   },
+  reparentDropTargetId: null,
 
   // Vue Pan & Zoom
   viewBox: { x: 0, y: 0, scale: 1 },
@@ -133,6 +137,9 @@ const MindMapView = {
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-boundary" title="Créer un enclos / clôture sur la branche (Ctrl+B)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" stroke-dasharray="4 3"/><path d="M7 8h10M7 12h6"/></svg>
+          </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-floating" title="Créer un sujet flottant indépendant (Alt+F ou Double-clic)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="7" stroke-dasharray="3 2"/><circle cx="7.5" cy="12" r="1.5" fill="currentColor"/><line x1="11" y1="12" x2="16" y2="12"/></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" title="Zoom avant (Ctrl + Molette)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -287,17 +294,18 @@ const MindMapView = {
               <tr><td><kbd>Alt+R</kbd></td><td><strong>Réorganiser harmonieusement la carte</strong></td></tr>
               <tr><td><kbd>Ctrl+L</kbd></td><td><strong>Créer une liaison transversale (Relation)</strong></td></tr>
               <tr><td><kbd>Ctrl+B</kbd></td><td><strong>Créer un enclos / clôture sur la branche</strong></td></tr>
+              <tr><td><kbd>Alt+F</kbd> ou <em>Double-clic</em></td><td><strong>Créer un sujet flottant indépendant</strong></td></tr>
               <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
               <tr><td><kbd>Entrée</kbd></td><td>Ajouter une branche voisine (Sœur)</td></tr>
               <tr><td><kbd>Espace</kbd> ou <em>Double-clic</em></td><td>Modifier le mot-clé</td></tr>
               <tr><td><kbd>F4</kbd></td><td>Ajouter / Modifier la note de branche</td></tr>
-              <tr><td><kbd>Suppr</kbd> / <kbd>Retour</kbd></td><td>Supprimer la branche ou liaison sélectionnée</td></tr>
+              <tr><td><kbd>Suppr</kbd> / <kbd>Retour</kbd></td><td>Supprimer la branche, enclos ou liaison sélectionnée</td></tr>
               <tr><td><kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd></td><td>Copier / Coller une branche</td></tr>
               <tr><td><em>Clic Droit</em></td><td>Menu contextuel complet (branche ou fond)</td></tr>
               <tr><td><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></td><td>Naviguer d'une branche à l'autre</td></tr>
               <tr><td><kbd>Ctrl + Molette</kbd></td><td>Zoomer / Dézoomer</td></tr>
               <tr><td><em>Clic-glissé fond</em></td><td>Déplacer la feuille (Panoramique)</td></tr>
-              <tr><td><kbd>R</kbd> ou <em>Double-clic</em></td><td>Recentrer la vue</td></tr>
+              <tr><td><kbd>R</kbd></td><td>Recentrer la vue</td></tr>
               <tr><td><kbd>?</kbd></td><td>Afficher / Masquer cette aide</td></tr>
             </table>
             <div class="mm-help-tip">
@@ -380,10 +388,16 @@ const MindMapView = {
 
           const node = this.dragState.node || this.findNode(this.dragState.nodeId);
           if (node) {
-            node.offsetX = this.dragState.initialOffsetX + deltaX;
-            node.offsetY = this.dragState.initialOffsetY + deltaY;
+            if (node.isFloating) {
+              node.x = (this.dragState.initialX ?? node.x) + deltaX;
+              node.y = (this.dragState.initialY ?? node.y) + deltaY;
+            } else {
+              node.offsetX = (this.dragState.initialOffsetX || 0) + deltaX;
+              node.offsetY = (this.dragState.initialOffsetY || 0) + deltaY;
+            }
             this.layoutTree();
             this.draw();
+            this.updateReparentDropTarget(e.clientX, e.clientY, node.id);
           }
           return;
         }
@@ -412,8 +426,19 @@ const MindMapView = {
         const wasActive = this.dragState.active;
         document.body.classList.remove('mm-dragging-node');
 
+        const targetDropId = this.reparentDropTargetId;
+        const draggedNodeId = this.dragState.nodeId;
+
+        // Nettoyage de l'indicateur visuel de cible
+        document.querySelectorAll('.reparent-drop-target').forEach(el => el.classList.remove('reparent-drop-target'));
+        this.reparentDropTargetId = null;
+
         if (wasActive && this.dragState.hasMoved) {
-          this.syncAndAutoSave();
+          if (targetDropId && draggedNodeId && targetDropId !== draggedNodeId) {
+            this.reparentNode(draggedNodeId, targetDropId);
+          } else {
+            this.syncAndAutoSave();
+          }
         }
 
         this.dragState.active = false;
@@ -469,6 +494,14 @@ const MindMapView = {
       } else if (typeof App !== 'undefined' && App.showToast) {
         App.showToast('Sélectionnez d\'abord une branche pour créer un enclos');
       }
+    });
+    document.getElementById('mm-btn-floating')?.addEventListener('click', (e) => {
+      e.currentTarget?.blur();
+      const rect = this.svg?.getBoundingClientRect() || { width: 800, height: 600 };
+      const centerSvgX = (rect.width / 2 - this.viewBox.x) / this.viewBox.scale;
+      const centerSvgY = (rect.height / 2 - this.viewBox.y) / this.viewBox.scale;
+      const offset = (this.floatingTopics?.length || 0) * 30;
+      this.createFloatingTopic(centerSvgX + 140 + offset, centerSvgY + 60 + offset);
     });
     document.getElementById('mm-btn-cancel-connecting')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cancelConnecting(); });
     document.getElementById('mm-btn-zoom-in')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(1.2); });
@@ -578,6 +611,17 @@ const MindMapView = {
         return;
       }
 
+      // Création d'un sujet flottant indépendant (Alt+F)
+      if (e.altKey && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        const rect = this.svg?.getBoundingClientRect() || { width: 800, height: 600 };
+        const centerSvgX = (rect.width / 2 - this.viewBox.x) / this.viewBox.scale;
+        const centerSvgY = (rect.height / 2 - this.viewBox.y) / this.viewBox.scale;
+        const offset = (this.floatingTopics?.length || 0) * 30;
+        this.createFloatingTopic(centerSvgX + 140 + offset, centerSvgY + 60 + offset);
+        return;
+      }
+
       // Si l'utilisateur est en train de taper dans un champ de saisie HTML
       const activeTag = document.activeElement?.tagName;
       if (['INPUT', 'TEXTAREA'].includes(activeTag)) return;
@@ -651,10 +695,14 @@ const MindMapView = {
       this.showContextMenu(e.clientX, e.clientY, null);
     });
 
-    // Double-clic sur le fond = recentrer
+    // Double-clic sur le fond = créer un sujet flottant indépendant (style XMind)
     this.svg?.addEventListener('dblclick', (e) => {
       if (e.target === this.svg || e.target === this.viewportG) {
-        this.fitView();
+        e.stopPropagation();
+        const rect = this.svg.getBoundingClientRect();
+        const mouseSvgX = (e.clientX - rect.left - this.viewBox.x) / this.viewBox.scale;
+        const mouseSvgY = (e.clientY - rect.top - this.viewBox.y) / this.viewBox.scale;
+        this.createFloatingTopic(mouseSvgX, mouseSvgY);
       }
     });
   },
@@ -712,9 +760,20 @@ const MindMapView = {
     const stack = [{ node: root, indent: -1 }];
     let idCounter = 1;
 
+    let inFloatingBlock = false;
     for (const rawLine of lines) {
       const line = rawLine.trimEnd();
-      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-connector:') || line.trim().startsWith('<!-- mindmap-node-shape:') || line.trim().startsWith('<!-- mindmap-rel:') || line.trim().startsWith('<!-- mindmap-boundary:') || line.trim().startsWith('<!-- mindmap-pos:')) continue;
+      const trimmed = line.trim();
+      if (trimmed.startsWith('<!-- mindmap-floating-start:')) {
+        inFloatingBlock = true;
+        continue;
+      }
+      if (trimmed.startsWith('<!-- mindmap-floating-end')) {
+        inFloatingBlock = false;
+        continue;
+      }
+      if (inFloatingBlock || trimmed.startsWith('<!-- mindmap-floating:')) continue;
+      if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('<!-- mindmap-layout:') || trimmed.startsWith('<!-- mindmap-connector:') || trimmed.startsWith('<!-- mindmap-node-shape:') || trimmed.startsWith('<!-- mindmap-rel:') || trimmed.startsWith('<!-- mindmap-boundary:') || trimmed.startsWith('<!-- mindmap-pos:')) continue;
 
       // Détection de l'indentation
       const match = line.match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
@@ -833,10 +892,114 @@ const MindMapView = {
       }
     }
 
+    // Extraction des sujets flottants (Floating Topics style XMind)
+    this.floatingTopics = [];
+    if (markdownContent) {
+      // 1. Blocs avec sous-arborescences
+      const blockFloatRegex = /<!--\s*mindmap-floating-start:\s*(.+?)(?:\s*\|\s*x:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*y:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->([\s\S]*?)<!--\s*mindmap-floating-end\s*-->/g;
+      let blockMatch;
+      while ((blockMatch = blockFloatRegex.exec(markdownContent)) !== null) {
+        const text = blockMatch[1].trim().toUpperCase();
+        const fx = blockMatch[2] !== undefined ? parseFloat(blockMatch[2]) : 200;
+        const fy = blockMatch[3] !== undefined ? parseFloat(blockMatch[3]) : 100;
+        const color = blockMatch[4] !== undefined ? blockMatch[4].trim() : '#0284c7';
+        const innerMd = blockMatch[5] || '';
+
+        const ftNode = {
+          id: `float_${idCounter++}`,
+          text: text,
+          ref: '',
+          note: '',
+          color: color || '#0284c7',
+          x: fx,
+          y: fy,
+          width: 100,
+          height: 30,
+          level: 1,
+          side: 'right',
+          children: [],
+          isFloating: true
+        };
+
+        const ftLines = innerMd.split(/\r?\n/);
+        const ftStack = [{ node: ftNode, indent: -1 }];
+        for (const ftRawLine of ftLines) {
+          const ftLine = ftRawLine.trimEnd();
+          const ftMatch = ftLine.match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
+          if (ftMatch) {
+            const indent = ftMatch[1].length;
+            let cText = ftMatch[3].trim();
+            let cRef = '';
+            let cNote = '';
+
+            const nMatch = cText.match(/<!--\s*note:\s*([\s\S]*?)\s*-->/);
+            if (nMatch) {
+              cNote = nMatch[1].trim();
+              cText = cText.replace(nMatch[0], '').trim();
+            }
+
+            const rMatch = cText.match(/\[([A-Za-z0-9À-ÿ\s:]+)\]$/);
+            if (rMatch) {
+              cRef = rMatch[1].trim();
+              cText = cText.replace(rMatch[0], '').trim();
+            }
+
+            const childNode = {
+              id: `node_${idCounter++}`,
+              text: cText.toUpperCase(),
+              ref: cRef,
+              note: cNote,
+              color: color || '#0284c7',
+              children: [],
+              level: 2,
+              side: 'right'
+            };
+
+            while (ftStack.length > 1 && ftStack[ftStack.length - 1].indent >= indent) {
+              ftStack.pop();
+            }
+            const parent = ftStack[ftStack.length - 1].node;
+            childNode.level = parent.level + 1;
+            parent.children.push(childNode);
+            ftStack.push({ node: childNode, indent });
+          }
+        }
+
+        this.floatingTopics.push(ftNode);
+      }
+
+      // 2. Sujets flottants d'une seule ligne
+      const singleFloatRegex = /<!--\s*mindmap-floating:\s*(.+?)(?:\s*\|\s*x:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*y:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->/g;
+      let singleMatch;
+      while ((singleMatch = singleFloatRegex.exec(markdownContent)) !== null) {
+        const text = singleMatch[1].trim().toUpperCase();
+        const fx = singleMatch[2] !== undefined ? parseFloat(singleMatch[2]) : 200;
+        const fy = singleMatch[3] !== undefined ? parseFloat(singleMatch[3]) : 100;
+        const color = singleMatch[4] !== undefined ? singleMatch[4].trim() : '#0284c7';
+
+        this.floatingTopics.push({
+          id: `float_${idCounter++}`,
+          text: text,
+          ref: '',
+          note: '',
+          color: color || '#0284c7',
+          x: fx,
+          y: fy,
+          width: 100,
+          height: 30,
+          level: 1,
+          side: 'right',
+          children: [],
+          isFloating: true
+        });
+      }
+    }
+
     return root;
   },
 
-  treeToMarkdown(tree) {
+  treeToMarkdown(tree = this.tree) {
+    if (!tree) return '';
     let md = '';
     if (this.treeStructure && this.treeStructure !== 'radiant') {
       md += `<!-- mindmap-layout: ${this.treeStructure} -->\n`;
@@ -848,7 +1011,7 @@ const MindMapView = {
       md += `<!-- mindmap-node-shape: ${this.nodeShape} -->\n`;
     }
     const serializeChildren = (node, indentLevel) => {
-      if (!node.children) return;
+      if (!node || !node.children) return;
       for (const child of node.children) {
         const indent = '  '.repeat(indentLevel);
         const refPart = child.ref ? ` [${child.ref}]` : '';
@@ -863,7 +1026,7 @@ const MindMapView = {
     // Sérialisation des positions spatiales manuelles (Free Positioning)
     const offsets = [];
     const collectOffsets = (node) => {
-      if (node.id !== 'root' && (Math.round(node.offsetX || 0) !== 0 || Math.round(node.offsetY || 0) !== 0)) {
+      if (node.id !== 'root' && !node.isFloating && (Math.round(node.offsetX || 0) !== 0 || Math.round(node.offsetY || 0) !== 0)) {
         const cleanText = node.text.replace(/\|/g, '');
         offsets.push(`<!-- mindmap-pos: ${cleanText} | x: ${Math.round(node.offsetX)} | y: ${Math.round(node.offsetY)} -->`);
       }
@@ -906,6 +1069,25 @@ const MindMapView = {
       });
     }
 
+    // Sérialisation des sujets flottants (Floating Topics style XMind)
+    if (this.floatingTopics && this.floatingTopics.length > 0) {
+      md += '\n';
+      this.floatingTopics.forEach(ft => {
+        const cleanText = ft.text.replace(/\|/g, '');
+        const xVal = Math.round(ft.x || 0);
+        const yVal = Math.round(ft.y || 0);
+        const colorPart = ft.color ? ` | color: ${ft.color}` : '';
+
+        if (ft.children && ft.children.length > 0) {
+          md += `<!-- mindmap-floating-start: ${cleanText} | x: ${xVal} | y: ${yVal}${colorPart} -->\n`;
+          serializeChildren(ft, 0);
+          md += `<!-- mindmap-floating-end -->\n`;
+        } else {
+          md += `<!-- mindmap-floating: ${cleanText} | x: ${xVal} | y: ${yVal}${colorPart} -->\n`;
+        }
+      });
+    }
+
     return md;
   },
 
@@ -932,6 +1114,7 @@ const MindMapView = {
       this.tree.y = 0;
       this.layoutSide(this.tree.children, 'right');
       this.applyNodeOffsets(this.tree);
+      this.layoutFloatingTopics();
       return;
     }
 
@@ -945,6 +1128,7 @@ const MindMapView = {
       this.measureTopDown(this.tree);
       this.layoutTopDown(this.tree);
       this.applyNodeOffsets(this.tree);
+      this.layoutFloatingTopics();
       return;
     }
 
@@ -978,13 +1162,27 @@ const MindMapView = {
 
     // Décalages spatiaux personnalisés (Free Positioning)
     this.applyNodeOffsets(this.tree);
+    this.layoutFloatingTopics();
+  },
+
+  layoutFloatingTopics() {
+    if (!this.floatingTopics || this.floatingTopics.length === 0) return;
+    this.floatingTopics.forEach(ft => {
+      ft.side = 'right';
+      this.propagateColorAndSide(ft, ft.color || '#0284c7', 'right');
+      this.measureNode(ft);
+      if (ft.children && ft.children.length > 0) {
+        this.layoutChildren(ft, 'right');
+      }
+      this.applyNodeOffsets(ft);
+    });
   },
 
   applyNodeOffsets(node = this.tree, inheritedDx = 0, inheritedDy = 0) {
     if (!node) return;
     const totalDx = inheritedDx + (node.offsetX || 0);
     const totalDy = inheritedDy + (node.offsetY || 0);
-    if (node.id !== 'root') {
+    if (node.id !== 'root' && !node.isFloating) {
       node.x += totalDx;
       node.y += totalDy;
     }
@@ -1012,7 +1210,31 @@ const MindMapView = {
   },
 
   measureNode(node) {
-    if (node.level === 0) {
+    if (node.isFloating) {
+      const textW = this.getTextWidth(node.text, 12, '800');
+      node.textWidth = textW;
+
+      let refW = 0;
+      if (node.ref) {
+        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 9, '700');
+        node.refPillWidth = Math.max(38, Math.min(84, refTextW + 14));
+        refW = node.refPillWidth + 8;
+      } else {
+        node.refPillWidth = 0;
+      }
+
+      let noteW = 0;
+      if (node.note) {
+        node.notePillWidth = 18;
+        noteW = 18 + 8;
+      } else {
+        node.notePillWidth = 0;
+      }
+
+      node.contentWidth = textW + refW + noteW;
+      node.width = Math.max(88, node.contentWidth + 28);
+      node.height = 32;
+    } else if (node.level === 0) {
       const textW = this.getTextWidth(node.text, 13, '800');
       node.textWidth = textW;
       node.width = Math.max(120, textW + 48);
@@ -1327,6 +1549,36 @@ const MindMapView = {
             <div class="mm-outline-tree">
               ${(this.tree.children || []).map((boi, idx) => this.renderOutlineBoi(boi, idx)).join('')}
             </div>
+
+            <!-- Section Sujets Flottants (Floating Topics style XMind) -->
+            ${(this.floatingTopics && this.floatingTopics.length > 0) ? `
+              <div class="mm-outline-floating-section">
+                <div class="mm-outline-floating-header">
+                  <span class="mm-outline-floating-badge">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="6"/><circle cx="8" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="12" r="1.5" fill="currentColor"/></svg>
+                  </span>
+                  <span class="mm-outline-floating-title">Sujets Flottants</span>
+                  <button type="button" class="btn-icon-subtle" data-action="add-floating-topic" title="Ajouter un sujet flottant">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+                <div class="mm-outline-floating-list">
+                  ${this.floatingTopics.map((ft, idx) => this.renderOutlineBoi(ft, idx)).join('')}
+                </div>
+              </div>
+            ` : `
+              <div class="mm-outline-floating-section" style="opacity: 0.85;">
+                <div class="mm-outline-floating-header">
+                  <span class="mm-outline-floating-badge">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="6"/><circle cx="8" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="12" r="1.5" fill="currentColor"/></svg>
+                  </span>
+                  <span class="mm-outline-floating-title" style="font-size: 11px;">Sujets Flottants</span>
+                  <button type="button" class="btn-icon-subtle" data-action="add-floating-topic" title="Créer un sujet flottant (Alt+F)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+              </div>
+            `}
           </div>
         </div>
       </div>
@@ -1497,6 +1749,14 @@ const MindMapView = {
   },
 
   bindOutlineEvents(outlineEl) {
+    // Bouton ajouter un sujet flottant
+    outlineEl.querySelectorAll('[data-action="add-floating-topic"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.createFloatingTopic(250, 100);
+      });
+    });
+
     // Clic sur chevron replier/déplier
     outlineEl.querySelectorAll('[data-action="toggle-collapse"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1874,13 +2134,23 @@ const MindMapView = {
     this.drawBoundaries();
 
     // 2. Dessiner toutes les branches (courbes fluides sous le texte)
-    this.drawBranches(this.tree);
+    if (this.tree) {
+      this.drawBranches(this.tree);
+    }
+    if (this.floatingTopics && this.floatingTopics.length > 0) {
+      this.floatingTopics.forEach(ft => this.drawBranches(ft));
+    }
 
     // 3. Dessiner les liaisons transversales inter-branches (Relations style XMind)
     this.drawRelationships();
 
     // 4. Dessiner tous les nœuds (textes, boutons contextuels)
-    this.drawNodes(this.tree);
+    if (this.tree) {
+      this.drawNodes(this.tree);
+    }
+    if (this.floatingTopics && this.floatingTopics.length > 0) {
+      this.floatingTopics.forEach(ft => this.drawNodes(ft));
+    }
   },
 
   drawBranches(node) {
@@ -2015,13 +2285,14 @@ const MindMapView = {
   },
 
   drawNodes(node) {
-    const isRoot = node.level === 0;
+    const isRoot = node.level === 0 && !node.isFloating;
+    const isFloatingRoot = !!node.isFloating;
     const isSelected = this.selectedNodeId === node.id;
     const isConnectingSource = this.connectingSourceId === node.id;
     const isTopDown = this.treeStructure === 'top-down';
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.setAttribute('class', `mm-node-g ${isRoot ? 'mm-root-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
+    g.setAttribute('class', `mm-node-g ${isRoot ? 'mm-root-node' : ''} ${isFloatingRoot ? 'mm-floating-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
     g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
     g.setAttribute('data-id', node.id);
 
@@ -2054,8 +2325,8 @@ const MindMapView = {
       g.appendChild(plusBtn);
 
     } else {
-      const isBox = this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
-      const rx = this.nodeShape === 'pill' ? 14 : 7;
+      const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
+      const rx = (node.isFloating || this.nodeShape === 'pill') ? 14 : 7;
       const boxW = node.width;
       const boxH = node.height || 28;
 
@@ -2067,10 +2338,10 @@ const MindMapView = {
         boxRect.setAttribute('width', boxW);
         boxRect.setAttribute('height', boxH);
         boxRect.setAttribute('rx', rx);
-        boxRect.setAttribute('class', `mm-branch-box ${this.nodeShape}`);
+        boxRect.setAttribute('class', `mm-branch-box ${node.isFloating ? 'mm-floating-box' : this.nodeShape}`);
         boxRect.setAttribute('fill', 'var(--bg-card, #ffffff)');
         boxRect.setAttribute('stroke', node.color || 'var(--accent-blue)');
-        boxRect.setAttribute('stroke-width', '1.6');
+        boxRect.setAttribute('stroke-width', node.isFloating ? '2' : '1.6');
         if (isSelected) {
           boxRect.setAttribute('filter', 'url(#mm-select-glow)');
         }
@@ -2084,7 +2355,7 @@ const MindMapView = {
         tintRect.setAttribute('height', boxH);
         tintRect.setAttribute('rx', rx);
         tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
-        tintRect.setAttribute('opacity', '0.08');
+        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : '0.08');
         g.appendChild(tintRect);
       }
 
@@ -2254,6 +2525,8 @@ const MindMapView = {
           startMouseSvgY: mouseSvgY,
           initialOffsetX: node.offsetX || 0,
           initialOffsetY: node.offsetY || 0,
+          initialX: node.x || 0,
+          initialY: node.y || 0,
           hasMoved: false
         };
       });
@@ -2352,20 +2625,35 @@ const MindMapView = {
   findNode(id, current = this.tree) {
     if (!current) return null;
     if (current.id === id) return current;
-    if (!current.children) return null;
-    for (const child of current.children) {
-      const found = this.findNode(id, child);
-      if (found) return found;
+    if (current.children) {
+      for (const child of current.children) {
+        const found = this.findNode(id, child);
+        if (found) return found;
+      }
+    }
+    if (current === this.tree && this.floatingTopics && this.floatingTopics.length > 0) {
+      for (const ft of this.floatingTopics) {
+        const found = this.findNode(id, ft);
+        if (found) return found;
+      }
     }
     return null;
   },
 
   findParent(id, current = this.tree) {
-    if (!current || !current.children) return null;
-    for (const child of current.children) {
-      if (child.id === id) return current;
-      const found = this.findParent(id, child);
-      if (found) return found;
+    if (!current) return null;
+    if (current.children) {
+      for (const child of current.children) {
+        if (child.id === id) return current;
+        const found = this.findParent(id, child);
+        if (found) return found;
+      }
+    }
+    if (current === this.tree && this.floatingTopics && this.floatingTopics.length > 0) {
+      for (const ft of this.floatingTopics) {
+        const found = this.findParent(id, ft);
+        if (found) return found;
+      }
     }
     return null;
   },
@@ -2374,10 +2662,17 @@ const MindMapView = {
     if (!current || !text) return null;
     const clean = text.trim().toUpperCase();
     if (current.text && current.text.trim().toUpperCase() === clean) return current;
-    if (!current.children) return null;
-    for (const child of current.children) {
-      const found = this.findNodeByText(text, child);
-      if (found) return found;
+    if (current.children) {
+      for (const child of current.children) {
+        const found = this.findNodeByText(text, child);
+        if (found) return found;
+      }
+    }
+    if (current === this.tree && this.floatingTopics && this.floatingTopics.length > 0) {
+      for (const ft of this.floatingTopics) {
+        const found = this.findNodeByText(text, ft);
+        if (found) return found;
+      }
     }
     return null;
   },
@@ -2419,6 +2714,13 @@ const MindMapView = {
       return;
     }
 
+    // Si le nœud sélectionné est une racine de sujet flottant
+    const floatingRoot = this.floatingTopics?.find(ft => ft.id === this.selectedNodeId);
+    if (floatingRoot) {
+      this.createFloatingTopic(floatingRoot.x, floatingRoot.y + 50);
+      return;
+    }
+
     const parent = this.findParent(this.selectedNodeId);
     if (!parent) return;
 
@@ -2453,6 +2755,39 @@ const MindMapView = {
   },
 
   deleteNode(id) {
+    // Si c'est un sujet flottant racine
+    const ftIndex = this.floatingTopics?.findIndex(ft => ft.id === id);
+    if (ftIndex !== undefined && ftIndex !== -1) {
+      const deletedIds = new Set();
+      const collectIds = (n) => {
+        if (!n) return;
+        deletedIds.add(n.id);
+        if (n.children) n.children.forEach(collectIds);
+      };
+      collectIds(this.floatingTopics[ftIndex]);
+      this.floatingTopics.splice(ftIndex, 1);
+      this.selectedNodeId = null;
+
+      if (this.relationships && this.relationships.length > 0) {
+        this.relationships = this.relationships.filter(r => !deletedIds.has(r.fromId) && !deletedIds.has(r.toId));
+      }
+      if (this.boundaries && this.boundaries.length > 0) {
+        this.boundaries = this.boundaries.filter(b => !deletedIds.has(b.rootId));
+        if (this.selectedBoundaryId && !this.boundaries.some(b => b.id === this.selectedBoundaryId)) {
+          this.selectedBoundaryId = null;
+        }
+      }
+      this.layoutTree();
+      if (this.viewMode === 'outline') {
+        this.renderOutlineView();
+      } else {
+        this.draw();
+        this.updateSelectionState();
+      }
+      this.syncAndAutoSave();
+      return;
+    }
+
     const parent = this.findParent(id);
     if (!parent) return;
 
@@ -2517,9 +2852,13 @@ const MindMapView = {
       return false;
     }
 
-    const currentParent = this.findParent(draggedId);
-    if (!currentParent) return false;
-    if (currentParent.id === newParentId) return false;
+    const isFloatingRoot = this.floatingTopics?.some(ft => ft.id === draggedId);
+    let currentParent = null;
+    if (!isFloatingRoot) {
+      currentParent = this.findParent(draggedId);
+      if (!currentParent) return false;
+      if (currentParent.id === newParentId) return false;
+    }
 
     const draggedNode = this.findNode(draggedId);
     if (!draggedNode) return false;
@@ -2527,8 +2866,18 @@ const MindMapView = {
     const newParent = this.findNode(newParentId);
     if (!newParent) return false;
 
-    // Retirer de l'ancien parent
-    currentParent.children = currentParent.children.filter(c => c.id !== draggedId);
+    // Retirer de l'ancien parent / conteneur flottant
+    if (isFloatingRoot) {
+      this.floatingTopics = this.floatingTopics.filter(ft => ft.id !== draggedId);
+      draggedNode.isFloating = false;
+      delete draggedNode.x;
+      delete draggedNode.y;
+    } else {
+      currentParent.children = currentParent.children.filter(c => c.id !== draggedId);
+    }
+
+    draggedNode.offsetX = 0;
+    draggedNode.offsetY = 0;
 
     // Attacher au nouveau parent
     newParent.children = newParent.children || [];
@@ -2557,6 +2906,111 @@ const MindMapView = {
       App.showToast(`Branche « ${draggedNode.text} » rattachée à « ${newParent.text} »`);
     }
     return true;
+  },
+
+  updateReparentDropTarget(clientX, clientY, draggedId) {
+    document.querySelectorAll('.reparent-drop-target').forEach(el => el.classList.remove('reparent-drop-target'));
+    this.reparentDropTargetId = null;
+
+    const elements = document.elementsFromPoint ? document.elementsFromPoint(clientX, clientY) : [document.elementFromPoint(clientX, clientY)];
+    if (!elements) return;
+
+    for (const el of elements) {
+      if (!el) continue;
+      const nodeG = el.closest ? el.closest('.mm-node-g') : null;
+      if (nodeG) {
+        const targetId = nodeG.getAttribute('data-id');
+        if (targetId && targetId !== draggedId && !this.isDescendant(draggedId, targetId)) {
+          this.reparentDropTargetId = targetId;
+          nodeG.classList.add('reparent-drop-target');
+          break;
+        }
+      }
+    }
+  },
+
+  createFloatingTopic(x, y, text = 'SUJET FLOTTANT') {
+    const id = `float_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+    const colors = ['#0284c7', '#2563eb', '#0d9488', '#d97706', '#7c3aed', '#db2777'];
+    const color = colors[(this.floatingTopics?.length || 0) % colors.length];
+
+    const newTopic = {
+      id: id,
+      text: text.toUpperCase(),
+      ref: '',
+      note: '',
+      color: color,
+      x: x !== undefined ? x : 200,
+      y: y !== undefined ? y : 100,
+      width: 100,
+      height: 32,
+      level: 1,
+      side: 'right',
+      children: [],
+      isFloating: true
+    };
+
+    this.floatingTopics = this.floatingTopics || [];
+    this.floatingTopics.push(newTopic);
+
+    this.layoutTree();
+    if (this.viewMode === 'outline') {
+      this.renderOutlineView();
+      const newEl = document.querySelector(`.mm-outline-text[data-id="${id}"]`);
+      if (newEl) this.startOutlineInlineEdit(id, newEl);
+    } else {
+      this.draw();
+      this.selectNode(id);
+      this.startInlineEdit(id);
+    }
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast('Nouveau sujet flottant créé');
+    }
+    return newTopic;
+  },
+
+  detachAsFloatingTopic(nodeId) {
+    if (!nodeId || nodeId === 'root') return;
+    const node = this.findNode(nodeId);
+    if (!node || node.isFloating) return;
+
+    const parent = this.findParent(nodeId);
+    if (!parent) return;
+
+    // Retirer de son parent
+    parent.children = parent.children.filter(c => c.id !== nodeId);
+
+    // Calculer une position par défaut à proximité de l'ancienne position
+    const currentX = node.x || 300;
+    const currentY = node.y || 200;
+    const offset = 40;
+
+    node.isFloating = true;
+    node.x = currentX + (node.side === 'left' ? -offset : offset);
+    node.y = currentY;
+    node.level = 1;
+    node.side = 'right';
+    node.offsetX = 0;
+    node.offsetY = 0;
+
+    this.floatingTopics = this.floatingTopics || [];
+    this.floatingTopics.push(node);
+
+    this.selectedNodeId = node.id;
+    this.layoutTree();
+    if (this.viewMode === 'outline') {
+      this.renderOutlineView();
+    } else {
+      this.draw();
+      this.updateSelectionState();
+    }
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Branche « ${node.text} » détachée en sujet flottant`);
+    }
   },
 
   escapeHtml(str) {
@@ -3513,6 +3967,14 @@ const MindMapView = {
             <span class="mm-ctx-label">Réinitialiser la position</span>
           </div>
         ` : ''}
+        ${!node?.isFloating ? `
+          <div class="mm-ctx-item" data-action="detach-floating">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </span>
+            <span class="mm-ctx-label">Détacher en sujet flottant</span>
+          </div>
+        ` : ''}
         <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="copy">
           <span class="mm-ctx-icon">
@@ -3629,6 +4091,13 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Nouvelle idée maîtresse (BOI)</span>
           <span class="mm-ctx-shortcut">Tab</span>
+        </div>
+        <div class="mm-ctx-item" data-action="add-floating">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="6"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+          </span>
+          <span class="mm-ctx-label">Nouveau sujet flottant</span>
+          <span class="mm-ctx-shortcut">Alt+F</span>
         </div>
         ${this.clipboardNode ? `
           <div class="mm-ctx-item" data-action="paste">
@@ -3772,6 +4241,16 @@ const MindMapView = {
             break;
           case 'add-boi':
             this.addChildToNode(this.tree);
+            break;
+          case 'add-floating': {
+            const rect = this.svg?.getBoundingClientRect() || { left: 0, top: 0, width: 800, height: 600 };
+            const mouseSvgX = (clientX - rect.left - this.viewBox.x) / this.viewBox.scale;
+            const mouseSvgY = (clientY - rect.top - this.viewBox.y) / this.viewBox.scale;
+            this.createFloatingTopic(mouseSvgX, mouseSvgY);
+            break;
+          }
+          case 'detach-floating':
+            if (targetNodeId) this.detachAsFloatingTopic(targetNodeId);
             break;
           case 'edit':
             if (targetNodeId) this.startInlineEdit(targetNodeId);
