@@ -3611,9 +3611,13 @@ const MindMapView = {
     input.type = 'text';
     input.value = node.text;
     input.placeholder = 'MOT-CLÉ';
-    input.className = 'mm-inline-editor';
+    const isPaperMode = !!(this.container && this.container.classList.contains('paper-mode'));
+    input.className = isPaperMode ? 'mm-inline-editor paper-mode' : 'mm-inline-editor';
     input.style.position = 'fixed';
     input.style.background = 'transparent';
+    if (isPaperMode) {
+      input.style.color = '#0f172a';
+    }
     input.style.border = 'none';
     input.style.outline = 'none';
     input.style.boxShadow = 'none';

@@ -32912,14 +32912,15 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
   background: var(--bg-reading, var(--bg-app, #1c1815));
 }
 
+/* ==========================================================================
+   MODE FEUILLE BLANCHE (PAPER MODE) DU MIND MAP
+   Garantit une lisibilité irréprochable même si l'application globale est en mode sombre
+   ========================================================================== */
 .note-mindmap-container.paper-mode {
   background: #ffffff !important;
 }
 
-.note-mindmap-container.paper-mode .mm-branch-text {
-  fill: #0f172a !important;
-}
-
+/* Nœud central en feuille blanche */
 .note-mindmap-container.paper-mode .mm-root-rect {
   fill: #ffffff !important;
   stroke: #2563eb !important;
@@ -32927,6 +32928,74 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
 
 .note-mindmap-container.paper-mode .mm-root-text {
   fill: #0f172a !important;
+}
+
+/* Boîtes de branches & sujets flottants en feuille blanche */
+.note-mindmap-container.paper-mode .mm-branch-box,
+.note-mindmap-container.paper-mode .mm-floating-box {
+  fill: #ffffff !important;
+}
+
+/* Textes des branches (tous niveaux) parfaitement foncés et nets */
+.note-mindmap-container.paper-mode .mm-branch-text,
+.note-mindmap-container.paper-mode .mm-node-g .mm-branch-text {
+  fill: #0f172a !important;
+}
+
+/* Éditeur inline transparent avec texte sombre en mode feuille blanche */
+.note-mindmap-container.paper-mode .mm-inline-editor,
+.mm-inline-editor.paper-mode,
+body.theme-dark .mm-inline-editor.paper-mode,
+body[class*="palette-dark"] .mm-inline-editor.paper-mode {
+  color: #0f172a !important;
+  caret-color: #2563eb !important;
+}
+
+/* Pastilles, enclos, boutons d'actions et relations en feuille blanche */
+.note-mindmap-container.paper-mode .mm-boundary-label-pill {
+  fill: #ffffff !important;
+}
+
+.note-mindmap-container.paper-mode .mm-note-pill circle {
+  fill: #ffffff !important;
+}
+
+.note-mindmap-container.paper-mode .mm-action-circle {
+  fill: #ffffff !important;
+  stroke: #cbd5e1 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-action-text {
+  fill: #64748b !important;
+}
+
+.note-mindmap-container.paper-mode .mm-rel-label-rect {
+  fill: #ffffff !important;
+  stroke: #cbd5e1 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-rel-label-text {
+  fill: #475569 !important;
+}
+
+/* Vue Plan en mode feuille blanche */
+.note-mindmap-container.paper-mode .mindmap-outline-container {
+  background: #fcf9f2 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-sheet {
+  background: #ffffff !important;
+  border-color: #e5dfd5 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-boi-block {
+  background: #f9f7f2 !important;
+  border-color: #e8e3d9 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-text,
+.note-mindmap-container.paper-mode .mm-outline-root-title {
+  color: #0f172a !important;
 }
 
 .mindmap-wrapper {
@@ -32976,13 +33045,13 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
   cursor: pointer;
 }
 
-body.theme-dark .mm-root-text,
-body[class*="palette-dark"] .mm-root-text {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-root-text,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-text {
   fill: #f8fafc;
 }
 
-body.theme-dark .mm-root-rect,
-body[class*="palette-dark"] .mm-root-rect {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-root-rect,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-rect {
   fill: var(--bg-card, #1e293b);
 }
 
@@ -33015,8 +33084,8 @@ body[class*="palette-dark"] .mm-root-rect {
   font-weight: 600 !important;
 }
 
-body.theme-dark .mm-branch-text,
-body[class*="palette-dark"] .mm-branch-text {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-branch-text,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-branch-text {
   fill: #f8fafc;
 }
 
@@ -33056,8 +33125,8 @@ body[class*="palette-dark"] .mm-branch-text {
   transition: all 0.15s ease;
 }
 
-body.theme-dark .mm-action-circle,
-body[class*="palette-dark"] .mm-action-circle {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-action-circle,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-action-circle {
   fill: #334155;
   stroke: #475569;
 }
@@ -33138,8 +33207,8 @@ body[class*="palette-dark"] .mm-action-circle {
   caret-color: var(--accent-blue, #2563eb);
 }
 
-body.theme-dark .mm-inline-editor,
-body[class*="palette-dark"] .mm-inline-editor {
+body.theme-dark .mm-inline-editor:not(.paper-mode),
+body[class*="palette-dark"] .mm-inline-editor:not(.paper-mode) {
   background: transparent !important;
   color: #f8fafc;
   caret-color: #60a5fa;
@@ -34637,8 +34706,8 @@ body[class*="palette-dark"] .mm-connecting-text kbd {
   transition: all 0.15s ease;
 }
 
-body.theme-dark .mm-rel-label-rect,
-body[class*="palette-dark"] .mm-rel-label-rect {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-rel-label-rect,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-rel-label-rect {
   fill: #1e293b;
   stroke: #475569;
 }
@@ -34650,8 +34719,8 @@ body[class*="palette-dark"] .mm-rel-label-rect {
   letter-spacing: 0.3px;
 }
 
-body.theme-dark .mm-rel-label-text,
-body[class*="palette-dark"] .mm-rel-label-text {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-rel-label-text,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-rel-label-text {
   fill: #94a3b8;
 }
 
@@ -35052,8 +35121,8 @@ body[class*="palette-dark"] .mm-rel-btn-cancel:hover {
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.08));
 }
 
-body.theme-dark .mm-boundary-label-pill,
-body[class*="palette-dark"] .mm-boundary-label-pill {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-boundary-label-pill,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-boundary-label-pill {
   fill: #1e293b;
 }
 
@@ -35454,7 +35523,8 @@ body[class*="palette-dark"] .mm-style-check {
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
 }
 
-body.theme-dark .mm-branch-box {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-branch-box,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-branch-box {
   fill: #1e293b !important;
 }
 
@@ -35647,7 +35717,8 @@ body.theme-dark .note-badge-inline-input {
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.16));
 }
 
-body.theme-dark .mm-floating-box {
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-floating-box,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-floating-box {
   fill: #1e293b !important;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
 }
