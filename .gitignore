@@ -67,25 +67,11 @@ Thumbs.db
 **/scratch/
 scratch/
 
-# Non-pack & copyrighted bibles (kept local, not tracked in Git)
-**/data/bibles/APEE/
-**/data/bibles/BDJ/
-**/data/bibles/BDS/
-**/data/bibles/BENFS/
-**/data/bibles/CAHEN/
-**/data/bibles/CRA/
-**/data/bibles/JXLFR/
-**/data/bibles/LAU/
-**/data/bibles/NBS/
-**/data/bibles/NEG79/
-**/data/bibles/NFC/
-**/data/bibles/OLT/
-**/data/bibles/Parole_Vivante/
-**/data/bibles/PDV2017/
-**/data/bibles/Segond_21/
-**/data/bibles/SV/
-**/data/bibles/TOB/
-**/data/bibles/gutenberg_2680.json
+# Data modules (kept local, hosted externally on open-shema-data)
+**/data/bibles/*
+!**/data/bibles/.gitkeep
+**/data/dictionaries/*
+!**/data/dictionaries/.gitkeep
 **/data/library_user_*.json
 **/data/ebooks/
 **/data/covers/epub_*
