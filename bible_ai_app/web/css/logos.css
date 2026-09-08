@@ -35633,6 +35633,12 @@ body.theme-dark .mm-floating-box {
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
 }
 
+.mm-node-g.mm-floating-node .mm-branch-text {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
 /* Cible de drop lors du réarrangement / rattachement (Reparenting) */
 .mm-node-g.reparent-drop-target .mm-branch-box,
 .mm-node-g.reparent-drop-target .mm-root-rect {

@@ -2380,9 +2380,20 @@ const MindMapView = {
       text.textContent = node.text;
 
       let badgeX;
-      const textW = node.textWidth || this.getTextWidth(node.text, 11.5, '700');
+      const textW = node.textWidth || this.getTextWidth(node.text, node.isFloating ? 12 : 11.5, node.isFloating ? '800' : '700');
 
-      if (isTopDown) {
+      if (node.isFloating) {
+        if (!node.ref && !node.note) {
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('x', 0);
+          badgeX = textW / 2 + 8;
+        } else {
+          const startX = -(node.contentWidth || textW) / 2;
+          text.setAttribute('text-anchor', 'start');
+          text.setAttribute('x', startX);
+          badgeX = startX + textW + 8;
+        }
+      } else if (isTopDown) {
         const startX = -(node.contentWidth || textW) / 2;
         text.setAttribute('text-anchor', 'start');
         text.setAttribute('x', startX);
@@ -3053,12 +3064,14 @@ const MindMapView = {
     if (!nodeG) return;
 
     const isRoot = nodeId === 'root';
+    const isFloating = !!node.isFloating;
+    const isCentered = isRoot || isFloating;
     const textEl = nodeG.querySelector('.mm-branch-text') || nodeG.querySelector('.mm-root-text');
     const targetRect = textEl ? textEl.getBoundingClientRect() : nodeG.getBoundingClientRect();
 
     const scale = this.viewBox?.scale || 1;
-    const baseFontSize = isRoot ? 14 : 11.5;
-    const isLeft = node.side === 'left';
+    const baseFontSize = isRoot ? 14 : (isFloating ? 12 : 11.5);
+    const isLeft = node.side === 'left' && !isFloating;
 
     // Masquer le texte SVG et les boutons d'actions pendant l'édition
     nodeG.classList.add('editing');
@@ -3085,14 +3098,14 @@ const MindMapView = {
     input.style.transform = `scale(${scale})`;
     input.style.caretColor = node.color || 'var(--accent-blue, #2563eb)';
 
-    const unscaledTextW = this.getTextWidth(node.text, baseFontSize, '700');
+    const unscaledTextW = this.getTextWidth(node.text, baseFontSize, isFloating ? '800' : '700');
     const initialUnscaledW = Math.max(unscaledTextW + 12, 40);
     input.style.width = `${initialUnscaledW}px`;
 
     if (isLeft) {
       input.style.textAlign = 'right';
       input.style.left = `${Math.round(targetRect.right - initialUnscaledW * scale)}px`;
-    } else if (isRoot) {
+    } else if (isCentered) {
       input.style.textAlign = 'center';
       const centerX = targetRect.left + targetRect.width / 2;
       input.style.left = `${Math.round(centerX - (initialUnscaledW * scale) / 2)}px`;
@@ -3108,12 +3121,12 @@ const MindMapView = {
     // Redimensionnement dynamique continu au fil de la frappe
     const handleDynamicResize = () => {
       const currentVal = input.value || ' ';
-      const curW = Math.max(this.getTextWidth(currentVal, baseFontSize, '700') + 12, 40);
+      const curW = Math.max(this.getTextWidth(currentVal, baseFontSize, isFloating ? '800' : '700') + 12, 40);
       input.style.width = `${curW}px`;
 
       if (isLeft) {
         input.style.left = `${Math.round(targetRect.right - curW * scale)}px`;
-      } else if (isRoot) {
+      } else if (isCentered) {
         const centerX = targetRect.left + targetRect.width / 2;
         input.style.left = `${Math.round(centerX - (curW * scale) / 2)}px`;
       } else {
