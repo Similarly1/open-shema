@@ -32996,6 +32996,25 @@ body[class*="palette-dark"] .mm-root-rect {
   fill: var(--text-primary, #1e293b);
 }
 
+/* Hiérarchie de Buzan : Niveau 1 (BOIs) plus gros et imposant */
+.mm-node-g.mm-level-1 .mm-branch-text {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.6px;
+}
+
+.mm-node-g.mm-level-2 .mm-branch-text {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+}
+
+.mm-node-g.mm-level-3 .mm-branch-text,
+.mm-node-g.mm-level-4 .mm-branch-text,
+.mm-node-g.mm-level-5 .mm-branch-text {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+}
+
 body.theme-dark .mm-branch-text,
 body[class*="palette-dark"] .mm-branch-text {
   fill: #f8fafc;

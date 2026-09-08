@@ -1428,13 +1428,14 @@ const MindMapView = {
       node.width = Math.max(88, node.contentWidth + 28);
       node.height = 32;
     } else if (node.level === 0) {
-      const textW = this.getTextWidth(node.text, 13, '800');
+      const textW = this.getTextWidth(node.text, 14, '800');
       node.textWidth = textW;
       node.markerWidth = 0;
       node.width = Math.max(120, textW + 48);
       node.height = 46;
-    } else {
-      const textW = this.getTextWidth(node.text, 11.5, '700');
+    } else if (node.level === 1) {
+      // NIVEAU 1 (BOIs - Règles de Buzan : plus gros, majuscules, autoritaire)
+      const textW = this.getTextWidth(node.text, 13.5, '800');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1448,9 +1449,9 @@ const MindMapView = {
 
       let refW = 0;
       if (node.ref) {
-        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 9, '700');
-        node.refPillWidth = Math.max(38, Math.min(84, refTextW + 14));
-        refW = node.refPillWidth + 8; // largeur de pastille + espacement
+        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 9.5, '700');
+        node.refPillWidth = Math.max(40, Math.min(88, refTextW + 16));
+        refW = node.refPillWidth + 8;
       } else {
         node.refPillWidth = 0;
       }
@@ -1458,38 +1459,16 @@ const MindMapView = {
       let noteW = 0;
       if (node.note) {
         node.notePillWidth = 18;
-        noteW = 18 + 8; // pastille ronde 18px + espacement
+        noteW = 18 + 8;
       } else {
         node.notePillWidth = 0;
       }
 
-      // La largeur de la branche englobe le mot, le marqueur et ses badges avec marges aérées
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(70, node.contentWidth + 24);
-      node.height = 28;
-    }
-
-    if (!node.children || node.children.length === 0) {
-      node.totalHeight = node.height + 18; // Espace négatif
-      return;
-    }
-
-    let sum = 0;
-    node.children.forEach(child => {
-      this.measureNode(child);
-      sum += child.totalHeight;
-    });
-    node.totalHeight = Math.max(node.height + 18, sum);
-  },
-
-  measureTopDown(node) {
-    if (node.level === 0) {
-      const textW = this.getTextWidth(node.text, 13, '800');
-      node.textWidth = textW;
-      node.markerWidth = 0;
-      node.width = Math.max(120, textW + 48);
-      node.height = 46;
-    } else {
+      node.width = Math.max(84, node.contentWidth + 28);
+      node.height = 34; // Plus gros que les niveaux inférieurs (34px vs 28px/24px)
+    } else if (node.level === 2) {
+      // NIVEAU 2 (Sous-branches)
       const textW = this.getTextWidth(node.text, 11.5, '700');
       node.textWidth = textW;
 
@@ -1520,8 +1499,163 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(76, node.contentWidth + 24);
+      node.width = Math.max(70, node.contentWidth + 24);
       node.height = 28;
+    } else {
+      // NIVEAU 3+ (Détails fins)
+      const textW = this.getTextWidth(node.text, 10.5, '600');
+      node.textWidth = textW;
+
+      let markerW = 0;
+      if (node.marker) {
+        const isP = String(node.marker).toLowerCase().startsWith('p');
+        node.markerWidth = isP ? 22 : 18;
+        markerW = node.markerWidth + 6;
+      } else {
+        node.markerWidth = 0;
+      }
+
+      let refW = 0;
+      if (node.ref) {
+        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 8.5, '700');
+        node.refPillWidth = Math.max(36, Math.min(80, refTextW + 12));
+        refW = node.refPillWidth + 6;
+      } else {
+        node.refPillWidth = 0;
+      }
+
+      let noteW = 0;
+      if (node.note) {
+        node.notePillWidth = 18;
+        noteW = 18 + 6;
+      } else {
+        node.notePillWidth = 0;
+      }
+
+      node.contentWidth = markerW + textW + refW + noteW;
+      node.width = Math.max(62, node.contentWidth + 20);
+      node.height = 24;
+    }
+
+    if (!node.children || node.children.length === 0) {
+      node.totalHeight = node.height + 18; // Espace négatif
+      return;
+    }
+
+    let sum = 0;
+    node.children.forEach(child => {
+      this.measureNode(child);
+      sum += child.totalHeight;
+    });
+    node.totalHeight = Math.max(node.height + 18, sum);
+  },
+
+  measureTopDown(node) {
+    if (node.level === 0) {
+      const textW = this.getTextWidth(node.text, 14, '800');
+      node.textWidth = textW;
+      node.markerWidth = 0;
+      node.width = Math.max(120, textW + 48);
+      node.height = 46;
+    } else if (node.level === 1) {
+      const textW = this.getTextWidth(node.text, 13.5, '800');
+      node.textWidth = textW;
+
+      let markerW = 0;
+      if (node.marker) {
+        const isP = String(node.marker).toLowerCase().startsWith('p');
+        node.markerWidth = isP ? 22 : 18;
+        markerW = node.markerWidth + 6;
+      } else {
+        node.markerWidth = 0;
+      }
+
+      let refW = 0;
+      if (node.ref) {
+        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 9.5, '700');
+        node.refPillWidth = Math.max(40, Math.min(88, refTextW + 16));
+        refW = node.refPillWidth + 8;
+      } else {
+        node.refPillWidth = 0;
+      }
+
+      let noteW = 0;
+      if (node.note) {
+        node.notePillWidth = 18;
+        noteW = 18 + 8;
+      } else {
+        node.notePillWidth = 0;
+      }
+
+      node.contentWidth = markerW + textW + refW + noteW;
+      node.width = Math.max(84, node.contentWidth + 28);
+      node.height = 34;
+    } else if (node.level === 2) {
+      const textW = this.getTextWidth(node.text, 11.5, '700');
+      node.textWidth = textW;
+
+      let markerW = 0;
+      if (node.marker) {
+        const isP = String(node.marker).toLowerCase().startsWith('p');
+        node.markerWidth = isP ? 22 : 18;
+        markerW = node.markerWidth + 6;
+      } else {
+        node.markerWidth = 0;
+      }
+
+      let refW = 0;
+      if (node.ref) {
+        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 9, '700');
+        node.refPillWidth = Math.max(38, Math.min(84, refTextW + 14));
+        refW = node.refPillWidth + 8;
+      } else {
+        node.refPillWidth = 0;
+      }
+
+      let noteW = 0;
+      if (node.note) {
+        node.notePillWidth = 18;
+        noteW = 18 + 8;
+      } else {
+        node.notePillWidth = 0;
+      }
+
+      node.contentWidth = markerW + textW + refW + noteW;
+      node.width = Math.max(72, node.contentWidth + 24);
+      node.height = 28;
+    } else {
+      const textW = this.getTextWidth(node.text, 10.5, '600');
+      node.textWidth = textW;
+
+      let markerW = 0;
+      if (node.marker) {
+        const isP = String(node.marker).toLowerCase().startsWith('p');
+        node.markerWidth = isP ? 22 : 18;
+        markerW = node.markerWidth + 6;
+      } else {
+        node.markerWidth = 0;
+      }
+
+      let refW = 0;
+      if (node.ref) {
+        const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 8.5, '700');
+        node.refPillWidth = Math.max(36, Math.min(80, refTextW + 12));
+        refW = node.refPillWidth + 6;
+      } else {
+        node.refPillWidth = 0;
+      }
+
+      let noteW = 0;
+      if (node.note) {
+        node.notePillWidth = 18;
+        noteW = 18 + 6;
+      } else {
+        node.notePillWidth = 0;
+      }
+
+      node.contentWidth = markerW + textW + refW + noteW;
+      node.width = Math.max(64, node.contentWidth + 20);
+      node.height = 24;
     }
 
     if (!node.children || node.children.length === 0) {
@@ -1564,19 +1698,48 @@ const MindMapView = {
   },
 
   layoutSide(bois, side) {
+    if (!bois || bois.length === 0) return;
+
     const totalHeight = bois.reduce((acc, b) => acc + b.totalHeight, 0);
-    let currentY = -totalHeight / 2;
-
     const dir = side === 'right' ? 1 : -1;
-    const rootGap = 160; // Distance du noyau aux premiers BOIs
+    const N = bois.length;
 
+    // Règles de Buzan : tous les BOIs (niveau 1) sont à la même distance uniforme du bloc principal
+    const rootW = this.tree ? (this.tree.width || 140) : 140;
+    const rootH = this.tree ? (this.tree.height || 46) : 46;
+    const uniformDist = 115; // Distance constante entre le bord du bloc central et le bord du BOI
+
+    if (N === 1) {
+      const boi = bois[0];
+      boi.x = dir * (rootW / 2 + uniformDist + boi.width / 2);
+      boi.y = 0;
+      this.layoutChildren(boi, side);
+      return;
+    }
+
+    // Répartition radiale équilibrée : chaque BOI est exactement à la même distance du bloc central
+    const maxAngleDeg = Math.min(50, 16 + (N - 1) * 8.5);
+    const maxAngleRad = (maxAngleDeg * Math.PI) / 180;
+
+    let cumulativeHeight = 0;
     bois.forEach(boi => {
-      const centerY = currentY + boi.totalHeight / 2;
-      boi.x = dir * rootGap;
-      boi.y = centerY;
+      const boiCenterY = cumulativeHeight + boi.totalHeight / 2;
+      const frac = totalHeight > 0 ? (boiCenterY / totalHeight) : 0.5;
+      const angle = -maxAngleRad + frac * (2 * maxAngleRad);
+
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
+
+      // Point sur le bord de l'ellipse du nœud racine
+      const rootEdgeX = dir * (rootW / 2) * cosA;
+      const rootEdgeY = (rootH / 2) * sinA;
+
+      // Position du BOI : distance constante 'uniformDist' depuis le bord du bloc principal
+      boi.x = rootEdgeX + dir * (uniformDist + boi.width / 2) * cosA;
+      boi.y = rootEdgeY + (uniformDist * 0.95 + boi.height / 2) * sinA;
 
       this.layoutChildren(boi, side);
-      currentY += boi.totalHeight;
+      cumulativeHeight += boi.totalHeight;
     });
   },
 
@@ -2390,7 +2553,6 @@ const MindMapView = {
         let x1 = node.x;
         let y1 = isRoot ? node.y + node.height / 2 : (isBox ? node.y + (node.height || 28) / 2 : node.y + 10);
 
-        // Si nœud central avec plusieurs branches, répartir les ancres horizontales
         if (isRoot && totalChildren > 1) {
           const childIdx = node.children.indexOf(child);
           const maxSpanX = Math.min((node.width || 120) * 0.7, (totalChildren - 1) * 16);
@@ -2401,10 +2563,17 @@ const MindMapView = {
         const x2 = child.x;
         const y2 = isBox ? child.y - (child.height || 28) / 2 : child.y + 10;
 
-        // Lignes plus étroites vers le sujet central (2.0px - 2.5px max au lieu de 5.2px)
-        const strokeWidth = isRoot 
-          ? (totalChildren >= 7 ? 2.0 : (totalChildren >= 4 ? 2.3 : 2.6))
-          : Math.max(1.8, 3.0 - child.level * 0.5);
+        // Règles de BUZAN : hiérarchie visuelle forte (niveau 1 plus gros, s'affinant ensuite)
+        let strokeWidth;
+        if (isRoot) {
+          strokeWidth = 4.2; // Branche maîtresse forte et organique (Buzan)
+        } else if (child.level === 2) {
+          strokeWidth = 2.6; // Branche secondaire
+        } else if (child.level === 3) {
+          strokeWidth = 1.9; // Branche tertiaire
+        } else {
+          strokeWidth = 1.5; // Ramification fine
+        }
         const strokeColor = child.color || 'var(--text-secondary)';
 
         let pathD = '';
@@ -2424,7 +2593,7 @@ const MindMapView = {
         } else {
           // 'curve' (Bézier cubique)
           const dy = Math.abs(y2 - y1);
-          const factor = isRoot ? 0.38 : 0.48;
+          const factor = isRoot ? 0.42 : 0.48;
           const cx1 = x1;
           const cy1 = y1 + dy * factor;
           const cx2 = x2;
@@ -2451,7 +2620,8 @@ const MindMapView = {
           underline.setAttribute('x2', underX2);
           underline.setAttribute('y2', child.y + 10);
           underline.setAttribute('stroke', strokeColor);
-          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.7));
+          const underlineW = child.level === 1 ? 3.0 : (child.level === 2 ? 2.0 : 1.5);
+          underline.setAttribute('stroke-width', underlineW);
           underline.setAttribute('stroke-linecap', 'round');
           this.viewportG.appendChild(underline);
         }
@@ -2459,34 +2629,35 @@ const MindMapView = {
       } else {
         // Radiant / Arbre logique (gauche / droite)
         const childSide = child.side || 'right';
-        const sameSideChildren = isRoot 
-          ? node.children.filter(c => (c.side || 'right') === childSide)
-          : [];
-        const totalOnSide = sameSideChildren.length;
 
-        const x1 = isRoot 
-          ? (childSide === 'right' ? node.width / 2 : -node.width / 2) 
-          : (childSide === 'right' ? node.x + node.width / 2 : node.x - node.width / 2);
-
-        let y1 = isRoot ? node.y : (isBox ? node.y : node.y + 10);
-
-        // Si nœud central avec plusieurs branches sur ce côté,
-        // répartir délicatement les ancres Y le long de la hauteur du nœud central
-        if (isRoot && totalOnSide > 1) {
-          const idxOnSide = sameSideChildren.indexOf(child);
+        // Position de départ sur le bloc principal : démarre précisément sur le bord de l'ellipse orienté vers le BOI
+        let x1, y1;
+        if (isRoot) {
+          const dir = childSide === 'right' ? 1 : -1;
+          const rootW = node.width || 140;
           const rootH = node.height || 46;
-          const maxSpanY = Math.min(rootH * 0.65, (totalOnSide - 1) * 7);
-          const yStep = maxSpanY / (totalOnSide - 1);
-          y1 = node.y - maxSpanY / 2 + idxOnSide * yStep;
+          const angle = Math.atan2(child.y - node.y, Math.abs(child.x - node.x));
+          x1 = dir * (rootW / 2) * Math.cos(angle);
+          y1 = (rootH / 2) * Math.sin(angle);
+        } else {
+          x1 = childSide === 'right' ? node.x + node.width / 2 : node.x - node.width / 2;
+          y1 = isBox ? node.y : node.y + 10;
         }
 
         const x2 = childSide === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
         const y2 = isBox ? child.y : child.y + 10;
 
-        // Lignes plus étroites vers le sujet central (2.0px - 2.5px max au lieu de 5.5px)
-        const strokeWidth = isRoot 
-          ? (totalOnSide >= 6 ? 2.0 : (totalOnSide >= 4 ? 2.3 : 2.6))
-          : Math.max(1.8, 3.0 - child.level * 0.5);
+        // Règles de BUZAN : hiérarchie visuelle forte (niveau 1 plus épais, s'affinant ensuite)
+        let strokeWidth;
+        if (isRoot) {
+          strokeWidth = 4.2; // Ligne maîtresse forte et organique (Buzan)
+        } else if (child.level === 2) {
+          strokeWidth = 2.6; // Branche secondaire
+        } else if (child.level === 3) {
+          strokeWidth = 1.9; // Branche tertiaire
+        } else {
+          strokeWidth = 1.5; // Ramification fine
+        }
         const strokeColor = child.color || 'var(--text-secondary)';
 
         let pathD = '';
@@ -2507,7 +2678,7 @@ const MindMapView = {
         } else {
           // Courbe de Bézier cubique organique avec départ fluide
           const dx = Math.abs(x2 - x1);
-          const factor = isRoot ? 0.38 : 0.48;
+          const factor = isRoot ? 0.42 : 0.48;
           const dir = childSide === 'right' ? 1 : -1;
           const cx1 = x1 + dir * dx * factor;
           const cy1 = y1;
@@ -2534,7 +2705,8 @@ const MindMapView = {
           underline.setAttribute('x2', underX2);
           underline.setAttribute('y2', y2);
           underline.setAttribute('stroke', strokeColor);
-          underline.setAttribute('stroke-width', Math.max(1.8, strokeWidth * 0.7));
+          const underlineW = child.level === 1 ? 3.0 : (child.level === 2 ? 2.0 : 1.5);
+          underline.setAttribute('stroke-width', underlineW);
           underline.setAttribute('stroke-linecap', 'round');
           this.viewportG.appendChild(underline);
         }
@@ -2550,9 +2722,11 @@ const MindMapView = {
     const isSelected = this.selectedNodeId === node.id;
     const isConnectingSource = this.connectingSourceId === node.id;
     const isTopDown = this.treeStructure === 'top-down';
+    const isLvl1 = node.level === 1;
+    const isLvl2 = node.level === 2;
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.setAttribute('class', `mm-node-g ${isRoot ? 'mm-root-node' : ''} ${isFloatingRoot ? 'mm-floating-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
+    g.setAttribute('class', `mm-node-g mm-level-${node.level} ${isRoot ? 'mm-root-node' : ''} ${isFloatingRoot ? 'mm-floating-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
     g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
     g.setAttribute('data-id', node.id);
 
@@ -2586,12 +2760,14 @@ const MindMapView = {
 
     } else {
       const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
-      const rx = (node.isFloating || this.nodeShape === 'pill') ? 14 : 7;
+      const isPill = node.isFloating || this.nodeShape === 'pill';
+      const rx = isPill ? (isLvl1 ? 17 : 14) : (isLvl1 ? 8 : 5);
       const boxW = node.width;
-      const boxH = node.height || 28;
+      const boxH = node.height || (isLvl1 ? 34 : 28);
+      const strokeW = node.isFloating ? '2' : (isLvl1 ? '2.2' : (isLvl2 ? '1.6' : '1.2'));
 
       if (isBox) {
-        // Boîte d'arrière-plan avec bordure colorée (Style XMind)
+        // Boîte d'arrière-plan avec bordure colorée (Style XMind & Buzan : Niveau 1 plus imposant)
         const boxRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         boxRect.setAttribute('x', -boxW / 2);
         boxRect.setAttribute('y', -boxH / 2);
@@ -2601,7 +2777,7 @@ const MindMapView = {
         boxRect.setAttribute('class', `mm-branch-box ${node.isFloating ? 'mm-floating-box' : this.nodeShape}`);
         boxRect.setAttribute('fill', 'var(--bg-card, #ffffff)');
         boxRect.setAttribute('stroke', node.color || 'var(--accent-blue)');
-        boxRect.setAttribute('stroke-width', node.isFloating ? '2' : '1.6');
+        boxRect.setAttribute('stroke-width', strokeW);
         if (isSelected) {
           boxRect.setAttribute('filter', 'url(#mm-select-glow)');
         }
@@ -2615,7 +2791,7 @@ const MindMapView = {
         tintRect.setAttribute('height', boxH);
         tintRect.setAttribute('rx', rx);
         tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
-        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : '0.08');
+        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.10' : '0.07'));
         g.appendChild(tintRect);
       }
 
@@ -2631,17 +2807,30 @@ const MindMapView = {
       hitRect.setAttribute('style', 'cursor: pointer;');
       g.appendChild(hitRect);
 
-      // Nœud de branche : Mot-clé
+      // Nœud de branche : Mot-clé (Buzan : plus gros pour niveau 1, majuscules)
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('dominant-baseline', isBox ? 'central' : 'bottom');
       text.setAttribute('y', isBox ? 0 : 5);
       text.setAttribute('class', 'mm-branch-text');
       text.setAttribute('fill', 'var(--text-primary)');
+      if (isLvl1) {
+        text.setAttribute('font-size', '13.5px');
+        text.setAttribute('font-weight', '800');
+        text.setAttribute('letter-spacing', '0.5px');
+      } else if (isLvl2) {
+        text.setAttribute('font-size', '11.5px');
+        text.setAttribute('font-weight', '700');
+      } else {
+        text.setAttribute('font-size', '10.5px');
+        text.setAttribute('font-weight', '600');
+      }
       text.textContent = node.text;
 
       let markerX = null;
       let badgeX;
-      const textW = node.textWidth || this.getTextWidth(node.text, node.isFloating ? 12 : 11.5, node.isFloating ? '800' : '700');
+      const baseFontSize = node.isFloating ? 12 : (isLvl1 ? 13.5 : (isLvl2 ? 11.5 : 10.5));
+      const baseFontWeight = node.isFloating || isLvl1 ? '800' : (isLvl2 ? '700' : '600');
+      const textW = node.textWidth || this.getTextWidth(node.text, baseFontSize, baseFontWeight);
       const isWideMarker = node.marker && String(node.marker).toLowerCase().startsWith('p');
       const markerW = node.marker ? ((isWideMarker ? 22 : 18) + 6) : 0;
       const markerHalf = isWideMarker ? 11 : 9;
@@ -3410,7 +3599,8 @@ const MindMapView = {
     const targetRect = textEl ? textEl.getBoundingClientRect() : nodeG.getBoundingClientRect();
 
     const scale = this.viewBox?.scale || 1;
-    const baseFontSize = isRoot ? 14 : (isFloating ? 12 : 11.5);
+    const baseFontSize = isRoot ? 14 : (isFloating ? 12 : (node.level === 1 ? 13.5 : (node.level === 2 ? 11.5 : 10.5)));
+    const baseFontWeight = isRoot || node.level === 1 || isFloating ? '800' : (node.level === 2 ? '700' : '600');
     const isLeft = node.side === 'left' && !isFloating;
 
     // Masquer le texte SVG et les boutons d'actions pendant l'édition
@@ -3433,12 +3623,13 @@ const MindMapView = {
     input.style.height = `${Math.max(16, Math.round(targetRect.height / scale))}px`;
     input.style.lineHeight = `${Math.max(16, Math.round(targetRect.height / scale))}px`;
     input.style.fontSize = `${baseFontSize}px`;
+    input.style.fontWeight = baseFontWeight;
     input.style.letterSpacing = '0.5px';
     input.style.transformOrigin = '0 0';
     input.style.transform = `scale(${scale})`;
     input.style.caretColor = node.color || 'var(--accent-blue, #2563eb)';
 
-    const unscaledTextW = this.getTextWidth(node.text, baseFontSize, isFloating ? '800' : '700');
+    const unscaledTextW = this.getTextWidth(node.text, baseFontSize, baseFontWeight);
     const initialUnscaledW = Math.max(unscaledTextW + 12, 40);
     input.style.width = `${initialUnscaledW}px`;
 
@@ -3461,7 +3652,7 @@ const MindMapView = {
     // Redimensionnement dynamique continu au fil de la frappe
     const handleDynamicResize = () => {
       const currentVal = input.value || ' ';
-      const curW = Math.max(this.getTextWidth(currentVal, baseFontSize, isFloating ? '800' : '700') + 12, 40);
+      const curW = Math.max(this.getTextWidth(currentVal, baseFontSize, baseFontWeight) + 12, 40);
       input.style.width = `${curW}px`;
 
       if (isLeft) {
