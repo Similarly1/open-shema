@@ -383,6 +383,13 @@ const MindMapView = {
             <div class="mm-help-tip">
               <strong>Astuce 100% Souris :</strong> Clic droit sur n'importe quel élément pour afficher toutes les options contextuelles, ou survolez une branche pour faire apparaître <span class="badge-mini">+</span> et <span class="badge-mini">×</span>.
             </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11.5px; color: var(--text-muted);">Spécification Markdown (.md)</span>
+              <button type="button" class="btn-secondary" id="mm-btn-open-markdown-guide" style="font-size: 11px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 5px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Guide Markdown</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -587,6 +594,13 @@ const MindMapView = {
     document.getElementById('mm-btn-palette')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cyclePalette(); });
     document.getElementById('mm-btn-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(); });
     document.getElementById('mm-btn-close-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(false); });
+    document.getElementById('mm-btn-open-markdown-guide')?.addEventListener('click', (e) => {
+      e.currentTarget?.blur();
+      this.toggleHelpDrawer(false);
+      if (typeof SettingsView !== 'undefined' && SettingsView.openMarkdownGuideModal) {
+        SettingsView.openMarkdownGuideModal('mindmap');
+      }
+    });
 
     // Options du popover de structure
     document.querySelectorAll('#mm-structure-popover .mm-structure-option').forEach(opt => {
@@ -4924,6 +4938,12 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Aide & Raccourcis</span>
           <span class="mm-ctx-shortcut">?</span>
+        </div>
+        <div class="mm-ctx-item" data-action="markdown-guide">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </span>
+          <span class="mm-ctx-label">Guide Spécification Markdown...</span>
         </div>
       `;
     }
