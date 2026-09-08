@@ -924,10 +924,17 @@ h1, h2, h3, h4, .font-title {
   line-height: 1.5;
 }
 
+.origin-list li > .origin-list-text,
+.origin-list li > div {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.5;
+}
+
 .origin-list svg {
   color: var(--accent-cyan);
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .origin-card.gold-border .origin-list svg {
