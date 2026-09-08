@@ -33732,5 +33732,83 @@ body[class*="palette-dark"] .mm-rel-btn-cancel:hover {
   }
 }
 
+/* ==========================================================================
+   GLISSER-DÉPOSER UNIVERSEL (DRAG & DROP BUZAN / XMIND)
+   ========================================================================== */
 
+/* Curseur grabbing global lors du drag */
+body.mm-dragging-node,
+body.mm-dragging-node * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
 
+/* Fantôme flottant translucide suivant le curseur */
+.mm-node-drag-ghost {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  border: 1.5px solid var(--accent-blue, #2563eb);
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  opacity: 0.95;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.1s ease;
+}
+
+.mm-node-drag-ghost .mm-ghost-badge {
+  background: var(--accent-blue, #2563eb);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+body.theme-dark .mm-node-drag-ghost,
+body[class*="palette-dark"] .mm-node-drag-ghost {
+  background: var(--bg-elevated, #1e293b);
+  color: #f1f5f9;
+  border-color: #3b82f6;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* Nœud cible lors du survol de glisser-déposer */
+.mm-node-g.drop-target-parent {
+  filter: drop-shadow(0 0 12px #3b82f6) !important;
+}
+
+.mm-node-g.drop-target-parent .mm-root-rect {
+  stroke: #3b82f6 !important;
+  stroke-width: 3.5px !important;
+  stroke-dasharray: 6,4 !important;
+  animation: mmDashFlow 0.8s linear infinite;
+}
+
+.mm-node-g.drop-target-parent .mm-branch-text {
+  fill: #2563eb !important;
+  font-weight: 900 !important;
+}
+
+/* Poignée de contrôle interactive de la courbure des liaisons */
+.mm-rel-handle {
+  cursor: grab;
+  transition: r 0.15s ease, stroke-width 0.15s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.mm-rel-handle:hover,
+.mm-relationship-g.selected .mm-rel-handle {
+  r: 7.5;
+  cursor: grabbing;
+  stroke-width: 2.5;
+}
