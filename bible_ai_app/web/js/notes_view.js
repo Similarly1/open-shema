@@ -112,6 +112,7 @@ const NotesView = {
       this.triggerAutoSave();
     });
     this.titleInput?.addEventListener('input', () => {
+      this.adjustTitleWidth();
       this.debouncedPushHistory();
       this.triggerAutoSave();
     });
@@ -799,7 +800,10 @@ const NotesView = {
   restoreHistoryState(state) {
     if (!state) return;
     if (this.contentInput) this.contentInput.innerHTML = state.html || '';
-    if (this.titleInput) this.titleInput.value = state.title || '';
+    if (this.titleInput) {
+      this.titleInput.value = state.title || '';
+      this.adjustTitleWidth();
+    }
     if (this.refInput) this.refInput.value = state.ref || '';
     if (this.tagsInput) this.tagsInput.value = state.tags || '';
     if (this.currentNote) {
@@ -1751,7 +1755,10 @@ const NotesView = {
     this.currentNote = note;
     const isMindmap = note.type === 'mindmap';
 
-    if (this.titleInput) this.titleInput.value = note.title || '';
+    if (this.titleInput) {
+      this.titleInput.value = note.title || '';
+      this.adjustTitleWidth();
+    }
     if (this.refInput) this.refInput.value = note.reference || '';
     if (this.tagsInput) this.tagsInput.value = note.tags || '';
     if (this.aiToggle) this.aiToggle.checked = note.include_in_ai !== false;
@@ -1947,6 +1954,15 @@ const NotesView = {
         btn.classList.remove('loading');
       }
     }
+  },
+
+  // Calcule la largeur compacte du champ titre pour laisser les badges sur la même ligne
+  adjustTitleWidth() {
+    if (!this.titleInput) return;
+    const val = this.titleInput.value || this.titleInput.placeholder || '';
+    const ch = Math.max(val.length, 2);
+    const w = Math.min(260, Math.max(50, Math.round(ch * 10.5 + 14)));
+    this.titleInput.style.width = `${w}px`;
   },
 
   // =========================================================================
