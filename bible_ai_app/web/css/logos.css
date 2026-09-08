@@ -35698,4 +35698,215 @@ body.theme-dark .mm-outline-floating-badge {
   flex: 1;
 }
 
+/* ==========================================================================
+   Marqueurs, Numérotation et Priorités Mind Map (Style XMind)
+   ========================================================================== */
+
+/* 1. Popover Marqueurs */
+.mm-marker-popover {
+  position: absolute;
+  bottom: 58px;
+  right: 180px;
+  width: 250px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  padding: 12px 14px;
+  z-index: 60;
+  animation: mmFadeIn 0.16s ease-out;
+  user-select: none;
+}
+
+body.theme-dark .mm-marker-popover,
+body[class*="palette-dark"] .mm-marker-popover {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+
+.mm-marker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+}
+
+body.theme-dark .mm-marker-header,
+body[class*="palette-dark"] .mm-marker-header {
+  border-color: #334155;
+}
+
+.mm-marker-title {
+  font-size: 11.5px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary, #64748b);
+}
+
+.mm-marker-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-secondary, #64748b);
+}
+
+body.theme-dark .mm-marker-badge,
+body[class*="palette-dark"] .mm-marker-badge {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.mm-marker-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.mm-marker-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.mm-marker-grid.numbers {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.mm-marker-grid.priorities {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.mm-marker-grid.symbols {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.mm-marker-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--m-bg, #0284c7);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, outline 0.12s ease;
+}
+
+.mm-marker-choice.wide {
+  border-radius: 6px;
+  font-size: 10px;
+  height: 24px;
+}
+
+.mm-marker-choice:hover {
+  transform: scale(1.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  filter: brightness(1.1);
+}
+
+.mm-marker-choice.active {
+  outline: 2.5px solid var(--accent-blue, #2563eb);
+  outline-offset: 2px;
+}
+
+.mm-marker-footer {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color, #f1f5f9);
+}
+
+body.theme-dark .mm-marker-footer,
+body[class*="palette-dark"] .mm-marker-footer {
+  border-color: #334155;
+}
+
+.mm-marker-clear-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+body.theme-dark .mm-marker-clear-btn,
+body[class*="palette-dark"] .mm-marker-clear-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.mm-marker-clear-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+body.theme-dark .mm-marker-clear-btn:hover,
+body[class*="palette-dark"] .mm-marker-clear-btn:hover {
+  background: #451a1a;
+  color: #f87171;
+  border-color: #7f1d1d;
+}
+
+/* 2. Badge Marqueur SVG sur les branches */
+.mm-node-marker-badge {
+  transition: transform 0.12s ease;
+}
+
+.mm-node-marker-badge:hover {
+  transform: scale(1.18);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25));
+}
+
+/* 3. Badge Marqueur dans la Vue Plan (Outliner) */
+.mm-outline-marker-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  font-size: 9.5px;
+  font-weight: 800;
+  margin-right: 6px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.mm-outline-marker-badge.wide {
+  border-radius: 4px;
+  min-width: 22px;
+  height: 16px;
+  font-size: 9px;
+  padding: 0 4px;
+}
+
+.mm-outline-marker-badge:hover {
+  transform: scale(1.15);
+  filter: brightness(1.1);
+}
+
+
 

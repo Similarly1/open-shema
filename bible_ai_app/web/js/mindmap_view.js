@@ -68,6 +68,27 @@ const MindMapView = {
     royal: ['#7c3aed', '#4f46e5', '#2563eb', '#9333ea', '#6366f1', '#c026d3', '#0284c7']
   },
 
+  // Marqueurs, numérotation et priorités (Style XMind)
+  MARKER_DEFS: {
+    '1': { label: '1', bg: '#ef4444', text: '#ffffff', isWide: false },
+    '2': { label: '2', bg: '#f97316', text: '#ffffff', isWide: false },
+    '3': { label: '3', bg: '#0284c7', text: '#ffffff', isWide: false },
+    '4': { label: '4', bg: '#10b981', text: '#ffffff', isWide: false },
+    '5': { label: '5', bg: '#8b5cf6', text: '#ffffff', isWide: false },
+    '6': { label: '6', bg: '#d946ef', text: '#ffffff', isWide: false },
+    '7': { label: '7', bg: '#06b6d4', text: '#ffffff', isWide: false },
+    '8': { label: '8', bg: '#eab308', text: '#1e293b', isWide: false },
+    '9': { label: '9', bg: '#64748b', text: '#ffffff', isWide: false },
+    'p1': { label: 'P1', bg: '#dc2626', text: '#ffffff', isWide: true },
+    'p2': { label: 'P2', bg: '#ea580c', text: '#ffffff', isWide: true },
+    'p3': { label: 'P3', bg: '#2563eb', text: '#ffffff', isWide: true },
+    'p4': { label: 'P4', bg: '#059669', text: '#ffffff', isWide: true },
+    'done': { label: '✓', bg: '#10b981', text: '#ffffff', isWide: false },
+    'progress': { label: '◐', bg: '#f59e0b', text: '#ffffff', isWide: false },
+    'star': { label: '★', bg: '#f59e0b', text: '#ffffff', isWide: false },
+    'alert': { label: '!', bg: '#ef4444', text: '#ffffff', isWide: false }
+  },
+
   // Icônes de squelette / structure
   STRUCTURE_ICONS: {
     radiant: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>',
@@ -140,6 +161,9 @@ const MindMapView = {
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-floating" title="Créer un sujet flottant indépendant (Alt+F ou Double-clic)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="7" stroke-dasharray="3 2"/><circle cx="7.5" cy="12" r="1.5" fill="currentColor"/><line x1="11" y1="12" x2="16" y2="12"/></svg>
+          </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-marker" title="Marqueurs, Numéros & Priorités (1-9, P1-P4, Statuts) — Touche M">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="15.5" font-size="10" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" title="Zoom avant (Ctrl + Molette)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -277,6 +301,50 @@ const MindMapView = {
           </div>
         </div>
 
+        <!-- Popover de sélection des Marqueurs & Priorités (style XMind) -->
+        <div class="mm-marker-popover hidden" id="mm-marker-popover">
+          <div class="mm-marker-header">
+            <span class="mm-marker-title">Marqueurs & Priorités</span>
+            <span class="mm-marker-badge">1 - 9 / M</span>
+          </div>
+
+          <div class="mm-marker-section-label">Numéros ordonnés (Touches 1 à 9)</div>
+          <div class="mm-marker-grid numbers">
+            <div class="mm-marker-choice" data-marker="1" style="--m-bg: #ef4444;" title="Numéro 1 (Touche 1)"><span>1</span></div>
+            <div class="mm-marker-choice" data-marker="2" style="--m-bg: #f97316;" title="Numéro 2 (Touche 2)"><span>2</span></div>
+            <div class="mm-marker-choice" data-marker="3" style="--m-bg: #0284c7;" title="Numéro 3 (Touche 3)"><span>3</span></div>
+            <div class="mm-marker-choice" data-marker="4" style="--m-bg: #10b981;" title="Numéro 4 (Touche 4)"><span>4</span></div>
+            <div class="mm-marker-choice" data-marker="5" style="--m-bg: #8b5cf6;" title="Numéro 5 (Touche 5)"><span>5</span></div>
+            <div class="mm-marker-choice" data-marker="6" style="--m-bg: #d946ef;" title="Numéro 6 (Touche 6)"><span>6</span></div>
+            <div class="mm-marker-choice" data-marker="7" style="--m-bg: #06b6d4;" title="Numéro 7 (Touche 7)"><span>7</span></div>
+            <div class="mm-marker-choice" data-marker="8" style="--m-bg: #eab308;" title="Numéro 8 (Touche 8)"><span style="color:#1e293b;">8</span></div>
+            <div class="mm-marker-choice" data-marker="9" style="--m-bg: #64748b;" title="Numéro 9 (Touche 9)"><span>9</span></div>
+          </div>
+
+          <div class="mm-marker-section-label" style="margin-top: 10px;">Priorités (P1 - P4)</div>
+          <div class="mm-marker-grid priorities">
+            <div class="mm-marker-choice wide" data-marker="p1" style="--m-bg: #dc2626;" title="Priorité 1 - Critique"><span>P1</span></div>
+            <div class="mm-marker-choice wide" data-marker="p2" style="--m-bg: #ea580c;" title="Priorité 2 - Majeure"><span>P2</span></div>
+            <div class="mm-marker-choice wide" data-marker="p3" style="--m-bg: #2563eb;" title="Priorité 3 - Normale"><span>P3</span></div>
+            <div class="mm-marker-choice wide" data-marker="p4" style="--m-bg: #059669;" title="Priorité 4 - Secondaire"><span>P4</span></div>
+          </div>
+
+          <div class="mm-marker-section-label" style="margin-top: 10px;">Statuts & Symboles</div>
+          <div class="mm-marker-grid symbols">
+            <div class="mm-marker-choice" data-marker="done" style="--m-bg: #10b981;" title="Terminé / Validé"><span>✓</span></div>
+            <div class="mm-marker-choice" data-marker="progress" style="--m-bg: #f59e0b;" title="En cours"><span>◐</span></div>
+            <div class="mm-marker-choice" data-marker="star" style="--m-bg: #f59e0b;" title="Étoile clé"><span>★</span></div>
+            <div class="mm-marker-choice" data-marker="alert" style="--m-bg: #ef4444;" title="Attention / Important"><span>!</span></div>
+          </div>
+
+          <div class="mm-marker-footer">
+            <button type="button" class="mm-marker-clear-btn" data-action="clear-marker" title="Effacer le marqueur (Touche 0)">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <span>Effacer le marqueur (0)</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Tiroir d'aide aux raccourcis clavier -->
         <div class="mindmap-help-drawer hidden" id="mindmap-help-drawer">
           <div class="mm-help-header">
@@ -288,6 +356,9 @@ const MindMapView = {
           </div>
           <div class="mm-help-content">
             <table class="mm-help-table">
+              <tr><td><kbd>1</kbd> à <kbd>9</kbd></td><td><strong>Numéroter / Marquer la branche</strong></td></tr>
+              <tr><td><kbd>0</kbd></td><td><strong>Effacer le marqueur de branche</strong></td></tr>
+              <tr><td><kbd>M</kbd></td><td><strong>Ouvrir le menu des marqueurs & priorités</strong></td></tr>
               <tr><td><kbd>Alt+P</kbd></td><td><strong>Basculer entre Vue Carte et Vue Plan</strong></td></tr>
               <tr><td><kbd>Alt+S</kbd></td><td><strong>Changer de squelette de mise en page</strong></td></tr>
               <tr><td><kbd>Alt+T</kbd></td><td><strong>Styles de connecteurs & formes de nœuds</strong></td></tr>
@@ -504,6 +575,10 @@ const MindMapView = {
       this.createFloatingTopic(centerSvgX + 140 + offset, centerSvgY + 60 + offset);
     });
     document.getElementById('mm-btn-cancel-connecting')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cancelConnecting(); });
+    document.getElementById('mm-btn-marker')?.addEventListener('click', (e) => {
+      e.currentTarget?.blur();
+      this.toggleMarkerPopover();
+    });
     document.getElementById('mm-btn-zoom-in')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(1.2); });
     document.getElementById('mm-btn-zoom-out')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(0.8); });
     document.getElementById('mm-btn-fit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.fitView(); });
@@ -538,6 +613,32 @@ const MindMapView = {
       }
     });
 
+    // Options du popover de marqueurs & priorités (style XMind)
+    document.getElementById('mm-marker-popover')?.addEventListener('click', (e) => {
+      const choice = e.target.closest('.mm-marker-choice');
+      if (choice) {
+        e.stopPropagation();
+        const marker = choice.getAttribute('data-marker');
+        if (!this.selectedNodeId || this.selectedNodeId === 'root') {
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Sélectionnez d\'abord une branche');
+          }
+          return;
+        }
+        this.setNodeMarker(this.selectedNodeId, marker);
+        this.toggleMarkerPopover(false);
+        return;
+      }
+      const clearBtn = e.target.closest('.mm-marker-clear-btn');
+      if (clearBtn) {
+        e.stopPropagation();
+        if (this.selectedNodeId && this.selectedNodeId !== 'root') {
+          this.setNodeMarker(this.selectedNodeId, null);
+        }
+        this.toggleMarkerPopover(false);
+      }
+    });
+
     // Fermer les popovers lors d'un clic extérieur
     window.addEventListener('click', (e) => {
       if (!e.target.closest('#mm-structure-popover') && !e.target.closest('#mm-btn-structure')) {
@@ -545,6 +646,9 @@ const MindMapView = {
       }
       if (!e.target.closest('#mm-styles-popover') && !e.target.closest('#mm-btn-styles')) {
         this.toggleStylesPopover(false);
+      }
+      if (!e.target.closest('#mm-marker-popover') && !e.target.closest('#mm-btn-marker')) {
+        this.toggleMarkerPopover(false);
       }
     });
 
@@ -664,6 +768,19 @@ const MindMapView = {
         if (this.selectedNodeId) this.startInlineEdit(this.selectedNodeId);
       } else if (e.key === 'r' || e.key === 'R') {
         this.fitView();
+      } else if (!e.ctrlKey && !e.altKey && !e.metaKey && (e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
+        this.toggleMarkerPopover();
+      } else if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key >= '1' && e.key <= '9') {
+        if (this.selectedNodeId && this.selectedNodeId !== 'root') {
+          e.preventDefault();
+          this.setNodeMarker(this.selectedNodeId, e.key);
+        }
+      } else if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key === '0') {
+        if (this.selectedNodeId && this.selectedNodeId !== 'root') {
+          e.preventDefault();
+          this.setNodeMarker(this.selectedNodeId, null);
+        }
       } else if (e.key === 'F4' || (e.altKey && (e.key === 'n' || e.key === 'N'))) {
         if (this.selectedNodeId && this.selectedNodeId !== 'root') {
           e.preventDefault();
@@ -790,6 +907,23 @@ const MindMapView = {
           text = text.replace(noteMatch[0], '').trim();
         }
 
+        // Extraction d'un marqueur <!-- marker: ... -->
+        let marker = null;
+        const markerMatch = text.match(/<!--\s*marker:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+        if (markerMatch) {
+          marker = markerMatch[1].trim().toLowerCase();
+          text = text.replace(markerMatch[0], '').trim();
+        }
+
+        // Support d'un préfixe optionnel [1], (1), [P1], etc.
+        if (!marker) {
+          const prefixMatch = text.match(/^\[([1-9]|p[1-4])\]\s*/i) || text.match(/^\(([1-9]|p[1-4])\)\s*/i);
+          if (prefixMatch) {
+            marker = prefixMatch[1].toLowerCase();
+            text = text.replace(prefixMatch[0], '').trim();
+          }
+        }
+
         // Extraction d'une référence biblique entre crochets ou parenthèses [Jean 3:16]
         const refMatch = text.match(/\[([A-Za-z0-9À-ÿ\s:]+)\]$/);
         if (refMatch) {
@@ -800,6 +934,7 @@ const MindMapView = {
         const newNode = {
           id: `node_${idCounter++}`,
           text: text.toUpperCase(), // Loi 4 de Buzan : MAJUSCULES
+          marker: marker,
           ref: ref,
           note: noteText,
           children: [],
@@ -896,18 +1031,34 @@ const MindMapView = {
     this.floatingTopics = [];
     if (markdownContent) {
       // 1. Blocs avec sous-arborescences
-      const blockFloatRegex = /<!--\s*mindmap-floating-start:\s*(.+?)(?:\s*\|\s*x:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*y:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->([\s\S]*?)<!--\s*mindmap-floating-end\s*-->/g;
+      const blockFloatRegex = /<!--\s*mindmap-floating-start:\s*(.+?)(?:\s*\|\s*marker:\s*(.*?))?(?:\s*\|\s*x:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*y:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->([\s\S]*?)<!--\s*mindmap-floating-end\s*-->/g;
       let blockMatch;
       while ((blockMatch = blockFloatRegex.exec(markdownContent)) !== null) {
-        const text = blockMatch[1].trim().toUpperCase();
-        const fx = blockMatch[2] !== undefined ? parseFloat(blockMatch[2]) : 200;
-        const fy = blockMatch[3] !== undefined ? parseFloat(blockMatch[3]) : 100;
-        const color = blockMatch[4] !== undefined ? blockMatch[4].trim() : '#0284c7';
-        const innerMd = blockMatch[5] || '';
+        let text = blockMatch[1].trim().toUpperCase();
+        let ftMarker = (blockMatch[2] || '').trim().toLowerCase() || null;
+        if (!ftMarker) {
+          const ftMarkerMatch = text.match(/<!--\s*marker:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+          if (ftMarkerMatch) {
+            ftMarker = ftMarkerMatch[1].trim().toLowerCase();
+            text = text.replace(ftMarkerMatch[0], '').trim();
+          }
+        }
+        if (!ftMarker) {
+          const pMatch = text.match(/^\[([1-9]|p[1-4])\]\s*/i) || text.match(/^\(([1-9]|p[1-4])\)\s*/i);
+          if (pMatch) {
+            ftMarker = pMatch[1].toLowerCase();
+            text = text.replace(pMatch[0], '').trim();
+          }
+        }
+        const fx = blockMatch[3] !== undefined ? parseFloat(blockMatch[3]) : 200;
+        const fy = blockMatch[4] !== undefined ? parseFloat(blockMatch[4]) : 100;
+        const color = blockMatch[5] !== undefined ? blockMatch[5].trim() : '#0284c7';
+        const innerMd = blockMatch[6] || '';
 
         const ftNode = {
           id: `float_${idCounter++}`,
           text: text,
+          marker: ftMarker,
           ref: '',
           note: '',
           color: color || '#0284c7',
@@ -931,11 +1082,25 @@ const MindMapView = {
             let cText = ftMatch[3].trim();
             let cRef = '';
             let cNote = '';
+            let cMarker = null;
 
             const nMatch = cText.match(/<!--\s*note:\s*([\s\S]*?)\s*-->/);
             if (nMatch) {
               cNote = nMatch[1].trim();
               cText = cText.replace(nMatch[0], '').trim();
+            }
+
+            const mMatch = cText.match(/<!--\s*marker:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+            if (mMatch) {
+              cMarker = mMatch[1].trim().toLowerCase();
+              cText = cText.replace(mMatch[0], '').trim();
+            }
+            if (!cMarker) {
+              const pMatch = cText.match(/^\[([1-9]|p[1-4])\]\s*/i) || cText.match(/^\(([1-9]|p[1-4])\)\s*/i);
+              if (pMatch) {
+                cMarker = pMatch[1].toLowerCase();
+                cText = cText.replace(pMatch[0], '').trim();
+              }
             }
 
             const rMatch = cText.match(/\[([A-Za-z0-9À-ÿ\s:]+)\]$/);
@@ -947,6 +1112,7 @@ const MindMapView = {
             const childNode = {
               id: `node_${idCounter++}`,
               text: cText.toUpperCase(),
+              marker: cMarker,
               ref: cRef,
               note: cNote,
               color: color || '#0284c7',
@@ -969,17 +1135,33 @@ const MindMapView = {
       }
 
       // 2. Sujets flottants d'une seule ligne
-      const singleFloatRegex = /<!--\s*mindmap-floating:\s*(.+?)(?:\s*\|\s*x:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*y:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->/g;
+      const singleFloatRegex = /<!--\s*mindmap-floating:\s*(.+?)(?:\s*\|\s*marker:\s*(.*?))?(?:\s*\|\s*x:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*y:\s*(-?\d+(?:\.\d+)?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->/g;
       let singleMatch;
       while ((singleMatch = singleFloatRegex.exec(markdownContent)) !== null) {
-        const text = singleMatch[1].trim().toUpperCase();
-        const fx = singleMatch[2] !== undefined ? parseFloat(singleMatch[2]) : 200;
-        const fy = singleMatch[3] !== undefined ? parseFloat(singleMatch[3]) : 100;
-        const color = singleMatch[4] !== undefined ? singleMatch[4].trim() : '#0284c7';
+        let text = singleMatch[1].trim().toUpperCase();
+        let sMarker = (singleMatch[2] || '').trim().toLowerCase() || null;
+        if (!sMarker) {
+          const sMarkerMatch = text.match(/<!--\s*marker:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+          if (sMarkerMatch) {
+            sMarker = sMarkerMatch[1].trim().toLowerCase();
+            text = text.replace(sMarkerMatch[0], '').trim();
+          }
+        }
+        if (!sMarker) {
+          const pMatch = text.match(/^\[([1-9]|p[1-4])\]\s*/i) || text.match(/^\(([1-9]|p[1-4])\)\s*/i);
+          if (pMatch) {
+            sMarker = pMatch[1].toLowerCase();
+            text = text.replace(pMatch[0], '').trim();
+          }
+        }
+        const fx = singleMatch[3] !== undefined ? parseFloat(singleMatch[3]) : 200;
+        const fy = singleMatch[4] !== undefined ? parseFloat(singleMatch[4]) : 100;
+        const color = singleMatch[5] !== undefined ? singleMatch[5].trim() : '#0284c7';
 
         this.floatingTopics.push({
           id: `float_${idCounter++}`,
           text: text,
+          marker: sMarker,
           ref: '',
           note: '',
           color: color || '#0284c7',
@@ -1014,9 +1196,10 @@ const MindMapView = {
       if (!node || !node.children) return;
       for (const child of node.children) {
         const indent = '  '.repeat(indentLevel);
+        const markerPart = child.marker ? ` <!-- marker: ${child.marker} -->` : '';
         const refPart = child.ref ? ` [${child.ref}]` : '';
         const notePart = child.note ? ` <!-- note: ${child.note.replace(/\r?\n/g, ' ')} -->` : '';
-        md += `${indent}- ${child.text}${refPart}${notePart}\n`;
+        md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}\n`;
         serializeChildren(child, indentLevel + 1);
       }
     };
@@ -1074,16 +1257,17 @@ const MindMapView = {
       md += '\n';
       this.floatingTopics.forEach(ft => {
         const cleanText = ft.text.replace(/\|/g, '');
+        const markerPart = ft.marker ? ` | marker: ${ft.marker}` : '';
         const xVal = Math.round(ft.x || 0);
         const yVal = Math.round(ft.y || 0);
         const colorPart = ft.color ? ` | color: ${ft.color}` : '';
 
         if (ft.children && ft.children.length > 0) {
-          md += `<!-- mindmap-floating-start: ${cleanText} | x: ${xVal} | y: ${yVal}${colorPart} -->\n`;
+          md += `<!-- mindmap-floating-start: ${cleanText}${markerPart} | x: ${xVal} | y: ${yVal}${colorPart} -->\n`;
           serializeChildren(ft, 0);
           md += `<!-- mindmap-floating-end -->\n`;
         } else {
-          md += `<!-- mindmap-floating: ${cleanText} | x: ${xVal} | y: ${yVal}${colorPart} -->\n`;
+          md += `<!-- mindmap-floating: ${cleanText}${markerPart} | x: ${xVal} | y: ${yVal}${colorPart} -->\n`;
         }
       });
     }
@@ -1214,6 +1398,15 @@ const MindMapView = {
       const textW = this.getTextWidth(node.text, 12, '800');
       node.textWidth = textW;
 
+      let markerW = 0;
+      if (node.marker) {
+        const isP = String(node.marker).toLowerCase().startsWith('p');
+        node.markerWidth = isP ? 22 : 18;
+        markerW = node.markerWidth + 6;
+      } else {
+        node.markerWidth = 0;
+      }
+
       let refW = 0;
       if (node.ref) {
         const refTextW = this.getTextWidth(node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref, 9, '700');
@@ -1231,17 +1424,27 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = textW + refW + noteW;
+      node.contentWidth = markerW + textW + refW + noteW;
       node.width = Math.max(88, node.contentWidth + 28);
       node.height = 32;
     } else if (node.level === 0) {
       const textW = this.getTextWidth(node.text, 13, '800');
       node.textWidth = textW;
+      node.markerWidth = 0;
       node.width = Math.max(120, textW + 48);
       node.height = 46;
     } else {
       const textW = this.getTextWidth(node.text, 11.5, '700');
       node.textWidth = textW;
+
+      let markerW = 0;
+      if (node.marker) {
+        const isP = String(node.marker).toLowerCase().startsWith('p');
+        node.markerWidth = isP ? 22 : 18;
+        markerW = node.markerWidth + 6;
+      } else {
+        node.markerWidth = 0;
+      }
 
       let refW = 0;
       if (node.ref) {
@@ -1260,8 +1463,8 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      // La largeur de la branche englobe le mot et ses badges avec marges aérées
-      node.contentWidth = textW + refW + noteW;
+      // La largeur de la branche englobe le mot, le marqueur et ses badges avec marges aérées
+      node.contentWidth = markerW + textW + refW + noteW;
       node.width = Math.max(70, node.contentWidth + 24);
       node.height = 28;
     }
@@ -1283,11 +1486,21 @@ const MindMapView = {
     if (node.level === 0) {
       const textW = this.getTextWidth(node.text, 13, '800');
       node.textWidth = textW;
+      node.markerWidth = 0;
       node.width = Math.max(120, textW + 48);
       node.height = 46;
     } else {
       const textW = this.getTextWidth(node.text, 11.5, '700');
       node.textWidth = textW;
+
+      let markerW = 0;
+      if (node.marker) {
+        const isP = String(node.marker).toLowerCase().startsWith('p');
+        node.markerWidth = isP ? 22 : 18;
+        markerW = node.markerWidth + 6;
+      } else {
+        node.markerWidth = 0;
+      }
 
       let refW = 0;
       if (node.ref) {
@@ -1306,7 +1519,7 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = textW + refW + noteW;
+      node.contentWidth = markerW + textW + refW + noteW;
       node.width = Math.max(76, node.contentWidth + 24);
       node.height = 28;
     }
@@ -1604,6 +1817,7 @@ const MindMapView = {
             ` : `
               <span class="mm-outline-dot-bullet" style="background: ${color};"></span>
             `}
+            ${this.renderOutlineMarkerPill(boi)}
             <span class="mm-outline-text boi-text" data-id="${boi.id}" title="Cliquer pour modifier">${this.escapeHtml(boi.text)}</span>
             ${boi.ref ? `
               <span class="mm-outline-ref-pill" data-ref="${this.escapeHtml(boi.ref)}" title="Cliquer pour lire le passage biblique">
@@ -1668,6 +1882,7 @@ const MindMapView = {
             ` : `
               <span class="mm-outline-sub-bullet"></span>
             `}
+            ${this.renderOutlineMarkerPill(node)}
             <span class="mm-outline-text sub-text" data-id="${node.id}" title="Cliquer pour modifier">${this.escapeHtml(node.text)}</span>
             ${node.ref ? `
               <span class="mm-outline-ref-pill" data-ref="${this.escapeHtml(node.ref)}" title="Cliquer pour lire le passage biblique">
@@ -1797,6 +2012,15 @@ const MindMapView = {
         e.stopPropagation();
         const bndId = pill.getAttribute('data-boundary-id');
         if (bndId) this.promptEditBoundaryLabel(bndId);
+      });
+    });
+
+    // Clic sur une pastille de marqueur -> faire défiler le marqueur
+    outlineEl.querySelectorAll('.mm-outline-marker-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nodeId = badge.getAttribute('data-id');
+        if (nodeId) this.cycleNodeMarker(nodeId);
       });
     });
 
@@ -2379,37 +2603,116 @@ const MindMapView = {
       text.setAttribute('fill', 'var(--text-primary)');
       text.textContent = node.text;
 
+      let markerX = null;
       let badgeX;
       const textW = node.textWidth || this.getTextWidth(node.text, node.isFloating ? 12 : 11.5, node.isFloating ? '800' : '700');
+      const isWideMarker = node.marker && String(node.marker).toLowerCase().startsWith('p');
+      const markerW = node.marker ? ((isWideMarker ? 22 : 18) + 6) : 0;
+      const markerHalf = isWideMarker ? 11 : 9;
 
       if (node.isFloating) {
-        if (!node.ref && !node.note) {
+        if (!node.marker && !node.ref && !node.note) {
           text.setAttribute('text-anchor', 'middle');
           text.setAttribute('x', 0);
           badgeX = textW / 2 + 8;
         } else {
           const startX = -(node.contentWidth || textW) / 2;
+          if (node.marker) {
+            markerX = startX + markerHalf;
+            const textX = startX + markerW;
+            text.setAttribute('text-anchor', 'start');
+            text.setAttribute('x', textX);
+            badgeX = textX + textW + 8;
+          } else {
+            text.setAttribute('text-anchor', 'start');
+            text.setAttribute('x', startX);
+            badgeX = startX + textW + 8;
+          }
+        }
+      } else if (isTopDown) {
+        const startX = -(node.contentWidth || textW) / 2;
+        if (node.marker) {
+          markerX = startX + markerHalf;
+          const textX = startX + markerW;
+          text.setAttribute('text-anchor', 'start');
+          text.setAttribute('x', textX);
+          badgeX = textX + textW + 8;
+        } else {
           text.setAttribute('text-anchor', 'start');
           text.setAttribute('x', startX);
           badgeX = startX + textW + 8;
         }
-      } else if (isTopDown) {
-        const startX = -(node.contentWidth || textW) / 2;
-        text.setAttribute('text-anchor', 'start');
-        text.setAttribute('x', startX);
-        badgeX = startX + textW + 8;
       } else if (node.side === 'right') {
-        const textX = -node.width / 2 + 10;
-        text.setAttribute('text-anchor', 'start');
-        text.setAttribute('x', textX);
-        badgeX = textX + textW + 8;
+        const baseLeft = -node.width / 2 + 10;
+        if (node.marker) {
+          markerX = baseLeft + markerHalf;
+          const textX = baseLeft + markerW;
+          text.setAttribute('text-anchor', 'start');
+          text.setAttribute('x', textX);
+          badgeX = textX + textW + 8;
+        } else {
+          text.setAttribute('text-anchor', 'start');
+          text.setAttribute('x', baseLeft);
+          badgeX = baseLeft + textW + 8;
+        }
       } else {
+        // Branche à gauche : mot aligné à droite, marqueur immédiatement à gauche du mot-clé
         const textX = node.width / 2 - 10;
         text.setAttribute('text-anchor', 'end');
         text.setAttribute('x', textX);
-        badgeX = textX - textW - 8;
+        const leftOfText = textX - textW;
+        if (node.marker) {
+          markerX = leftOfText - markerHalf - 4;
+          badgeX = leftOfText - markerW - 8;
+        } else {
+          badgeX = leftOfText - 8;
+        }
       }
       g.appendChild(text);
+
+      // Pastille Marqueur / Numéro / Priorité si présent (placé immédiatement à gauche du mot-clé)
+      if (node.marker && markerX !== null) {
+        const def = this.MARKER_DEFS[node.marker];
+        if (def) {
+          const markerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          markerG.setAttribute('transform', `translate(${markerX}, ${isBox ? 0 : 3})`);
+          markerG.setAttribute('class', 'mm-node-marker-badge');
+          markerG.setAttribute('style', 'cursor: pointer;');
+          markerG.setAttribute('title', `Marqueur : ${def.label} (Cliquer pour faire défiler)`);
+
+          if (def.isWide) {
+            const mRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            mRect.setAttribute('x', -11);
+            mRect.setAttribute('y', -8);
+            mRect.setAttribute('width', 22);
+            mRect.setAttribute('height', 16);
+            mRect.setAttribute('rx', 4.5);
+            mRect.setAttribute('fill', def.bg);
+            markerG.appendChild(mRect);
+          } else {
+            const mCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            mCircle.setAttribute('r', 8.5);
+            mCircle.setAttribute('fill', def.bg);
+            markerG.appendChild(mCircle);
+          }
+
+          const mText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          mText.setAttribute('text-anchor', 'middle');
+          mText.setAttribute('dominant-baseline', 'central');
+          mText.setAttribute('font-size', def.isWide ? '9px' : '9.5px');
+          mText.setAttribute('font-weight', '800');
+          mText.setAttribute('fill', def.text);
+          mText.textContent = def.label;
+          markerG.appendChild(mText);
+
+          markerG.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.cycleNodeMarker(node.id);
+          });
+
+          g.appendChild(markerG);
+        }
+      }
 
       // Pastille de référence biblique si présente
       if (node.ref) {
@@ -2631,6 +2934,7 @@ const MindMapView = {
         delBtn.style.display = isBndSel ? 'inline' : 'none';
       }
     });
+    this.updateMarkerPopoverUI();
   },
 
   findNode(id, current = this.tree) {
@@ -3669,6 +3973,7 @@ const MindMapView = {
       return {
         id: `node_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         text: orig.text,
+        marker: orig.marker || null,
         ref: orig.ref || '',
         note: orig.note || '',
         color: orig.color,
@@ -3971,6 +4276,13 @@ const MindMapView = {
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
           </span>
           <span class="mm-ctx-label">Changer la couleur</span>
+        </div>
+        <div class="mm-ctx-item" data-action="marker">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="15.5" font-size="10" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
+          </span>
+          <span class="mm-ctx-label">Marqueur / Priorité...</span>
+          <span class="mm-ctx-shortcut">1-9</span>
         </div>
         ${(node?.offsetX || node?.offsetY) ? `
           <div class="mm-ctx-item" data-action="reset-position">
@@ -4290,6 +4602,12 @@ const MindMapView = {
           case 'color':
             if (targetNodeId) this.promptChangeColor(targetNodeId);
             break;
+          case 'marker':
+            if (targetNodeId && targetNodeId !== 'root') {
+              this.selectNode(targetNodeId);
+              this.toggleMarkerPopover(true);
+            }
+            break;
           case 'reset-position':
             if (node) {
               node.offsetX = 0;
@@ -4476,6 +4794,78 @@ const MindMapView = {
         if (check) check.classList.toggle('hidden', !isActive);
       });
     }
+  },
+
+  setNodeMarker(nodeId, marker) {
+    if (!nodeId || nodeId === 'root') return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+    this.saveHistory();
+    const cleanMarker = marker ? String(marker).trim().toLowerCase() : null;
+    node.marker = cleanMarker;
+    this.layoutTree();
+    this.draw();
+    this.syncAndAutoSave();
+    if (this.viewMode === 'outline') {
+      this.renderOutlineView();
+    }
+    this.updateMarkerPopoverUI();
+    if (typeof App !== 'undefined' && App.showToast) {
+      if (cleanMarker && this.MARKER_DEFS[cleanMarker]) {
+        App.showToast(`Marqueur ${this.MARKER_DEFS[cleanMarker].label} appliqué`);
+      } else {
+        App.showToast('Marqueur effacé');
+      }
+    }
+  },
+
+  cycleNodeMarker(nodeId) {
+    if (!nodeId || nodeId === 'root') return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+    const cycleOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'p1', 'p2', 'p3', 'p4', 'done', 'progress', 'star', 'alert', null];
+    const currentMarker = node.marker ? String(node.marker).toLowerCase() : null;
+    const idx = cycleOrder.indexOf(currentMarker);
+    const nextMarker = idx === -1 ? '1' : cycleOrder[(idx + 1) % cycleOrder.length];
+    this.setNodeMarker(nodeId, nextMarker);
+  },
+
+  toggleMarkerPopover(force = null) {
+    if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
+    const popover = document.getElementById('mm-marker-popover');
+    if (!popover) return;
+    const isHidden = popover.classList.contains('hidden');
+    const shouldOpen = force !== null ? force : isHidden;
+    popover.classList.toggle('hidden', !shouldOpen);
+    if (shouldOpen) {
+      document.getElementById('mm-structure-popover')?.classList.add('hidden');
+      document.getElementById('mm-styles-popover')?.classList.add('hidden');
+      document.getElementById('mindmap-help-drawer')?.classList.add('hidden');
+      this.updateMarkerPopoverUI();
+    }
+  },
+
+  updateMarkerPopoverUI() {
+    if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
+    const popover = document.getElementById('mm-marker-popover');
+    if (!popover || popover.classList.contains('hidden')) return;
+    const node = this.selectedNodeId ? this.findNode(this.selectedNodeId) : null;
+    const currentMarker = node ? (node.marker || null) : null;
+    popover.querySelectorAll('.mm-marker-choice').forEach(choice => {
+      const val = choice.getAttribute('data-marker');
+      choice.classList.toggle('active', val === currentMarker);
+    });
+  },
+
+  renderOutlineMarkerPill(node) {
+    if (!node || !node.marker) return '';
+    const def = this.MARKER_DEFS[node.marker];
+    if (!def) return '';
+    return `
+      <span class="mm-outline-marker-badge ${def.isWide ? 'wide' : ''}" style="background-color: ${def.bg}; color: ${def.text};" data-id="${node.id}" title="Marqueur : ${def.label} (Cliquer pour changer)">
+        ${def.label}
+      </span>
+    `;
   },
 
   // =========================================================================
