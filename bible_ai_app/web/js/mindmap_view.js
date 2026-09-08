@@ -27,6 +27,8 @@ const MindMapView = {
   relationships: [], // [ { id, fromId, toId, label, color, customControl } ]
   connectingSourceId: null, // ID du nœud source en cours de liaison
   selectedRelId: null, // ID de la liaison sélectionnée
+  boundaries: [], // [ { id, rootId, label, color } ] Clôtures / Enclos style XMind
+  selectedBoundaryId: null, // ID de l'enclos sélectionné
 
   // Pile d'historique Undo / Redo
   history: [],
@@ -128,6 +130,9 @@ const MindMapView = {
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-relationship" title="Créer une liaison transversale entre deux branches (Ctrl+L)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
+          </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-boundary" title="Créer un enclos / clôture sur la branche (Ctrl+B)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" stroke-dasharray="4 3"/><path d="M7 8h10M7 12h6"/></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" title="Zoom avant (Ctrl + Molette)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -281,6 +286,7 @@ const MindMapView = {
               <tr><td><kbd>Alt+T</kbd></td><td><strong>Styles de connecteurs & formes de nœuds</strong></td></tr>
               <tr><td><kbd>Alt+R</kbd></td><td><strong>Réorganiser harmonieusement la carte</strong></td></tr>
               <tr><td><kbd>Ctrl+L</kbd></td><td><strong>Créer une liaison transversale (Relation)</strong></td></tr>
+              <tr><td><kbd>Ctrl+B</kbd></td><td><strong>Créer un enclos / clôture sur la branche</strong></td></tr>
               <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
               <tr><td><kbd>Entrée</kbd></td><td>Ajouter une branche voisine (Sœur)</td></tr>
               <tr><td><kbd>Espace</kbd> ou <em>Double-clic</em></td><td>Modifier le mot-clé</td></tr>
@@ -321,6 +327,7 @@ const MindMapView = {
         this.panStart = { x: e.clientX - this.viewBox.x, y: e.clientY - this.viewBox.y };
         this.selectedNodeId = null;
         this.selectedRelId = null;
+        this.selectedBoundaryId = null;
         this.updateSelectionState();
       }
     });
@@ -456,6 +463,13 @@ const MindMapView = {
         App.showToast('Sélectionnez d\'abord une branche à relier');
       }
     });
+    document.getElementById('mm-btn-boundary')?.addEventListener('click', () => {
+      if (this.selectedNodeId && this.selectedNodeId !== 'root') {
+        this.createBoundary(this.selectedNodeId);
+      } else if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Sélectionnez d\'abord une branche pour créer un enclos');
+      }
+    });
     document.getElementById('mm-btn-cancel-connecting')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cancelConnecting(); });
     document.getElementById('mm-btn-zoom-in')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(1.2); });
     document.getElementById('mm-btn-zoom-out')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(0.8); });
@@ -553,6 +567,17 @@ const MindMapView = {
         return;
       }
 
+      // Création d'un enclos / clôture (Ctrl+B)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) {
+        e.preventDefault();
+        if (this.selectedNodeId && this.selectedNodeId !== 'root') {
+          this.createBoundary(this.selectedNodeId);
+        } else if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Sélectionnez d\'abord une branche pour créer un enclos');
+        }
+        return;
+      }
+
       // Si l'utilisateur est en train de taper dans un champ de saisie HTML
       const activeTag = document.activeElement?.tagName;
       if (['INPUT', 'TEXTAREA'].includes(activeTag)) return;
@@ -583,7 +608,9 @@ const MindMapView = {
         this.addSiblingToSelected();
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        if (this.selectedRelId) {
+        if (this.selectedBoundaryId) {
+          this.deleteBoundary(this.selectedBoundaryId);
+        } else if (this.selectedRelId) {
           this.deleteRelationship(this.selectedRelId);
         } else {
           this.deleteSelected();
@@ -687,7 +714,7 @@ const MindMapView = {
 
     for (const rawLine of lines) {
       const line = rawLine.trimEnd();
-      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-connector:') || line.trim().startsWith('<!-- mindmap-node-shape:') || line.trim().startsWith('<!-- mindmap-rel:') || line.trim().startsWith('<!-- mindmap-pos:')) continue;
+      if (!line.trim() || line.trim().startsWith('#') || line.trim().startsWith('<!-- mindmap-layout:') || line.trim().startsWith('<!-- mindmap-connector:') || line.trim().startsWith('<!-- mindmap-node-shape:') || line.trim().startsWith('<!-- mindmap-rel:') || line.trim().startsWith('<!-- mindmap-boundary:') || line.trim().startsWith('<!-- mindmap-pos:')) continue;
 
       // Détection de l'indentation
       const match = line.match(/^(\s*)([-*+]|\d+\.)\s+(.*)$/);
@@ -784,6 +811,28 @@ const MindMapView = {
       }
     }
 
+    // Extraction des enclos / clôtures <!-- mindmap-boundary: RACINE | label: ... | color: ... -->
+    this.boundaries = [];
+    if (markdownContent) {
+      const bndRegex = /<!--\s*mindmap-boundary:\s*(.+?)(?:\s*\|\s*label:\s*(.*?))?(?:\s*\|\s*color:\s*(.*?))?\s*-->/g;
+      let bndMatch;
+      while ((bndMatch = bndRegex.exec(markdownContent)) !== null) {
+        const rootRef = bndMatch[1].trim();
+        const label = bndMatch[2] !== undefined ? bndMatch[2].trim() : 'ENCLOS';
+        const color = bndMatch[3] !== undefined ? bndMatch[3].trim() : '';
+
+        const targetNode = this.findNode(rootRef, root) || this.findNodeByText(rootRef, root);
+        if (targetNode && targetNode.id !== 'root') {
+          this.boundaries.push({
+            id: `bnd_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+            rootId: targetNode.id,
+            label: label || 'ENCLOS',
+            color: color || ''
+          });
+        }
+      }
+    }
+
     return root;
   },
 
@@ -839,6 +888,20 @@ const MindMapView = {
           const colorPart = rel.color ? ` | color: ${rel.color}` : '';
           const cxPart = rel.customControl ? ` | cx: ${Math.round(rel.customControl.x)} | cy: ${Math.round(rel.customControl.y)}` : '';
           md += `<!-- mindmap-rel: ${fromText} -> ${toText}${labelPart}${colorPart}${cxPart} -->\n`;
+        }
+      });
+    }
+
+    // Sérialisation des enclos / clôtures (Boundaries style XMind)
+    if (this.boundaries && this.boundaries.length > 0) {
+      md += '\n';
+      this.boundaries.forEach(bnd => {
+        const rootNode = this.findNode(bnd.rootId, tree || this.tree);
+        if (rootNode) {
+          const rootText = rootNode.text.replace(/\|/g, '');
+          const labelPart = bnd.label ? ` | label: ${bnd.label.replace(/\|/g, '')}` : '';
+          const colorPart = bnd.color ? ` | color: ${bnd.color}` : '';
+          md += `<!-- mindmap-boundary: ${rootText}${labelPart}${colorPart} -->\n`;
         }
       });
     }
@@ -1302,6 +1365,7 @@ const MindMapView = {
               </span>
             ` : ''}
             ${this.renderOutlineRelPills(boi.id)}
+            ${this.renderOutlineBoundaryPill(boi.id)}
           </div>
 
           <div class="mm-outline-actions">
@@ -1365,6 +1429,7 @@ const MindMapView = {
               </span>
             ` : ''}
             ${this.renderOutlineRelPills(node.id)}
+            ${this.renderOutlineBoundaryPill(node.id)}
           </div>
 
           <div class="mm-outline-actions">
@@ -1463,6 +1528,15 @@ const MindMapView = {
             setTimeout(() => targetBlock.classList.remove('highlight-pulse'), 1600);
           }
         }
+      });
+    });
+
+    // Clic sur une pastille d'enclos -> modification du titre
+    outlineEl.querySelectorAll('.mm-outline-boundary-pill[data-action="edit-boundary"]').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const bndId = pill.getAttribute('data-boundary-id');
+        if (bndId) this.promptEditBoundaryLabel(bndId);
       });
     });
 
@@ -1796,13 +1870,16 @@ const MindMapView = {
     if (!this.viewportG) return;
     this.viewportG.innerHTML = '';
 
-    // 1. Dessiner d'abord toutes les branches (courbes fluides sous le texte)
+    // 1. Dessiner d'abord les enclos / clôtures en arrière-plan (au fond sous les branches et nœuds)
+    this.drawBoundaries();
+
+    // 2. Dessiner toutes les branches (courbes fluides sous le texte)
     this.drawBranches(this.tree);
 
-    // 2. Dessiner les liaisons transversales inter-branches (Relations style XMind)
+    // 3. Dessiner les liaisons transversales inter-branches (Relations style XMind)
     this.drawRelationships();
 
-    // 3. Dessiner tous les nœuds (textes, boutons contextuels)
+    // 4. Dessiner tous les nœuds (textes, boutons contextuels)
     this.drawNodes(this.tree);
   },
 
@@ -2246,6 +2323,7 @@ const MindMapView = {
   selectNode(id) {
     this.selectedNodeId = id;
     this.selectedRelId = null;
+    this.selectedBoundaryId = null;
     this.updateSelectionState();
   },
 
@@ -2259,6 +2337,14 @@ const MindMapView = {
       const handle = el.querySelector('.mm-rel-handle');
       if (handle) {
         handle.style.display = isRelSel ? 'inline' : 'none';
+      }
+    });
+    this.viewportG?.querySelectorAll('.mm-boundary-g').forEach(el => {
+      const isBndSel = el.getAttribute('data-boundary-id') === this.selectedBoundaryId;
+      el.classList.toggle('selected', isBndSel);
+      const delBtn = el.querySelector('.mm-boundary-del-btn');
+      if (delBtn) {
+        delBtn.style.display = isBndSel ? 'inline' : 'none';
       }
     });
   },
@@ -2385,6 +2471,13 @@ const MindMapView = {
 
     if (this.relationships && this.relationships.length > 0) {
       this.relationships = this.relationships.filter(r => !deletedIds.has(r.fromId) && !deletedIds.has(r.toId));
+    }
+
+    if (this.boundaries && this.boundaries.length > 0) {
+      this.boundaries = this.boundaries.filter(b => !deletedIds.has(b.rootId));
+      if (this.selectedBoundaryId && !this.boundaries.some(b => b.id === this.selectedBoundaryId)) {
+        this.selectedBoundaryId = null;
+      }
     }
 
     this.layoutTree();
@@ -3399,6 +3492,13 @@ const MindMapView = {
           <span class="mm-ctx-label">Créer une liaison</span>
           <span class="mm-ctx-shortcut">Ctrl+L</span>
         </div>
+        <div class="mm-ctx-item" data-action="boundary">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" stroke-dasharray="4 3"/><path d="M7 8h10M7 12h6"/></svg>
+          </span>
+          <span class="mm-ctx-label">${this.boundaries?.some(b => b.rootId === targetNodeId) ? 'Modifier l\'enclos' : 'Créer un enclos'}</span>
+          <span class="mm-ctx-shortcut">Ctrl+B</span>
+        </div>
         <div class="mm-ctx-item" data-action="color">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
@@ -3684,6 +3784,16 @@ const MindMapView = {
             break;
           case 'relationship':
             if (targetNodeId) this.startConnecting(targetNodeId);
+            break;
+          case 'boundary':
+            if (targetNodeId) {
+              const bnd = this.boundaries?.find(b => b.rootId === targetNodeId);
+              if (bnd) {
+                this.promptEditBoundaryLabel(bnd.id);
+              } else {
+                this.createBoundary(targetNodeId);
+              }
+            }
             break;
           case 'color':
             if (targetNodeId) this.promptChangeColor(targetNodeId);
@@ -4398,5 +4508,337 @@ const MindMapView = {
     });
 
     document.addEventListener('keydown', handleKey);
+  },
+
+  // =========================================================================
+  // ENCLOS / CLÔTURES STYLE XMIND (Boundaries)
+  // =========================================================================
+
+  getBoundaryBBox(boundary) {
+    const rootNode = this.findNode(boundary.rootId);
+    if (!rootNode) return null;
+
+    const nodes = [];
+    const collect = (n) => {
+      if (!n) return;
+      nodes.push(n);
+      if (n.children) n.children.forEach(collect);
+    };
+    collect(rootNode);
+
+    if (nodes.length === 0) return null;
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    nodes.forEach(n => {
+      const hw = (n.width || 70) / 2;
+      const hh = (n.height || 28) / 2;
+      minX = Math.min(minX, n.x - hw);
+      maxX = Math.max(maxX, n.x + hw);
+      minY = Math.min(minY, n.y - hh);
+      maxY = Math.max(maxY, n.y + hh);
+    });
+
+    const padX = 18;
+    const padY = 16;
+    return {
+      x: minX - padX,
+      y: minY - padY,
+      width: (maxX - minX) + 2 * padX,
+      height: (maxY - minY) + 2 * padY
+    };
+  },
+
+  drawBoundaries() {
+    if (!this.boundaries || this.boundaries.length === 0 || !this.viewportG) return;
+
+    let bndLayer = this.viewportG.querySelector('#mm-boundaries-layer');
+    if (!bndLayer) {
+      bndLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      bndLayer.setAttribute('id', 'mm-boundaries-layer');
+      if (this.viewportG.firstChild) {
+        this.viewportG.insertBefore(bndLayer, this.viewportG.firstChild);
+      } else {
+        this.viewportG.appendChild(bndLayer);
+      }
+    } else {
+      bndLayer.innerHTML = '';
+    }
+
+    this.boundaries.forEach(bnd => {
+      const bbox = this.getBoundaryBBox(bnd);
+      if (!bbox) return;
+
+      const rootNode = this.findNode(bnd.rootId);
+      const bndColor = bnd.color || rootNode?.color || '#2563eb';
+      const isSelected = this.selectedBoundaryId === bnd.id;
+
+      const bndG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      bndG.setAttribute('class', `mm-boundary-g ${isSelected ? 'selected' : ''}`);
+      bndG.setAttribute('data-boundary-id', bnd.id);
+
+      // 1. Rectangle d'enclos principal (bordure en pointillés + fond translucide doux)
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', bbox.x);
+      rect.setAttribute('y', bbox.y);
+      rect.setAttribute('width', bbox.width);
+      rect.setAttribute('height', bbox.height);
+      rect.setAttribute('rx', 12);
+      rect.setAttribute('ry', 12);
+      rect.setAttribute('class', 'mm-boundary-rect');
+      rect.setAttribute('fill', this.hexToRgba(bndColor, isSelected ? 0.12 : 0.06));
+      rect.setAttribute('stroke', bndColor);
+      rect.setAttribute('stroke-width', isSelected ? '2.4' : '1.8');
+      rect.setAttribute('stroke-dasharray', isSelected ? '7,3' : '6,4');
+      rect.setAttribute('style', 'cursor: pointer;');
+      bndG.appendChild(rect);
+
+      // 2. Étiquette supérieure style pilule XMind
+      const labelText = (bnd.label || 'ENCLOS').toUpperCase();
+      const textW = this.getTextWidth(labelText, 9.5, '700');
+      const pillW = Math.max(56, textW + 20);
+      const pillH = 22;
+      const pillX = bbox.x + 14;
+      const pillY = bbox.y - pillH / 2;
+
+      const labelG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      labelG.setAttribute('transform', `translate(${pillX}, ${pillY})`);
+      labelG.setAttribute('class', 'mm-boundary-label-g');
+      labelG.setAttribute('style', 'cursor: pointer;');
+
+      const pillRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      pillRect.setAttribute('x', 0);
+      pillRect.setAttribute('y', 0);
+      pillRect.setAttribute('width', pillW);
+      pillRect.setAttribute('height', pillH);
+      pillRect.setAttribute('rx', 11);
+      pillRect.setAttribute('class', 'mm-boundary-label-pill');
+      pillRect.setAttribute('fill', 'var(--bg-card, #ffffff)');
+      pillRect.setAttribute('stroke', bndColor);
+      pillRect.setAttribute('stroke-width', '1.5');
+      labelG.appendChild(pillRect);
+
+      const labelT = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      labelT.setAttribute('x', pillW / 2);
+      labelT.setAttribute('y', pillH / 2);
+      labelT.setAttribute('text-anchor', 'middle');
+      labelT.setAttribute('dominant-baseline', 'central');
+      labelT.setAttribute('class', 'mm-boundary-label-text');
+      labelT.setAttribute('fill', bndColor);
+      labelT.textContent = labelText;
+      labelG.appendChild(labelT);
+
+      // Bouton supprimer [×] visible au survol ou à la sélection
+      const delBtnG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      delBtnG.setAttribute('transform', `translate(${pillW + 9}, ${pillH / 2})`);
+      delBtnG.setAttribute('class', 'mm-boundary-del-btn');
+      delBtnG.setAttribute('title', 'Supprimer cet enclos');
+      delBtnG.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
+
+      const delCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      delCircle.setAttribute('r', 7.5);
+      delCircle.setAttribute('class', 'mm-boundary-del-circle');
+      delBtnG.appendChild(delCircle);
+
+      const delXText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      delXText.setAttribute('text-anchor', 'middle');
+      delXText.setAttribute('dominant-baseline', 'central');
+      delXText.setAttribute('class', 'mm-boundary-del-text');
+      delXText.setAttribute('y', -0.5);
+      delXText.textContent = '×';
+      delBtnG.appendChild(delXText);
+
+      delBtnG.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.deleteBoundary(bnd.id);
+      });
+      labelG.appendChild(delBtnG);
+
+      // Événements sur l'enclos
+      bndG.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.selectBoundary(bnd.id);
+      });
+
+      labelG.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        this.promptEditBoundaryLabel(bnd.id);
+      });
+
+      bndG.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.selectBoundary(bnd.id);
+        this.promptEditBoundaryLabel(bnd.id);
+      });
+
+      bndG.appendChild(labelG);
+      bndLayer.appendChild(bndG);
+    });
+  },
+
+  selectBoundary(bndId) {
+    this.selectedBoundaryId = bndId;
+    this.selectedNodeId = null;
+    this.selectedRelId = null;
+    this.updateSelectionState();
+  },
+
+  createBoundary(rootNodeId, label = null) {
+    if (!rootNodeId || rootNodeId === 'root') return;
+    const node = this.findNode(rootNodeId);
+    if (!node) return;
+
+    // Si un enclos existe déjà sur cette branche, ouvrir directement l'édition
+    let bnd = this.boundaries?.find(b => b.rootId === rootNodeId);
+    if (bnd) {
+      this.selectedBoundaryId = bnd.id;
+      this.selectedNodeId = null;
+      this.selectedRelId = null;
+      this.updateSelectionState();
+      this.promptEditBoundaryLabel(bnd.id);
+      return;
+    }
+
+    const newBnd = {
+      id: `bnd_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      rootId: rootNodeId,
+      label: label || 'ENCLOS',
+      color: node.color || '#2563eb'
+    };
+
+    if (!this.boundaries) this.boundaries = [];
+    this.boundaries.push(newBnd);
+    this.selectedBoundaryId = newBnd.id;
+    this.selectedNodeId = null;
+    this.selectedRelId = null;
+
+    this.draw();
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Enclos créé autour de « ${node.text} »`);
+    }
+
+    this.promptEditBoundaryLabel(newBnd.id);
+  },
+
+  deleteBoundary(bndId) {
+    if (!this.boundaries) return;
+    this.boundaries = this.boundaries.filter(b => b.id !== bndId);
+    if (this.selectedBoundaryId === bndId) this.selectedBoundaryId = null;
+    this.draw();
+    this.syncAndAutoSave();
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast('Enclos supprimé');
+    }
+  },
+
+  promptEditBoundaryLabel(bndId) {
+    const bnd = this.boundaries?.find(b => b.id === bndId);
+    if (!bnd) return;
+
+    const rootNode = this.findNode(bnd.rootId);
+    document.getElementById('mm-boundary-edit-modal')?.remove();
+
+    const presets = [
+      'ARGUMENTATION',
+      'ENCLOS',
+      'CONTEXTE',
+      'APPLICATION',
+      'EXHORTATION',
+      'DOCTRINE',
+      'CONCLUSION'
+    ];
+
+    const overlay = document.createElement('div');
+    overlay.id = 'mm-boundary-edit-modal';
+    overlay.className = 'mm-rel-modal-overlay';
+    overlay.innerHTML = `
+      <div class="mm-rel-modal" role="dialog" aria-modal="true">
+        <div class="mm-rel-modal-title">
+          <span>Enclos / Clôture</span>
+          <button type="button" class="mm-modal-close-btn" id="mm-btn-close-bnd-modal" title="Fermer (Échap)">×</button>
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">
+          Branche mère : <strong>${this.escapeHtml(rootNode?.text || 'Branche')}</strong>
+        </div>
+        <div class="mm-rel-presets">
+          ${presets.map(p => `<button type="button" class="mm-rel-preset-chip" data-label="${p}">${p}</button>`).join('')}
+        </div>
+        <input type="text" class="mm-rel-modal-input" id="mm-bnd-input-label" value="${this.escapeHtml(bnd.label || 'ENCLOS')}" placeholder="Titre de l'enclos...">
+        <div class="mm-rel-modal-actions">
+          <button type="button" class="mm-rel-btn-delete" id="mm-btn-del-bnd" title="Supprimer cet enclos">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Supprimer</span>
+          </button>
+          <div class="mm-rel-modal-right-actions">
+            <button type="button" class="mm-rel-btn-cancel" id="mm-btn-cancel-bnd">Annuler</button>
+            <button type="button" class="mm-rel-btn-save" id="mm-btn-save-bnd">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Appliquer</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const input = document.getElementById('mm-bnd-input-label');
+    input?.focus();
+    input?.select();
+
+    const close = () => {
+      overlay.remove();
+      document.removeEventListener('keydown', handleKey);
+    };
+
+    const handleKey = (e) => {
+      if (e.key === 'Escape') close();
+      if (e.key === 'Enter') save();
+    };
+
+    const save = () => {
+      const val = (input?.value || '').trim().toUpperCase() || 'ENCLOS';
+      bnd.label = val;
+      close();
+      this.draw();
+      this.syncAndAutoSave();
+    };
+
+    overlay.querySelectorAll('.mm-rel-preset-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const lbl = chip.getAttribute('data-label');
+        if (input) input.value = lbl;
+        save();
+      });
+    });
+
+    document.getElementById('mm-btn-close-bnd-modal')?.addEventListener('click', close);
+    document.getElementById('mm-btn-cancel-bnd')?.addEventListener('click', close);
+    document.getElementById('mm-btn-save-bnd')?.addEventListener('click', save);
+    document.getElementById('mm-btn-del-bnd')?.addEventListener('click', () => {
+      close();
+      this.deleteBoundary(bndId);
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener('keydown', handleKey);
+  },
+
+  renderOutlineBoundaryPill(nodeId) {
+    if (!this.boundaries || this.boundaries.length === 0) return '';
+    const bnd = this.boundaries.find(b => b.rootId === nodeId);
+    if (!bnd) return '';
+
+    return `
+      <span class="mm-outline-boundary-pill" data-action="edit-boundary" data-boundary-id="${bnd.id}" title="Enclos : ${this.escapeHtml(bnd.label)} (Cliquer pour modifier)">
+        <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" stroke-dasharray="3 2"/><path d="M7 8h10"/></svg>
+        <span>${this.escapeHtml(bnd.label || 'ENCLOS')}</span>
+      </span>
+    `;
   }
 };

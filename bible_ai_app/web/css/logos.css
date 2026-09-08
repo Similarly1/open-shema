@@ -35001,6 +35001,110 @@ body[class*="palette-dark"] .mm-rel-btn-cancel:hover {
   100% { background-color: transparent; }
 }
 
+/* ======================================================= */
+/* ENCLOS / CLÔTURES STYLE XMIND (MINDMAP BOUNDARIES)     */
+/* ======================================================= */
+.mm-boundary-g {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.mm-boundary-rect {
+  transition: stroke 0.2s ease, stroke-width 0.2s ease, fill 0.2s ease;
+}
+
+.mm-boundary-g:hover .mm-boundary-rect {
+  stroke-width: 2.2px;
+}
+
+.mm-boundary-g.selected .mm-boundary-rect {
+  stroke-width: 2.6px;
+  filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.4));
+}
+
+.mm-boundary-label-g {
+  cursor: pointer;
+  user-select: none;
+}
+
+.mm-boundary-label-pill {
+  fill: var(--bg-card, #ffffff);
+  transition: all 0.15s ease;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+body.theme-dark .mm-boundary-label-pill,
+body[class*="palette-dark"] .mm-boundary-label-pill {
+  fill: #1e293b;
+}
+
+.mm-boundary-label-text {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.mm-boundary-del-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+}
+
+.mm-boundary-g:hover .mm-boundary-del-btn,
+.mm-boundary-g.selected .mm-boundary-del-btn {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.mm-boundary-del-circle {
+  fill: #ef4444;
+  transition: fill 0.15s ease;
+}
+
+.mm-boundary-del-btn:hover .mm-boundary-del-circle {
+  fill: #dc2626;
+}
+
+.mm-boundary-del-text {
+  fill: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+/* Pastille Enclos en Vue Plan (Outliner) */
+.mm-outline-boundary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1.5px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-blue, #2563eb);
+  border: 1px dashed rgba(37, 99, 235, 0.4);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.mm-outline-boundary-pill:hover {
+  background: rgba(37, 99, 235, 0.16);
+  border-color: var(--accent-blue, #2563eb);
+}
+
+body.theme-dark .mm-outline-boundary-pill,
+body[class*="palette-dark"] .mm-outline-boundary-pill {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
 /* 10. Impression */
 @media print {
   #app-window-titlebar,
