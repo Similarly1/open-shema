@@ -3515,7 +3515,7 @@
                   <textarea id="cfg-sermon-restructure-system-prompt" style="display: none;"></textarea>
                 </div>
 
-                <!-- Carte 7 : Évaluation & Audit Homilétique de Prédication (Florent Varak / IBG) -->
+                <!-- Carte 7 : Évaluation & Audit Homilétique de Prédication (Homilétique textuelle) -->
                 <div class="prompt-setting-card" id="prompt-card-sermon_evaluation" style="margin-top: 12px;">
                   <div class="prompt-card-main">
                     <div class="prompt-card-header">
@@ -4528,13 +4528,16 @@
               </div>
             </div>
             <div class="notes-editor-subbar" id="notes-editor-subbar">
-              <div class="notes-subbar-meta">
-                <input type="text" id="note-edit-ref" class="text-field" style="width: 200px;" placeholder="Passage lié (optionnel, ex: Jean 3:16)">
-                <div class="note-tags-wrap" style="flex: 1; max-width: 260px; display: flex; align-items: center; position: relative; min-width: 0;">
-                  <input type="text" id="note-edit-tags" class="text-field" style="width: 100%; padding-right: 34px;" placeholder="Tags (séparés par virgules)...">
-                  <button type="button" class="btn-ai-sparkle-inline" id="btn-note-gen-tags-ai" title="Générer des tags automatiques par IA selon le contenu">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1 1.3-1.3Z"/></svg>
-                  </button>
+              <div class="notes-subbar-meta" id="notes-subbar-meta">
+                <!-- Champs cachés pour compatibilité et synchronisation système -->
+                <input type="hidden" id="note-edit-ref">
+                <input type="hidden" id="note-edit-tags">
+
+                <!-- Zone interactive de badges (Passage lié & Tags style Notion / Craft) -->
+                <div class="note-meta-badges" id="note-meta-badges">
+                  <div id="note-passage-badge-container" class="note-badge-group"></div>
+                  <div class="note-meta-sep" id="note-meta-sep"></div>
+                  <div id="note-tags-badge-container" class="note-badge-group"></div>
                 </div>
               </div>
               <div class="notes-subbar-outline-actions hidden" id="notes-subbar-outline-actions">

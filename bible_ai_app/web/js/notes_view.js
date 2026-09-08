@@ -802,6 +802,12 @@ const NotesView = {
     if (this.titleInput) this.titleInput.value = state.title || '';
     if (this.refInput) this.refInput.value = state.ref || '';
     if (this.tagsInput) this.tagsInput.value = state.tags || '';
+    if (this.currentNote) {
+      this.currentNote.title = state.title || '';
+      this.currentNote.reference = state.ref || '';
+      this.currentNote.tags = state.tags || '';
+    }
+    this.renderMetaBadges();
     this.triggerAutoSave();
   },
 
@@ -1749,6 +1755,7 @@ const NotesView = {
     if (this.refInput) this.refInput.value = note.reference || '';
     if (this.tagsInput) this.tagsInput.value = note.tags || '';
     if (this.aiToggle) this.aiToggle.checked = note.include_in_ai !== false;
+    this.renderMetaBadges();
 
     // Bascule d'affichage entre Éditeur texte et Mind Map SVG
     const mmContainer = document.getElementById('note-mindmap-container');
@@ -1843,7 +1850,12 @@ const NotesView = {
   },
 
   async generateTitleWithAI() {
-    const rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    let rawMarkdown = '';
+    if (this.currentNote && this.currentNote.type === 'mindmap') {
+      rawMarkdown = this.currentNote.content || '';
+    } else {
+      rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    }
     if (!rawMarkdown || rawMarkdown.trim().length < 15) {
       App.showToast('Veuillez d\'abord rédiger du contenu dans la note pour générer un titre.');
       return;
@@ -1885,7 +1897,12 @@ const NotesView = {
   },
 
   async generateTagsWithAI() {
-    const rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    let rawMarkdown = '';
+    if (this.currentNote && this.currentNote.type === 'mindmap') {
+      rawMarkdown = this.currentNote.content || '';
+    } else {
+      rawMarkdown = this.richHtmlToMarkdown(this.contentInput);
+    }
     if (!rawMarkdown || rawMarkdown.trim().length < 15) {
       App.showToast('Veuillez d\'abord rédiger du contenu dans la note pour générer des tags.');
       return;
@@ -1903,12 +1920,17 @@ const NotesView = {
       const res = await API.call('generate_note_tags', rawMarkdown, ref, currentTags);
       
       if (res && res.success && res.tags) {
+        let finalTags = res.tags;
+        if (this.currentNote?.type === 'mindmap' && !finalTags.split(',').map(t => t.trim().toLowerCase()).includes('mindmap')) {
+          finalTags = finalTags ? `${finalTags}, mindmap` : 'mindmap';
+        }
         if (this.tagsInput) {
-          this.tagsInput.value = res.tags;
+          this.tagsInput.value = finalTags;
         }
         if (this.currentNote) {
-          this.currentNote.tags = res.tags;
+          this.currentNote.tags = finalTags;
         }
+        this.renderMetaBadges();
         this.pushHistoryState();
         this.saveCurrentNote(true);
         App.showToast(`Tags générés par IA (${res.model_used || 'IA'}) !`);
@@ -1924,6 +1946,285 @@ const NotesView = {
         btn.classList.remove('loading');
       }
     }
+  },
+
+  // =========================================================================
+  // GESTION DES BADGES DE MÉTADONNÉES (Passage lié & Tags style Notion / Craft)
+  // =========================================================================
+
+  renderMetaBadges() {
+    const passageContainer = document.getElementById('note-passage-badge-container');
+    const tagsContainer = document.getElementById('note-tags-badge-container');
+    const sep = document.getElementById('note-meta-sep');
+    if (!passageContainer || !tagsContainer) return;
+
+    passageContainer.innerHTML = '';
+    tagsContainer.innerHTML = '';
+
+    if (!this.currentNote) {
+      if (sep) sep.style.display = 'none';
+      return;
+    }
+
+    if (sep) sep.style.display = 'block';
+
+    // 1. SECTION PASSAGE LIÉ
+    const currentRef = (this.refInput?.value || this.currentNote?.reference || '').trim();
+    if (currentRef) {
+      const pill = document.createElement('span');
+      pill.className = 'note-badge-pill scripture';
+      pill.title = 'Cliquer sur la référence pour ouvrir dans la Bible';
+      pill.innerHTML = `
+        <span class="badge-icon">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </span>
+        <span class="badge-label">${this.escapeHtml(currentRef)}</span>
+        <button type="button" class="badge-action-btn badge-btn-edit" title="Modifier le passage lié">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </button>
+        <button type="button" class="badge-action-btn badge-btn-delete" title="Détacher le passage">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+
+      // Clic sur le libellé -> ouvrir dans la Bible
+      pill.querySelector('.badge-label')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('bible');
+          if (typeof BibleReader !== 'undefined' && BibleReader.navigateTo) {
+            BibleReader.navigateTo(currentRef);
+          }
+        }
+      });
+
+      // Clic sur éditer -> ouvrir BookPicker
+      pill.querySelector('.badge-btn-edit')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openPassagePicker();
+      });
+
+      // Clic sur supprimer -> détacher le passage
+      pill.querySelector('.badge-btn-delete')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.setNoteReference('');
+      });
+
+      passageContainer.appendChild(pill);
+    } else {
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'note-badge-btn-add';
+      addBtn.title = 'Lier un passage biblique à cette note';
+      addBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Lier un passage</span>
+      `;
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openPassagePicker();
+      });
+      passageContainer.appendChild(addBtn);
+    }
+
+    // 2. SECTION MOTS-CLÉS (TAGS)
+    const rawTags = (this.tagsInput?.value || this.currentNote?.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+    // Filtrer le tag technique interne 'mindmap' pour ne pas encombrer l'interface utilisateur
+    const userTags = rawTags.filter(t => t.toLowerCase() !== 'mindmap');
+
+    userTags.forEach(tag => {
+      const pill = document.createElement('span');
+      pill.className = 'note-badge-pill tag';
+      pill.innerHTML = `
+        <span class="badge-icon">#</span>
+        <span class="badge-label">${this.escapeHtml(tag)}</span>
+        <button type="button" class="badge-action-btn badge-btn-remove-tag" title="Supprimer ce mot-clé">
+          <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+      pill.querySelector('.badge-btn-remove-tag')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.removeTag(tag);
+      });
+      tagsContainer.appendChild(pill);
+    });
+
+    // Bouton '+ Tag'
+    const addTagBtn = document.createElement('button');
+    addTagBtn.type = 'button';
+    addTagBtn.className = 'note-badge-btn-add';
+    addTagBtn.id = 'note-badge-btn-add-tag';
+    addTagBtn.title = 'Ajouter un mot-clé';
+    addTagBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Tag</span>
+    `;
+    addTagBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.promptAddTagInline(tagsContainer, addTagBtn);
+    });
+    tagsContainer.appendChild(addTagBtn);
+
+    // Bouton Génération IA des tags
+    const aiTagsBtn = document.createElement('button');
+    aiTagsBtn.type = 'button';
+    aiTagsBtn.className = 'btn-ai-sparkle-inline';
+    aiTagsBtn.id = 'btn-note-gen-tags-ai';
+    aiTagsBtn.title = 'Générer des tags automatiques par IA selon le contenu';
+    aiTagsBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/></svg>
+    `;
+    aiTagsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.generateTagsWithAI();
+    });
+    tagsContainer.appendChild(aiTagsBtn);
+  },
+
+  openPassagePicker() {
+    let initialBook = 'Gen';
+    let initialChapter = 1;
+    const currentRef = (this.refInput?.value || this.currentNote?.reference || '').trim();
+
+    if (currentRef && typeof BookPicker !== 'undefined' && typeof BookPicker.parseQuickPassage === 'function') {
+      const parsed = BookPicker.parseQuickPassage(currentRef);
+      if (parsed && parsed.bookCode) {
+        initialBook = parsed.bookCode;
+        if (parsed.chapter) initialChapter = parsed.chapter;
+      }
+    } else if (typeof BibleReader !== 'undefined' && BibleReader.currentBook) {
+      initialBook = BibleReader.currentBook;
+      initialChapter = BibleReader.currentChapter || 1;
+    }
+
+    if (typeof BookPicker !== 'undefined') {
+      BookPicker.open(initialBook, initialChapter, (bCode, chNum, vNum = null) => {
+        if (!bCode) {
+          this.setNoteReference('');
+        } else {
+          const book = (BookPicker.booksData || []).find(b => b.code.toLowerCase() === bCode.toLowerCase());
+          const bookName = book ? book.name : bCode;
+          const refStr = vNum ? `${bookName} ${chNum}:${vNum}` : `${bookName} ${chNum}`;
+          this.setNoteReference(refStr);
+        }
+      }, {
+        center: true,
+        allowClear: !!currentRef,
+        targetLabel: this.currentNote?.title || 'Note',
+        initialQuery: currentRef
+      });
+    } else {
+      const manualRef = prompt('Référence biblique liée (ex: Jean 3:16) :', currentRef);
+      if (manualRef !== null) {
+        this.setNoteReference(manualRef.trim());
+      }
+    }
+  },
+
+  setNoteReference(refString) {
+    const cleanRef = (refString || '').trim();
+    if (this.refInput) this.refInput.value = cleanRef;
+    if (this.currentNote) this.currentNote.reference = cleanRef;
+    this.renderMetaBadges();
+    this.pushHistoryState();
+    this.triggerAutoSave();
+    this.saveCurrentNote(true);
+  },
+
+  addTag(newTag) {
+    newTag = (newTag || '').trim().replace(/^#+/, '');
+    if (!newTag) return;
+    const currentStr = (this.tagsInput?.value || this.currentNote?.tags || '');
+    let tags = currentStr.split(',').map(t => t.trim()).filter(Boolean);
+    
+    // Vérifier si le mot-clé existe déjà (insensible à la casse)
+    if (tags.some(t => t.toLowerCase() === newTag.toLowerCase())) return;
+
+    tags.push(newTag);
+
+    // Si note de type mindmap, garantir la présence du tag technique interne 'mindmap'
+    if (this.currentNote?.type === 'mindmap' && !tags.some(t => t.toLowerCase() === 'mindmap')) {
+      tags.push('mindmap');
+    }
+
+    const updatedStr = tags.join(', ');
+    if (this.tagsInput) this.tagsInput.value = updatedStr;
+    if (this.currentNote) this.currentNote.tags = updatedStr;
+
+    this.renderMetaBadges();
+    this.pushHistoryState();
+    this.triggerAutoSave();
+    this.saveCurrentNote(true);
+  },
+
+  removeTag(tagToRemove) {
+    if (!tagToRemove) return;
+    const currentStr = (this.tagsInput?.value || this.currentNote?.tags || '');
+    let tags = currentStr.split(',').map(t => t.trim()).filter(Boolean);
+
+    tags = tags.filter(t => t.toLowerCase() !== tagToRemove.toLowerCase().trim());
+
+    // Si note de type mindmap, garantir le maintien du tag technique 'mindmap'
+    if (this.currentNote?.type === 'mindmap' && !tags.some(t => t.toLowerCase() === 'mindmap')) {
+      tags.push('mindmap');
+    }
+
+    const updatedStr = tags.join(', ');
+    if (this.tagsInput) this.tagsInput.value = updatedStr;
+    if (this.currentNote) this.currentNote.tags = updatedStr;
+
+    this.renderMetaBadges();
+    this.pushHistoryState();
+    this.triggerAutoSave();
+    this.saveCurrentNote(true);
+  },
+
+  promptAddTagInline(container, btnEl) {
+    if (!container || !btnEl) return;
+    
+    const existingInput = container.querySelector('.note-badge-inline-input');
+    if (existingInput) {
+      existingInput.focus();
+      return;
+    }
+
+    btnEl.style.display = 'none';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'note-badge-inline-input';
+    input.placeholder = 'mot-clé...';
+    input.maxLength = 30;
+
+    let committed = false;
+    const commit = () => {
+      if (committed) return;
+      committed = true;
+      const val = input.value.trim();
+      if (val) {
+        this.addTag(val);
+      } else {
+        this.renderMetaBadges();
+      }
+    };
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        commit();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        committed = true;
+        this.renderMetaBadges();
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      commit();
+    });
+
+    container.insertBefore(input, btnEl);
+    input.focus();
   },
 
   // =========================================================================

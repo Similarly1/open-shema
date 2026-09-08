@@ -34088,3 +34088,168 @@ body.theme-dark .mm-branch-box {
   fill: #1e293b !important;
 }
 
+/* ==========================================================================
+   Badges de métadonnées de note (Passage lié & Tags style Notion / Craft)
+   ========================================================================== */
+.note-meta-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 28px;
+}
+
+.note-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.note-meta-sep {
+  width: 1px;
+  height: 16px;
+  background-color: var(--border-color, #e2e8f0);
+  margin: 0 4px;
+}
+
+body.theme-dark .note-meta-sep {
+  background-color: #334155;
+}
+
+/* Boutons '+ Lier un passage' et '+ Tag' */
+.note-badge-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 14px;
+  border: 1px dashed var(--border-color, #cbd5e1);
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.note-badge-btn-add:hover {
+  background: var(--bg-secondary, #f1f5f9);
+  border-color: var(--accent-blue, #3b82f6);
+  color: var(--accent-blue, #2563eb);
+}
+
+body.theme-dark .note-badge-btn-add {
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+body.theme-dark .note-badge-btn-add:hover {
+  background: #1e293b;
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+/* Pastilles actives */
+.note-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+/* Pastille Passage lié (Bleu noble) */
+.note-badge-pill.scripture {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+body.theme-dark .note-badge-pill.scripture {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.note-badge-pill.scripture .badge-label {
+  cursor: pointer;
+}
+
+.note-badge-pill.scripture .badge-label:hover {
+  text-decoration: underline;
+}
+
+/* Pastille Tag / Mot-clé (Ambre / Ardoise) */
+.note-badge-pill.tag {
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-secondary, #475569);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+body.theme-dark .note-badge-pill.tag {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+.note-badge-pill .badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.note-badge-pill .badge-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.note-badge-pill .badge-action-btn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+body.theme-dark .note-badge-pill .badge-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Saisie inline d'un nouveau tag */
+.note-badge-inline-input {
+  width: 90px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--accent-blue, #3b82f6);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+body.theme-dark .note-badge-inline-input {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+
