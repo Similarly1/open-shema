@@ -117,8 +117,9 @@ const MindMapView = {
             <filter id="mm-glow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.15"/>
             </filter>
-            <filter id="mm-select-glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#3b82f6" flood-opacity="0.5"/>
+            <filter id="mm-select-glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#3b82f6" flood-opacity="0.6"/>
+              <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4"/>
             </filter>
             <marker id="mm-rel-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
@@ -2829,6 +2830,8 @@ const MindMapView = {
     g.setAttribute('class', `mm-node-g mm-level-${node.level} ${isRoot ? 'mm-root-node' : ''} ${isFloatingRoot ? 'mm-floating-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
     g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
     g.setAttribute('data-id', node.id);
+    const nodeColor = node.color || (isRoot ? 'var(--accent-blue, #2563eb)' : '#3b82f6');
+    g.style.setProperty('--node-color', nodeColor);
 
     if (isRoot) {
       // Médaillon central arrondi avec icône vectorielle noble
@@ -2878,9 +2881,7 @@ const MindMapView = {
         boxRect.setAttribute('fill', 'var(--bg-card, #ffffff)');
         boxRect.setAttribute('stroke', node.color || 'var(--accent-blue)');
         boxRect.setAttribute('stroke-width', strokeW);
-        if (isSelected) {
-          boxRect.setAttribute('filter', 'url(#mm-select-glow)');
-        }
+        boxRect.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'url(#mm-glow)');
         g.appendChild(boxRect);
 
         // Fond teinté translucide assorti à la couleur de la branche
@@ -2893,6 +2894,18 @@ const MindMapView = {
         tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
         tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.10' : '0.07'));
         g.appendChild(tintRect);
+      } else {
+        // Mode souligné (underline) : halo d'illumination discret visible uniquement à la sélection
+        const haloRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        const haloW = node.width + 12;
+        const haloH = (node.height || 24) + 6;
+        haloRect.setAttribute('x', -haloW / 2);
+        haloRect.setAttribute('y', -haloH / 2);
+        haloRect.setAttribute('width', haloW);
+        haloRect.setAttribute('height', haloH);
+        haloRect.setAttribute('rx', 8);
+        haloRect.setAttribute('class', 'mm-underline-halo');
+        g.appendChild(haloRect);
       }
 
       // Zone réceptive continue invisible
@@ -3241,7 +3254,12 @@ const MindMapView = {
 
   updateSelectionState() {
     this.viewportG?.querySelectorAll('.mm-node-g').forEach(el => {
-      el.classList.toggle('selected', el.getAttribute('data-id') === this.selectedNodeId);
+      const isSel = el.getAttribute('data-id') === this.selectedNodeId;
+      el.classList.toggle('selected', isSel);
+      const box = el.querySelector('.mm-branch-box, .mm-root-rect, .mm-floating-box');
+      if (box) {
+        box.setAttribute('filter', isSel ? 'url(#mm-select-glow)' : 'url(#mm-glow)');
+      }
     });
     this.viewportG?.querySelectorAll('.mm-relationship-g').forEach(el => {
       const isRelSel = el.getAttribute('data-rel-id') === this.selectedRelId;

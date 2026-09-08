@@ -33031,10 +33031,60 @@ body[class*="palette-dark"] .mm-inline-editor.paper-mode {
   transition: all 0.2s ease;
 }
 
+/* Illumination & Mise en valeur subtile de l'élément sélectionné */
 .mm-node-g.selected .mm-root-rect {
-  stroke: #3b82f6;
-  stroke-width: 3.5px;
+  stroke: var(--node-color, var(--accent-blue, #3b82f6)) !important;
+  stroke-width: 3.5px !important;
+  filter: drop-shadow(0 0 14px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.5)) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.mm-node-g.selected .mm-branch-box,
+.mm-node-g.selected .mm-floating-box {
+  stroke: var(--node-color, var(--accent-blue, #3b82f6)) !important;
+  stroke-width: 2.8px !important;
+  filter: drop-shadow(0 0 11px var(--node-color, rgba(59, 130, 246, 0.75))) drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-node-g.selected .mm-branch-box,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-node-g.selected .mm-branch-box,
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-node-g.selected .mm-floating-box,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-node-g.selected .mm-floating-box {
+  stroke-width: 2.8px !important;
+  filter: drop-shadow(0 0 13px var(--node-color, #60a5fa)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.45)) !important;
+}
+
+.note-mindmap-container.paper-mode .mm-node-g.selected .mm-branch-box,
+.note-mindmap-container.paper-mode .mm-node-g.selected .mm-floating-box {
+  stroke-width: 2.8px !important;
+  filter: drop-shadow(0 0 9px var(--node-color, #2563eb)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.12)) !important;
+}
+
+/* Halo subtil en mode souligné (underline) */
+.mm-underline-halo {
+  fill: var(--node-color, var(--accent-blue, #3b82f6));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.mm-node-g.selected .mm-underline-halo {
+  opacity: 0.16 !important;
+  filter: drop-shadow(0 0 8px var(--node-color, #3b82f6));
+}
+
+.mm-node-g.selected .mm-branch-text {
+  font-weight: 800 !important;
+  letter-spacing: 0.6px;
+}
+
+body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-node-g.selected .mm-branch-text,
+body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-node-g.selected .mm-branch-text {
+  fill: #ffffff !important;
+  text-shadow: 0 0 8px var(--node-color, rgba(147, 197, 253, 0.6));
+}
+
 
 .mm-root-text {
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
