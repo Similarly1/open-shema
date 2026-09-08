@@ -420,6 +420,8 @@ const MindMapView = {
     // 2. Zoom à la molette
     this.svg?.addEventListener('wheel', (e) => {
       e.preventDefault();
+      const activeEditor = document.querySelector('.mm-inline-editor');
+      if (activeEditor) activeEditor.blur();
       this.hideTooltip();
       const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
       const rect = this.svg.getBoundingClientRect();
@@ -2501,101 +2503,51 @@ const MindMapView = {
 
     const isRoot = nodeId === 'root';
     const textEl = nodeG.querySelector('.mm-branch-text') || nodeG.querySelector('.mm-root-text');
-    const boxEl = nodeG.querySelector('.mm-branch-box') || nodeG.querySelector('.mm-root-rect');
-    const refEl = nodeG.querySelector('.mm-scripture-pill');
-    const noteEl = nodeG.querySelector('.mm-note-indicator');
-
     const targetRect = textEl ? textEl.getBoundingClientRect() : nodeG.getBoundingClientRect();
-    const boxRect = boxEl ? boxEl.getBoundingClientRect() : null;
-    const refRect = refEl ? refEl.getBoundingClientRect() : null;
-    const noteRect = noteEl ? noteEl.getBoundingClientRect() : null;
 
-    // 1. Hauteur et calage vertical parfaitement confinés dans le nœud (aucun débordement)
-    let screenY;
-    let inputHeight;
-    if (boxRect) {
-      inputHeight = Math.max(20, Math.round(boxRect.height - 4));
-      screenY = Math.round(boxRect.top + 2);
-    } else {
-      inputHeight = Math.max(20, Math.round(targetRect.height + 4));
-      screenY = Math.round(targetRect.top - 2);
-    }
-
-    // 2. Calcul des bornes horizontales sécurisées (anti-chevauchement des pastilles)
+    const scale = this.viewBox?.scale || 1;
+    const baseFontSize = isRoot ? 14 : 11.5;
     const isLeft = node.side === 'left';
-    let screenX;
-    let inputWidth;
-    let minLeftBound;
-    let maxRightBound;
-
-    if (isRoot) {
-      const naturalW = Math.max(60, Math.round(targetRect.width + 16));
-      inputWidth = boxRect ? Math.min(boxRect.width - 8, naturalW) : naturalW;
-      screenX = Math.round(targetRect.left + (targetRect.width - inputWidth) / 2);
-    } else if (isLeft) {
-      // Branche à gauche : pastilles à gauche, texte calé à droite
-      const badgeRight = Math.max(
-        refRect ? refRect.right : 0,
-        noteRect ? noteRect.right : 0
-      );
-      minLeftBound = badgeRight > 0 ? Math.round(badgeRight + 4) : (boxRect ? Math.round(boxRect.left + 5) : Math.round(targetRect.left - 4));
-      maxRightBound = boxRect ? Math.round(boxRect.right - 5) : Math.round(targetRect.right + 4);
-
-      const naturalW = Math.max(48, Math.round(targetRect.width + 14));
-      const availW = Math.max(40, maxRightBound - minLeftBound);
-      inputWidth = Math.min(naturalW, availW);
-      screenX = Math.max(minLeftBound, maxRightBound - inputWidth);
-    } else {
-      // Branche à droite ou top-down : texte à gauche, pastilles à droite
-      const badgeLeft = Math.min(
-        refRect ? refRect.left : 999999,
-        noteRect ? noteRect.left : 999999
-      );
-      minLeftBound = boxRect ? Math.round(boxRect.left + 5) : Math.round(targetRect.left - 2);
-      maxRightBound = badgeLeft < 999999 ? Math.round(badgeLeft - 4) : (boxRect ? Math.round(boxRect.right - 5) : Math.round(targetRect.right + 25));
-
-      const naturalW = Math.max(48, Math.round(targetRect.width + 14));
-      const availW = Math.max(40, maxRightBound - minLeftBound);
-      inputWidth = Math.min(naturalW, availW);
-      screenX = minLeftBound;
-    }
 
     // Masquer le texte SVG et les boutons d'actions pendant l'édition
     nodeG.classList.add('editing');
 
-    // Création de l'input flottant calé sur le mot
+    // Création de l'input transparent calé directement sur le texte avec GPU scale
     const input = document.createElement('input');
     input.type = 'text';
     input.value = node.text;
+    input.placeholder = 'MOT-CLÉ';
     input.className = 'mm-inline-editor';
     input.style.position = 'fixed';
-    input.style.left = `${screenX}px`;
-    input.style.top = `${screenY}px`;
-    input.style.width = `${inputWidth}px`;
-    input.style.height = `${inputHeight}px`;
+    input.style.background = 'transparent';
+    input.style.border = 'none';
+    input.style.outline = 'none';
+    input.style.boxShadow = 'none';
+    input.style.padding = '0';
+    input.style.margin = '0';
+    input.style.top = `${Math.round(targetRect.top)}px`;
+    input.style.height = `${Math.max(16, Math.round(targetRect.height / scale))}px`;
+    input.style.lineHeight = `${Math.max(16, Math.round(targetRect.height / scale))}px`;
+    input.style.fontSize = `${baseFontSize}px`;
+    input.style.letterSpacing = '0.5px';
+    input.style.transformOrigin = '0 0';
+    input.style.transform = `scale(${scale})`;
+    input.style.caretColor = node.color || 'var(--accent-blue, #2563eb)';
 
-    // Adaptation esthétique à la forme et couleur du nœud
-    if (this.nodeShape === 'pill') {
-      input.style.borderRadius = '11px';
-    } else {
-      input.style.borderRadius = '6px';
-    }
-
-    if (node.color && typeof node.color === 'string' && node.color.startsWith('#')) {
-      input.style.borderColor = node.color;
-      input.style.boxShadow = `0 0 0 3px ${this.hexToRgba(node.color, 0.22)}, 0 2px 8px rgba(0, 0, 0, 0.08)`;
-    }
+    const unscaledTextW = this.getTextWidth(node.text, baseFontSize, '700');
+    const initialUnscaledW = Math.max(unscaledTextW + 12, 40);
+    input.style.width = `${initialUnscaledW}px`;
 
     if (isLeft) {
       input.style.textAlign = 'right';
+      input.style.left = `${Math.round(targetRect.right - initialUnscaledW * scale)}px`;
     } else if (isRoot) {
       input.style.textAlign = 'center';
+      const centerX = targetRect.left + targetRect.width / 2;
+      input.style.left = `${Math.round(centerX - (initialUnscaledW * scale) / 2)}px`;
     } else {
       input.style.textAlign = 'left';
-    }
-
-    if (isRoot) {
-      input.style.fontSize = '13.5px';
+      input.style.left = `${Math.round(targetRect.left)}px`;
     }
 
     document.body.appendChild(input);
@@ -2605,25 +2557,16 @@ const MindMapView = {
     // Redimensionnement dynamique continu au fil de la frappe
     const handleDynamicResize = () => {
       const currentVal = input.value || ' ';
-      const textW = this.getTextWidth(currentVal, isRoot ? 13.5 : 11.5, '700');
-      const desiredW = Math.max(48, Math.round(textW + 16));
+      const curW = Math.max(this.getTextWidth(currentVal, baseFontSize, '700') + 12, 40);
+      input.style.width = `${curW}px`;
 
-      if (isRoot) {
-        const maxW = boxRect ? Math.max(boxRect.width - 8, desiredW) : desiredW;
-        input.style.width = `${maxW}px`;
-        input.style.left = `${Math.round(targetRect.left + (targetRect.width - maxW) / 2)}px`;
-      } else if (isLeft) {
-        // Calage à droite, expansion vers la gauche (bloqué avant la pastille)
-        const newLeft = Math.max(minLeftBound, maxRightBound - desiredW);
-        const actualW = maxRightBound - newLeft;
-        input.style.width = `${actualW}px`;
-        input.style.left = `${newLeft}px`;
+      if (isLeft) {
+        input.style.left = `${Math.round(targetRect.right - curW * scale)}px`;
+      } else if (isRoot) {
+        const centerX = targetRect.left + targetRect.width / 2;
+        input.style.left = `${Math.round(centerX - (curW * scale) / 2)}px`;
       } else {
-        // Calage à gauche, expansion vers la droite
-        const avail = Math.max(48, maxRightBound - minLeftBound);
-        const actualW = Math.min(desiredW, avail + 30);
-        input.style.width = `${actualW}px`;
-        input.style.left = `${minLeftBound}px`;
+        input.style.left = `${Math.round(targetRect.left)}px`;
       }
     };
 
