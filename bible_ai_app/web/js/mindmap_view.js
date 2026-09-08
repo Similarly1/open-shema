@@ -118,6 +118,9 @@ const MindMapView = {
           <button type="button" class="mm-dock-btn" id="mm-btn-structure" title="Squelette de mise en page : Radiante, Arbre droit, Organigramme (Alt+S)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
           </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-reorganize" title="Réorganiser harmonieusement la carte (Alt+R)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+          </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-relationship" title="Créer une liaison transversale entre deux branches (Ctrl+L)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
           </button>
@@ -191,6 +194,7 @@ const MindMapView = {
             <table class="mm-help-table">
               <tr><td><kbd>Alt+P</kbd></td><td><strong>Basculer entre Vue Carte et Vue Plan</strong></td></tr>
               <tr><td><kbd>Alt+S</kbd></td><td><strong>Changer de squelette de mise en page</strong></td></tr>
+              <tr><td><kbd>Alt+R</kbd></td><td><strong>Réorganiser harmonieusement la carte</strong></td></tr>
               <tr><td><kbd>Ctrl+L</kbd></td><td><strong>Créer une liaison transversale (Relation)</strong></td></tr>
               <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
               <tr><td><kbd>Entrée</kbd></td><td>Ajouter une branche voisine (Sœur)</td></tr>
@@ -353,6 +357,7 @@ const MindMapView = {
       e.stopPropagation();
       this.toggleStructurePopover();
     });
+    document.getElementById('mm-btn-reorganize')?.addEventListener('click', () => this.autoReorganize());
     document.getElementById('mm-btn-relationship')?.addEventListener('click', () => {
       if (this.selectedNodeId) {
         this.startConnecting(this.selectedNodeId);
@@ -412,6 +417,13 @@ const MindMapView = {
       if (e.altKey && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         this.cycleStructure();
+        return;
+      }
+
+      // Réorganisation automatique harmonieuse de la carte (Alt+R)
+      if (e.altKey && (e.key === 'r' || e.key === 'R')) {
+        e.preventDefault();
+        this.autoReorganize();
         return;
       }
 
@@ -2027,7 +2039,12 @@ const MindMapView = {
       el.classList.toggle('selected', el.getAttribute('data-id') === this.selectedNodeId);
     });
     this.viewportG?.querySelectorAll('.mm-relationship-g').forEach(el => {
-      el.classList.toggle('selected', el.getAttribute('data-rel-id') === this.selectedRelId);
+      const isRelSel = el.getAttribute('data-rel-id') === this.selectedRelId;
+      el.classList.toggle('selected', isRelSel);
+      const handle = el.querySelector('.mm-rel-handle');
+      if (handle) {
+        handle.style.display = isRelSel ? 'inline' : 'none';
+      }
     });
   },
 
@@ -2422,18 +2439,97 @@ const MindMapView = {
   fitView() {
     if (!this.svg) return;
     const rect = this.svg.getBoundingClientRect();
-    if (this.treeStructure === 'top-down') {
-      this.viewBox.x = rect.width / 2;
-      this.viewBox.y = Math.max(90, rect.height * 0.22);
-    } else if (this.treeStructure === 'right-tree') {
-      this.viewBox.x = Math.max(140, rect.width * 0.22);
-      this.viewBox.y = rect.height / 2;
-    } else {
-      this.viewBox.x = rect.width / 2;
-      this.viewBox.y = rect.height / 2;
+    if (!rect || rect.width <= 0 || rect.height <= 0) return;
+
+    // 1. Calcul de l'emprise géométrique réelle de tous les éléments (BBox SVG ou parcours récursif)
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+    let bbox = null;
+    try {
+      if (this.viewportG && typeof this.viewportG.getBBox === 'function') {
+        bbox = this.viewportG.getBBox();
+      }
+    } catch (e) {
+      bbox = null;
     }
-    this.viewBox.scale = 1.0;
+
+    if (bbox && bbox.width > 20 && bbox.height > 20 && isFinite(bbox.x) && isFinite(bbox.y)) {
+      minX = bbox.x;
+      maxX = bbox.x + bbox.width;
+      minY = bbox.y;
+      maxY = bbox.y + bbox.height;
+    } else {
+      // Fallback géométrique analytique
+      const traverse = (node) => {
+        if (!node) return;
+        const w = (node.width || 120) / 2 + 30;
+        const h = (node.height || 36) / 2 + 20;
+        minX = Math.min(minX, node.x - w);
+        maxX = Math.max(maxX, node.x + w);
+        minY = Math.min(minY, node.y - h);
+        maxY = Math.max(maxY, node.y + h);
+        if (node.children) node.children.forEach(traverse);
+      };
+      traverse(this.tree);
+    }
+
+    if (!isFinite(minX) || !isFinite(maxX) || minX >= maxX) {
+      minX = -120; maxX = 120;
+      minY = -60; maxY = 60;
+    }
+
+    const contentW = Math.max(100, maxX - minX);
+    const contentH = Math.max(80, maxY - minY);
+    const contentCenterX = (minX + maxX) / 2;
+    const contentCenterY = (minY + maxY) / 2;
+
+    // 2. Marge de confort généreuse autour de la carte
+    const padding = 70;
+    const availW = Math.max(80, rect.width - padding * 2);
+    const availH = Math.max(80, rect.height - padding * 2);
+
+    // 3. Calcul du zoom optimal pour embrasser 100% de la carte sans coupure
+    const scaleX = availW / contentW;
+    const scaleY = availH / contentH;
+    const fitScale = Math.min(scaleX, scaleY);
+
+    // Bornes de zoom douces : min 0.25 (très grande carte), max 1.15 (éviter le gigantisme sur petite carte)
+    const targetScale = Math.min(Math.max(0.25, fitScale), 1.15);
+
+    // 4. Centrage précis sur le centre de gravité de la carte
+    this.viewBox.x = rect.width / 2 - contentCenterX * targetScale;
+    this.viewBox.y = rect.height / 2 - contentCenterY * targetScale;
+    this.viewBox.scale = targetScale;
+
     this.applyTransform();
+  },
+
+  autoReorganize() {
+    if (!this.tree) return;
+
+    // Réinitialisation de tous les décalages spatiaux manuels
+    const resetOffsets = (node) => {
+      node.offsetX = 0;
+      node.offsetY = 0;
+      if (node.children) node.children.forEach(resetOffsets);
+    };
+    resetOffsets(this.tree);
+
+    // Réinitialisation des courbures manuelles des liaisons pour un tracé automatique équilibré
+    if (this.relationships) {
+      this.relationships.forEach(rel => {
+        rel.customControl = null;
+      });
+    }
+
+    this.layoutTree();
+    this.draw();
+    this.fitView();
+    this.syncAndAutoSave();
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast('✨ Carte réorganisée harmonieusement');
+    }
   },
 
   togglePaperMode() {
@@ -3117,6 +3213,14 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Changer la palette de couleurs</span>
         </div>
+        <div class="mm-ctx-divider"></div>
+        <div class="mm-ctx-item" data-action="reorganize">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+          </span>
+          <span class="mm-ctx-label">Réorganiser harmonieusement</span>
+          <span class="mm-ctx-shortcut">Alt+R</span>
+        </div>
         <div class="mm-ctx-item" data-action="fit">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
@@ -3169,6 +3273,13 @@ const MindMapView = {
           ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
         </div>
         <div class="mm-ctx-divider"></div>
+        <div class="mm-ctx-item" data-action="reorganize">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+          </span>
+          <span class="mm-ctx-label">Réorganiser harmonieusement</span>
+          <span class="mm-ctx-shortcut">Alt+R</span>
+        </div>
         <div class="mm-ctx-item" data-action="fit">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
@@ -3299,6 +3410,9 @@ const MindMapView = {
             break;
           case 'fit':
             this.fitView();
+            break;
+          case 'reorganize':
+            this.autoReorganize();
             break;
           case 'palette':
             this.cyclePalette();
@@ -3511,48 +3625,48 @@ const MindMapView = {
       relG.appendChild(visiblePath);
 
       // Poignée de contrôle interactive de la courbure Bézier (style XMind)
-      // UNIQUEMENT visible lorsque la liaison est sélectionnée
-      if (isSelected) {
-        const handleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        handleCircle.setAttribute('cx', cx);
-        handleCircle.setAttribute('cy', cy);
-        handleCircle.setAttribute('r', '6.5');
-        handleCircle.setAttribute('class', 'mm-rel-handle');
-        handleCircle.setAttribute('fill', relColor);
-        handleCircle.setAttribute('stroke', '#ffffff');
-        handleCircle.setAttribute('stroke-width', '2');
-        handleCircle.setAttribute('title', 'Glisser pour ajuster la courbure (Double-clic pour réinitialiser)');
+      // Toujours attachée au SVG, affichée dynamiquement dès que la liaison est sélectionnée
+      const handleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      handleCircle.setAttribute('cx', cx);
+      handleCircle.setAttribute('cy', cy);
+      handleCircle.setAttribute('r', '6.5');
+      handleCircle.setAttribute('class', 'mm-rel-handle');
+      handleCircle.setAttribute('fill', relColor);
+      handleCircle.setAttribute('stroke', '#ffffff');
+      handleCircle.setAttribute('stroke-width', '2');
+      handleCircle.style.display = isSelected ? 'inline' : 'none';
+      handleCircle.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
+      handleCircle.setAttribute('title', 'Glisser pour ajuster la courbure (Double-clic pour réinitialiser)');
 
-        handleCircle.addEventListener('mousedown', (e) => {
-          if (e.button !== 0) return;
-          e.stopPropagation();
-          e.preventDefault();
-          this.selectRelationship(rel.id);
-          this.dragState = {
-            active: true,
-            type: 'rel-curve',
-            nodeId: null,
-            relId: rel.id,
-            startX: e.clientX,
-            startY: e.clientY,
-            hasMoved: false,
-            targetNodeId: null
-          };
-        });
+      handleCircle.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.stopPropagation();
+        e.preventDefault();
+        this.selectRelationship(rel.id);
+        this.dragState = {
+          active: true,
+          type: 'rel-curve',
+          nodeId: null,
+          relId: rel.id,
+          startX: e.clientX,
+          startY: e.clientY,
+          hasMoved: false,
+          targetNodeId: null
+        };
+      });
 
-        handleCircle.addEventListener('dblclick', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          rel.customControl = null;
-          this.drawRelationships();
-          this.syncAndAutoSave();
-          if (typeof App !== 'undefined' && App.showToast) {
-            App.showToast('Courbure de la liaison réinitialisée');
-          }
-        });
+      handleCircle.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        rel.customControl = null;
+        this.drawRelationships();
+        this.syncAndAutoSave();
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Courbure de la liaison réinitialisée');
+        }
+      });
 
-        relG.appendChild(handleCircle);
-      }
+      relG.appendChild(handleCircle);
 
       // Étiquette flottante centrale
       const labelText = (rel.label || 'VOIR AUSSI').toUpperCase();
@@ -3633,9 +3747,6 @@ const MindMapView = {
     this.selectedRelId = relId;
     this.selectedNodeId = null;
     this.updateSelectionState();
-    this.viewportG?.querySelectorAll('.mm-relationship-g').forEach(el => {
-      el.classList.toggle('selected', el.getAttribute('data-rel-id') === relId);
-    });
   },
 
   deleteRelationship(relId) {
