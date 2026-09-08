@@ -131,6 +131,20 @@ const MindMapView = {
         <!-- Vue Plan (Outliner hiérarchique interactif) -->
         <div id="mindmap-outline-view" class="mindmap-outline-container hidden"></div>
 
+        <!-- Bandeau supérieur discret en plein écran -->
+        <div class="mm-fullscreen-bar" id="mm-fullscreen-bar">
+          <div class="mm-fs-bar-left">
+            <span class="mm-fs-note-title" id="mm-fs-note-title">Mind Map</span>
+            <span class="mm-fs-note-ref" id="mm-fs-note-ref" style="display: none;"></span>
+          </div>
+          <div class="mm-fs-bar-right">
+            <button type="button" class="mm-fs-exit-btn" id="mm-fs-btn-exit" title="Quitter le plein écran (Échap ou F11)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/></svg>
+              <span>Quitter le plein écran</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Bannière d'indication mode liaison -->
         <div id="mm-connecting-banner" class="mm-connecting-banner hidden">
           <div class="mm-connecting-badge">
@@ -183,6 +197,9 @@ const MindMapView = {
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-export" title="Exporter la carte mentale en PDF / PNG / JPG (Ctrl+E)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-fullscreen" title="Mode Plein Écran (F11 ou F)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-help" title="Aide raccourcis clavier (?)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -597,6 +614,14 @@ const MindMapView = {
     document.getElementById('mm-btn-theme')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.togglePaperMode(); });
     document.getElementById('mm-btn-palette')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cyclePalette(); });
     document.getElementById('mm-btn-export')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.openExportModal(); });
+    document.getElementById('mm-btn-fullscreen')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleFullscreen(); });
+    document.getElementById('mm-fs-btn-exit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleFullscreen(false); });
+    document.addEventListener('fullscreenchange', () => {
+      const isNativeFs = !!document.fullscreenElement;
+      if (!isNativeFs && document.body.classList.contains('mindmap-fullscreen-active')) {
+        this.toggleFullscreen(false);
+      }
+    });
     document.getElementById('mm-btn-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(); });
     document.getElementById('mm-btn-close-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(false); });
     document.getElementById('mm-btn-open-markdown-guide')?.addEventListener('click', (e) => {
@@ -845,6 +870,13 @@ const MindMapView = {
         return;
       }
 
+      // Bascule Plein Écran (F11)
+      if (e.key === 'F11') {
+        e.preventDefault();
+        this.toggleFullscreen();
+        return;
+      }
+
       // Si l'utilisateur est en train de taper dans un champ de saisie HTML
       const activeTag = document.activeElement?.tagName;
       if (['INPUT', 'TEXTAREA'].includes(activeTag)) return;
@@ -887,6 +919,16 @@ const MindMapView = {
         if (this.selectedNodeId) this.startInlineEdit(this.selectedNodeId);
       } else if (e.key === 'r' || e.key === 'R') {
         this.fitView();
+      } else if (e.key === 'Escape') {
+        if (document.body.classList.contains('mindmap-fullscreen-active')) {
+          e.preventDefault();
+          this.toggleFullscreen(false);
+          return;
+        }
+      } else if (!e.ctrlKey && !e.altKey && !e.metaKey && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        this.toggleFullscreen();
+        return;
       } else if (!e.ctrlKey && !e.altKey && !e.metaKey && (e.key === 'm' || e.key === 'M')) {
         e.preventDefault();
         this.toggleMarkerPopover();
@@ -1984,6 +2026,15 @@ const MindMapView = {
     this.updateViewModeUI();
     this.updateStructureUI();
     this.updateStylesUI();
+
+    const fsTitleEl = document.getElementById('mm-fs-note-title');
+    const fsRefEl = document.getElementById('mm-fs-note-ref');
+    if (fsTitleEl) fsTitleEl.textContent = note.title || 'Mind Map';
+    if (fsRefEl) {
+      const ref = (note.reference || '').trim();
+      fsRefEl.textContent = ref ? `Passage : ${ref}` : '';
+      fsRefEl.style.display = ref ? 'inline' : 'none';
+    }
   },
 
   refreshView() {
@@ -6537,55 +6588,100 @@ const MindMapView = {
 
   getDiagramBoundingBox() {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    let bbox = null;
-    try {
-      if (this.viewportG && typeof this.viewportG.getBBox === 'function') {
-        bbox = this.viewportG.getBBox();
-      }
-    } catch (e) {
-      bbox = null;
+
+    // 1. Parcours géométrique analytique complet de tous les éléments du diagramme
+    const traverse = (node) => {
+      if (!node) return;
+      const w = (node.width || 120) / 2 + 65; // Marge pour pastilles versets/notes et actions
+      const h = (node.height || 36) / 2 + 25;
+      minX = Math.min(minX, node.x - w);
+      maxX = Math.max(maxX, node.x + w);
+      minY = Math.min(minY, node.y - h);
+      maxY = Math.max(maxY, node.y + h);
+      if (node.children) node.children.forEach(traverse);
+    };
+    if (this.tree) traverse(this.tree);
+
+    // Sujets flottants
+    if (this.floatingTopics && this.floatingTopics.length > 0) {
+      this.floatingTopics.forEach(ft => {
+        const w = (ft.width || 120) / 2 + 65;
+        const h = (ft.height || 36) / 2 + 25;
+        minX = Math.min(minX, ft.x - w);
+        maxX = Math.max(maxX, ft.x + w);
+        minY = Math.min(minY, ft.y - h);
+        maxY = Math.max(maxY, ft.y + h);
+        if (ft.children) ft.children.forEach(traverse);
+      });
     }
 
-    if (bbox && bbox.width > 20 && bbox.height > 20 && isFinite(bbox.x) && isFinite(bbox.y)) {
-      minX = bbox.x;
-      maxX = bbox.x + bbox.width;
-      minY = bbox.y;
-      maxY = bbox.y + bbox.height;
-    } else {
-      const traverse = (node) => {
-        if (!node) return;
-        const w = (node.width || 120) / 2 + 30;
-        const h = (node.height || 36) / 2 + 20;
-        minX = Math.min(minX, node.x - w);
-        maxX = Math.max(maxX, node.x + w);
-        minY = Math.min(minY, node.y - h);
-        maxY = Math.max(maxY, node.y + h);
-        if (node.children) node.children.forEach(traverse);
-      };
-      traverse(this.tree);
+    // Enclos (Boundaries)
+    if (this.boundaries && this.boundaries.length > 0) {
+      this.boundaries.forEach(bnd => {
+        const b = this.getBoundaryBBox(bnd);
+        if (b) {
+          minX = Math.min(minX, b.x - 15);
+          maxX = Math.max(maxX, b.x + b.width + 15);
+          minY = Math.min(minY, b.y - 25); // Marge pour l'étiquette pilule supérieure
+          maxY = Math.max(maxY, b.y + b.height + 15);
+        }
+      });
+    }
 
-      if (this.boundaries && this.boundaries.length > 0) {
-        this.boundaries.forEach(bnd => {
-          const b = this.getBoundaryBBox(bnd);
-          if (b) {
-            minX = Math.min(minX, b.x);
-            maxX = Math.max(maxX, b.x + b.width);
-            minY = Math.min(minY, b.y - 14);
-            maxY = Math.max(maxY, b.y + b.height);
-          }
-        });
+    // Liaisons (Relationships) avec courbures Bézier et étiquettes flottantes
+    if (this.relationships && this.relationships.length > 0) {
+      this.relationships.forEach(rel => {
+        const fromNode = this.findNode(rel.fromId);
+        const toNode = this.findNode(rel.toId);
+        if (!fromNode || !toNode) return;
+        const p1 = this.getNodeConnectionPoint(fromNode, { x: toNode.x, y: toNode.y });
+        const p2 = this.getNodeConnectionPoint(toNode, { x: fromNode.x, y: fromNode.y });
+        minX = Math.min(minX, p1.x, p2.x);
+        maxX = Math.max(maxX, p1.x, p2.x);
+        minY = Math.min(minY, p1.y, p2.y);
+        maxY = Math.max(maxY, p1.y, p2.y);
+
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const curvature = Math.min(85, Math.max(30, dist * 0.2));
+        let cx = (p1.x + p2.x) / 2 + (-dy / dist) * curvature;
+        let cy = (p1.y + p2.y) / 2 + (dx / dist) * curvature;
+        if (rel.customControl) {
+          cx = rel.customControl.x;
+          cy = rel.customControl.y;
+        }
+        minX = Math.min(minX, cx - 30);
+        maxX = Math.max(maxX, cx + 30);
+        minY = Math.min(minY, cy - 20);
+        maxY = Math.max(maxY, cy + 20);
+
+        // Étiquette pilule de la liaison
+        const lx = 0.25 * p1.x + 0.5 * cx + 0.25 * p2.x;
+        const ly = 0.25 * p1.y + 0.5 * cy + 0.25 * p2.y;
+        const labelText = (rel.label || 'VOIR AUSSI').toUpperCase();
+        const textW = this.getTextWidth(labelText, 9.5, '700');
+        const pillW = Math.max(54, textW + 24);
+        minX = Math.min(minX, lx - pillW / 2 - 15);
+        maxX = Math.max(maxX, lx + pillW / 2 + 15);
+        minY = Math.min(minY, ly - 20);
+        maxY = Math.max(maxY, ly + 20);
+      });
+    }
+
+    // 2. Fusion avec le BBox DOM réel si disponible
+    try {
+      if (this.viewportG && typeof this.viewportG.getBBox === 'function') {
+        const bbox = this.viewportG.getBBox();
+        if (bbox && bbox.width > 20 && bbox.height > 20 && isFinite(bbox.x) && isFinite(bbox.y)) {
+          minX = Math.min(minX, bbox.x);
+          maxX = Math.max(maxX, bbox.x + bbox.width);
+          minY = Math.min(minY, bbox.y);
+          maxY = Math.max(maxY, bbox.y + bbox.height);
+        }
       }
-      if (this.floatingTopics && this.floatingTopics.length > 0) {
-        this.floatingTopics.forEach(ft => {
-          const w = (ft.width || 100) / 2 + 30;
-          const h = (ft.height || 34) / 2 + 20;
-          minX = Math.min(minX, ft.x - w);
-          maxX = Math.max(maxX, ft.x + w);
-          minY = Math.min(minY, ft.y - h);
-          maxY = Math.max(maxY, ft.y + h);
-          if (ft.children) ft.children.forEach(traverse);
-        });
-      }
+    } catch (e) {
+      // Ignorer si échec getBBox
     }
 
     if (!isFinite(minX) || !isFinite(maxX) || minX >= maxX) {
@@ -6606,7 +6702,7 @@ const MindMapView = {
 
     const scope = options.scope || 'fit';
     const bg = options.bg || 'white';
-    const padding = options.padding !== undefined ? options.padding : 50;
+    const padding = options.padding !== undefined ? options.padding : 70;
 
     let exportX, exportY, exportW, exportH;
 
@@ -6627,49 +6723,128 @@ const MindMapView = {
 
     const cloneG = this.viewportG.cloneNode(true);
 
-    // Supprimer les contrôles interactifs de l'interface
-    cloneG.querySelectorAll('.mm-node-actions, .reparent-drop-target, #mm-connecting-preview-group').forEach(el => el.remove());
-    cloneG.querySelectorAll('.mm-selected-node, .mm-selected-rel, .mm-selected-boundary').forEach(el => {
-      el.classList.remove('mm-selected-node', 'mm-selected-rel', 'mm-selected-boundary');
+    // CRUCIAL : Supprimer le transform de navigation interactif (pan/zoom d'écran)
+    // afin que les coordonnées internes du clone correspondent exactement au repère diagramme !
+    cloneG.removeAttribute('transform');
+    cloneG.removeAttribute('id');
+
+    // Supprimer tous les contrôles interactifs de l'interface
+    cloneG.querySelectorAll(`
+      .mm-node-actions,
+      .reparent-drop-target,
+      #mm-connecting-preview-group,
+      .mm-rel-del-btn,
+      .mm-boundary-del-btn,
+      .mm-rel-handle,
+      .mm-root-plus,
+      .mm-node-plus,
+      .mm-rel-hit-path,
+      .mm-rel-del-circle,
+      .mm-boundary-del-circle,
+      rect[fill="transparent"]
+    `).forEach(el => el.remove());
+
+    // Retirer les surbrillances de sélection
+    cloneG.querySelectorAll('.selected, .mm-selected-node, .mm-selected-rel, .mm-selected-boundary').forEach(el => {
+      el.classList.remove('selected', 'mm-selected-node', 'mm-selected-rel', 'mm-selected-boundary');
     });
 
     const bodyStyle = window.getComputedStyle(document.body);
-    const themeBgCard = bodyStyle.getPropertyValue('--bg-card').trim() || '#ffffff';
-    const themeTextPrimary = bodyStyle.getPropertyValue('--text-primary').trim() || '#0f172a';
+    const themeBgCard = bodyStyle.getPropertyValue('--bg-card').trim() || '#1e293b';
+    const themeBgSurface = bodyStyle.getPropertyValue('--bg-surface').trim() || bodyStyle.getPropertyValue('--bg-main').trim() || '#0f172a';
+    const themeTextPrimary = bodyStyle.getPropertyValue('--text-primary').trim() || '#f8fafc';
+    const themeTextSecondary = bodyStyle.getPropertyValue('--text-secondary').trim() || '#94a3b8';
+    const themeBorder = bodyStyle.getPropertyValue('--border-color').trim() || '#334155';
 
-    // Inliner les styles pour autonomie totale du SVG hors DOM
     const isWhiteBg = (bg === 'white');
+    const cardBgColor = isWhiteBg ? '#ffffff' : themeBgCard;
+    const textColor = isWhiteBg ? '#0f172a' : themeTextPrimary;
+    const textSecColor = isWhiteBg ? '#475569' : themeTextSecondary;
+    const borderColor = isWhiteBg ? '#cbd5e1' : themeBorder;
+
+    // Inliner explicitement styles et attributs SVG pour autonomie 100% hors DOM :
+
+    // 1. Nœud central (Root)
+    cloneG.querySelectorAll('.mm-root-rect').forEach(r => {
+      r.setAttribute('fill', cardBgColor);
+      r.setAttribute('stroke', '#2563eb');
+      r.setAttribute('stroke-width', '3.2');
+    });
+    cloneG.querySelectorAll('.mm-root-text').forEach(t => {
+      t.setAttribute('fill', textColor);
+      t.setAttribute('font-size', '16px');
+      t.setAttribute('font-weight', '900');
+      t.setAttribute('letter-spacing', '0.8px');
+    });
+
+    // 2. Boîtes de branches et sujets flottants
+    cloneG.querySelectorAll('.mm-branch-box, .mm-floating-box').forEach(b => {
+      b.setAttribute('fill', cardBgColor);
+      const curStroke = b.getAttribute('stroke');
+      if (!curStroke || curStroke.includes('var(')) {
+        b.setAttribute('stroke', '#2563eb');
+      }
+    });
+
+    // 3. Étiquettes de liaisons (Relations) - Élimination radicale des rectangles noirs
+    cloneG.querySelectorAll('.mm-rel-label-rect').forEach(rect => {
+      rect.setAttribute('fill', cardBgColor);
+      rect.setAttribute('stroke', borderColor);
+      rect.setAttribute('stroke-width', '1.2');
+    });
+    cloneG.querySelectorAll('.mm-rel-label-text').forEach(t => {
+      t.setAttribute('fill', textSecColor);
+      t.setAttribute('font-size', '9.5px');
+      t.setAttribute('font-weight', '700');
+      t.setAttribute('letter-spacing', '0.4px');
+    });
+
+    // 4. Enclos (Boundaries)
+    cloneG.querySelectorAll('.mm-boundary-label-pill').forEach(pill => {
+      pill.setAttribute('fill', cardBgColor);
+    });
+    cloneG.querySelectorAll('.mm-boundary-label-text').forEach(t => {
+      t.setAttribute('font-size', '9.5px');
+      t.setAttribute('font-weight', '700');
+    });
+
+    // 5. Pastilles de notes
+    cloneG.querySelectorAll('.mm-note-pill circle').forEach(c => {
+      c.setAttribute('fill', cardBgColor);
+    });
+
+    // 6. Pastilles de versets bibliques
+    cloneG.querySelectorAll('.mm-scripture-pill text').forEach(t => {
+      const curFill = t.getAttribute('fill');
+      if (curFill && curFill.includes('var(')) {
+        t.setAttribute('fill', '#2563eb');
+      }
+      t.setAttribute('font-weight', '700');
+    });
+    cloneG.querySelectorAll('.mm-scripture-pill rect').forEach(r => {
+      const curFill = r.getAttribute('fill');
+      if (curFill && curFill.includes('var(')) {
+        r.setAttribute('fill', '#2563eb');
+      }
+    });
+
+    // 7. Tous les autres éléments texte
     cloneG.querySelectorAll('text').forEach(t => {
       const curFill = t.getAttribute('fill');
       if (!curFill || curFill.includes('var(') || curFill === 'currentColor') {
-        t.setAttribute('fill', isWhiteBg ? '#0f172a' : themeTextPrimary);
+        t.setAttribute('fill', textColor);
       }
       if (!t.getAttribute('font-family')) {
         t.setAttribute('font-family', 'Inter, system-ui, -apple-system, sans-serif');
       }
     });
 
-    cloneG.querySelectorAll('.mm-node-box').forEach(b => {
-      const curFill = b.getAttribute('fill');
-      if (!curFill || curFill.includes('var(')) {
-        b.setAttribute('fill', isWhiteBg ? '#ffffff' : themeBgCard);
-      }
-    });
-
-    cloneG.querySelectorAll('.mm-scripture-pill circle, .mm-note-pill circle').forEach(c => {
-      const curFill = c.getAttribute('fill');
-      if (!curFill || curFill.includes('var(')) {
-        c.setAttribute('fill', isWhiteBg ? '#f8fafc' : themeBgCard);
-      }
-    });
-
-    // Fond SVG selon choix
+    // Fond SVG selon le choix de l'utilisateur
     let bgRectSvg = '';
     if (bg === 'white') {
       bgRectSvg = `<rect x="${exportX}" y="${exportY}" width="${exportW}" height="${exportH}" fill="#ffffff" />`;
     } else if (bg === 'theme') {
-      const themeBg = bodyStyle.getPropertyValue('--bg-surface').trim() || bodyStyle.getPropertyValue('--bg-main').trim() || '#0f172a';
-      bgRectSvg = `<rect x="${exportX}" y="${exportY}" width="${exportW}" height="${exportH}" fill="${themeBg}" />`;
+      bgRectSvg = `<rect x="${exportX}" y="${exportY}" width="${exportW}" height="${exportH}" fill="${themeBgSurface}" />`;
     }
 
     const defsEl = this.svg.querySelector('defs');
@@ -6683,9 +6858,15 @@ const MindMapView = {
         ${defsContent}
         <style>
           text { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-          .mm-node-text { font-weight: 700; }
-          .mm-central-node-text { font-weight: 800; }
-          .mm-node-actions { display: none !important; }
+          .mm-root-text { font-weight: 900 !important; font-size: 16px !important; letter-spacing: 0.8px !important; }
+          .mm-branch-text { font-family: Inter, system-ui, sans-serif; }
+          .mm-rel-label-rect { fill: ${cardBgColor} !important; stroke: ${borderColor} !important; stroke-width: 1.2px !important; }
+          .mm-rel-label-text { font-weight: 700 !important; font-size: 9.5px !important; fill: ${textSecColor} !important; letter-spacing: 0.4px !important; }
+          .mm-boundary-label-pill { fill: ${cardBgColor} !important; }
+          .mm-boundary-label-text { font-weight: 700 !important; font-size: 9.5px !important; }
+          .mm-root-rect { fill: ${cardBgColor} !important; stroke: #2563eb !important; stroke-width: 3.2px !important; }
+          .mm-branch-box, .mm-floating-box { fill: ${cardBgColor} !important; }
+          .mm-node-actions, .mm-rel-del-btn, .mm-boundary-del-btn, .mm-rel-handle, .reparent-drop-target, #mm-connecting-preview-group { display: none !important; }
         </style>
       </defs>
       ${bgRectSvg}
@@ -6834,6 +7015,82 @@ const MindMapView = {
       if (typeof App !== 'undefined' && App.showToast) {
         App.showToast(`Erreur export : ${err.message || 'inconnue'}`, 'error');
       }
+    }
+  },
+
+  toggleFullscreen(forceState) {
+    const isCurrentlyFs = document.body.classList.contains('mindmap-fullscreen-active');
+    const targetState = (typeof forceState === 'boolean') ? forceState : !isCurrentlyFs;
+
+    if (targetState) {
+      document.body.classList.add('mindmap-fullscreen-active');
+      // Demande de plein écran physique OS si disponible
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+
+      // Mettre à jour titre et passage dans le bandeau flottant supérieur
+      const titleEl = document.getElementById('mm-fs-note-title');
+      const refEl = document.getElementById('mm-fs-note-ref');
+      if (titleEl) titleEl.textContent = this.currentNote?.title || 'Mind Map';
+      if (refEl) {
+        const ref = (this.currentNote?.reference || '').trim();
+        refEl.textContent = ref ? `Passage : ${ref}` : '';
+        refEl.style.display = ref ? 'inline' : 'none';
+      }
+
+      this.updateFullscreenButtons(true);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Mode plein écran activé (Échap ou F11 pour quitter)');
+      }
+    } else {
+      document.body.classList.remove('mindmap-fullscreen-active');
+      // Sortie du plein écran natif système si actif
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+
+      this.updateFullscreenButtons(false);
+    }
+
+    // Recentrage doux et adaptation de l'espace de dessin
+    setTimeout(() => {
+      if (this.viewMode === 'map') {
+        this.fitView();
+      }
+    }, 140);
+  },
+
+  updateFullscreenButtons(isActive) {
+    // 1. Bouton de la barre supérieure de la note
+    const headerBtn = document.getElementById('btn-toggle-mindmap-fullscreen');
+    if (headerBtn) {
+      headerBtn.classList.toggle('active', isActive);
+      headerBtn.title = isActive ? 'Quitter le plein écran (Échap ou F11)' : 'Mode Plein Écran (F11 ou F)';
+      headerBtn.querySelector('.icon-mm-fullscreen-enter')?.classList.toggle('hidden', isActive);
+      headerBtn.querySelector('.icon-mm-fullscreen-exit')?.classList.toggle('hidden', !isActive);
+      const label = headerBtn.querySelector('#label-mm-fullscreen');
+      if (label) label.textContent = isActive ? 'Réduire' : 'Plein écran';
+    }
+
+    // 2. Bouton du dock flottant inférieur
+    const dockBtn = document.getElementById('mm-btn-fullscreen');
+    if (dockBtn) {
+      dockBtn.classList.toggle('active', isActive);
+      dockBtn.title = isActive ? 'Quitter le plein écran (Échap ou F11)' : 'Mode Plein Écran (F11 ou F)';
+      dockBtn.innerHTML = isActive ? `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/>
+        </svg>
+      ` : `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      `;
     }
   }
 };

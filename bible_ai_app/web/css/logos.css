@@ -32920,6 +32920,147 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
 }
 
 /* ==========================================================================
+   MODE PLEIN ÉCRAN HYBRIDE DU MIND MAP (ZEN / FOCUS / PROJECTION)
+   ========================================================================== */
+body.mindmap-fullscreen-active #note-mindmap-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9998 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Bandeau flottant discret supérieur en mode plein écran */
+.mm-fullscreen-bar {
+  position: absolute;
+  top: 18px;
+  left: 24px;
+  right: 24px;
+  z-index: 50;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  animation: mmFsFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.mindmap-fullscreen-active .mm-fullscreen-bar {
+  display: flex;
+}
+
+@keyframes mmFsFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mm-fs-bar-left {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.45);
+  max-width: 60vw;
+}
+
+.note-mindmap-container.paper-mode .mm-fs-bar-left {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.14);
+}
+
+.mm-fs-note-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-mindmap-container.paper-mode .mm-fs-note-title {
+  color: #0f172a;
+}
+
+.mm-fs-note-ref {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.22);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  white-space: nowrap;
+}
+
+.note-mindmap-container.paper-mode .mm-fs-note-ref {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.mm-fs-exit-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.45);
+  font-family: inherit;
+  user-select: none;
+}
+
+.note-mindmap-container.paper-mode .mm-fs-exit-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12);
+}
+
+.mm-fs-exit-btn:hover {
+  background: #2563eb !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45) !important;
+}
+
+/* Position et comportement du dock en plein écran */
+body.mindmap-fullscreen-active .mindmap-dock {
+  bottom: 24px;
+  opacity: 0.88;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+body.mindmap-fullscreen-active .mindmap-dock:hover {
+  opacity: 1;
+}
+
+#btn-toggle-mindmap-fullscreen.active {
+  border-color: var(--accent-blue, #2563eb);
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+}
+
+/* ==========================================================================
    MODE FEUILLE BLANCHE (PAPER MODE) DU MIND MAP
    Garantit une lisibilité irréprochable même si l'application globale est en mode sombre
    ========================================================================== */
@@ -32927,7 +33068,9 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
   background: #ffffff !important;
 }
 
-/* Nœud central en feuille blanche */
+/* --- VUE CARTE (SVG DIAGRAM) EN MODE FEUILLE BLANCHE --- */
+
+/* Nœud central */
 .note-mindmap-container.paper-mode .mm-root-rect {
   fill: #ffffff !important;
   stroke: #2563eb !important;
@@ -32937,10 +33080,18 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
   fill: #0f172a !important;
 }
 
-/* Boîtes de branches & sujets flottants en feuille blanche */
+/* Boîtes de branches & sujets flottants */
 .note-mindmap-container.paper-mode .mm-branch-box,
 .note-mindmap-container.paper-mode .mm-floating-box {
   fill: #ffffff !important;
+}
+
+.note-mindmap-container.paper-mode .mm-floating-box {
+  stroke: #64748b !important;
+}
+
+.note-mindmap-container.paper-mode .mm-floating-node .mm-branch-text {
+  fill: #0f172a !important;
 }
 
 /* Textes des branches (tous niveaux) parfaitement foncés et nets */
@@ -32949,7 +33100,19 @@ body[class*="palette-dark"] .drawer-pastoral-ref-pill.primary {
   fill: #0f172a !important;
 }
 
-/* Éditeur inline transparent avec texte sombre en mode feuille blanche */
+/* Nœud sélectionné en feuille blanche */
+.note-mindmap-container.paper-mode .mm-node-g.selected .mm-branch-box,
+.note-mindmap-container.paper-mode .mm-node-g.selected .mm-floating-box {
+  stroke-width: 2.8px !important;
+  filter: drop-shadow(0 0 9px var(--node-color, #2563eb)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.12)) !important;
+}
+
+.note-mindmap-container.paper-mode .mm-node-g.selected .mm-branch-text {
+  fill: #0f172a !important;
+  text-shadow: none !important;
+}
+
+/* Éditeur inline transparent avec texte sombre */
 .note-mindmap-container.paper-mode .mm-inline-editor,
 .mm-inline-editor.paper-mode,
 body.theme-dark .mm-inline-editor.paper-mode,
@@ -32958,57 +33121,395 @@ body[class*="palette-dark"] .mm-inline-editor.paper-mode {
   caret-color: #2563eb !important;
 }
 
-/* Pastilles, enclos, boutons d'actions et relations en feuille blanche */
-.note-mindmap-container.paper-mode .mm-boundary-label-pill {
-  fill: #ffffff !important;
+/* Pastilles Scripturaires SVG dans la Carte */
+.note-mindmap-container.paper-mode .mm-scripture-pill rect {
+  fill: #eff6ff !important;
+  stroke: #bfdbfe !important;
+  stroke-width: 1px !important;
+  opacity: 1 !important;
 }
 
+.note-mindmap-container.paper-mode .mm-scripture-pill text {
+  fill: #1d4ed8 !important;
+  font-weight: 750 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-scripture-pill:hover rect {
+  fill: #dbeafe !important;
+  stroke: #2563eb !important;
+  opacity: 1 !important;
+}
+
+/* Pastilles d'annotations / Notes SVG */
 .note-mindmap-container.paper-mode .mm-note-pill circle {
   fill: #ffffff !important;
+  stroke: #d97706 !important;
+  stroke-width: 1.3px !important;
 }
 
 .note-mindmap-container.paper-mode .mm-note-pill path,
 .note-mindmap-container.paper-mode .mm-note-pill polyline,
 .note-mindmap-container.paper-mode .mm-note-pill line {
-  stroke: var(--node-color, #2563eb) !important;
+  stroke: #b45309 !important;
 }
 
+/* Boutons d'actions contextuelles SVG (+) et (-) */
 .note-mindmap-container.paper-mode .mm-action-circle {
   fill: #ffffff !important;
-  stroke: #cbd5e1 !important;
+  stroke: #94a3b8 !important;
 }
 
 .note-mindmap-container.paper-mode .mm-action-text {
-  fill: #64748b !important;
+  fill: #334155 !important;
+  font-weight: bold !important;
 }
 
+.note-mindmap-container.paper-mode .mm-action-btn:hover .mm-action-circle {
+  fill: #2563eb !important;
+  stroke: #2563eb !important;
+}
+
+.note-mindmap-container.paper-mode .mm-action-btn:hover .mm-action-text {
+  fill: #ffffff !important;
+}
+
+/* Enclos / Clôtures SVG (Boundaries) */
+.note-mindmap-container.paper-mode .mm-boundary-label-pill {
+  fill: #ffffff !important;
+  stroke: #2563eb !important;
+  stroke-width: 1.5px !important;
+}
+
+.note-mindmap-container.paper-mode .mm-boundary-label-text {
+  fill: #1e40af !important;
+  font-weight: 800 !important;
+}
+
+/* Relations transversales SVG */
 .note-mindmap-container.paper-mode .mm-rel-label-rect {
   fill: #ffffff !important;
   stroke: #cbd5e1 !important;
+  stroke-width: 1.2px !important;
 }
 
 .note-mindmap-container.paper-mode .mm-rel-label-text {
-  fill: #475569 !important;
+  fill: #1e293b !important;
+  font-weight: 700 !important;
 }
 
-/* Vue Plan en mode feuille blanche */
+.note-mindmap-container.paper-mode .mm-relationship-g:hover .mm-rel-label-rect,
+.note-mindmap-container.paper-mode .mm-relationship-g.selected .mm-rel-label-rect {
+  stroke: #2563eb !important;
+}
+
+.note-mindmap-container.paper-mode .mm-relationship-g:hover .mm-rel-label-text,
+.note-mindmap-container.paper-mode .mm-relationship-g.selected .mm-rel-label-text {
+  fill: #2563eb !important;
+}
+
+/* Bannière d'indication mode liaison */
+.note-mindmap-container.paper-mode .mm-connecting-banner {
+  background: #ffffff !important;
+  border-color: #2563eb !important;
+  color: #0f172a !important;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2) !important;
+}
+
+.note-mindmap-container.paper-mode .mm-connecting-text {
+  color: #0f172a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-connecting-text kbd {
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #0f172a !important;
+}
+
+/* Dock flottant en mode feuille blanche */
+.note-mindmap-container.paper-mode .mindmap-dock {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+.note-mindmap-container.paper-mode .mm-dock-btn {
+  color: #475569 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-dock-btn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-dock-btn.active {
+  background: rgba(37, 99, 235, 0.12) !important;
+  color: #2563eb !important;
+}
+
+.note-mindmap-container.paper-mode .mm-dock-separator {
+  background: #e2e8f0 !important;
+}
+
+/* --- VUE PLAN (OUTLINER) EN MODE FEUILLE BLANCHE --- */
+
 .note-mindmap-container.paper-mode .mindmap-outline-container {
   background: #fcf9f2 !important;
 }
 
-.note-mindmap-container.paper-mode .mm-outline-sheet {
+.note-mindmap-container.paper-mode .mm-outline-sheet,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-sheet,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-sheet {
   background: #ffffff !important;
   border-color: #e5dfd5 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
 }
 
-.note-mindmap-container.paper-mode .mm-outline-boi-block {
+.note-mindmap-container.paper-mode .mm-outline-root-header,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-root-header,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-root-header {
+  border-bottom: 2px solid #e2e8f0 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-root-badge,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-root-badge,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-root-badge {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #dbeafe !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-root-title,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-root-title,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-root-title {
+  color: #0f172a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-root-title:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-root-title:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-root-title:hover {
+  background: #f1f5f9 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-boi-block,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-boi-block,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-boi-block {
   background: #f9f7f2 !important;
   border-color: #e8e3d9 !important;
 }
 
-.note-mindmap-container.paper-mode .mm-outline-text,
-.note-mindmap-container.paper-mode .mm-outline-root-title {
+.note-mindmap-container.paper-mode .mm-outline-row:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-row:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-row:hover {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-chevron,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-chevron,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-chevron {
+  color: #64748b !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-chevron:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-chevron:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-chevron:hover {
+  background: #e2e8f0 !important;
   color: #0f172a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-sub-bullet,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-sub-bullet,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-sub-bullet {
+  background: #94a3b8 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-text,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-text,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-text {
+  color: #0f172a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-text:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-text:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-text:hover {
+  background: #f1f5f9 !important;
+}
+
+/* Encart de note de branche déplié (Extrême lisibilité même en app mode sombre) */
+.note-mindmap-container.paper-mode .mm-outline-note-card,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-note-card,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-note-card {
+  background: #fffbeb !important;
+  border-left: 3.5px solid #d97706 !important;
+  border-top: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border-right: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2) !important;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08) !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-note-card:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-note-card:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-note-card:hover {
+  background: #fef3c7 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-note-card svg,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-note-card svg,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-note-card svg {
+  color: #b45309 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-note-text,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-note-text,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-note-text {
+  color: #78350f !important;
+  font-weight: 500 !important;
+  font-size: 12.5px !important;
+  line-height: 1.5 !important;
+}
+
+/* Badge icône note sur la ligne de branche */
+.note-mindmap-container.paper-mode .mm-outline-note-badge,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-note-badge,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-note-badge {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border: 1px solid #fde68a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-note-badge:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-note-badge:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-note-badge:hover {
+  background: #fde68a !important;
+  color: #78350f !important;
+}
+
+/* Pastille référence biblique dans le plan */
+.note-mindmap-container.paper-mode .mm-outline-ref-pill,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-ref-pill,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-ref-pill {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe !important;
+  font-weight: 600 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-ref-pill:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-ref-pill:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-ref-pill:hover {
+  background: #dbeafe !important;
+  border-color: #2563eb !important;
+  color: #1e40af !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Pastille Enclos dans le plan */
+.note-mindmap-container.paper-mode .mm-outline-boundary-pill,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-boundary-pill,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-boundary-pill {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+  border: 1.5px dashed #60a5fa !important;
+  font-weight: 750 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-boundary-pill:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-boundary-pill:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-boundary-pill:hover {
+  background: #dbeafe !important;
+  border-color: #2563eb !important;
+  color: #1d4ed8 !important;
+}
+
+/* Pastilles Relations transversales dans le plan */
+.note-mindmap-container.paper-mode .mm-outline-rel-pill.outgoing,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-rel-pill.outgoing,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-rel-pill.outgoing {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe !important;
+  font-weight: 600 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-rel-pill.outgoing:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-rel-pill.outgoing:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-rel-pill.outgoing:hover {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-rel-pill.incoming,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-rel-pill.incoming,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-rel-pill.incoming {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 600 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-rel-pill.incoming:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-rel-pill.incoming:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-rel-pill.incoming:hover {
+  background: #475569 !important;
+  color: #ffffff !important;
+  border-color: #475569 !important;
+}
+
+/* Boutons d'actions contextuelles au survol dans le plan */
+.note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle {
+  color: #64748b !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle.danger:hover,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle.danger:hover,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-actions .btn-icon-subtle.danger:hover {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+/* Lignes guides arborescentes dans le plan */
+.note-mindmap-container.paper-mode .mm-outline-children,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-children,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-children {
+  border-left-color: #e2e8f0 !important;
+}
+
+/* Section Sujets Flottants dans le plan */
+.note-mindmap-container.paper-mode .mm-outline-floating-section,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-floating-section,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-floating-section {
+  border-top-color: #e2e8f0 !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-floating-badge,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-floating-badge,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-floating-badge {
+  background: #f1f5f9 !important;
+  color: #2563eb !important;
+}
+
+.note-mindmap-container.paper-mode .mm-outline-floating-title,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-floating-title,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-floating-title {
+  color: #475569 !important;
+}
+
+/* Champ d'édition inline dans le plan */
+.note-mindmap-container.paper-mode .mm-outline-inline-input,
+body.theme-dark .note-mindmap-container.paper-mode .mm-outline-inline-input,
+body[class*="palette-dark"] .note-mindmap-container.paper-mode .mm-outline-inline-input {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
 }
 
 .mindmap-wrapper {
@@ -36311,43 +36812,58 @@ body[class*="palette-dark"] .mm-marker-clear-btn:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 12px 8px;
-  border-radius: 8px;
+  gap: 6px;
+  padding: 12px 10px;
+  border-radius: 9px;
   border: 1.5px solid var(--border-color, #e2e8f0);
   background: var(--bg-card, #ffffff);
-  color: var(--text-primary);
+  color: var(--text-secondary, #64748b);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: inherit;
+  user-select: none;
 }
 
 .mm-format-tab:hover {
   border-color: var(--accent-blue, #2563eb);
-  background: var(--bg-surface, rgba(0, 0, 0, 0.02));
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
-.mm-format-tab.active {
-  border-color: var(--accent-blue, #2563eb);
-  background: rgba(37, 99, 235, 0.08);
-  color: var(--accent-blue, #2563eb);
-  box-shadow: 0 0 0 1px var(--accent-blue, #2563eb);
+.mm-format-tab.active,
+body.theme-dark .mm-format-tab.active,
+body[class*="palette-dark"] .mm-format-tab.active {
+  border-color: #3b82f6 !important;
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px #3b82f6, 0 6px 18px rgba(29, 78, 216, 0.5) !important;
+  transform: translateY(-1px);
 }
 
 .mm-format-name {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
+}
+
+.mm-format-tab.active .mm-format-name {
+  color: #ffffff !important;
+  font-weight: 800 !important;
 }
 
 .mm-format-badge {
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-muted, #64748b);
 }
 
 .mm-format-tab.active .mm-format-badge {
-  color: var(--accent-blue, #2563eb);
-  font-weight: 600;
+  color: #dbeafe !important;
+  font-weight: 700 !important;
+}
+
+.mm-format-tab.active svg {
+  stroke: #ffffff !important;
 }
 
 .mm-export-pills {
@@ -36359,36 +36875,48 @@ body[class*="palette-dark"] .mm-marker-clear-btn:hover {
 .mm-pill-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 6px;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 7px;
   border: 1px solid var(--border-color, #e2e8f0);
   background: var(--bg-surface, #f8fafc);
-  color: var(--text-primary);
+  color: var(--text-secondary, #64748b);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.16s ease;
   font-family: inherit;
+  user-select: none;
 }
 
 .mm-pill-btn:hover {
   border-color: var(--accent-blue, #2563eb);
   background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
-.mm-pill-btn.active {
-  border-color: var(--accent-blue, #2563eb);
-  background: var(--accent-blue, #2563eb);
-  color: #ffffff;
+.mm-pill-btn.active,
+body.theme-dark .mm-pill-btn.active,
+body[class*="palette-dark"] .mm-pill-btn.active {
+  border-color: #3b82f6 !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+.mm-pill-btn.active svg {
+  stroke: #ffffff !important;
 }
 
 .mm-pill-btn.active svg circle[stroke] {
-  stroke: #ffffff;
+  stroke: #ffffff !important;
 }
 
 .mm-pill-btn.active svg path[fill="currentColor"] {
-  fill: #ffffff;
+  fill: #ffffff !important;
 }
 
 .mm-export-preview-box {
@@ -36478,16 +37006,33 @@ body[class*="palette-dark"] .mm-export-item-icon {
   background: rgba(255, 255, 255, 0.05);
 }
 
-body.theme-dark .mm-pill-btn,
-body[class*="palette-dark"] .mm-pill-btn {
+body.theme-dark .mm-pill-btn:not(.active),
+body[class*="palette-dark"] .mm-pill-btn:not(.active) {
   background: #0f172a;
   border-color: #334155;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
-body.theme-dark .mm-format-tab,
-body[class*="palette-dark"] .mm-format-tab {
+body.theme-dark .mm-pill-btn:not(.active):hover,
+body[class*="palette-dark"] .mm-pill-btn:not(.active):hover {
+  background: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+body.theme-dark .mm-format-tab:not(.active),
+body[class*="palette-dark"] .mm-format-tab:not(.active) {
   background: #0f172a;
   border-color: #334155;
+  color: #94a3b8;
+}
+
+body.theme-dark .mm-format-tab:not(.active):hover,
+body[class*="palette-dark"] .mm-format-tab:not(.active):hover {
+  background: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
 }
 
 body.theme-dark .mm-export-preview-box,

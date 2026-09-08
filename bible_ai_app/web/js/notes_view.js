@@ -63,6 +63,12 @@ const NotesView = {
       }
     });
 
+    document.getElementById('btn-toggle-mindmap-fullscreen')?.addEventListener('click', () => {
+      if (typeof MindMapView !== 'undefined') {
+        MindMapView.toggleFullscreen();
+      }
+    });
+
     const exportMmBtn = document.getElementById('btn-export-mindmap');
     exportMmBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1832,6 +1838,7 @@ const NotesView = {
     const previewBtn = document.getElementById('btn-toggle-note-preview');
     const exportDropdownWrap = document.getElementById('mm-export-dropdown-wrap');
     const toggleModeBtn = document.getElementById('btn-toggle-mindmap-mode');
+    const toggleFullscreenBtn = document.getElementById('btn-toggle-mindmap-fullscreen');
 
     if (isMindmap) {
       this.contentInput?.classList.add('hidden');
@@ -1839,6 +1846,7 @@ const NotesView = {
       previewBtn?.classList.add('hidden');
       toggleModeBtn?.classList.remove('hidden');
       exportDropdownWrap?.classList.remove('hidden');
+      toggleFullscreenBtn?.classList.remove('hidden');
 
       if (mmContainer) {
         mmContainer.classList.remove('hidden');
@@ -1850,8 +1858,12 @@ const NotesView = {
       mmContainer?.classList.add('hidden');
       toggleModeBtn?.classList.add('hidden');
       exportDropdownWrap?.classList.add('hidden');
+      toggleFullscreenBtn?.classList.add('hidden');
       if (typeof MindMapView !== 'undefined') {
         MindMapView.closeExportDropdown();
+        if (document.body.classList.contains('mindmap-fullscreen-active')) {
+          MindMapView.toggleFullscreen(false);
+        }
       }
       document.getElementById('notes-editor-subbar')?.classList.add('hidden');
       document.getElementById('notes-subbar-outline-actions')?.classList.add('hidden');
