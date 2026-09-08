@@ -31870,16 +31870,19 @@ body[class*="palette-dark"] .mm-action-circle {
   background: var(--bg-card, #ffffff);
   color: var(--text-primary, #0f172a);
   border: 1.5px solid var(--accent-blue, #2563eb);
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 12px;
+  border-radius: 6px;
+  padding: 0 7px;
+  font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08);
   outline: none;
   font-family: inherit;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  transition: width 0.04s ease, left 0.04s ease;
 }
 
 body.theme-dark .mm-inline-editor,
@@ -31887,6 +31890,7 @@ body[class*="palette-dark"] .mm-inline-editor {
   background: #1e293b;
   color: #f8fafc;
   border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 /* Dock flottant minimaliste en bas */
