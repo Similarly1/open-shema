@@ -205,6 +205,10 @@ const MindMapView = {
     // 1. Panoramique à la souris (Drag)
     this.svg?.addEventListener('mousedown', (e) => {
       this.hideTooltip();
+      if (this.connectingSourceId && !e.target.closest('.mm-node-g')) {
+        this.cancelConnecting();
+        return;
+      }
       if (e.target === this.svg || e.target.id === 'mindmap-svg' || e.target === this.viewportG) {
         this.isPanning = true;
         this.panStart = { x: e.clientX - this.viewBox.x, y: e.clientY - this.viewBox.y };
@@ -1814,12 +1818,16 @@ const MindMapView = {
 
   selectNode(id) {
     this.selectedNodeId = id;
+    this.selectedRelId = null;
     this.updateSelectionState();
   },
 
   updateSelectionState() {
     this.viewportG?.querySelectorAll('.mm-node-g').forEach(el => {
       el.classList.toggle('selected', el.getAttribute('data-id') === this.selectedNodeId);
+    });
+    this.viewportG?.querySelectorAll('.mm-relationship-g').forEach(el => {
+      el.classList.toggle('selected', el.getAttribute('data-rel-id') === this.selectedRelId);
     });
   },
 
@@ -3241,18 +3249,98 @@ const MindMapView = {
       el.classList.toggle('connecting-source', el.getAttribute('data-id') === sourceId);
     });
 
+    // Créer le calque / élément de prévisualisation de liaison interactive en direct
+    let previewLayer = this.viewportG?.querySelector('#mm-connecting-preview-group');
+    if (!previewLayer && this.viewportG) {
+      previewLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      previewLayer.setAttribute('id', 'mm-connecting-preview-group');
+      const previewPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      previewPath.setAttribute('id', 'mm-connecting-preview-path');
+      previewPath.setAttribute('class', 'mm-rel-preview-path');
+      previewPath.setAttribute('fill', 'none');
+      previewPath.setAttribute('stroke', node.color || 'var(--accent-blue, #2563eb)');
+      previewPath.setAttribute('stroke-width', '2.5');
+      previewPath.setAttribute('stroke-dasharray', '6,4');
+      previewPath.setAttribute('marker-end', 'url(#mm-rel-arrow)');
+      previewLayer.appendChild(previewPath);
+      this.viewportG.appendChild(previewLayer);
+    }
+
+    // Écouteur de mouvement de la souris pour la flèche en direct
+    if (this._onConnectingMouseMove) {
+      window.removeEventListener('mousemove', this._onConnectingMouseMove);
+    }
+
+    this._onConnectingMouseMove = (e) => {
+      if (!this.connectingSourceId || !this.svg) return;
+      const rect = this.svg.getBoundingClientRect();
+      const mouseSvgX = (e.clientX - rect.left - this.viewBox.x) / this.viewBox.scale;
+      const mouseSvgY = (e.clientY - rect.top - this.viewBox.y) / this.viewBox.scale;
+
+      const srcNode = this.findNode(this.connectingSourceId);
+      if (!srcNode) return;
+
+      // Détecter si on survole une branche cible candidate
+      let hoveredNode = null;
+      const elementUnderCursor = document.elementFromPoint(e.clientX, e.clientY);
+      const nodeEl = elementUnderCursor?.closest('.mm-node-g');
+      if (nodeEl) {
+        const nid = nodeEl.getAttribute('data-id');
+        if (nid && nid !== this.connectingSourceId) {
+          hoveredNode = this.findNode(nid);
+        }
+      }
+
+      this.viewportG?.querySelectorAll('.mm-node-g').forEach(el => {
+        const nid = el.getAttribute('data-id');
+        el.classList.toggle('connecting-target', !!(hoveredNode && nid === hoveredNode.id));
+      });
+
+      let targetPt = { x: mouseSvgX, y: mouseSvgY };
+      if (hoveredNode) {
+        targetPt = this.getNodeConnectionPoint(hoveredNode, { x: srcNode.x, y: srcNode.y });
+      }
+
+      const p1 = this.getNodeConnectionPoint(srcNode, targetPt);
+      const p2 = targetPt;
+
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      const nx = -dy / dist;
+      const ny = dx / dist;
+      const curvature = Math.min(85, Math.max(25, dist * 0.2));
+      const cx = (p1.x + p2.x) / 2 + nx * curvature;
+      const cy = (p1.y + p2.y) / 2 + ny * curvature;
+
+      const previewPath = document.getElementById('mm-connecting-preview-path');
+      if (previewPath) {
+        previewPath.setAttribute('d', `M ${p1.x} ${p1.y} Q ${cx} ${cy}, ${p2.x} ${p2.y}`);
+      }
+    };
+
+    window.addEventListener('mousemove', this._onConnectingMouseMove);
+
     if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast('Cliquez sur la branche cible pour créer la liaison');
+      App.showToast('Pointez et cliquez sur la branche cible pour créer la liaison');
     }
   },
 
   cancelConnecting() {
     this.connectingSourceId = null;
+    if (this._onConnectingMouseMove) {
+      window.removeEventListener('mousemove', this._onConnectingMouseMove);
+      this._onConnectingMouseMove = null;
+    }
+    document.getElementById('mm-connecting-preview-group')?.remove();
+
     const banner = document.getElementById('mm-connecting-banner');
     if (banner) banner.classList.add('hidden');
     this.svg?.classList.remove('mm-connecting-mode');
     this.viewportG?.querySelectorAll('.mm-node-g').forEach(el => {
       el.classList.remove('connecting-source');
+      el.classList.remove('connecting-target');
     });
   },
 
@@ -3331,7 +3419,7 @@ const MindMapView = {
       <div class="mm-rel-modal" role="dialog" aria-modal="true">
         <div class="mm-rel-modal-title">
           <span>Liaison transversale</span>
-          <button type="button" class="btn-icon-subtle" id="mm-btn-close-rel-modal">×</button>
+          <button type="button" class="mm-modal-close-btn" id="mm-btn-close-rel-modal" title="Fermer (Échap)">×</button>
         </div>
         <div style="font-size: 12px; color: var(--text-secondary);">
           De <strong>${this.escapeHtml(fromNode?.text || 'Source')}</strong> vers <strong>${this.escapeHtml(toNode?.text || 'Cible')}</strong>
@@ -3341,10 +3429,16 @@ const MindMapView = {
         </div>
         <input type="text" class="mm-rel-modal-input" id="mm-rel-input-label" value="${this.escapeHtml(rel.label || 'VOIR AUSSI')}" placeholder="Mot-clé de la relation...">
         <div class="mm-rel-modal-actions">
-          <button type="button" class="btn-subtle danger" id="mm-btn-del-rel" style="color: #ef4444;">Supprimer la liaison</button>
-          <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn-subtle" id="mm-btn-cancel-rel">Annuler</button>
-            <button type="button" class="btn-primary" id="mm-btn-save-rel">Appliquer</button>
+          <button type="button" class="mm-rel-btn-delete" id="mm-btn-del-rel" title="Supprimer définitivement cette liaison">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Supprimer</span>
+          </button>
+          <div class="mm-rel-modal-right-actions">
+            <button type="button" class="mm-rel-btn-cancel" id="mm-btn-cancel-rel">Annuler</button>
+            <button type="button" class="mm-rel-btn-save" id="mm-btn-save-rel">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Appliquer</span>
+            </button>
           </div>
         </div>
       </div>

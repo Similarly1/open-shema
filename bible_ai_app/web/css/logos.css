@@ -33304,35 +33304,34 @@ body[class*="palette-dark"] .mm-rel-label-text {
   cursor: pointer;
 }
 
-.mm-relationship-g:hover .mm-rel-del-btn,
-.mm-relationship-g.selected .mm-rel-del-btn {
+/* Apparaît UNIQUEMENT au survol de l'étiquette */
+.mm-rel-label-g:hover .mm-rel-del-btn {
   opacity: 1;
   pointer-events: all;
 }
 
 .mm-rel-del-circle {
   fill: #ef4444;
-  transition: transform 0.15s ease;
+  transition: fill 0.15s ease;
 }
 
 .mm-rel-del-btn:hover .mm-rel-del-circle {
   fill: #dc2626;
-  transform: scale(1.15);
-  transform-origin: center;
 }
 
 .mm-rel-del-text {
   fill: #ffffff;
   font-size: 11px;
   font-weight: bold;
+  pointer-events: none;
 }
 
 /* Modal d'édition d'étiquette de relation */
 .mm-rel-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
   z-index: 999999;
   display: flex;
   align-items: center;
@@ -33348,14 +33347,14 @@ body[class*="palette-dark"] .mm-rel-label-text {
 .mm-rel-modal {
   background: var(--bg-card, #ffffff);
   border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 12px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
-  width: 380px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  width: 390px;
   max-width: 92vw;
-  padding: 18px 20px;
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 15px;
 }
 
 body.theme-dark .mm-rel-modal,
@@ -33366,11 +33365,47 @@ body[class*="palette-dark"] .mm-rel-modal {
 }
 
 .mm-rel-modal-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  color: var(--text-primary, #0f172a);
+}
+
+body.theme-dark .mm-rel-modal-title,
+body[class*="palette-dark"] .mm-rel-modal-title {
+  color: #f8fafc;
+}
+
+.mm-modal-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mm-modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary, #0f172a);
+}
+
+body.theme-dark .mm-modal-close-btn {
+  color: #94a3b8;
+}
+
+body.theme-dark .mm-modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
 }
 
 .mm-rel-presets {
@@ -33392,7 +33427,7 @@ body[class*="palette-dark"] .mm-rel-modal {
 }
 
 .mm-rel-preset-chip:hover {
-  background: rgba(37, 99, 235, 0.1);
+  background: rgba(37, 99, 235, 0.12);
   border-color: #2563eb;
   color: #2563eb;
 }
@@ -33406,15 +33441,15 @@ body[class*="palette-dark"] .mm-rel-preset-chip {
 
 body.theme-dark .mm-rel-preset-chip:hover,
 body[class*="palette-dark"] .mm-rel-preset-chip:hover {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(59, 130, 246, 0.25);
   border-color: #60a5fa;
   color: #93c5fd;
 }
 
 .mm-rel-modal-input {
   width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 9px 12px;
+  border-radius: 8px;
   border: 1.5px solid var(--border-color, #cbd5e1);
   font-size: 13px;
   font-family: inherit;
@@ -33423,11 +33458,12 @@ body[class*="palette-dark"] .mm-rel-preset-chip:hover {
   background: var(--bg-card, #ffffff);
   color: var(--text-primary);
   box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .mm-rel-modal-input:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 body.theme-dark .mm-rel-modal-input,
@@ -33437,11 +33473,130 @@ body[class*="palette-dark"] .mm-rel-modal-input {
   color: #f8fafc;
 }
 
+/* Boutons d'action du modal liaison */
 .mm-rel-modal-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.mm-rel-modal-right-actions {
+  display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.mm-rel-btn-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.mm-rel-btn-delete:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+body.theme-dark .mm-rel-btn-delete,
+body[class*="palette-dark"] .mm-rel-btn-delete {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+body.theme-dark .mm-rel-btn-delete:hover,
+body[class*="palette-dark"] .mm-rel-btn-delete:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.mm-rel-btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 15px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.mm-rel-btn-cancel:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+body.theme-dark .mm-rel-btn-cancel,
+body[class*="palette-dark"] .mm-rel-btn-cancel {
+  background: #334155;
+  color: #cbd5e1;
+  border-color: #475569;
+}
+
+body.theme-dark .mm-rel-btn-cancel:hover,
+body[class*="palette-dark"] .mm-rel-btn-cancel:hover {
+  background: #475569;
+  color: #ffffff;
+  border-color: #64748b;
+}
+
+.mm-rel-btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+
+.mm-rel-btn-save:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
+}
+
+/* Ligne de prévisualisation interactive en direct */
+#mm-connecting-preview-group {
+  pointer-events: none;
+}
+
+.mm-rel-preview-path {
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.6));
+  animation: mmDashFlow 0.8s linear infinite;
+}
+
+@keyframes mmDashFlow {
+  to { stroke-dashoffset: -18; }
+}
+
+.mindmap-svg-canvas.mm-connecting-mode .mm-node-g.connecting-target {
+  filter: drop-shadow(0 0 10px #3b82f6) !important;
 }
 
 /* Pastille liaison dans la Vue Plan (Outliner) */
