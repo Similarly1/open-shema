@@ -130,7 +130,7 @@ const MindMapView = {
           <button type="button" class="mm-dock-btn" id="mm-btn-zoom-out" title="Zoom arrière">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-fit" title="Recentrer et ajuster la carte (R ou Espace)">
+          <button type="button" class="mm-dock-btn" id="mm-btn-fit" title="Recentrer et ajuster la carte à l'écran (R)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-theme" title="Basculer Fond Thème / Feuille Blanche">
@@ -365,14 +365,14 @@ const MindMapView = {
         App.showToast('Sélectionnez d\'abord une branche à relier');
       }
     });
-    document.getElementById('mm-btn-cancel-connecting')?.addEventListener('click', () => this.cancelConnecting());
-    document.getElementById('mm-btn-zoom-in')?.addEventListener('click', () => this.zoom(1.2));
-    document.getElementById('mm-btn-zoom-out')?.addEventListener('click', () => this.zoom(0.8));
-    document.getElementById('mm-btn-fit')?.addEventListener('click', () => this.fitView());
-    document.getElementById('mm-btn-theme')?.addEventListener('click', () => this.togglePaperMode());
-    document.getElementById('mm-btn-palette')?.addEventListener('click', () => this.cyclePalette());
-    document.getElementById('mm-btn-help')?.addEventListener('click', () => this.toggleHelpDrawer());
-    document.getElementById('mm-btn-close-help')?.addEventListener('click', () => this.toggleHelpDrawer(false));
+    document.getElementById('mm-btn-cancel-connecting')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cancelConnecting(); });
+    document.getElementById('mm-btn-zoom-in')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(1.2); });
+    document.getElementById('mm-btn-zoom-out')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(0.8); });
+    document.getElementById('mm-btn-fit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.fitView(); });
+    document.getElementById('mm-btn-theme')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.togglePaperMode(); });
+    document.getElementById('mm-btn-palette')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cyclePalette(); });
+    document.getElementById('mm-btn-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(); });
+    document.getElementById('mm-btn-close-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(false); });
 
     // Options du popover de structure
     document.querySelectorAll('#mm-structure-popover .mm-structure-option').forEach(opt => {
@@ -1370,8 +1370,7 @@ const MindMapView = {
         this.hideTooltip();
         this.openScriptureRef(ref);
       });
-      pill.addEventListener('mouseenter', (e) => this.showScriptureTooltip(e, ref));
-      pill.addEventListener('mousemove', (e) => this.moveTooltip(e));
+      pill.addEventListener('mouseenter', () => this.showScriptureTooltip(pill, ref));
       pill.addEventListener('mouseleave', () => this.hideTooltip());
     });
   },
@@ -1869,8 +1868,7 @@ const MindMapView = {
         refText.textContent = node.ref.length > 11 ? node.ref.slice(0, 9) + '…' : node.ref;
         refG.appendChild(refText);
 
-        refG.addEventListener('mouseenter', (e) => this.showScriptureTooltip(e, node.ref));
-        refG.addEventListener('mousemove', (e) => this.moveTooltip(e));
+        refG.addEventListener('mouseenter', () => this.showScriptureTooltip(refG, node.ref));
         refG.addEventListener('mouseleave', () => this.hideTooltip());
 
         refG.addEventListener('click', (e) => {
@@ -1910,8 +1908,7 @@ const MindMapView = {
         noteIconG.setAttribute('fill', 'none');
         noteG.appendChild(noteIconG);
 
-        noteG.addEventListener('mouseenter', (e) => this.showNoteTooltip(e, node.note));
-        noteG.addEventListener('mousemove', (e) => this.moveTooltip(e));
+        noteG.addEventListener('mouseenter', () => this.showNoteTooltip(noteG, node.note));
         noteG.addEventListener('mouseleave', () => this.hideTooltip());
 
         noteG.addEventListener('click', (e) => {
@@ -2269,41 +2266,27 @@ const MindMapView = {
     const nodeG = this.viewportG?.querySelector(`.mm-node-g[data-id="${nodeId}"]`);
     if (!nodeG) return;
 
+    const textEl = nodeG.querySelector('.mm-branch-text') || nodeG.querySelector('.mm-root-text');
+    const targetRect = textEl ? textEl.getBoundingClientRect() : nodeG.getBoundingClientRect();
+
+    const screenX = Math.round(targetRect.left - 4);
+    const screenY = Math.round(targetRect.top - 2);
+    const inputWidth = Math.max(80, Math.round(targetRect.width + 16));
+    const inputHeight = Math.max(22, Math.round(targetRect.height + 4));
+
     // Masquer le texte SVG et les boutons d'actions pendant l'édition
     nodeG.classList.add('editing');
-
-    const rect = this.svg.getBoundingClientRect();
-    const isRoot = node.id === 'root';
-    const scale = this.viewBox.scale;
-
-    // Calcul précis de l'emplacement de l'input
-    let screenX, screenY, inputWidth;
-
-    if (isRoot) {
-      screenX = rect.left + this.viewBox.x + (node.x - node.width / 2) * scale;
-      screenY = rect.top + this.viewBox.y + (node.y - node.height / 2) * scale;
-      inputWidth = Math.max(100, node.width * scale);
-    } else {
-      const textW = node.textWidth || this.getTextWidth(node.text, 11.5, '700');
-      let textX;
-      if (this.treeStructure === 'top-down') {
-        textX = node.x - (node.contentWidth || textW) / 2;
-      } else {
-        textX = node.side === 'right' ? node.x - node.width / 2 + 10 : node.x + node.width / 2 - 10 - textW;
-      }
-      screenX = rect.left + this.viewBox.x + textX * scale;
-      screenY = rect.top + this.viewBox.y + (node.y - 14) * scale;
-      inputWidth = Math.max(80, (textW + 20) * scale);
-    }
 
     // Création d'un input flottant calé sur le mot
     const input = document.createElement('input');
     input.type = 'text';
     input.value = node.text;
     input.className = 'mm-inline-editor';
+    input.style.position = 'fixed';
     input.style.left = `${screenX}px`;
     input.style.top = `${screenY}px`;
     input.style.width = `${inputWidth}px`;
+    input.style.height = `${inputHeight}px`;
 
     document.body.appendChild(input);
     input.focus();
@@ -2574,7 +2557,16 @@ const MindMapView = {
   // GESTION DES INFOBULLES FLOTTANTES RICHES (Versets & Notes)
   // =========================================================================
 
-  showTooltip(e, contentHtml) {
+  formatVerseText(rawText) {
+    if (!rawText) return '';
+    let safe = String(rawText).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Rétablir proprement les balises exposant pour les numéros de versets
+    safe = safe.replace(/&lt;sup&gt;(\d+)&lt;\/sup&gt;/gi, '<sup>$1</sup>');
+    safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+    return safe;
+  },
+
+  showTooltip(targetEl, contentHtml) {
     if (!this.tooltipEl) {
       this.tooltipEl = document.createElement('div');
       this.tooltipEl.id = 'mm-floating-tooltip';
@@ -2584,26 +2576,34 @@ const MindMapView = {
 
     this.tooltipEl.innerHTML = contentHtml;
     this.tooltipEl.style.display = 'block';
-    this.moveTooltip(e);
+    this.positionTooltip(targetEl);
   },
 
-  moveTooltip(e) {
-    if (!this.tooltipEl || this.tooltipEl.style.display === 'none') return;
+  positionTooltip(targetEl) {
+    if (!this.tooltipEl || !targetEl) return;
+    const rect = (typeof targetEl.getBoundingClientRect === 'function')
+      ? targetEl.getBoundingClientRect()
+      : { left: 0, top: 0, width: 0, height: 0, bottom: 0 };
     const tooltipRect = this.tooltipEl.getBoundingClientRect();
-    const padding = 12;
-    let left = e.clientX - tooltipRect.width / 2;
-    let top = e.clientY - tooltipRect.height - 12;
+    const tooltipW = tooltipRect.width || 330;
+    const tooltipH = tooltipRect.height || 140;
 
+    // Centrage horizontal fixe sur l'élément survolé
+    let left = rect.left + (rect.width / 2) - (tooltipW / 2);
+    const padding = 16;
     if (left < padding) left = padding;
-    if (left + tooltipRect.width > window.innerWidth - padding) {
-      left = window.innerWidth - tooltipRect.width - padding;
-    }
-    if (top < padding) {
-      top = e.clientY + 22;
+    if (left + tooltipW > window.innerWidth - padding) {
+      left = window.innerWidth - tooltipW - padding;
     }
 
-    this.tooltipEl.style.left = `${left}px`;
-    this.tooltipEl.style.top = `${top}px`;
+    // Position fixe au-dessus de l'élément (ou en dessous si manque d'espace en haut)
+    let top = rect.top - tooltipH - 10;
+    if (top < padding) {
+      top = rect.bottom + 10;
+    }
+
+    this.tooltipEl.style.left = `${Math.round(left)}px`;
+    this.tooltipEl.style.top = `${Math.round(top)}px`;
   },
 
   hideTooltip() {
@@ -2613,20 +2613,26 @@ const MindMapView = {
     }
   },
 
-  async showScriptureTooltip(e, ref) {
+  async showScriptureTooltip(targetEl, ref) {
     this.currentTooltipTarget = ref;
-    const cacheKey = (ref || '').trim().toLowerCase();
+    const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) 
+      ? BibleReader.currentBible1 
+      : (localStorage.getItem('bible_version') || 'Segond 21');
+    const cacheKey = `${ref}_${activeBible}`.trim().toLowerCase();
 
     const renderTooltip = (verseText = null, version = null) => {
+      const displayVer = version || (typeof BibleReader !== 'undefined' && typeof BibleReader.getBibleDisplayName === 'function' 
+        ? BibleReader.getBibleDisplayName(activeBible) 
+        : activeBible);
       let html = `
         <div class="mm-tooltip-header">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <span>${version ? `Verset (${version})` : 'Passage Biblique'}</span>
+          <span>Verset (${this.escapeHtml(displayVer)})</span>
         </div>
         <div class="mm-tooltip-ref">${this.escapeHtml(ref)}</div>
       `;
       if (verseText) {
-        html += `<div class="mm-tooltip-verse-text">« ${this.escapeHtml(verseText)} »</div>`;
+        html += `<div class="mm-tooltip-verse-text">« ${this.formatVerseText(verseText)} »</div>`;
       }
       html += `<div class="mm-tooltip-hint">Cliquer pour ouvrir dans le lecteur biblique</div>`;
       return html;
@@ -2634,20 +2640,21 @@ const MindMapView = {
 
     if (this._verseCache && this._verseCache[cacheKey]) {
       const cached = this._verseCache[cacheKey];
-      this.showTooltip(e, renderTooltip(cached.text, cached.version));
+      this.showTooltip(targetEl, renderTooltip(cached.text, cached.version));
       return;
     }
 
-    this.showTooltip(e, renderTooltip());
+    this.showTooltip(targetEl, renderTooltip());
 
     try {
       this._verseCache = this._verseCache || {};
       if (typeof API !== 'undefined' && API.getVersePreview) {
-        const res = await API.getVersePreview(ref);
+        const res = await API.getVersePreview(ref, activeBible);
         if (res && res.success && res.text) {
-          this._verseCache[cacheKey] = { text: res.text, version: res.version || 'LSG' };
+          const verName = res.version || res.bible || (typeof BibleReader !== 'undefined' && typeof BibleReader.getBibleDisplayName === 'function' ? BibleReader.getBibleDisplayName(activeBible) : activeBible);
+          this._verseCache[cacheKey] = { text: res.text, version: verName };
           if (this.currentTooltipTarget === ref && this.tooltipEl && this.tooltipEl.style.display !== 'none') {
-            this.showTooltip(e, renderTooltip(res.text, res.version || 'LSG'));
+            this.showTooltip(targetEl, renderTooltip(res.text, verName));
           }
         }
       }
@@ -2656,7 +2663,7 @@ const MindMapView = {
     }
   },
 
-  showNoteTooltip(e, noteText) {
+  showNoteTooltip(targetEl, noteText) {
     this.currentTooltipTarget = null;
     const html = `
       <div class="mm-tooltip-header">
@@ -2666,7 +2673,7 @@ const MindMapView = {
       <div class="mm-tooltip-body">${this.escapeHtml(noteText)}</div>
       <div class="mm-tooltip-hint">Cliquer ou F4 pour modifier</div>
     `;
-    this.showTooltip(e, html);
+    this.showTooltip(targetEl, html);
   },
 
   // =========================================================================

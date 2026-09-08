@@ -199,6 +199,7 @@ const BookPicker = {
 
     // Centrage plein écran pour modal MindMap
     if (this.currentOptions.center && this.popoverEl) {
+      this.popoverEl.classList.add('centered');
       this.popoverEl.style.position = 'fixed';
       this.popoverEl.style.top = '50%';
       this.popoverEl.style.left = '50%';
@@ -244,6 +245,7 @@ const BookPicker = {
     this.popoverEl?.classList.add('hidden');
     this.backdropEl?.classList.add('hidden');
     if (this.popoverEl) {
+      this.popoverEl.classList.remove('centered');
       this.popoverEl.style.position = '';
       this.popoverEl.style.top = '';
       this.popoverEl.style.left = '';

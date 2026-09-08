@@ -5796,9 +5796,24 @@ input:checked + .slider.round:before {
   display: none;
 }
 
+.book-picker-popover.centered {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  z-index: 1001 !important;
+  animation: popoverFadeInCentered 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 @keyframes popoverFadeIn {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popoverFadeInCentered {
+  from { opacity: 0; transform: translate(-50%, calc(-50% - 8px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
 }
 
 .popover-header {
@@ -31773,7 +31788,7 @@ body[class*="palette-dark"] .mm-action-circle {
 }
 
 .mm-inline-editor {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
   background: var(--bg-card, #ffffff);
   color: var(--text-primary, #0f172a);
@@ -32586,6 +32601,17 @@ body[class*="palette-dark"] .mm-tooltip-header {
   background: var(--bg-secondary, #f1f5f9);
   border-left: 2.5px solid var(--accent-blue, #2563eb);
   border-radius: 4px;
+}
+
+.mm-tooltip-verse-text sup {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-blue, #2563eb);
+  margin-right: 2px;
+  font-style: normal;
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
 }
 
 body.theme-dark .mm-tooltip-verse-text,
