@@ -1538,7 +1538,12 @@ const MindMapView = {
     }
 
     if (!node.children || node.children.length === 0) {
-      node.totalHeight = node.height + 18; // Espace négatif
+      const contentHeight = node.height + 18; // Espace négatif
+      const hasBoundary = this.boundaries && this.boundaries.some(b => b.rootId === node.id);
+      node.boundaryTop = hasBoundary ? 42 : 0;
+      node.boundaryBottom = hasBoundary ? 28 : 0;
+      node.contentHeight = contentHeight;
+      node.totalHeight = contentHeight + node.boundaryTop + node.boundaryBottom;
       return;
     }
 
@@ -1547,7 +1552,12 @@ const MindMapView = {
       this.measureNode(child);
       sum += child.totalHeight;
     });
-    node.totalHeight = Math.max(node.height + 18, sum);
+    const contentHeight = Math.max(node.height + 18, sum);
+    const hasBoundary = this.boundaries && this.boundaries.some(b => b.rootId === node.id);
+    node.boundaryTop = hasBoundary ? 42 : 0;
+    node.boundaryBottom = hasBoundary ? 28 : 0;
+    node.contentHeight = contentHeight;
+    node.totalHeight = contentHeight + node.boundaryTop + node.boundaryBottom;
   },
 
   measureTopDown(node) {
@@ -1659,7 +1669,12 @@ const MindMapView = {
     }
 
     if (!node.children || node.children.length === 0) {
-      node.totalWidth = node.width + 28; // Marge négative horizontale entre feuilles
+      const contentWidth = node.width + 28; // Marge négative horizontale entre feuilles
+      const hasBoundary = this.boundaries && this.boundaries.some(b => b.rootId === node.id);
+      node.boundaryLeft = hasBoundary ? 24 : 0;
+      node.boundaryRight = hasBoundary ? 24 : 0;
+      node.contentWidth = contentWidth;
+      node.totalWidth = contentWidth + node.boundaryLeft + node.boundaryRight;
       return;
     }
 
@@ -1668,7 +1683,12 @@ const MindMapView = {
       this.measureTopDown(child);
       sum += child.totalWidth;
     });
-    node.totalWidth = Math.max(node.width + 28, sum);
+    const contentWidth = Math.max(node.width + 28, sum);
+    const hasBoundary = this.boundaries && this.boundaries.some(b => b.rootId === node.id);
+    node.boundaryLeft = hasBoundary ? 24 : 0;
+    node.boundaryRight = hasBoundary ? 24 : 0;
+    node.contentWidth = contentWidth;
+    node.totalWidth = contentWidth + node.boundaryLeft + node.boundaryRight;
   },
 
   layoutTopDown(root) {
@@ -1721,8 +1741,12 @@ const MindMapView = {
     let currentY = -totalHeight / 2;
 
     bois.forEach(boi => {
-      // Centrage vertical de chaque sous-arbre dans son espace alloué dédié
-      boi.y = currentY + boi.totalHeight / 2;
+      const bTop = boi.boundaryTop || 0;
+      const bBot = boi.boundaryBottom || 0;
+      const cHeight = boi.contentHeight || (boi.totalHeight - bTop - bBot);
+
+      // Centrage vertical du contenu de chaque sous-arbre dans son espace alloué dédié
+      boi.y = currentY + bTop + cHeight / 2;
 
       // Position horizontale : garantit la distance uniforme par rapport au contour du médaillon central
       boi.x = dir * (rootW / 2 + uniformDist + boi.width / 2);
@@ -1737,10 +1761,15 @@ const MindMapView = {
 
     const dir = side === 'right' ? 1 : -1;
     const clearHorizGap = 55; // Espace horizontal net garanti entre bord parent et bord enfant
-    let currentY = parent.y - parent.totalHeight / 2;
+    const childrenTotalHeight = parent.children.reduce((acc, c) => acc + c.totalHeight, 0);
+    let currentY = parent.y - childrenTotalHeight / 2;
 
     parent.children.forEach(child => {
-      const centerY = currentY + child.totalHeight / 2;
+      const bTop = child.boundaryTop || 0;
+      const bBot = child.boundaryBottom || 0;
+      const cHeight = child.contentHeight || (child.totalHeight - bTop - bBot);
+      const centerY = currentY + bTop + cHeight / 2;
+
       child.x = parent.x + dir * (parent.width / 2 + clearHorizGap + child.width / 2);
       child.y = centerY;
 
@@ -3904,6 +3933,19 @@ const MindMapView = {
         if (node.children) node.children.forEach(traverse);
       };
       traverse(this.tree);
+
+      // Prise en compte des enclos dans le cadrage automatique
+      if (this.boundaries && this.boundaries.length > 0) {
+        this.boundaries.forEach(bnd => {
+          const b = this.getBoundaryBBox(bnd);
+          if (b) {
+            minX = Math.min(minX, b.x);
+            maxX = Math.max(maxX, b.x + b.width);
+            minY = Math.min(minY, b.y - 14); // Marge pour l'étiquette pilule
+            maxY = Math.max(maxY, b.y + b.height);
+          }
+        });
+      }
     }
 
     if (!isFinite(minX) || !isFinite(maxX) || minX >= maxX) {
@@ -3958,32 +4000,61 @@ const MindMapView = {
 
     this.layoutTree();
 
-    // Dégagement automatique des sujets flottants s'ils chevauchent des branches de l'arbre
-    if (this.floatingTopics && this.floatingTopics.length > 0 && this.tree) {
-      const allTreeNodes = [];
-      const collect = (n) => {
-        allTreeNodes.push(n);
-        if (n.children) n.children.forEach(collect);
-      };
-      collect(this.tree);
+    // Dégagement automatique des sujets flottants s'ils chevauchent des branches de l'arbre ou des enclos
+    if (this.floatingTopics && this.floatingTopics.length > 0) {
+      if (this.tree) {
+        const allTreeNodes = [];
+        const collect = (n) => {
+          allTreeNodes.push(n);
+          if (n.children) n.children.forEach(collect);
+        };
+        collect(this.tree);
 
-      this.floatingTopics.forEach(ft => {
-        const ftHalfW = (ft.width || 88) / 2;
-        const ftHalfH = (ft.height || 32) / 2;
-        allTreeNodes.forEach(tn => {
-          const tnHalfW = (tn.width || 80) / 2;
-          const tnHalfH = (tn.height || 28) / 2;
-          const padX = ftHalfW + tnHalfW + 25;
-          const padY = ftHalfH + tnHalfH + 20;
-          if (Math.abs(ft.x - tn.x) < padX && Math.abs(ft.y - tn.y) < padY) {
-            if (ft.y <= tn.y) {
-              ft.y = tn.y - padY;
-            } else {
-              ft.y = tn.y + padY;
+        this.floatingTopics.forEach(ft => {
+          const ftHalfW = (ft.width || 88) / 2;
+          const ftHalfH = (ft.height || 32) / 2;
+          allTreeNodes.forEach(tn => {
+            const tnHalfW = (tn.width || 80) / 2;
+            const tnHalfH = (tn.height || 28) / 2;
+            const padX = ftHalfW + tnHalfW + 25;
+            const padY = ftHalfH + tnHalfH + 20;
+            if (Math.abs(ft.x - tn.x) < padX && Math.abs(ft.y - tn.y) < padY) {
+              if (ft.y <= tn.y) {
+                ft.y = tn.y - padY;
+              } else {
+                ft.y = tn.y + padY;
+              }
             }
-          }
+          });
         });
-      });
+      }
+
+      if (this.boundaries && this.boundaries.length > 0) {
+        this.boundaries.forEach(bnd => {
+          const bbox = this.getBoundaryBBox(bnd);
+          if (!bbox) return;
+          this.floatingTopics.forEach(ft => {
+            const ftHalfW = (ft.width || 88) / 2;
+            const ftHalfH = (ft.height || 32) / 2;
+            const ftLeft = ft.x - ftHalfW;
+            const ftRight = ft.x + ftHalfW;
+            const ftTop = ft.y - ftHalfH;
+            const ftBottom = ft.y + ftHalfH;
+            const bTop = bbox.y - 14;
+            const bBottom = bbox.y + bbox.height + 10;
+            const bLeft = bbox.x - 10;
+            const bRight = bbox.x + bbox.width + 10;
+
+            if (ftRight > bLeft && ftLeft < bRight && ftBottom > bTop && ftTop < bBottom) {
+              if (ft.y < (bTop + bBottom) / 2) {
+                ft.y = bTop - ftHalfH - 15;
+              } else {
+                ft.y = bBottom + ftHalfH + 15;
+              }
+            }
+          });
+        });
+      }
     }
     this.draw();
     this.fitView();
@@ -5752,10 +5823,18 @@ const MindMapView = {
 
     const padX = 18;
     const padY = 16;
+    let bWidth = (maxX - minX) + 2 * padX;
+    const labelText = (boundary.label || 'ENCLOS').toUpperCase();
+    const textW = this.getTextWidth ? this.getTextWidth(labelText, 9.5, '700') : 60;
+    const pillW = Math.max(56, textW + 20);
+    if (pillW + 28 > bWidth) {
+      bWidth = pillW + 28;
+    }
+
     return {
       x: minX - padX,
       y: minY - padY,
-      width: (maxX - minX) + 2 * padX,
+      width: bWidth,
       height: (maxY - minY) + 2 * padY
     };
   },
@@ -5809,7 +5888,7 @@ const MindMapView = {
       const textW = this.getTextWidth(labelText, 9.5, '700');
       const pillW = Math.max(56, textW + 20);
       const pillH = 22;
-      const pillX = bbox.x + 14;
+      const pillX = Math.min(bbox.x + 14, bbox.x + bbox.width - pillW - 10);
       const pillY = bbox.y - pillH / 2;
 
       const labelG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -5924,6 +6003,7 @@ const MindMapView = {
     this.selectedNodeId = null;
     this.selectedRelId = null;
 
+    this.layoutTree();
     this.draw();
     this.syncAndAutoSave();
 
@@ -5938,6 +6018,7 @@ const MindMapView = {
     if (!this.boundaries) return;
     this.boundaries = this.boundaries.filter(b => b.id !== bndId);
     if (this.selectedBoundaryId === bndId) this.selectedBoundaryId = null;
+    this.layoutTree();
     this.draw();
     this.syncAndAutoSave();
     if (typeof App !== 'undefined' && App.showToast) {
@@ -6014,6 +6095,7 @@ const MindMapView = {
       const val = (input?.value || '').trim().toUpperCase() || 'ENCLOS';
       bnd.label = val;
       close();
+      this.layoutTree();
       this.draw();
       this.syncAndAutoSave();
     };
