@@ -4800,7 +4800,6 @@ const MindMapView = {
     if (!nodeId || nodeId === 'root') return;
     const node = this.findNode(nodeId);
     if (!node) return;
-    this.saveHistory();
     const cleanMarker = marker ? String(marker).trim().toLowerCase() : null;
     node.marker = cleanMarker;
     this.layoutTree();
