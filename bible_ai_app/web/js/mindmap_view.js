@@ -2618,16 +2618,35 @@ const MindMapView = {
       } else {
         // Radiant / Arbre logique (gauche / droite)
         const childSide = child.side || 'right';
+        const dir = childSide === 'right' ? 1 : -1;
 
-        // Position de départ sur le bloc principal : démarre précisément sur le bord de l'ellipse orienté vers le BOI
+        // Position de départ sur le bloc principal : ventilation élégante le long du pourtour de l'ellipse
         let x1, y1;
+        let totalOnSide = 1;
         if (isRoot) {
-          const dir = childSide === 'right' ? 1 : -1;
           const rootW = node.width || 140;
           const rootH = node.height || 46;
-          const angle = Math.atan2(child.y - node.y, Math.abs(child.x - node.x));
-          x1 = dir * (rootW / 2) * Math.cos(angle);
-          y1 = (rootH / 2) * Math.sin(angle);
+          const sameSideChildren = node.children
+            .filter(c => (c.side || 'right') === childSide)
+            .sort((a, b) => a.y - b.y);
+          totalOnSide = sameSideChildren.length;
+          const idxOnSide = sameSideChildren.indexOf(child);
+
+          if (totalOnSide <= 1) {
+            x1 = dir * (rootW / 2);
+            y1 = 0;
+          } else {
+            // Répartition aérée sur 75% de la hauteur du médaillon central (évite tout faisceau serré)
+            const maxSpanY = Math.min(rootH * 0.75, (totalOnSide - 1) * 8.5);
+            const yStep = maxSpanY / (totalOnSide - 1);
+            y1 = -maxSpanY / 2 + idxOnSide * yStep;
+
+            // Point d'ancrage calculé précisément sur le contour arrondi du médaillon central
+            const capRadius = rootH / 2;
+            const flatW = rootW / 2 - capRadius;
+            const capX = Math.sqrt(Math.max(0, capRadius * capRadius - y1 * y1));
+            x1 = dir * (flatW + capX);
+          }
         } else {
           x1 = childSide === 'right' ? node.x + node.width / 2 : node.x - node.width / 2;
           y1 = isBox ? node.y : node.y + 10;
@@ -2636,16 +2655,16 @@ const MindMapView = {
         const x2 = childSide === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
         const y2 = isBox ? child.y : child.y + 10;
 
-        // Règles de BUZAN : hiérarchie visuelle forte (niveau 1 plus épais, s'affinant ensuite)
+        // Finesse élégante et hiérarchie visuelle (affinement des liaisons vers le sujet central)
         let strokeWidth;
         if (isRoot) {
-          strokeWidth = 4.2; // Ligne maîtresse forte et organique (Buzan)
+          strokeWidth = totalOnSide >= 4 ? 2.2 : (totalOnSide === 3 ? 2.5 : 2.9);
         } else if (child.level === 2) {
-          strokeWidth = 2.6; // Branche secondaire
+          strokeWidth = 2.0;
         } else if (child.level === 3) {
-          strokeWidth = 1.9; // Branche tertiaire
+          strokeWidth = 1.6;
         } else {
-          strokeWidth = 1.5; // Ramification fine
+          strokeWidth = 1.2;
         }
         const strokeColor = child.color || 'var(--text-secondary)';
 
@@ -2694,7 +2713,7 @@ const MindMapView = {
           underline.setAttribute('x2', underX2);
           underline.setAttribute('y2', y2);
           underline.setAttribute('stroke', strokeColor);
-          const underlineW = child.level === 1 ? 3.0 : (child.level === 2 ? 2.0 : 1.5);
+          const underlineW = child.level === 1 ? (totalOnSide >= 4 ? 2.2 : 2.6) : (child.level === 2 ? 1.8 : 1.4);
           underline.setAttribute('stroke-width', underlineW);
           underline.setAttribute('stroke-linecap', 'round');
           this.viewportG.appendChild(underline);
