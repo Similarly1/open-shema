@@ -209,23 +209,6 @@ function initStickySplitScroll() {
     });
   }
 
-  // Écouteur toggle des détails exégétiques sur mobile
-  document.querySelectorAll('.feature-details-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const card = btn.closest('.split-feature-card');
-      const list = card ? card.querySelector('.feature-highlights-list') : null;
-      if (list) {
-        const isOpen = list.classList.toggle('is-open');
-        btn.classList.toggle('active', isOpen);
-        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        const span = btn.querySelector('span');
-        if (span) {
-          span.textContent = isOpen ? 'Masquer les points clés' : 'Points clés exégétiques';
-        }
-      }
-    });
-  });
 
   let ticking = false;
   function checkVisibleCard() {
@@ -386,7 +369,7 @@ function initInteractiveSimulators() {
     if (role === 'enseignement') roleText = "Enseignement biblique & groupes d'étude";
     if (role === 'perso') roleText = "Étude personnelle & méditation";
 
-    let postureDesc = "Sparring-partner exigeant et pastoral (challenge les conclusions pour tester la solidité de l'argumentation théologique).";
+    let postureDesc = "Miroir critique exigeant et pastoral (stimule la réflexion et éprouve la solidité de l'argumentation théologique sans se substituer au prédicateur).";
     if (posture === 'academique') postureDesc = "Scientifique, neutre, axé sur la critique textuelle et le contexte historique comparatif.";
     if (posture === 'pedagogique') postureDesc = "Pédagogique, didactique, vulgarisation claire et plans mémorisables.";
     if (posture === 'pastoral') postureDesc = "Bienveillant, encourageant, orienté vers la transformation du cœur.";
