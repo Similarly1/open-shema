@@ -1182,6 +1182,113 @@ Règles impératives :
         if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg><span>Régénérer</span>';
       }
     });
+
+    // Guide & Spécification des fichiers Markdown (.md)
+    this.bindMarkdownGuideModal();
+  },
+
+  bindMarkdownGuideModal() {
+    // Bouton d'ouverture depuis la section Notes des paramètres
+    document.getElementById('btn-open-markdown-guide')?.addEventListener('click', () => {
+      this.openMarkdownGuideModal('notes');
+    });
+
+    // Boutons de fermeture
+    document.getElementById('btn-close-markdown-spec-modal')?.addEventListener('click', () => {
+      this.closeMarkdownGuideModal();
+    });
+    document.getElementById('btn-done-markdown-spec-modal')?.addEventListener('click', () => {
+      this.closeMarkdownGuideModal();
+    });
+
+    // Clic extérieur sur le fond pour fermer
+    const modal = document.getElementById('markdown-spec-modal');
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        this.closeMarkdownGuideModal();
+      }
+    });
+
+    // Touche Échap
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+        this.closeMarkdownGuideModal();
+      }
+    });
+
+    // Bascule des onglets internes du guide
+    const tabButtons = document.querySelectorAll('#md-guide-tabs-bar .settings-tab');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabKey = btn.dataset.mdTab;
+        if (tabKey) this.switchMarkdownGuideTab(tabKey);
+      });
+    });
+
+    // Configuration des boutons Copier le modèle
+    const setupCopyBtn = (btnId, codeId, label) => {
+      const btn = document.getElementById(btnId);
+      const codeEl = document.getElementById(codeId);
+      if (!btn || !codeEl) return;
+      btn.addEventListener('click', async () => {
+        try {
+          const text = codeEl.textContent || '';
+          await navigator.clipboard.writeText(text);
+          const originalHtml = btn.innerHTML;
+          btn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copié !</span>`;
+          btn.classList.add('btn-primary');
+          btn.classList.remove('btn-secondary');
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`Modèle « ${label} » copié dans le presse-papiers`);
+          }
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-secondary');
+          }, 2000);
+        } catch (e) {
+          console.error('Erreur copie presse-papiers:', e);
+        }
+      });
+    };
+
+    setupCopyBtn('btn-copy-template-notes', 'code-template-notes', 'Note textuelle');
+    setupCopyBtn('btn-copy-template-mindmap', 'code-template-mindmap', 'Mind Map');
+    setupCopyBtn('btn-copy-template-sermons', 'code-template-sermons', 'Sermon');
+    setupCopyBtn('btn-copy-template-highlights', 'code-template-highlights', 'Surlignages');
+  },
+
+  openMarkdownGuideModal(initialTab = 'notes') {
+    const modal = document.getElementById('markdown-spec-modal');
+    if (!modal) return;
+    this.switchMarkdownGuideTab(initialTab);
+    modal.classList.remove('hidden');
+  },
+
+  closeMarkdownGuideModal() {
+    const modal = document.getElementById('markdown-spec-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  switchMarkdownGuideTab(tabKey) {
+    const tabButtons = document.querySelectorAll('#md-guide-tabs-bar .settings-tab');
+    tabButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mdTab === tabKey);
+    });
+
+    const panes = {
+      notes: document.getElementById('md-pane-notes'),
+      mindmap: document.getElementById('md-pane-mindmap'),
+      sermons: document.getElementById('md-pane-sermons'),
+      highlights: document.getElementById('md-pane-highlights'),
+      sync: document.getElementById('md-pane-sync')
+    };
+
+    Object.keys(panes).forEach(k => {
+      if (panes[k]) {
+        panes[k].classList.toggle('hidden', k !== tabKey);
+      }
+    });
   },
 
   async loadTheologicalProfileCard() {

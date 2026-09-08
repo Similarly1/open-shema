@@ -90,6 +90,13 @@ const NotesView = {
       this.togglePreview();
     });
 
+    document.getElementById('btn-notes-markdown-guide')?.addEventListener('click', () => {
+      const isMindmap = this.currentNote?.type === 'mindmap';
+      if (typeof SettingsView !== 'undefined' && SettingsView.openMarkdownGuideModal) {
+        SettingsView.openMarkdownGuideModal(isMindmap ? 'mindmap' : 'notes');
+      }
+    });
+
     // Boutons Historique Annuler / Rétablir
     document.getElementById('btn-note-undo')?.addEventListener('click', () => {
       this.undo();
