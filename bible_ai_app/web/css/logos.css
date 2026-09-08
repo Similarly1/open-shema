@@ -9758,22 +9758,44 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   overflow: hidden;
 }
 .notes-editor-header {
-  padding: 14px 20px;
+  padding: 10px 20px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  min-height: 50px;
+  box-sizing: border-box;
 }
-.note-title-input {
+
+.notes-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.note-title-wrap {
+  display: flex;
+  align-items: center;
+  min-width: 130px;
+  max-width: 320px;
+  flex: 0 1 auto;
+}
+
+.note-title-input {
+  width: 100%;
   font-size: 18px;
   font-weight: 800;
   border: none;
   outline: none;
   background-color: transparent;
   color: var(--text-primary);
+  padding: 0;
 }
+
 .notes-editor-subbar {
   padding: 6px 20px;
   background-color: var(--bg-subtle);
@@ -9782,8 +9804,12 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 44px;
+  min-height: 40px;
   box-sizing: border-box;
+}
+
+.notes-editor-subbar.hidden {
+  display: none !important;
 }
 
 .notes-subbar-meta {
@@ -26029,21 +26055,82 @@ body.reading-bg-dark .comm-dropdown-popover {
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
-  background-color: var(--bg-primary);
-  padding: 2px 8px 2px 4px;
-  gap: 4px;
+  background-color: var(--bg-sidebar);
+  padding: 0;
+  gap: 0;
+  position: relative;
+  min-height: 40px;
+  overflow: hidden;
 }
 
-.sermons-resources-drawer .drawer-tabs {
+.sermon-tabs-scroll-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sermon-tabs-scroll-area .drawer-tabs {
   display: flex;
   align-items: center;
   gap: 3px;
   overflow-x: auto;
   scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  padding: 4px 14px;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
 }
 
-.sermons-resources-drawer .drawer-tabs::-webkit-scrollbar {
+.sermon-tabs-scroll-area .drawer-tabs::-webkit-scrollbar {
   display: none;
+}
+
+.sermon-tabs-scroll-area.has-overflow-right::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, var(--bg-sidebar, #090d16) 80%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sermon-tabs-scroll-area.has-overflow-left::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 100%;
+  background: linear-gradient(90deg, var(--bg-sidebar, #090d16) 20%, transparent 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sermon-drawer-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 6px;
+  flex-shrink: 0;
+  z-index: 8;
+  background: inherit;
+  border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  height: 100%;
+}
+
+.drawer-tabs-scroll-btn.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .sermons-resources-drawer .drawer-tab {
@@ -31104,7 +31191,9 @@ body[class*="palette-light"] #right-drawer .drawer-body {
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #right-drawer .drawer-tabs-wrapper,
 body[class*="palette-light"] #right-drawer .drawer-tabs-wrapper,
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #drawer-tabs-wrapper,
-body[class*="palette-light"] #drawer-tabs-wrapper {
+body[class*="palette-light"] #drawer-tabs-wrapper,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #sermon-drawer-tabs-wrapper,
+body[class*="palette-light"] #sermon-drawer-tabs-wrapper {
   background: var(--bg-sidebar, #f1f5f9) !important;
   border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
 }
@@ -31112,21 +31201,27 @@ body[class*="palette-light"] #drawer-tabs-wrapper {
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #right-drawer .drawer-tabs,
 body[class*="palette-light"] #right-drawer .drawer-tabs,
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #drawer-tabs-bar,
-body[class*="palette-light"] #drawer-tabs-bar {
+body[class*="palette-light"] #drawer-tabs-bar,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #sermon-drawer-tabs-bar,
+body[class*="palette-light"] #sermon-drawer-tabs-bar {
   background: transparent !important;
 }
 
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #right-drawer .drawer-tabs-wrapper.has-overflow-right::after,
 body[class*="palette-light"] #right-drawer .drawer-tabs-wrapper.has-overflow-right::after,
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #drawer-tabs-wrapper.has-overflow-right::after,
-body[class*="palette-light"] #drawer-tabs-wrapper.has-overflow-right::after {
+body[class*="palette-light"] #drawer-tabs-wrapper.has-overflow-right::after,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-tabs-scroll-area.has-overflow-right::after,
+body[class*="palette-light"] .sermon-tabs-scroll-area.has-overflow-right::after {
   background: linear-gradient(90deg, transparent 0%, var(--bg-sidebar, #f1f5f9) 80%) !important;
 }
 
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #right-drawer .drawer-tabs-wrapper.has-overflow-left::before,
 body[class*="palette-light"] #right-drawer .drawer-tabs-wrapper.has-overflow-left::before,
 body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) #drawer-tabs-wrapper.has-overflow-left::before,
-body[class*="palette-light"] #drawer-tabs-wrapper.has-overflow-left::before {
+body[class*="palette-light"] #drawer-tabs-wrapper.has-overflow-left::before,
+body.theme-light:not(.palette-dark-slate):not(.palette-dark-oled):not(.palette-dark-warm) .sermon-tabs-scroll-area.has-overflow-left::before,
+body[class*="palette-light"] .sermon-tabs-scroll-area.has-overflow-left::before {
   background: linear-gradient(90deg, var(--bg-sidebar, #f1f5f9) 20%, transparent 100%) !important;
 }
 

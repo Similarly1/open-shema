@@ -1168,7 +1168,11 @@ const MindMapView = {
     const isOutline = this.viewMode === 'outline';
 
     // Niveau 2 : Affichage des outils du plan dans la sous-barre
+    const subbar = document.getElementById('notes-editor-subbar');
     const subbarActions = document.getElementById('notes-subbar-outline-actions');
+    if (subbar) {
+      subbar.classList.toggle('hidden', !isOutline);
+    }
     if (subbarActions) {
       subbarActions.classList.toggle('hidden', !isOutline);
       if (isOutline) {

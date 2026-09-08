@@ -1780,6 +1780,7 @@ const NotesView = {
       mmContainer?.classList.add('hidden');
       toggleModeBtn?.classList.add('hidden');
       exportOutlineBtn?.classList.add('hidden');
+      document.getElementById('notes-editor-subbar')?.classList.add('hidden');
       document.getElementById('notes-subbar-outline-actions')?.classList.add('hidden');
       previewBtn?.classList.remove('hidden');
       this.contentInput?.classList.remove('hidden');
