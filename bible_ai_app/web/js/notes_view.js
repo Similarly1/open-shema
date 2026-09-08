@@ -2088,21 +2088,6 @@ const NotesView = {
       this.promptAddTagInline(tagsContainer, addTagBtn);
     });
     tagsContainer.appendChild(addTagBtn);
-
-    // Bouton Génération IA des tags
-    const aiTagsBtn = document.createElement('button');
-    aiTagsBtn.type = 'button';
-    aiTagsBtn.className = 'btn-ai-sparkle-inline';
-    aiTagsBtn.id = 'btn-note-gen-tags-ai';
-    aiTagsBtn.title = 'Générer des tags automatiques par IA selon le contenu';
-    aiTagsBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/></svg>
-    `;
-    aiTagsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.generateTagsWithAI();
-    });
-    tagsContainer.appendChild(aiTagsBtn);
   },
 
   openPassagePicker() {
