@@ -7927,43 +7927,4 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
   margin: 0;
 }
 
-/* Bloc des captures réelles du module Mind Map */
-.mindmap-gallery-block {
-  margin-top: 56px;
-  padding-top: 48px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.mindmap-gallery-header {
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto 36px;
-}
-
-.mindmap-gallery-title {
-  font-family: var(--font-heading);
-  font-size: 1.65rem;
-  font-weight: 800;
-  color: var(--text-main);
-  margin: 8px 0 10px;
-}
-
-.mindmap-gallery-subtitle {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.mindmap-gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-@media (max-width: 980px) {
-  .mindmap-gallery-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 
