@@ -1634,15 +1634,15 @@ function initMindmapShowcase() {
     }
   };
 
-  // Dictionnaire Complet des Infobulles Exégétiques et Bibliques
+  // Dictionnaire Complet des Infobulles Exégétiques et Bibliques — Version Néo-Crampon Libre (NCL)
   const tooltipsData = {
     // 1. JUSTIFICATION
     'badge-verse-justif': {
-      header: 'Verset (Segond 21)',
-      ref: 'Romains 3:21-5:21',
-      text: '« Mais maintenant, la justice de Dieu dont témoignent la loi et les prophètes a été manifestée indépendamment de la loi: justice de Dieu par la foi en Jésus-Christ pour tous ceux qui croient. »',
+      header: 'Verset (Néo-Crampon Libre)',
+      ref: 'Romains 3:21-22 (Rm 3:21-5:21)',
+      text: '« Mais maintenant, sans la Loi, a été manifestée une justice de Dieu à laquelle rendent témoignage la Loi et les Prophètes, justice de Dieu par la foi en Jésus-Christ pour tous ceux et à tous ceux qui croient ; il n’y a pas de distinction. »',
       hint: 'Cliquer pour ouvrir dans le lecteur biblique',
-      toast: 'Lecteur biblique : Romains 3:21-5:21 (Segond 21)'
+      toast: 'Lecteur biblique : Romains 3:21-5:21 (Néo-Crampon Libre)'
     },
     'badge-note-justif': {
       header: 'Note de branche',
@@ -1653,11 +1653,11 @@ function initMindmapShowcase() {
     },
     // 2. CONDAMNATION
     'badge-verse-condem': {
-      header: 'Verset (Segond 21)',
-      ref: 'Romains 1:18-3:20',
-      text: '« La colère de Dieu se révèle du ciel contre toute impiété et toute injustice des hommes qui retiennent injustement la vérité captive... Il n\'y a pas de juste, pas même un seul. »',
+      header: 'Verset (Néo-Crampon Libre)',
+      ref: 'Romains 1:18 ; 3:10 (Rm 1:18-3:20)',
+      text: '« En effet, la colère de Dieu éclate du haut du ciel contre toute impiété et toute injustice des hommes, qui, par leur injustice, retiennent la vérité captive... selon qu’il est écrit : Il n’y a pas de juste, pas même un seul. »',
       hint: 'Cliquer pour ouvrir dans le lecteur biblique',
-      toast: 'Lecteur biblique : Romains 1:18-3:20 (Segond 21)'
+      toast: 'Lecteur biblique : Romains 1:18-3:20 (Néo-Crampon Libre)'
     },
     'badge-note-condem': {
       header: 'Note de branche',
@@ -1668,11 +1668,11 @@ function initMindmapShowcase() {
     },
     // 3. LIBÉRATION
     'badge-verse-lib': {
-      header: 'Verset (Segond 21)',
-      ref: 'Romains 6:1-8:39',
-      text: '« Il n\'y a donc maintenant aucune condamnation pour ceux qui sont en Jésus-Christ. La loi de l\'Esprit de vie en Jésus-Christ m\'a libéré de la loi du péché et de la mort. »',
+      header: 'Verset (Néo-Crampon Libre)',
+      ref: 'Romains 8:1-2 (Rm 6:1-8:39)',
+      text: '« Il n’y a donc maintenant aucune condamnation pour ceux qui sont en Jésus-Christ. En effet, la loi de l’Esprit de la vie m’a affranchi en Jésus-Christ de la loi du péché et de la mort. »',
       hint: 'Cliquer pour ouvrir dans le lecteur biblique',
-      toast: 'Lecteur biblique : Romains 6:1-8:39 (Segond 21)'
+      toast: 'Lecteur biblique : Romains 6:1-8:39 (Néo-Crampon Libre)'
     },
     'badge-note-lib': {
       header: 'Note de branche',
@@ -1683,11 +1683,11 @@ function initMindmapShowcase() {
     },
     // 4. ISRAËL
     'badge-verse-israel': {
-      header: 'Verset (Segond 21)',
-      ref: 'Romains 9:1-11:36',
-      text: '« Car les dons et l\'appel de Dieu sont irrévocables. Ô profondeur de la richesse, de la sagesse et de la connaissance de Dieu ! »',
+      header: 'Verset (Néo-Crampon Libre)',
+      ref: 'Romains 11:29, 33 (Rm 9:1-11:36)',
+      text: '« Car les dons et la vocation de Dieu sont sans repentance. Ô profondeur inépuisable et de la sagesse et de la science de Dieu ! Que ses jugements sont insondables et ses voies incompréhensibles ! »',
       hint: 'Cliquer pour ouvrir dans le lecteur biblique',
-      toast: 'Lecteur biblique : Romains 9:1-11:36 (Segond 21)'
+      toast: 'Lecteur biblique : Romains 9:1-11:36 (Néo-Crampon Libre)'
     },
     'badge-note-israel': {
       header: 'Note de branche',
@@ -1698,11 +1698,11 @@ function initMindmapShowcase() {
     },
     // 5. ÉTHIQUE
     'badge-verse-ethique': {
-      header: 'Verset (Segond 21)',
-      ref: 'Romains 12:1-16:27',
-      text: '« Je vous encourage donc par les compassions de Dieu à offrir votre corps comme un sacrifice vivant, saint, agréable à Dieu: ce sera de votre part un culte raisonnable. »',
+      header: 'Verset (Néo-Crampon Libre)',
+      ref: 'Romains 12:1-2 (Rm 12:1-16:27)',
+      text: '« Je vous exhorte donc, mes frères, par la miséricorde de Dieu, à offrir vos corps comme une hostie vivante, sainte, agréable à Dieu : c’est là le culte spirituel que vous lui devez. Et ne vous conformez pas au siècle présent, mais transformez-vous par le renouvellement de l’esprit... »',
       hint: 'Cliquer pour ouvrir dans le lecteur biblique',
-      toast: 'Lecteur biblique : Romains 12:1-16:27 (Segond 21)'
+      toast: 'Lecteur biblique : Romains 12:1-16:27 (Néo-Crampon Libre)'
     },
     'badge-note-ethique': {
       header: 'Note de branche',
@@ -1719,125 +1719,125 @@ function initMindmapShowcase() {
       hint: 'Cliquer ou F4 pour modifier',
       toast: 'Éditeur : Note historique de CONTEXTE ouverte'
     },
-    // SOUS-BRANCHES CLÉS
+    // SOUS-BRANCHES CLÉS (NÉO-CRAMPON LIBRE)
     'badge-sub-foi': {
-      header: 'Doctrine (Rm 3:28)',
+      header: 'Doctrine (Rm 3:28 • NCL)',
       ref: 'Romains 3:28',
-      text: '« Car nous estimons que l\'homme est justifié par la foi, sans les œuvres de la loi. »',
+      text: '« Car nous tenons pour certain que l’homme est justifié par la foi, à l’exclusion des œuvres de la Loi. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 3:28'
+      toast: 'Lecteur biblique : Romains 3:28 (Néo-Crampon Libre)'
     },
     'badge-sub-abraham': {
-      header: 'Typologie biblique (Rm 4:3)',
+      header: 'Typologie biblique (Rm 4:3 • NCL)',
       ref: 'Romains 4:3',
-      text: '« Abraham crut à Dieu, et cela lui fut imputé à justice. »',
+      text: '« En effet, que dit l’Écriture ? Abraham crut à Dieu, et cela lui fut imputé à justice. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 4:3'
+      toast: 'Lecteur biblique : Romains 4:3 (Néo-Crampon Libre)'
     },
     'badge-sub-paix': {
-      header: 'Fruit salvifique (Rm 5:1)',
+      header: 'Fruit salvifique (Rm 5:1 • NCL)',
       ref: 'Romains 5:1',
-      text: '« Étant donc justifiés par la foi, nous avons la paix avec Dieu par notre Seigneur Jésus-Christ. »',
+      text: '« Étant donc justifiés par la foi, nous avons la paix avec Dieu par Notre-Seigneur Jésus-Christ. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 5:1'
+      toast: 'Lecteur biblique : Romains 5:1 (Néo-Crampon Libre)'
     },
     'badge-sub-redaction': {
-      header: 'Contexte géographique (Ac 20:2-3)',
+      header: 'Contexte géographique (Ac 20:2-3 • NCL)',
       ref: 'Actes 20:2-3',
-      text: '« Il parcourut ces contrées en adressant aux disciples de nombreuses exhortations. Puis il se rendit en Grèce, où il séjourna trois mois. »',
+      text: '« Il parcourut cette contrée, en adressant aux disciples de nombreuses exhortations, et se rendit en Grèce, où il passa trois mois. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Actes 20:2-3'
+      toast: 'Lecteur biblique : Actes 20:2-3 (Néo-Crampon Libre)'
     },
     'badge-sub-espagne': {
-      header: 'Vision missionnaire (Rm 15:24)',
+      header: 'Vision missionnaire (Rm 15:24 • NCL)',
       ref: 'Romains 15:24',
-      text: '« J\'espère vous voir en passant, quand je me rendrai en Espagne, et y être accompagné par vous... »',
+      text: '« J’espère vous voir en passant, quand je me rendrai en Espagne, et y être accompagné par vous, après que j’aurai satisfait, en partie du moins, mon désir de me trouver parmi vous. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 15:24'
+      toast: 'Lecteur biblique : Romains 15:24 (Néo-Crampon Libre)'
     },
     'badge-sub-paiens': {
-      header: 'Passage exégétique',
-      ref: 'Romains 1:18-32',
-      text: '« En effet, les perfections invisibles de Dieu, sa puissance éternelle et sa divinité, se voient comme à l\'œil nu depuis la création du monde... »',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
+      ref: 'Romains 1:19-20',
+      text: '« En effet ses perfections invisibles, son éternelle puissance et sa divinité sont, depuis la création du monde, rendues visibles à l’intelligence par le moyen de ses œuvres. Ils sont donc inexcusables. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 1:18-32'
+      toast: 'Lecteur biblique : Romains 1:18-32 (Néo-Crampon Libre)'
     },
     'badge-sub-juifs': {
-      header: 'Passage exégétique',
-      ref: 'Romains 2:1-3:8',
-      text: '« Qui que tu sois, homme, toi qui juges, tu es inexcusable; car en jugeant les autres, tu te condamnes toi-même... »',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
+      ref: 'Romains 2:1',
+      text: '« Ainsi, qui que tu sois, ô homme, toi qui juges, tu es inexcusable ; car, en jugeant les autres, tu te condamnes toi-même, puisque tu fais les mêmes choses, toi qui juges. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 2:1-3:8'
+      toast: 'Lecteur biblique : Romains 2:1-3:8 (Néo-Crampon Libre)'
     },
     'badge-sub-verdict': {
-      header: 'Passage exégétique',
-      ref: 'Romains 3:9-20',
-      text: '« Quoi donc! Sommes-nous plus excellents? Nullement. Car nous avons déjà prouvé que tous, Juifs et Grecs, sont sous l\'empire du péché. »',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
+      ref: 'Romains 3:9',
+      text: '« Eh bien donc ? Avons-nous quelque supériorité ? Non, aucune ; car nous venons de prouver que tous, Juifs et Grecs sont sous le péché. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 3:9-20'
+      toast: 'Lecteur biblique : Romains 3:9-20 (Néo-Crampon Libre)'
     },
     'badge-sub-bapteme': {
-      header: 'Passage exégétique',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
       ref: 'Romains 6:3-4',
-      text: '« Ignorez-vous que nous tous qui avons été baptisés en Jésus-Christ, c\'est en sa mort que nous avons été baptisés? »',
+      text: '« Ne savez-vous pas que nous tous qui avons été baptisés en Jésus-Christ, c’est en sa mort que nous avons été baptisés ? Nous avons donc été ensevelis avec lui par le baptême en sa mort... »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 6'
+      toast: 'Lecteur biblique : Romains 6 (Néo-Crampon Libre)'
     },
     'badge-sub-loi': {
-      header: 'Passage exégétique',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
       ref: 'Romains 7:6',
-      text: '« Mais maintenant, nous avons été dégagés de la loi, étant morts à cette loi sous laquelle nous étions retenus... »',
+      text: '« Mais maintenant nous avons été dégagés de la Loi, étant morts à la Loi, sous l’autorité de laquelle nous étions tenus, de sorte que nous servons Dieu dans un esprit nouveau, et non selon une lettre surannée. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 7'
+      toast: 'Lecteur biblique : Romains 7 (Néo-Crampon Libre)'
     },
     'badge-sub-esprit': {
-      header: 'Passage exégétique',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
       ref: 'Romains 8:14-16',
-      text: '« Car tous ceux qui sont conduits par l\'Esprit de Dieu sont fils de Dieu. Et vous n\'avez pas reçu un esprit de servitude pour être encore dans la crainte... »',
+      text: '« Car tous ceux qui sont conduits par l’Esprit de Dieu sont fils de Dieu. En effet, vous n’avez pas reçu un Esprit de servitude, pour être encore dans la crainte ; mais vous avez reçu un Esprit d’adoption, en qui nous crions : Abba ! Père ! »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 8'
+      toast: 'Lecteur biblique : Romains 8 (Néo-Crampon Libre)'
     },
     'badge-sub-election': {
-      header: 'Passage exégétique',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
       ref: 'Romains 9:15-16',
-      text: '« Car il dit à Moïse: Je ferai miséricorde à qui je fais miséricorde... Ainsi donc, cela ne dépend ni de celui qui veut, ni de celui qui court, mais de Dieu qui fait miséricorde. »',
+      text: '« Car il dit à Moïse : Je ferai miséricorde à qui je veux faire miséricorde, et j’aurai compassion de qui je veux avoir compassion. Ainsi donc l’élection ne dépend ni de la volonté, ni des efforts, mais de Dieu qui fait miséricorde. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 9'
+      toast: 'Lecteur biblique : Romains 9 (Néo-Crampon Libre)'
     },
     'badge-sub-trebuchement': {
-      header: 'Passage exégétique',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
       ref: 'Romains 10:9-10',
-      text: '« Si tu confesses de ta bouche le Seigneur Jésus, et si tu crois dans ton cœur que Dieu l\'a ressuscité des morts, tu seras sauvé. »',
+      text: '« Si tu confesses de ta bouche Jésus comme Seigneur, et si tu crois dans ton cœur que Dieu l’a ressuscité des morts tu seras sauvé. Car c’est en croyant de cœur qu’on parvient à la justice, et c’est en confessant de bouche qu’on parvient au salut. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 10'
+      toast: 'Lecteur biblique : Romains 10 (Néo-Crampon Libre)'
     },
     'badge-sub-restauration': {
-      header: 'Passage exégétique',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
       ref: 'Romains 11:25-26',
-      text: '« L\'endurcissement d\'une partie d\'Israël durera jusqu\'à ce que la totalité des païens soit entrée. Et ainsi tout Israël sera sauvé. »',
+      text: '« Car je ne veux pas, frères, que vous ignoriez ce mystère... c’est qu’une partie d’Israël est tombée dans l’aveuglement jusqu’à ce que la masse des Gentils soit entrée. Et ainsi tout Israël sera sauvé. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 11'
+      toast: 'Lecteur biblique : Romains 11 (Néo-Crampon Libre)'
     },
     'badge-sub-consecration': {
-      header: 'Passage exégétique',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
       ref: 'Romains 12:2',
-      text: '« Ne vous conformez pas au siècle présent, mais soyez transformés par le renouvellement de l\'intelligence... »',
+      text: '« Et ne vous conformez pas au siècle présent, mais transformez-vous par le renouvellement de l’esprit, afin que vous éprouviez quelle est la volonté de Dieu, ce qui est bon, ce qui lui est agréable, ce qui est parfait. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 12'
+      toast: 'Lecteur biblique : Romains 12 (Néo-Crampon Libre)'
     },
     'badge-sub-cite': {
-      header: 'Passage exégétique',
-      ref: 'Romains 13:1-7',
-      text: '« Que toute personne soit soumise aux autorités supérieures; car il n\'y a point d\'autorité qui ne vienne de Dieu... »',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
+      ref: 'Romains 13:1',
+      text: '« Que toute âme soit soumise aux autorités supérieures ; car il n’y a pas d’autorité qui ne vienne de Dieu, et celles qui existent ont été instituées par lui. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 13'
+      toast: 'Lecteur biblique : Romains 13 (Néo-Crampon Libre)'
     },
     'badge-sub-unite': {
-      header: 'Passage exégétique',
-      ref: 'Romains 14:1; 15:7',
-      text: '« Accueillez celui qui est faible dans la foi, sans discuter les opinions... Accueillez-vous donc les uns les autres, comme Christ vous a accueillis, pour la gloire de Dieu. »',
+      header: 'Passage exégétique (Néo-Crampon Libre)',
+      ref: 'Romains 14:1 ; 15:7',
+      text: '« Quant à celui qui est faible dans la foi, accueillez-le sans discuter ses opinions. Accueillez-vous donc les uns les autres, comme le Christ vous a accueillis, pour la gloire de Dieu. »',
       hint: 'Cliquer pour ouvrir le verset',
-      toast: 'Lecteur biblique : Romains 14-16'
+      toast: 'Lecteur biblique : Romains 14-16 (Néo-Crampon Libre)'
     }
   };
 
