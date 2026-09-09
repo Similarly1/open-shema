@@ -129,6 +129,16 @@ def get_verse():
 ---
 ```
 
+#### Icônes Vectorielles SVG en Ligne (`::identifiant::`)
+Open Shema permet d'insérer des symboles vectoriels nobles directement dans le corps de vos notes textuelles, sans aucun émoji et automatiquement adaptés aux thèmes clair/sombre via `currentColor` :
+```markdown
+La centralité de la ::croix:: et la fidélité aux Écritures (::bible::) pour l'édification de la ::cite:: de Dieu.
+```
+* **Syntaxe** : `::identifiant::` (ex : `::croix::`, `::bible::`, `::colombe::`, `::flamme::`, `::cite::`, `::tour::`, `::village::`, etc.).
+* **Rendu** : Remplacé dynamiquement à la lecture par le glyphe SVG 16×16 vectoriel pur, aligné avec la ligne typographique.
+* **Insertion rapide** : Bouton d'icône vectorielle de la barre d'outils ou saisie directe du code `::id::`.
+* Voir la section 5 pour le catalogue complet des 121 identifiants.
+
 ---
 
 ## 4. Les Cartes Mentales Radiantes (Mind Maps)
@@ -157,7 +167,7 @@ tags:
   - mindmap
   - théologie
 type: mindmap
-icon: brain
+icon: bouclier
 palette: ocean
 include_in_ai: true
 updated_at: "08/09/2026 12:30"
@@ -168,18 +178,19 @@ updated_at: "08/09/2026 12:30"
 <!-- mindmap-layout: radiant -->
 <!-- mindmap-connector: curve -->
 <!-- mindmap-node-shape: underline -->
+<!-- mindmap-root-icon: bouclier -->
 
-- DÉFINITION [Hébreux 11:1] <!-- marker: 1 -->
-  - ASSURANCE
+- DÉFINITION [Hébreux 11:1] <!-- marker: 1 --> <!-- icon: cle -->
+  - ASSURANCE <!-- icon: ancre -->
     - DES CHOSES ESPÉRÉES
   - DÉMONSTRATION
     - DE CELLES QU'ON NE VOIT PAS
-- SOURCE [Romains 10:17] <!-- marker: p1 --> <!-- note: La foi naît de ce qu'on entend, et ce qu'on entend vient de la parole du Christ -->
-  - PAROLE DE DIEU <!-- marker: star -->
-  - PRÉDICATION
-- FRUITS [Galates 5:6] <!-- marker: done -->
-  - AGISSANTE PAR L'AMOUR
-  - PERSÉVÉRANCE
+- SOURCE [Romains 10:17] <!-- marker: p1 --> <!-- icon: bible --> <!-- note: La foi naît de ce qu'on entend, et ce qu'on entend vient de la parole du Christ -->
+  - PAROLE DE DIEU <!-- marker: star --> <!-- icon: epee -->
+  - PRÉDICATION <!-- icon: trompette -->
+- FRUITS [Galates 5:6] <!-- marker: done --> <!-- icon: vigne -->
+  - AGISSANTE PAR L'AMOUR <!-- icon: coeur -->
+  - PERSÉVÉRANCE <!-- icon: tour -->
 
 <!-- mindmap-pos: DÉFINITION | x: -20 | y: -10 -->
 <!-- mindmap-pos: SOURCE | x: 30 | y: 15 -->
@@ -239,7 +250,35 @@ Open Shema supporte la numérotation ordonnée, les priorités d'urgence et les 
    * `- [P1] MON MOT-CLÉ` ou `- [P2] MON MOT-CLÉ`
 3. **Raccourcis Clavier** : Touches `1` à `9` pour affecter immédiatement un marqueur au nœud sélectionné, touche `0` pour effacer le marqueur, ou touche `M` pour ouvrir la palette des marqueurs.
 
-### 4.6 Clôtures & Enclos Sémantiques (Boundaries style XMind)
+### 4.6 Icônes Vectorielles SVG (Thème Central & Branches)
+
+Open Shema intègre un catalogue exhaustif de **121 symboles vectoriels nobles** (100% SVG purs, 0% émoji) pour illustrer organiquement les cartes mentales :
+
+1. **Thème Central (Nœud Racine)** :
+   * **Directive HTML prioritaire** : `<!-- mindmap-root-icon: id -->` (ex : `<!-- mindmap-root-icon: bouclier -->`, `<!-- mindmap-root-icon: cite -->`).
+   * **Frontmatter YAML** : `icon: bouclier` dans l'en-tête de la note.
+   * **Titre Markdown** : `# ::bouclier:: DOCTRINE DE LA FOI`.
+   * *Affichage* : Le glyphe s'affiche en grand format au cœur du noyau central, avec halo subtil et échelle renforcée.
+
+2. **Branches et Sous-Branches** :
+   * **Directive de fin de ligne** : `<!-- icon: id -->` (ex : `- ASSURANCE <!-- icon: ancre -->`).
+   * **Préfixe en ligne rapide** : `- ::ancre:: ASSURANCE`.
+   * *Affichage* : Glyphe vectoriel 18×18 placé au départ du libellé de la branche.
+
+3. **Saisie Prédictive et Assignation Instantanée** :
+   * Pendant l'édition directe d'un mot-clé (<kbd>Espace</kbd> ou double-clic), tapez simplement `::id` (ex : `::croix`, `::tour`, `::cite`, `::bible`) : le mot-clé est automatiquement assigné et l'icône appliquée sans rompre votre flux de pensée.
+
+4. **Moteur de Suggestions Sémantiques Automatiques (Zéro LLM, < 0.2ms)** :
+   * Dès qu'un mot-clé est saisi ou sélectionné, un moteur d'exégèse sémantique local (basé sur un thésaurus biblique de 296 entrées) suggère immédiatement les symboles les plus pertinents :
+     - *« Cité »* propose : **Cité / Ville / Jérusalem** (`cite`), **Tour Forte / Citadelle** (`tour`), **Temple / Sanctuaire** (`temple`).
+     - *« Résurrection »* propose : **Tombeau Ouvert** (`tombeau`), **Lumière** (`lumiere`), **Couronne** (`couronne`).
+     - *« Combat »* propose : **Épée de la Parole** (`epee`), **Bouclier de la Foi** (`bouclier`), **Casque du Salut** (`casque`).
+   * Un clic sur la suggestion ou sur le menu contextuel applique instantanément le symbole.
+
+5. **Palette Universelle Clavier & Souris** :
+   * Raccourci <kbd>I</kbd> ou menu contextuel *Choisir une icône SVG* : ouvre la palette modale de 390px en 3 colonnes réactives avec recherche instantanée et navigation complète aux flèches directionnelles (<kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>, <kbd>Entrée</kbd>, <kbd>Échap</kbd>).
+
+### 4.7 Clôtures & Enclos Sémantiques (Boundaries style XMind)
 
 Un enclos regroupe graphiquement une sous-branche et l'ensemble de ses sous-niveaux dans un périmètre pointillé teinté, surmonté d'une étiquette d'intitulé :
 ```markdown
@@ -248,7 +287,7 @@ Un enclos regroupe graphiquement une sous-branche et l'ensemble de ses sous-nive
 * **Raccourci de création** : `Ctrl+B` sur la branche sélectionnée (ou via le menu contextuel clic droit).
 * **Édition** : Clic sur le badge de l'enclos pour renommer ou modifier la couleur. Touche `Suppr` pour supprimer l'enclos.
 
-### 4.7 Sujets Flottants Autonomes (Floating Topics)
+### 4.8 Sujets Flottants Autonomes (Floating Topics)
 
 Les sujets flottants sont des idées indépendantes de l'arborescence centrale, positionnées librement sur le canevas SVG :
 
@@ -265,7 +304,7 @@ Les sujets flottants sont des idées indépendantes de l'arborescence centrale, 
    ```
 * **Création** : `Alt+F` ou **Double-clic** sur le fond du canevas.
 
-### 4.8 Liaisons Transversales (Relations style XMind)
+### 4.9 Liaisons Transversales (Relations style XMind)
 
 Pour relier deux branches non directement parentes, Open Shema trace une flèche orientée personnalisable :
 ```markdown
@@ -276,7 +315,7 @@ Pour relier deux branches non directement parentes, Open Shema trace une flèche
 * `cx:` / `cy:` Décalage de la poignée de contrôle de Bézier (ajustable à la souris pour courber la flèche).
 * **Création** : `Ctrl+L` ou bouton "Relier" du dock flottant.
 
-### 4.9 Déplacement Spatial Libre (Free Positioning)
+### 4.10 Déplacement Spatial Libre (Free Positioning)
 
 Lorsque l'utilisateur réorganise visuellement une branche à la souris, Open Shema enregistre le décalage spatial à la fin du fichier sans rompre l'arbre logique :
 ```markdown
@@ -284,14 +323,14 @@ Lorsque l'utilisateur réorganise visuellement une branche à la souris, Open Sh
 ```
 * **Raccourci de réalignement automatique** : `Alt+R` rééquilibre harmonieusement l'ensemble de la carte.
 
-### 4.10 Mode Plan Outliner Synchrone (`Alt+P`)
+### 4.11 Mode Plan Outliner Synchrone (`Alt+P`)
 
 Open Shema permet de basculer instantanément entre :
 1. **La Vue Carte Graphique SVG** (vision spatiale, rayonnante, dynamique).
 2. **La Vue Plan Outliner** (mode liste textuel structuré, pliable/dépliable, avec marqueurs et notes synchronisés en temps réel).
 * **Raccourci de bascule** : `Alt+P` ou le bouton d'en-tête "Vue Plan".
 
-### 4.11 Tableau des Raccourcis Clavier
+### 4.12 Tableau des Raccourcis Clavier
 
 | Raccourci | Action |
 | :--- | :--- |
@@ -306,6 +345,7 @@ Open Shema permet de basculer instantanément entre :
 | <kbd>1</kbd> à <kbd>9</kbd> | Affecter un numéro / marqueur de priorité |
 | <kbd>0</kbd> | Effacer le marqueur de la branche |
 | <kbd>M</kbd> | Ouvrir le panneau des marqueurs et priorités |
+| <kbd>I</kbd> | Ouvrir la palette universelle d'icônes SVG (ou supprimer l'icône active) |
 | <kbd>F4</kbd> ou <kbd>Alt+N</kbd> | Ajouter ou modifier la note de branche |
 | <kbd>Alt+S</kbd> | Changer le squelette (Radiant, Arbre droit, Organigramme) |
 | <kbd>Alt+T</kbd> | Ouvrir les styles de connecteurs et formes de nœuds |
@@ -317,9 +357,33 @@ Open Shema permet de basculer instantanément entre :
 
 ---
 
-## 5. Les Surlignages Bibliques
+## 5. Référentiel des 121 Icônes Vectorielles SVG Nobles
 
-### 5.1 Fichier Central JSON
+L'intégralité du catalogue d'icônes d'Open Shema obéit à une charte graphique d'excellence :
+- **Pureté vectorielle** : 100% SVG purs, zéro émoji système.
+- **Ligne graphique unifiée** : Tracé régulier de 2.0 à 2.3px sur grille normalisée 24×24, avec terminaisons arrondies (`round`).
+- **Adaptabilité chromatique totale** : Définies avec `currentColor`, les icônes adoptent automatiquement la teinte active du thème (sombre, clair ou sépia).
+
+### Les 7 Familles Thématiques & Identifiants Officiels
+
+| Famille | Nb | Identifiants utilisables (`::id::` ou `<!-- icon: id -->`) |
+| :--- | :---: | :--- |
+| **1. Théologie & Rédemption** | 18 | `croix`, `bible`, `colombe`, `flamme`, `couronne`, `ichtus`, `calice`, `pain`, `temple`, `menorah`, `alliance`, `trinite`, `tombeau`, `agneau`, `lion-juda`, `alpha-omega`, `arche-alliance`, `grace` |
+| **2. Histoire Sainte & Symboles** | 19 | `buisson-ardent`, `tables-loi`, `arche-noe`, `arc-en-ciel`, `serpent-airain`, `corne-onction`, `shofar`, `couronne-epines`, `trois-croix`, `voile-dechire`, `puits`, `filet`, `chariot-feu`, `fronde-david`, `manteau-prophete`, `colonne-nuee`, `manne`, `tente`, `cite` |
+| **3. Étude, Exégèse & Rédaction** | 17 | `cle`, `loupe`, `ampoule`, `parchemin`, `plume`, `balance`, `boussole`, `livre-ouvert`, `marque-page`, `codex`, `langues`, `lunettes`, `sceau`, `dossier`, `citations`, `comparaison`, `arbre-racine` |
+| **4. Prière, Culte & Vie Spirituelle** | 16 | `priere`, `harpe`, `trompette`, `autel`, `encens`, `lampe-huile`, `cloche`, `coeur`, `goutte-huile`, `genou`, `offrande`, `recueillement`, `choeur`, `ciel-ouvert`, `repos-sabbat`, `benediction` |
+| **5. Marche Chrétienne, Combat & Vertus** | 18 | `epee`, `bouclier`, `casque`, `cuirasse`, `ceinture`, `sandales`, `ancre`, `berger`, `chemin`, `montagne`, `echelle`, `phare`, `joug`, `chaines-brisees`, `vetement-blanc`, `miroir`, `perle`, `tour` |
+| **6. Création, Nature & Paraboles** | 17 | `lumiere`, `etoile`, `arbre`, `eau`, `vigne`, `olivier`, `figuier`, `ble`, `semence`, `lys`, `rocher`, `colombe-rameau`, `sel`, `levain`, `aigle`, `cerf`, `arc-orage` |
+| **7. Communauté, Ministère & Organisation** | 16 | `famille`, `fraternite`, `porte`, `globe`, `visite`, `village`, `chariot-ble`, `aumone`, `check`, `cible`, `epingle`, `avertissement`, `question`, `tag`, `coffre`, `couronne-etoiles` |
+
+* **Total : 121 icônes vectorielles souveraines.**
+* **Thésaurus sémantique : 296 correspondances** couvrant l'ensemble des 66 livres de la Bible, les doctrines cardinales de la foi et les grandes métaphores scripturaires.
+
+---
+
+## 6. Les Surlignages Bibliques
+
+### 6.1 Fichier Central JSON
 
 Les surlignages effectués dans le lecteur biblique sont stockés dans `data/highlights.json` :
 
@@ -344,7 +408,7 @@ Les surlignages effectués dans le lecteur biblique sont stockés dans `data/hig
 * **`color`** : Codes de couleurs gérés : `yellow`, `green`, `blue`, `amber`, `purple`, `rose`.
 * **`note_id`** : Identifiant optionnel d'une note Markdown liée à ce surlignage précis.
 
-### 5.2 Export Structuré en Fichier Markdown (`.md`)
+### 6.2 Export Structuré en Fichier Markdown (`.md`)
 
 Accessible depuis les Paramètres (*Exporter en Markdown*), il génère une vue d'étude prête pour l'impression ou l'archivage dans Obsidian :
 
@@ -365,11 +429,11 @@ Accessible depuis les Paramètres (*Exporter en Markdown*), il génère une vue 
 
 ---
 
-## 6. Les Manuscrits de Prédications & Sermons
+## 7. Les Manuscrits de Prédications & Sermons
 
 Les prédications sont enregistrées dans le répertoire `data/sermons/*.md`.
 
-### 6.1 Structure du Fichier
+### 7.1 Structure du Fichier
 
 ```markdown
 ---
@@ -417,7 +481,7 @@ Développement théologique...
 Appel et application personnelle...
 ```
 
-### 6.2 Repères Scéniques et Vidéoprojection (Cues)
+### 7.2 Repères Scéniques et Vidéoprojection (Cues)
 
 Les indications destinées à l'équipe technique de culte ou à l'orateur sont encodées de deux manières :
 * Format verbeux standard : `> [!cue] Projeter verset 4`
@@ -425,7 +489,7 @@ Les indications destinées à l'équipe technique de culte ou à l'orateur sont 
 
 ---
 
-## 7. Le Réservoir d'Illustrations Homilétiques
+## 8. Le Réservoir d'Illustrations Homilétiques
 
 Les fiches d'illustrations réutilisables sont stockées dans `data/illustrations/*.md`.
 
@@ -447,7 +511,7 @@ Dans la tourmente hivernale de 1872, un phare de la côte bretonne...
 
 ---
 
-## 8. Guide d'Utilisation avec Obsidian, Logseq et VS Code
+## 9. Guide d'Utilisation avec Obsidian, Logseq et VS Code
 
 Pour utiliser simultanément Open Shema et votre éditeur Markdown externe préféré :
 
