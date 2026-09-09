@@ -1812,7 +1812,7 @@
               <button type="button" class="mindmap-toggle-btn" id="btn-mm-theme-dark">Mode Sombre</button>
             </div>
 
-            <!-- Boutons d'export rapide -->
+            <!-- Boutons d'export rapide et réinitialisation -->
             <button type="button" class="mindmap-export-badge-btn" id="btn-mm-demo-pdf" title="Exporter en PDF Vectoriel">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               <span>PDF Vectoriel HD</span>
@@ -1820,6 +1820,10 @@
             <button type="button" class="mindmap-export-badge-btn" id="btn-mm-demo-png" title="Exporter en PNG Transparent">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
               <span>PNG Transparent</span>
+            </button>
+            <button type="button" class="mindmap-export-badge-btn" id="btn-mm-reset-pos" title="Réinitialiser les positions par défaut">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+              <span>Réinitialiser la disposition</span>
             </button>
           </div>
         </div>
@@ -1902,25 +1906,25 @@
 
             <!-- ================= LIAISON RELATIONNELLE CLÉ DÉGAGÉE ================= -->
             <!-- Entre Justification et Condamnation (courbe haute dans l'espace libre) -->
-            <path d="M 595 261 C 655 180, 770 115, 895 95" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="5,4" />
-            <g transform="translate(655, 142)">
+            <path id="curve-relation" d="M 595 261 C 655 180, 770 115, 895 95" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="5,4" />
+            <g id="badge-relation" transform="translate(655, 142)">
               <rect x="0" y="0" width="170" height="22" rx="5" fill="#0f172a" stroke="#dc2626" stroke-width="1" />
               <text x="85" y="15" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle">BESOIN D'UNE JUSTICE EXTERNE</text>
             </g>
 
             <!-- ================= COURBES BUZAN DEPUIS LE CENTRE ================= -->
             <!-- Vers Justification (Gauche Centre) -->
-            <path d="M 660 285 C 640 285, 620 285, 595 285" fill="none" stroke="url(#grad-justif)" stroke-width="6" stroke-linecap="round" />
+            <path id="curve-justif" d="M 660 285 C 640 285, 620 285, 595 285" fill="none" stroke="url(#grad-justif)" stroke-width="6" stroke-linecap="round" />
             <!-- Vers Contexte Corinthe 57 (Gauche Haut) -->
-            <path d="M 680 259 C 635 180, 595 110, 555 95" fill="none" stroke="url(#grad-contexte)" stroke-width="4" stroke-linecap="round" />
+            <path id="curve-contexte" d="M 680 259 C 635 180, 595 110, 555 95" fill="none" stroke="url(#grad-contexte)" stroke-width="4" stroke-linecap="round" />
             <!-- Vers Israël (Gauche Bas) -->
-            <path d="M 680 311 C 635 385, 605 450, 575 473" fill="none" stroke="url(#grad-israel)" stroke-width="4" stroke-linecap="round" />
+            <path id="curve-israel" d="M 680 311 C 635 385, 605 450, 575 473" fill="none" stroke="url(#grad-israel)" stroke-width="4" stroke-linecap="round" />
             <!-- Vers Condamnation (Droite Haut) -->
-            <path d="M 800 259 C 835 180, 865 110, 895 95" fill="none" stroke="url(#grad-condamnation)" stroke-width="4.5" stroke-linecap="round" />
+            <path id="curve-condem" d="M 800 259 C 835 180, 865 110, 895 95" fill="none" stroke="url(#grad-condamnation)" stroke-width="4.5" stroke-linecap="round" />
             <!-- Vers Libération (Droite Centre) -->
-            <path d="M 820 285 C 845 285, 870 285, 895 285" fill="none" stroke="url(#grad-liberation)" stroke-width="5.5" stroke-linecap="round" />
+            <path id="curve-lib" d="M 820 285 C 845 285, 870 285, 895 285" fill="none" stroke="url(#grad-liberation)" stroke-width="5.5" stroke-linecap="round" />
             <!-- Vers Éthique (Droite Bas) -->
-            <path d="M 800 311 C 835 385, 865 450, 895 473" fill="none" stroke="url(#grad-ethique)" stroke-width="4.5" stroke-linecap="round" />
+            <path id="curve-ethique" d="M 800 311 C 835 385, 865 450, 895 473" fill="none" stroke="url(#grad-ethique)" stroke-width="4.5" stroke-linecap="round" />
 
             <!-- ================= NŒUD RACINE CENTRALE : ROMAINS (Lisibilité Maximale) ================= -->
             <g class="mm-node-root-group is-selected" id="mm-node-root" style="cursor: pointer;">
@@ -1949,14 +1953,20 @@
 
             <!-- ================= BRANCHE 1 HAUT GAUCHE : CONTEXTE CORINTHE 57 ================= -->
             <g class="mm-branch-node" id="mm-node-contexte" style="cursor: pointer;">
+              <!-- Sous-branches aérées (connectées sans aucun espace vide à l'apex de la capsule x=310) -->
+              <path d="M 310 95 C 275 75, 245 75, 220 75" fill="none" stroke="#d97706" stroke-width="1.8" />
+              <text x="215" y="79" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-redaction" style="cursor: pointer;" text-anchor="end">RÉDACTION (Ac 20:2-3)</text>
+              <path d="M 310 95 C 275 115, 245 115, 220 115" fill="none" stroke="#d97706" stroke-width="1.8" />
+              <text x="215" y="119" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-espagne" style="cursor: pointer;" text-anchor="end">ESPAGNE (Rm 15:24)</text>
+
               <rect x="310" y="74" width="245" height="42" rx="21" class="mm-branch-rect ctx-rect" />
               <!-- Boutons d'actions (+ et ×) sur apex gauche -->
               <g class="mm-node-actions" id="actions-contexte">
-                <g class="mm-action-btn danger" id="btn-contexte-del" transform="translate(270, 95)" title="Supprimer la branche">
+                <g class="mm-action-btn danger" id="btn-contexte-del" transform="translate(265, 95)" title="Supprimer la branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">×</text>
                 </g>
-                <g class="mm-action-btn" id="btn-contexte-add" transform="translate(294, 95)" title="Ajouter une sous-branche">
+                <g class="mm-action-btn" id="btn-contexte-add" transform="translate(289, 95)" title="Ajouter une sous-branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">+</text>
                 </g>
@@ -1971,41 +1981,36 @@
                 <line x1="-1.5" y1="2" x2="1.5" y2="2" stroke="#d97706" stroke-width="1" />
               </g>
               <text x="374" y="99" font-family="'Inter', sans-serif" font-size="10.5" font-weight="800" class="mm-node-text" letter-spacing="0.3">CONTEXTE CORINTHE 57</text>
-              <!-- Sous-branches aérées (largement contenues, finissant à x=215) -->
-              <path d="M 270 95 C 250 75, 235 75, 220 75" fill="none" stroke="#d97706" stroke-width="1.8" />
-              <text x="215" y="79" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-redaction" style="cursor: pointer;" text-anchor="end">RÉDACTION (Ac 20:2-3)</text>
-              <path d="M 270 95 C 250 115, 235 115, 220 115" fill="none" stroke="#d97706" stroke-width="1.8" />
-              <text x="215" y="119" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-espagne" style="cursor: pointer;" text-anchor="end">ESPAGNE (Rm 15:24)</text>
             </g>
 
             <!-- ================= BRANCHE 2 MILIEU GAUCHE : JUSTIFICATION ================= -->
-            <!-- Lignes reliant Justification à ses 3 sous-branches bien contenues dans l'enclos -->
-            <path d="M 226 285 C 215 225, 208 225, 195 225" fill="none" stroke="#4f46e5" stroke-width="2.2" />
-            <path d="M 226 285 C 215 285, 208 285, 195 285" fill="none" stroke="#4f46e5" stroke-width="2.2" />
-            <path d="M 226 285 C 215 345, 208 345, 195 345" fill="none" stroke="#4f46e5" stroke-width="2.2" />
-
-            <!-- Sous-branches FOI, ABRAHAM, PAIX (capsules élargies à 135px : AUCUN DÉBORDEMENT DE MOT-CLÉ) -->
-            <g class="mm-sub-node" id="badge-sub-foi" transform="translate(195, 225)" style="cursor: pointer;">
-              <rect x="-135" y="-14" width="135" height="28" rx="14" class="mm-sub-rect" />
-              <circle cx="-16" cy="0" r="7.5" fill="#ef4444" />
-              <text x="-16" y="3" font-family="'Inter', sans-serif" font-size="8" font-weight="800" fill="#ffffff" text-anchor="middle">P1</text>
-              <text x="-32" y="3.5" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" class="mm-sub-text" text-anchor="end">FOI (Rm 3)</text>
-            </g>
-
-            <g class="mm-sub-node" id="badge-sub-abraham" transform="translate(195, 285)" style="cursor: pointer;">
-              <rect x="-135" y="-14" width="135" height="28" rx="14" class="mm-sub-rect" />
-              <text x="-18" y="3.5" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" class="mm-sub-text" text-anchor="end">ABRAHAM (Rm 4)</text>
-            </g>
-
-            <g class="mm-sub-node" id="badge-sub-paix" transform="translate(195, 345)" style="cursor: pointer;">
-              <rect x="-135" y="-14" width="135" height="28" rx="14" class="mm-sub-rect" />
-              <circle cx="-16" cy="0" r="7.5" fill="#10b981" />
-              <text x="-16" y="3" font-family="'Inter', sans-serif" font-size="7.5" font-weight="800" fill="#ffffff" text-anchor="middle">✓</text>
-              <text x="-32" y="3.5" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" class="mm-sub-text" text-anchor="end">PAIX (Rm 5)</text>
-            </g>
-
-            <!-- NŒUD PRINCIPAL : JUSTIFICATION (Capsule aérée 325px, texte parfaitement logé sans buter sur l'arrondi) -->
             <g class="mm-branch-node" id="mm-node-justification" style="cursor: pointer;">
+              <!-- Lignes reliant Justification à ses 3 sous-branches (partent directement de l'apex x=270, ZÉRO ESPACE VIDE) -->
+              <path d="M 270 285 C 235 225, 215 225, 195 225" fill="none" stroke="#4f46e5" stroke-width="2.2" />
+              <path d="M 270 285 L 195 285" fill="none" stroke="#4f46e5" stroke-width="2.2" />
+              <path d="M 270 285 C 235 345, 215 345, 195 345" fill="none" stroke="#4f46e5" stroke-width="2.2" />
+
+              <!-- Sous-branches FOI, ABRAHAM, PAIX (capsules aérées de 135px) -->
+              <g class="mm-sub-node" id="badge-sub-foi" transform="translate(195, 225)" style="cursor: pointer;">
+                <rect x="-135" y="-14" width="135" height="28" rx="14" class="mm-sub-rect" />
+                <circle cx="-16" cy="0" r="7.5" fill="#ef4444" />
+                <text x="-16" y="3" font-family="'Inter', sans-serif" font-size="8" font-weight="800" fill="#ffffff" text-anchor="middle">P1</text>
+                <text x="-32" y="3.5" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" class="mm-sub-text" text-anchor="end">FOI (Rm 3)</text>
+              </g>
+
+              <g class="mm-sub-node" id="badge-sub-abraham" transform="translate(195, 285)" style="cursor: pointer;">
+                <rect x="-135" y="-14" width="135" height="28" rx="14" class="mm-sub-rect" />
+                <text x="-18" y="3.5" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" class="mm-sub-text" text-anchor="end">ABRAHAM (Rm 4)</text>
+              </g>
+
+              <g class="mm-sub-node" id="badge-sub-paix" transform="translate(195, 345)" style="cursor: pointer;">
+                <rect x="-135" y="-14" width="135" height="28" rx="14" class="mm-sub-rect" />
+                <circle cx="-16" cy="0" r="7.5" fill="#10b981" />
+                <text x="-16" y="3" font-family="'Inter', sans-serif" font-size="7.5" font-weight="800" fill="#ffffff" text-anchor="middle">✓</text>
+                <text x="-32" y="3.5" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" class="mm-sub-text" text-anchor="end">PAIX (Rm 5)</text>
+              </g>
+
+              <!-- NŒUD PRINCIPAL : JUSTIFICATION -->
               <rect x="270" y="261" width="325" height="48" rx="24" class="mm-branch-rect justif-rect" />
 
               <!-- Boutons d'actions '×' et '+' rattachés à gauche de JUSTIFICATION -->
@@ -2038,20 +2043,28 @@
               <circle cx="418" cy="285" r="10.5" fill="#d97706" />
               <text x="418" y="289" text-anchor="middle" font-family="'Inter', sans-serif" font-size="11" font-weight="800" fill="#ffffff">2</text>
 
-              <!-- 4. Texte de la branche : JUSTIFICATION (pleinement centré avec marge de 40px avant l'arrondi) -->
+              <!-- 4. Texte de la branche : JUSTIFICATION -->
               <text x="438" y="290" font-family="'Inter', sans-serif" font-size="12" font-weight="900" class="mm-node-title" letter-spacing="0.8">JUSTIFICATION</text>
             </g>
 
             <!-- ================= BRANCHE 3 BAS GAUCHE : ISRAËL ================= -->
             <g class="mm-branch-node" id="mm-node-israel" style="cursor: pointer;">
+              <!-- Sous-branches aérées (connectées sans aucun espace vide à l'apex x=300) -->
+              <path d="M 300 473 C 260 425, 235 425, 220 425" fill="none" stroke="#7c3aed" stroke-width="1.8" />
+              <text x="215" y="429" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-election" style="cursor: pointer;" text-anchor="end">ÉLECTION (Rm 9)</text>
+              <path d="M 300 473 L 220 473" fill="none" stroke="#7c3aed" stroke-width="1.8" />
+              <text x="215" y="477" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-trebuchement" style="cursor: pointer;" text-anchor="end">TRÉBUCHEMENT (Rm 10)</text>
+              <path d="M 300 473 C 260 520, 235 520, 220 520" fill="none" stroke="#7c3aed" stroke-width="1.8" />
+              <text x="215" y="524" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-restauration" style="cursor: pointer;" text-anchor="end">RESTAURATION (Rm 11)</text>
+
               <rect x="300" y="450" width="275" height="46" rx="23" class="mm-branch-rect israel-rect" />
               <!-- Boutons d'actions (+ et ×) sur apex gauche -->
               <g class="mm-node-actions" id="actions-israel">
-                <g class="mm-action-btn danger" id="btn-israel-del" transform="translate(260, 473)" title="Supprimer la branche">
+                <g class="mm-action-btn danger" id="btn-israel-del" transform="translate(255, 473)" title="Supprimer la branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">×</text>
                 </g>
-                <g class="mm-action-btn" id="btn-israel-add" transform="translate(284, 473)" title="Ajouter une sous-branche">
+                <g class="mm-action-btn" id="btn-israel-add" transform="translate(279, 473)" title="Ajouter une sous-branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">+</text>
                 </g>
@@ -2071,17 +2084,18 @@
               <circle cx="446" cy="473" r="10" fill="#7c3aed" />
               <text x="446" y="477" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" fill="#ffffff" text-anchor="middle">4</text>
               <text x="468" y="477" font-family="'Inter', sans-serif" font-size="11.5" font-weight="800" class="mm-node-title" letter-spacing="0.5">ISRAËL</text>
-              <!-- Sous-branches aérées (finissant à x=215, commence à x=85, AUCUN DÉBORDEMENT D'AUCUNE LETTRE !) -->
-              <path d="M 260 473 C 245 425, 230 425, 220 425" fill="none" stroke="#7c3aed" stroke-width="1.8" />
-              <text x="215" y="429" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-election" style="cursor: pointer;" text-anchor="end">ÉLECTION (Rm 9)</text>
-              <path d="M 260 473 C 245 473, 230 473, 220 473" fill="none" stroke="#7c3aed" stroke-width="1.8" />
-              <text x="215" y="477" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-trebuchement" style="cursor: pointer;" text-anchor="end">TRÉBUCHEMENT (Rm 10)</text>
-              <path d="M 260 473 C 245 520, 230 520, 220 520" fill="none" stroke="#7c3aed" stroke-width="1.8" />
-              <text x="215" y="524" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-restauration" style="cursor: pointer;" text-anchor="end">RESTAURATION (Rm 11)</text>
             </g>
 
             <!-- ================= BRANCHE 4 HAUT DROITE : CONDAMNATION ================= -->
             <g class="mm-branch-node" id="mm-node-condamnation" style="cursor: pointer;">
+              <!-- Sous-branches aérées (connectées sans aucun espace vide à l'apex x=1195) -->
+              <path d="M 1195 95 C 1235 57, 1265 57, 1285 57" fill="none" stroke="#dc2626" stroke-width="1.8" />
+              <text x="1290" y="61" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-paiens" style="cursor: pointer;">PAÏENS (Rm 1:18-32)</text>
+              <path d="M 1195 95 L 1285 95" fill="none" stroke="#dc2626" stroke-width="1.8" />
+              <text x="1290" y="99" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-juifs" style="cursor: pointer;">JUIFS (Rm 2:1-3:8)</text>
+              <path d="M 1195 95 C 1235 133, 1265 133, 1285 133" fill="none" stroke="#dc2626" stroke-width="1.8" />
+              <text x="1290" y="137" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-verdict" style="cursor: pointer;">VERDICT (Rm 3:9-20)</text>
+
               <rect x="895" y="73" width="300" height="44" rx="22" class="mm-branch-rect condem-rect" />
               <circle cx="915" cy="95" r="10" fill="#dc2626" />
               <text x="915" y="99" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" fill="#ffffff" text-anchor="middle">1</text>
@@ -2100,26 +2114,27 @@
               <text x="1047" y="99" font-family="'Inter', sans-serif" font-size="11" font-weight="800" class="mm-node-title" letter-spacing="0.5">CONDAMNATION</text>
               <!-- Boutons d'actions (+ et ×) sur apex droit -->
               <g class="mm-node-actions" id="actions-condem">
-                <g class="mm-action-btn" id="btn-condem-add" transform="translate(1211, 95)" title="Ajouter une sous-branche">
+                <g class="mm-action-btn" id="btn-condem-add" transform="translate(1215, 95)" title="Ajouter une sous-branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">+</text>
                 </g>
-                <g class="mm-action-btn danger" id="btn-condem-del" transform="translate(1235, 95)" title="Supprimer la branche">
+                <g class="mm-action-btn danger" id="btn-condem-del" transform="translate(1239, 95)" title="Supprimer la branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">×</text>
                 </g>
               </g>
-              <!-- Sous-branches aérées (commence à 1285, termine à 1420, largement avant 1510) -->
-              <path d="M 1245 95 C 1265 57, 1275 57, 1285 57" fill="none" stroke="#dc2626" stroke-width="1.8" />
-              <text x="1290" y="61" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-paiens" style="cursor: pointer;">PAÏENS (Rm 1:18-32)</text>
-              <path d="M 1245 95 C 1265 95, 1275 95, 1285 95" fill="none" stroke="#dc2626" stroke-width="1.8" />
-              <text x="1290" y="99" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-juifs" style="cursor: pointer;">JUIFS (Rm 2:1-3:8)</text>
-              <path d="M 1245 95 C 1265 133, 1275 133, 1285 133" fill="none" stroke="#dc2626" stroke-width="1.8" />
-              <text x="1290" y="137" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-verdict" style="cursor: pointer;">VERDICT (Rm 3:9-20)</text>
             </g>
 
             <!-- ================= BRANCHE 5 MILIEU DROITE : LIBÉRATION ================= -->
             <g class="mm-branch-node" id="mm-node-liberation" style="cursor: pointer;">
+              <!-- Sous-branches aérées (connectées sans aucun espace vide à l'apex x=1185) -->
+              <path d="M 1185 285 C 1225 245, 1260 245, 1285 245" fill="none" stroke="#0284c7" stroke-width="1.8" />
+              <text x="1290" y="249" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-bapteme" style="cursor: pointer;">BAPTÊME (Rm 6)</text>
+              <path d="M 1185 285 L 1285 285" fill="none" stroke="#0284c7" stroke-width="1.8" />
+              <text x="1290" y="289" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-loi" style="cursor: pointer;">LOI (Rm 7)</text>
+              <path d="M 1185 285 C 1225 325, 1260 325, 1285 325" fill="none" stroke="#0284c7" stroke-width="1.8" />
+              <text x="1290" y="329" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-esprit" style="cursor: pointer;">ESPRIT (Rm 8)</text>
+
               <rect x="895" y="263" width="290" height="44" rx="22" class="mm-branch-rect lib-rect" />
               <circle cx="915" cy="285" r="10" fill="#0284c7" />
               <text x="915" y="289" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" fill="#ffffff" text-anchor="middle">3</text>
@@ -2138,26 +2153,27 @@
               <text x="1043" y="289" font-family="'Inter', sans-serif" font-size="11" font-weight="800" class="mm-node-title" letter-spacing="0.5">LIBÉRATION</text>
               <!-- Boutons d'actions (+ et ×) sur apex droit -->
               <g class="mm-node-actions" id="actions-lib">
-                <g class="mm-action-btn" id="btn-lib-add" transform="translate(1201, 285)" title="Ajouter une sous-branche">
+                <g class="mm-action-btn" id="btn-lib-add" transform="translate(1210, 285)" title="Ajouter une sous-branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">+</text>
                 </g>
-                <g class="mm-action-btn danger" id="btn-lib-del" transform="translate(1225, 285)" title="Supprimer la branche">
+                <g class="mm-action-btn danger" id="btn-lib-del" transform="translate(1234, 285)" title="Supprimer la branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">×</text>
                 </g>
               </g>
-              <!-- Sous-branches aérées -->
-              <path d="M 1235 285 C 1260 245, 1275 245, 1285 245" fill="none" stroke="#0284c7" stroke-width="1.8" />
-              <text x="1290" y="249" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-bapteme" style="cursor: pointer;">BAPTÊME (Rm 6)</text>
-              <path d="M 1235 285 C 1260 285, 1275 285, 1285 285" fill="none" stroke="#0284c7" stroke-width="1.8" />
-              <text x="1290" y="289" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-loi" style="cursor: pointer;">LOI (Rm 7)</text>
-              <path d="M 1235 285 C 1260 325, 1275 325, 1285 325" fill="none" stroke="#0284c7" stroke-width="1.8" />
-              <text x="1290" y="329" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-esprit" style="cursor: pointer;">ESPRIT (Rm 8)</text>
             </g>
 
             <!-- ================= BRANCHE 6 BAS DROITE : ÉTHIQUE ================= -->
             <g class="mm-branch-node" id="mm-node-ethique" style="cursor: pointer;">
+              <!-- Sous-branches aérées (connectées sans aucun espace vide à l'apex x=1175) -->
+              <path d="M 1175 473 C 1215 433, 1250 433, 1275 433" fill="none" stroke="#059669" stroke-width="1.8" />
+              <text x="1280" y="437" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-consecration" style="cursor: pointer;">CONSÉCRATION (Rm 12)</text>
+              <path d="M 1175 473 L 1275 473" fill="none" stroke="#059669" stroke-width="1.8" />
+              <text x="1280" y="477" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-cite" style="cursor: pointer;">CITÉ &amp; POUVOIR (Rm 13)</text>
+              <path d="M 1175 473 C 1215 513, 1250 513, 1275 513" fill="none" stroke="#059669" stroke-width="1.8" />
+              <text x="1280" y="517" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-unite" style="cursor: pointer;">UNITÉ FRATERNELLE (Rm 14-16)</text>
+
               <rect x="895" y="451" width="280" height="44" rx="22" class="mm-branch-rect eth-rect" />
               <circle cx="915" cy="473" r="10" fill="#059669" />
               <text x="915" y="477" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" fill="#ffffff" text-anchor="middle">5</text>
@@ -2176,22 +2192,15 @@
               <text x="1047" y="477" font-family="'Inter', sans-serif" font-size="11" font-weight="800" class="mm-node-title" letter-spacing="0.5">ÉTHIQUE</text>
               <!-- Boutons d'actions (+ et ×) sur apex droit -->
               <g class="mm-node-actions" id="actions-ethique">
-                <g class="mm-action-btn" id="btn-ethique-add" transform="translate(1191, 473)" title="Ajouter une sous-branche">
+                <g class="mm-action-btn" id="btn-ethique-add" transform="translate(1205, 473)" title="Ajouter une sous-branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">+</text>
                 </g>
-                <g class="mm-action-btn danger" id="btn-ethique-del" transform="translate(1215, 473)" title="Supprimer la branche">
+                <g class="mm-action-btn danger" id="btn-ethique-del" transform="translate(1229, 473)" title="Supprimer la branche">
                   <circle r="10" class="mm-action-circle" />
                   <text y="0.5" class="mm-action-text" font-size="11" font-weight="700">×</text>
                 </g>
               </g>
-              <!-- Sous-branches aérées (finissant à 1465, bien avant la bordure de l'enclos à 1510) -->
-              <path d="M 1225 473 C 1250 433, 1265 433, 1275 433" fill="none" stroke="#059669" stroke-width="1.8" />
-              <text x="1280" y="437" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-consecration" style="cursor: pointer;">CONSÉCRATION (Rm 12)</text>
-              <path d="M 1225 473 C 1250 473, 1265 473, 1275 473" fill="none" stroke="#059669" stroke-width="1.8" />
-              <text x="1280" y="477" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-cite" style="cursor: pointer;">CITÉ &amp; POUVOIR (Rm 13)</text>
-              <path d="M 1225 473 C 1250 513, 1265 513, 1275 513" fill="none" stroke="#059669" stroke-width="1.8" />
-              <text x="1280" y="517" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" class="mm-leaf-text" id="badge-sub-unite" style="cursor: pointer;">UNITÉ FRATERNELLE (Rm 14-16)</text>
             </g>
           </svg>
 

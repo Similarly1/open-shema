@@ -1884,6 +1884,168 @@ function initMindmapShowcase() {
     'mm-node-ethique'
   ];
 
+  const nodeOffsets = {
+    'mm-node-root': { dx: 0, dy: 0 },
+    'mm-node-contexte': { dx: 0, dy: 0 },
+    'mm-node-justification': { dx: 0, dy: 0 },
+    'mm-node-israel': { dx: 0, dy: 0 },
+    'mm-node-condamnation': { dx: 0, dy: 0 },
+    'mm-node-liberation': { dx: 0, dy: 0 },
+    'mm-node-ethique': { dx: 0, dy: 0 }
+  };
+
+  const defaultCurvePaths = {
+    'curve-justif': 'M 660 285 C 640 285, 620 285, 595 285',
+    'curve-contexte': 'M 680 259 C 635 180, 595 110, 555 95',
+    'curve-israel': 'M 680 311 C 635 385, 605 450, 575 473',
+    'curve-condem': 'M 800 259 C 835 180, 865 110, 895 95',
+    'curve-lib': 'M 820 285 C 845 285, 870 285, 895 285',
+    'curve-ethique': 'M 800 311 C 835 385, 865 450, 895 473',
+    'curve-relation': 'M 595 261 C 655 180, 770 115, 895 95'
+  };
+
+  const svgArt = stage.querySelector('.mindmap-svg-art');
+
+  const getSVGCoordinates = (e) => {
+    if (!svgArt) return { x: e.clientX, y: e.clientY };
+    const pt = svgArt.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const ctm = svgArt.getScreenCTM();
+    return ctm ? pt.matrixTransform(ctm.inverse()) : { x: e.clientX, y: e.clientY };
+  };
+
+  const getBezierPoint = (t, p0, p1, p2, p3) => {
+    const mt = 1 - t;
+    return mt * mt * mt * p0 + 3 * mt * mt * t * p1 + 3 * mt * t * t * p2 + t * t * t * p3;
+  };
+
+  const updateMindmapCurves = () => {
+    const isDefault = Object.values(nodeOffsets).every(o => o.dx === 0 && o.dy === 0);
+    if (isDefault) {
+      Object.keys(defaultCurvePaths).forEach(cid => {
+        const el = document.getElementById(cid);
+        if (el) el.setAttribute('d', defaultCurvePaths[cid]);
+      });
+      const badgeRel = document.getElementById('badge-relation');
+      if (badgeRel) badgeRel.setAttribute('transform', 'translate(655, 142)');
+      return;
+    }
+
+    const root = nodeOffsets['mm-node-root'] || { dx: 0, dy: 0 };
+    const justif = nodeOffsets['mm-node-justification'] || { dx: 0, dy: 0 };
+    const ctx = nodeOffsets['mm-node-contexte'] || { dx: 0, dy: 0 };
+    const isr = nodeOffsets['mm-node-israel'] || { dx: 0, dy: 0 };
+    const cnd = nodeOffsets['mm-node-condamnation'] || { dx: 0, dy: 0 };
+    const lib = nodeOffsets['mm-node-liberation'] || { dx: 0, dy: 0 };
+    const eth = nodeOffsets['mm-node-ethique'] || { dx: 0, dy: 0 };
+
+    // 1. Vers Justification (Gauche Centre)
+    const curveJustif = document.getElementById('curve-justif');
+    if (curveJustif) {
+      const sx = 660 + root.dx;
+      const sy = 285 + root.dy;
+      const ex = 595 + justif.dx;
+      const ey = 285 + justif.dy;
+      const cx1 = sx - (sx - ex) * 0.35;
+      const cy1 = sy;
+      const cx2 = ex + (sx - ex) * 0.35;
+      const cy2 = ey;
+      curveJustif.setAttribute('d', `M ${sx.toFixed(1)} ${sy.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+    }
+
+    // 2. Vers Contexte Corinthe 57 (Gauche Haut)
+    const curveCtx = document.getElementById('curve-contexte');
+    if (curveCtx) {
+      const sx = 680 + root.dx;
+      const sy = 259 + root.dy;
+      const ex = 555 + ctx.dx;
+      const ey = 95 + ctx.dy;
+      const cx1 = sx - (sx - ex) * 0.35;
+      const cy1 = sy - (sy - ey) * 0.45;
+      const cx2 = ex + (sx - ex) * 0.35;
+      const cy2 = ey + (sy - ey) * 0.20;
+      curveCtx.setAttribute('d', `M ${sx.toFixed(1)} ${sy.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+    }
+
+    // 3. Vers Israël (Gauche Bas)
+    const curveIsr = document.getElementById('curve-israel');
+    if (curveIsr) {
+      const sx = 680 + root.dx;
+      const sy = 311 + root.dy;
+      const ex = 575 + isr.dx;
+      const ey = 473 + isr.dy;
+      const cx1 = sx - (sx - ex) * 0.42;
+      const cy1 = sy + (ey - sy) * 0.45;
+      const cx2 = ex + (sx - ex) * 0.28;
+      const cy2 = ey - (ey - sy) * 0.14;
+      curveIsr.setAttribute('d', `M ${sx.toFixed(1)} ${sy.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+    }
+
+    // 4. Vers Condamnation (Droite Haut)
+    const curveCnd = document.getElementById('curve-condem');
+    if (curveCnd) {
+      const sx = 800 + root.dx;
+      const sy = 259 + root.dy;
+      const ex = 895 + cnd.dx;
+      const ey = 95 + cnd.dy;
+      const cx1 = sx + (ex - sx) * 0.37;
+      const cy1 = sy - (sy - ey) * 0.48;
+      const cx2 = ex - (ex - sx) * 0.31;
+      const cy2 = ey + (sy - ey) * 0.09;
+      curveCnd.setAttribute('d', `M ${sx.toFixed(1)} ${sy.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+    }
+
+    // 5. Vers Libération (Droite Centre)
+    const curveLib = document.getElementById('curve-lib');
+    if (curveLib) {
+      const sx = 820 + root.dx;
+      const sy = 285 + root.dy;
+      const ex = 895 + lib.dx;
+      const ey = 285 + lib.dy;
+      const cx1 = sx + (ex - sx) * 0.35;
+      const cy1 = sy;
+      const cx2 = ex - (ex - sx) * 0.35;
+      const cy2 = ey;
+      curveLib.setAttribute('d', `M ${sx.toFixed(1)} ${sy.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+    }
+
+    // 6. Vers Éthique (Droite Bas)
+    const curveEth = document.getElementById('curve-ethique');
+    if (curveEth) {
+      const sx = 800 + root.dx;
+      const sy = 311 + root.dy;
+      const ex = 895 + eth.dx;
+      const ey = 473 + eth.dy;
+      const cx1 = sx + (ex - sx) * 0.37;
+      const cy1 = sy + (ey - sy) * 0.45;
+      const cx2 = ex - (ex - sx) * 0.31;
+      const cy2 = ey - (ey - sy) * 0.14;
+      curveEth.setAttribute('d', `M ${sx.toFixed(1)} ${sy.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+    }
+
+    // 7. Relation Justification -> Condamnation + Badge
+    const curveRel = document.getElementById('curve-relation');
+    const badgeRel = document.getElementById('badge-relation');
+    if (curveRel) {
+      const sx = 595 + justif.dx;
+      const sy = 261 + justif.dy;
+      const ex = 895 + cnd.dx;
+      const ey = 95 + cnd.dy;
+      const cx1 = sx + (ex - sx) * 0.20;
+      const cy1 = sy - (sy - ey) * 0.49;
+      const cx2 = ex - (ex - sx) * 0.42;
+      const cy2 = ey + (sy - ey) * 0.12;
+      curveRel.setAttribute('d', `M ${sx.toFixed(1)} ${sy.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+
+      if (badgeRel) {
+        const bx = getBezierPoint(0.42, sx, cx1, cx2, ex);
+        const by = getBezierPoint(0.42, sy, cy1, cy2, ey);
+        badgeRel.setAttribute('transform', `translate(${(bx - 85).toFixed(1)}, ${(by - 11).toFixed(1)})`);
+      }
+    }
+  };
+
   const selectNode = (selectedEl) => {
     selectableNodeIds.forEach(id => {
       const node = document.getElementById(id);
@@ -1894,15 +2056,96 @@ function initMindmapShowcase() {
     }
   };
 
-  // Écouteur de clic sur chaque capsule pour révéler les boutons Ajouter et Supprimer
+  // Drag & Drop interactif des capsules sélectionnées
+  let activeDragNode = null;
+  let dragStartCoords = { x: 0, y: 0 };
+  let nodeStartOffset = { dx: 0, dy: 0 };
+  let hasMoved = false;
+
+  const onPointerDown = (e, nodeId) => {
+    // Ne pas déclencher le drag sur les boutons d'actions, infobulles ou textes de sous-branches
+    if (e.target.closest('.mm-action-btn, .mm-scripture-pill, .mm-note-pill, .mm-leaf-text, .mm-sub-node')) return;
+
+    const el = document.getElementById(nodeId);
+    if (!el) return;
+
+    selectNode(el);
+
+    activeDragNode = el;
+    hasMoved = false;
+    dragStartCoords = getSVGCoordinates(e);
+    nodeStartOffset = { ...(nodeOffsets[nodeId] || { dx: 0, dy: 0 }) };
+  };
+
+  const onPointerMove = (e) => {
+    if (!activeDragNode) return;
+    const currentCoords = getSVGCoordinates(e);
+    const deltaX = currentCoords.x - dragStartCoords.x;
+    const deltaY = currentCoords.y - dragStartCoords.y;
+
+    if (!hasMoved && (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3)) {
+      hasMoved = true;
+      activeDragNode.classList.add('is-dragging');
+      stage.classList.add('is-dragging');
+    }
+
+    if (hasMoved) {
+      const nodeId = activeDragNode.id;
+      const newDx = Math.round(nodeStartOffset.dx + deltaX);
+      const newDy = Math.round(nodeStartOffset.dy + deltaY);
+      nodeOffsets[nodeId] = { dx: newDx, dy: newDy };
+      activeDragNode.setAttribute('transform', `translate(${newDx}, ${newDy})`);
+      updateMindmapCurves();
+    }
+  };
+
+  const onPointerUp = (e) => {
+    if (!activeDragNode) return;
+    const wasDragging = hasMoved;
+    activeDragNode.classList.remove('is-dragging');
+    stage.classList.remove('is-dragging');
+    activeDragNode = null;
+    hasMoved = false;
+
+    if (wasDragging) {
+      const clickBlocker = (clickEvent) => {
+        clickEvent.stopPropagation();
+        window.removeEventListener('click', clickBlocker, true);
+      };
+      window.addEventListener('click', clickBlocker, true);
+    }
+  };
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerUp);
+
+  // Écouteur de sélection et de drag sur chaque capsule
   selectableNodeIds.forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
+    el.addEventListener('pointerdown', (e) => onPointerDown(e, id));
     el.addEventListener('click', (e) => {
       if (e.target.closest('.mm-action-btn, .mm-scripture-pill, .mm-note-pill')) return;
       selectNode(el);
     });
   });
+
+  // Bouton de réinitialisation de la disposition
+  const btnResetPos = document.getElementById('btn-mm-reset-pos');
+  if (btnResetPos) {
+    btnResetPos.addEventListener('click', () => {
+      selectableNodeIds.forEach(id => {
+        nodeOffsets[id] = { dx: 0, dy: 0 };
+        const el = document.getElementById(id);
+        if (el) {
+          el.removeAttribute('transform');
+        }
+      });
+      updateMindmapCurves();
+      showToast('Disposition réinitialisée : positions d\'origine restaurées');
+    });
+  }
 
   // Sélection initiale : ROMAINS (mot central)
   const rootNode = document.getElementById('mm-node-root');

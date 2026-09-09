@@ -7534,6 +7534,19 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
   color: #0b0f17;
 }
 
+#btn-mm-reset-pos {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+#btn-mm-reset-pos:hover {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fbbf24;
+  border-color: #f59e0b;
+  transform: translateY(-1px);
+}
+
 /* Stage de Dessin SVG interactif */
 .mindmap-canvas-stage {
   position: relative;
@@ -7625,12 +7638,31 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
 .mindmap-canvas-stage:not(.paper-mode) .mm-scripture-rect { fill: #1e1b4b !important; stroke: #6366f1 !important; stroke-width: 1.2px; }
 .mindmap-canvas-stage:not(.paper-mode) .mm-note-circle { fill: #1e293b !important; stroke: #d97706 !important; stroke-width: 1.8px; }
 
-/* Nœud sélectionné avec halo lumineux rayonnant (Capture 4) */
+/* Nœud sélectionné avec halo lumineux rayonnant et curseur de déplacement */
 .mm-node-root-group.is-selected .mm-root-rect,
 .mm-branch-node.is-selected .mm-branch-rect {
   filter: url(#mm-select-glow);
   stroke: #3b82f6 !important;
   stroke-width: 3.2px !important;
+}
+
+.mm-branch-node.is-selected,
+.mm-node-root-group.is-selected {
+  cursor: grab !important;
+}
+
+.mm-branch-node.is-dragging,
+.mm-node-root-group.is-dragging,
+.mindmap-canvas-stage.is-dragging,
+.mindmap-canvas-stage.is-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+/* Transition fluide des nœuds hors glissement */
+.mm-branch-node:not(.is-dragging),
+.mm-node-root-group:not(.is-dragging) {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Boutons d'actions circulaires (+) et (×) rattachés aux nœuds (Captures 3 & 4) */
