@@ -162,10 +162,10 @@ class InstallerAPI:
             "is_fallback": True,
             "has_local_build": has_local,
             "local_archive_path": local_pkg if has_local else None,
-            "tag": "v0.1.2",
-            "name": "Open Shema v0.1.2 (Bêta)",
-            "download_url": f"https://github.com/{repo}/releases/download/v0.1.2/OpenShema.zip",
-            "size_str": "~580 Mo",
+            "tag": "v0.2.0",
+            "name": "Open Shema v0.2.0 (Bêta)",
+            "download_url": f"https://github.com/{repo}/releases/download/v0.2.0/OpenShema.zip",
+            "size_str": "~590 Mo",
             "notes": "Version complète d'Open Shema incluant le moteur biblique et les modules."
         }
 
