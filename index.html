@@ -1794,11 +1794,6 @@
         <!-- Barre de fenêtre -->
         <div class="mindmap-window-header">
           <div class="mindmap-window-title-wrap">
-            <div class="mindmap-window-dots">
-              <span class="mindmap-dot red"></span>
-              <span class="mindmap-dot yellow"></span>
-              <span class="mindmap-dot green"></span>
-            </div>
             <div class="mindmap-window-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2"><path d="M12 2v20M7 8h10"/></svg>
               <span>Épître aux Romains — Architecture Théologique &amp; Exégétique (ROMAINS)</span>
@@ -2203,11 +2198,6 @@
               </g>
             </g>
           </svg>
-
-          <!-- Infobulle interactive flottante (positionnée après le SVG avec z-index élevé) -->
-          <div class="mm-interactive-tooltip" id="mm-floating-tooltip" style="display: none;">
-            <div class="mm-tooltip-inner" id="mm-tooltip-content"></div>
-          </div>
         </div>
       </div>
 
@@ -3101,6 +3091,11 @@
       </div>
     </div>
   </section>
+
+  <!-- Infobulle interactive flottante de la Mind Map (Premier Plan Absolu) -->
+  <div class="mm-interactive-tooltip" id="mm-floating-tooltip" style="display: none;">
+    <div class="mm-tooltip-inner" id="mm-tooltip-content"></div>
+  </div>
 
   <!-- Lightbox Modal Haute Définition & Plein Écran -->
   <div class="lightbox-modal" id="lightbox-modal" role="dialog" aria-modal="true">

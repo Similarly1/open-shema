@@ -1602,7 +1602,7 @@ function initMindmapShowcase() {
     });
   }
 
-  // Gestion des Infobulles Flottantes (Stabilisées contre tout scintillement)
+  // Gestion des Infobulles Flottantes (Positionnement Premier Plan Absolu & Anti-Débordement)
   let activeTooltipTarget = null;
 
   const showTooltip = (targetEl, html) => {
@@ -1610,17 +1610,38 @@ function initMindmapShowcase() {
     if (activeTooltipTarget === targetEl) return;
     activeTooltipTarget = targetEl;
 
-    const stageRect = stage.getBoundingClientRect();
-    const targetRect = targetEl.getBoundingClientRect();
-
     tooltipContent.innerHTML = html;
-
-    const left = Math.round(targetRect.left - stageRect.left + (targetRect.width / 2));
-    const top = Math.round(targetRect.top - stageRect.top - 8);
-
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${top}px`;
     tooltip.style.display = 'block';
+
+    const targetRect = targetEl.getBoundingClientRect();
+    const tooltipWidth = tooltip.offsetWidth || 280;
+    const tooltipHeight = tooltip.offsetHeight || 130;
+
+    // Point cible au centre horizontal et 12px au-dessus
+    const targetCenterX = targetRect.left + (targetRect.width / 2);
+    let targetY = targetRect.top - 12;
+
+    // Serrage (clamping) strict dans la fenêtre du navigateur (marge de sécurité de 16px)
+    const margin = 16;
+    const minCenter = margin + (tooltipWidth / 2);
+    const maxCenter = window.innerWidth - margin - (tooltipWidth / 2);
+    const clampedCenterX = Math.max(minCenter, Math.min(maxCenter, targetCenterX));
+
+    // Calcul dynamique de l'alignement de la flèche vers la cible
+    const arrowOffset = targetCenterX - (clampedCenterX - tooltipWidth / 2);
+    const arrowPercent = Math.max(8, Math.min(92, (arrowOffset / tooltipWidth) * 100));
+    tooltip.style.setProperty('--arrow-left', `${arrowPercent.toFixed(1)}%`);
+
+    // Inversion vers le bas si la cible est trop proche du haut de l'écran
+    if (targetY - tooltipHeight < 12) {
+      targetY = targetRect.bottom + 12;
+      tooltip.classList.add('position-bottom');
+    } else {
+      tooltip.classList.remove('position-bottom');
+    }
+
+    tooltip.style.left = `${Math.round(clampedCenterX)}px`;
+    tooltip.style.top = `${Math.round(targetY)}px`;
 
     requestAnimationFrame(() => {
       tooltip.classList.add('is-visible');
@@ -1634,6 +1655,10 @@ function initMindmapShowcase() {
       tooltip.style.display = 'none';
     }
   };
+
+  // Fermer proprement l'infobulle en cas de défilement ou redimensionnement de la fenêtre
+  window.addEventListener('scroll', hideTooltip, { passive: true });
+  window.addEventListener('resize', hideTooltip, { passive: true });
 
   // Dictionnaire Complet des Infobulles Exégétiques et Bibliques — Version Néo-Crampon Libre (NCL)
   const tooltipsData = {
