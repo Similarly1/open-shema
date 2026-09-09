@@ -567,7 +567,8 @@ function initLightboxModal() {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      galleryCards.forEach(card => {
+      const gridCards = document.querySelectorAll('.gallery-grid .gallery-item-card');
+      gridCards.forEach(card => {
         const itemCat = card.getAttribute('data-category');
         if (category === 'all' || itemCat === category) {
           card.style.display = 'flex';
