@@ -7643,56 +7643,56 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
   pointer-events: none;
 }
 
-/* Pastilles Scripturaires et Notes au survol (Captures 2 & 3) */
+/* Pastilles Scripturaires et Notes au survol (Captures 2 & 3 - Stabilisées) */
 .mm-scripture-pill,
 .mm-note-pill {
   cursor: pointer;
-  transition: transform 0.18s ease, filter 0.18s ease;
 }
 
-.mm-scripture-pill:hover,
-.mm-note-pill:hover {
-  transform: scale(1.12);
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+.mm-scripture-pill:hover rect {
+  fill: #c7d2fe !important;
+  stroke: #3b82f6 !important;
+  stroke-width: 1.8px !important;
 }
 
-/* Infobulle Interactive Flottante Superposée (Captures 2 & 3) */
-@keyframes mmTooltipPop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -85%) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -100%) scale(1);
-  }
+.mm-note-pill:hover circle {
+  fill: #fef3c7 !important;
+  stroke: #92400e !important;
+  stroke-width: 2.2px !important;
 }
 
+/* Infobulle Interactive Flottante Superposée (Captures 2 & 3 - Stable & Opaque) */
 .mm-interactive-tooltip {
   position: absolute;
-  z-index: 120;
-  min-width: 280px;
-  max-width: 350px;
-  background: #161c28;
+  z-index: 10000 !important;
+  min-width: 240px;
+  max-width: 300px;
+  background: #161c28 !important;
   color: #f8fafc;
   border: 1px solid #2a3449;
-  border-radius: 10px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 3px 10px rgba(0, 0, 0, 0.3);
-  padding: 12px 14px;
-  pointer-events: none;
-  animation: mmTooltipPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-radius: 8px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+  padding: 9px 12px;
+  pointer-events: none !important;
+  transform: translate(-50%, -100%);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.mm-interactive-tooltip.is-visible {
+  opacity: 1;
 }
 
 /* Flèche triangulaire vers le bas */
 .mm-interactive-tooltip::after {
   content: '';
   position: absolute;
-  bottom: -6px;
+  bottom: -5px;
   left: 50%;
   transform: translateX(-50%) rotate(45deg);
-  width: 12px;
-  height: 12px;
-  background: #161c28;
+  width: 10px;
+  height: 10px;
+  background: #161c28 !important;
   border-right: 1px solid #2a3449;
   border-bottom: 1px solid #2a3449;
 }
@@ -7700,13 +7700,13 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
 .mm-tooltip-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-weight: 700;
-  font-size: 10.5px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   color: #60a5fa;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .mm-tooltip-header svg {
@@ -7715,38 +7715,38 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
 }
 
 .mm-tooltip-ref {
-  font-size: 13.5px;
+  font-size: 12px;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 3px;
 }
 
 .mm-tooltip-verse-text {
-  font-size: 12px;
+  font-size: 11px;
   font-style: italic;
   line-height: 1.45;
   color: #cbd5e1;
-  margin: 6px 0 4px 0;
-  padding: 6px 10px;
-  background: rgba(15, 23, 42, 0.75);
-  border-left: 3px solid #3b82f6;
+  margin: 5px 0 3px 0;
+  padding: 5px 8px;
+  background: #0f172a !important;
+  border-left: 2.5px solid #3b82f6;
   border-radius: 4px;
 }
 
 .mm-tooltip-body {
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: #f8fafc;
-  line-height: 1.45;
-  margin: 4px 0;
+  line-height: 1.4;
+  margin: 3px 0;
   font-weight: 500;
 }
 
 .mm-tooltip-hint {
-  font-size: 10px;
+  font-size: 9.5px;
   color: #64748b;
-  margin-top: 6px;
+  margin-top: 5px;
   border-top: 1px solid #26334d;
-  padding-top: 5px;
+  padding-top: 4px;
 }
 
 /* Grille des 4 Piliers Mind Map */

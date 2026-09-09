@@ -1601,24 +1601,37 @@ function initMindmapShowcase() {
     });
   }
 
-  // Gestion des Infobulles Flottantes (Captures 2 et 3)
-  const positionTooltip = (targetEl, html) => {
+  // Gestion des Infobulles Flottantes (Captures 2 et 3 - Stabilisées contre tout scintillement)
+  let activeTooltipTarget = null;
+
+  const showTooltip = (targetEl, html) => {
     if (!tooltip || !tooltipContent) return;
+    if (activeTooltipTarget === targetEl) return; // Verrou : Ne pas rejouer si déjà actif
+    activeTooltipTarget = targetEl;
+
     const stageRect = stage.getBoundingClientRect();
     const targetRect = targetEl.getBoundingClientRect();
 
     tooltipContent.innerHTML = html;
-    tooltip.style.display = 'block';
 
-    const left = targetRect.left - stageRect.left + (targetRect.width / 2);
-    const top = targetRect.top - stageRect.top - 12;
+    const left = Math.round(targetRect.left - stageRect.left + (targetRect.width / 2));
+    const top = Math.round(targetRect.top - stageRect.top - 8);
 
     tooltip.style.left = `${left}px`;
     tooltip.style.top = `${top}px`;
+    tooltip.style.display = 'block';
+
+    requestAnimationFrame(() => {
+      tooltip.classList.add('is-visible');
+    });
   };
 
   const hideTooltip = () => {
-    if (tooltip) tooltip.style.display = 'none';
+    activeTooltipTarget = null;
+    if (tooltip) {
+      tooltip.classList.remove('is-visible');
+      tooltip.style.display = 'none';
+    }
   };
 
   // 1. Infobulle du passage biblique Romains 3:21-5:21 (Capture 2)
@@ -1634,7 +1647,7 @@ function initMindmapShowcase() {
       <div class="mm-tooltip-hint">Cliquer pour ouvrir dans le lecteur biblique</div>
     `;
 
-    verseBadgeJustif.addEventListener('mouseenter', () => positionTooltip(verseBadgeJustif, verseHtml));
+    verseBadgeJustif.addEventListener('mouseenter', () => showTooltip(verseBadgeJustif, verseHtml));
     verseBadgeJustif.addEventListener('mouseleave', hideTooltip);
     verseBadgeJustif.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1654,7 +1667,7 @@ function initMindmapShowcase() {
       <div class="mm-tooltip-hint">Cliquer ou F4 pour modifier</div>
     `;
 
-    noteBadgeJustif.addEventListener('mouseenter', () => positionTooltip(noteBadgeJustif, noteHtml));
+    noteBadgeJustif.addEventListener('mouseenter', () => showTooltip(noteBadgeJustif, noteHtml));
     noteBadgeJustif.addEventListener('mouseleave', hideTooltip);
     noteBadgeJustif.addEventListener('click', (e) => {
       e.stopPropagation();

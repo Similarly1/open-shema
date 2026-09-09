@@ -1826,11 +1826,6 @@
 
         <!-- Scène Interactive SVG (Arborescence Buzan - Épître aux Romains) -->
         <div class="mindmap-canvas-stage paper-mode" id="mm-canvas-stage">
-          <!-- Infobulle interactive flottante (Captures 2 & 3) -->
-          <div class="mm-interactive-tooltip" id="mm-floating-tooltip" style="display: none;">
-            <div class="mm-tooltip-inner" id="mm-tooltip-content"></div>
-          </div>
-
           <svg class="mindmap-svg-art" viewBox="0 0 1180 570" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <!-- Filtre de surbrillance rayonnante pour nœud sélectionné (Capture 4) -->
@@ -2128,6 +2123,11 @@
               <text x="1050" y="524" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" fill="#64748b">ENVOI &amp; DOXOLOGIE (Rm 15-16)</text>
             </g>
           </svg>
+
+          <!-- Infobulle interactive flottante (positionnée après le SVG avec z-index élevé) -->
+          <div class="mm-interactive-tooltip" id="mm-floating-tooltip" style="display: none;">
+            <div class="mm-tooltip-inner" id="mm-tooltip-content"></div>
+          </div>
         </div>
       </div>
 
