@@ -122,13 +122,6 @@ const NotesView = {
       this.togglePreview();
     });
 
-    document.getElementById('btn-notes-markdown-guide')?.addEventListener('click', () => {
-      const isMindmap = this.currentNote?.type === 'mindmap';
-      if (typeof SettingsView !== 'undefined' && SettingsView.openMarkdownGuideModal) {
-        SettingsView.openMarkdownGuideModal(isMindmap ? 'mindmap' : 'notes');
-      }
-    });
-
     // Boutons Historique Annuler / Rétablir
     document.getElementById('btn-note-undo')?.addEventListener('click', () => {
       this.undo();
@@ -507,6 +500,29 @@ const NotesView = {
       this.surroundSelectionWithTag('code');
     } else if (action === 'highlight') {
       this.surroundSelectionWithTag('mark');
+    } else if (action === 'svg-icon') {
+      const savedRange = (this.currentSelectionRange || window.getSelection()?.getRangeAt(0))?.cloneRange();
+      const text = window.getSelection()?.toString()?.trim() || '';
+      const rect = savedRange ? savedRange.getBoundingClientRect() : null;
+      if (typeof SvgIconsRegistry !== 'undefined') {
+        SvgIconsRegistry.openPicker({
+          anchorRect: rect,
+          title: text ? `Icône pour « ${text} »` : 'Insérer une icône SVG',
+          currentText: text,
+          onSelect: (iconId) => {
+            if (savedRange) {
+              const sel = window.getSelection();
+              sel.removeAllRanges();
+              sel.addRange(savedRange);
+            }
+            const iconHtml = `${SvgIconsRegistry.renderInlineHtml(iconId)}&nbsp;`;
+            document.execCommand('insertHTML', false, iconHtml);
+            this.pushHistoryState();
+            this.triggerAutoSave();
+          }
+        });
+      }
+      return;
     } else if (action === 'link') {
       this.handleLinkAction();
       return;
@@ -664,6 +680,23 @@ const NotesView = {
 
       const target = e.target.closest('#note-edit-content, input[type="text"], textarea') || this.contentInput;
       this.activeTargetInput = target;
+
+      // Mémoriser la position de la souris et la sélection / curseur sous le clic droit
+      this.contextMenuCoords = { x: e.clientX, y: e.clientY };
+      const currentSel = window.getSelection();
+      if (currentSel && currentSel.rangeCount > 0 && !currentSel.isCollapsed) {
+        this.contextMenuRange = currentSel.getRangeAt(0).cloneRange();
+      } else if (document.caretRangeFromPoint) {
+        this.contextMenuRange = document.caretRangeFromPoint(e.clientX, e.clientY);
+      } else if (document.caretPositionFromPoint) {
+        const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if (pos) {
+          const r = document.createRange();
+          r.setStart(pos.offsetNode, pos.offset);
+          r.collapse(true);
+          this.contextMenuRange = r;
+        }
+      }
 
       e.preventDefault();
       e.stopPropagation();
@@ -999,7 +1032,60 @@ const NotesView = {
         }
         break;
 
-      // 3. Insérer (Tableaux réels, Encarts, Horodatage...)
+      // 3. Insérer (Tableaux réels, Encarts, Horodatage, Icônes SVG...)
+      case 'svg-icon':
+      case 'insert-svg-icon': {
+        if (typeof SvgIconsRegistry !== 'undefined') {
+          const sel = window.getSelection();
+          let rect = null;
+          let range = null;
+          if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+            range = sel.getRangeAt(0).cloneRange();
+          } else if (this.contextMenuRange) {
+            range = this.contextMenuRange.cloneRange();
+          } else if (this.currentSelectionRange) {
+            range = this.currentSelectionRange.cloneRange();
+          } else if (sel && sel.rangeCount > 0) {
+            range = sel.getRangeAt(0).cloneRange();
+          }
+
+          if (range) {
+            const r = range.getBoundingClientRect();
+            if (r && (r.width > 0 || r.height > 0 || r.left > 0 || r.top > 0)) {
+              rect = r;
+            }
+          }
+
+          if (!rect && this.contextMenuCoords) {
+            rect = {
+              left: this.contextMenuCoords.x,
+              top: this.contextMenuCoords.y,
+              width: 0,
+              height: 0,
+              right: this.contextMenuCoords.x,
+              bottom: this.contextMenuCoords.y
+            };
+          }
+
+          SvgIconsRegistry.openPicker({
+            anchorRect: rect,
+            title: 'Insérer une icône SVG',
+            currentText: window.getSelection()?.toString()?.trim() || '',
+            onSelect: (iconId) => {
+              if (range) {
+                const s = window.getSelection();
+                s.removeAllRanges();
+                s.addRange(range);
+              }
+              const iconHtml = `${SvgIconsRegistry.renderInlineHtml(iconId)}&nbsp;`;
+              document.execCommand('insertHTML', false, iconHtml);
+              this.pushHistoryState();
+              this.triggerAutoSave();
+            }
+          });
+        }
+        return;
+      }
       case 'horizontal-rule':
       case 'divider':
       case 'hr':
@@ -1366,6 +1452,14 @@ const NotesView = {
       .replace(/\^([^\^]+)\^/g, '<sup>$1</sup>')
       .replace(/~([^~]+)~/g, '<sub>$1</sub>');
 
+    // 10bis. Icônes vectorielles SVG : ::mot-clé::
+    text = text.replace(/::([a-zA-Z0-9_-]+)::/g, (match, iconId) => {
+      if (typeof SvgIconsRegistry !== 'undefined' && SvgIconsRegistry.has(iconId)) {
+        return SvgIconsRegistry.renderInlineHtml(iconId);
+      }
+      return match;
+    });
+
     // 11. Paragraphes normaux
     const blocks = text.split(/\n\s*\n/);
     const htmlBlocks = blocks.map(block => {
@@ -1481,6 +1575,13 @@ const NotesView = {
           }
 
           return childrenText ? `\n${childrenText}\n` : '';
+        }
+        case 'span': {
+          if (node.classList.contains('note-svg-icon') || node.dataset.icon) {
+            const iconId = node.dataset.icon || node.getAttribute('data-icon');
+            if (iconId) return `::${iconId}::`;
+          }
+          return childrenText;
         }
         default:
           return childrenText;
@@ -2421,6 +2522,7 @@ const NotesView = {
       {
         category: "Tableaux & Outils",
         items: [
+          { id: "svg-icon", label: "Icône SVG", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M7 8h10"/></svg>`, desc: "Insérer un symbole vectoriel (croix, bible...)", action: "svg-icon" },
           { id: "table", label: "Tableau interactif", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`, desc: "Tableau à colonnes et lignes", action: "table" },
           { id: "code", label: "Bloc de code", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`, desc: "Code ou texte préformaté", action: "code" },
           { id: "divider", label: "Séparateur horizontal", iconSvg: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>`, desc: "Ligne de séparation (---)", action: "divider" },
@@ -2445,6 +2547,20 @@ const NotesView = {
     }
 
     const textBefore = node.textContent.slice(0, range.startOffset);
+
+    // 1. Détection de la saisie d'icône inline ::mot-clé
+    const lastDoubleColonIndex = textBefore.lastIndexOf('::');
+    if (lastDoubleColonIndex !== -1) {
+      const isStartOrSpace = lastDoubleColonIndex === 0 || /\s/.test(textBefore[lastDoubleColonIndex - 1]);
+      if (isStartOrSpace) {
+        const query = textBefore.slice(lastDoubleColonIndex + 2);
+        const rect = range.getBoundingClientRect();
+        this.openInlineIconMenu(query, rect, node, range, lastDoubleColonIndex);
+        return;
+      }
+    }
+
+    // 2. Détection de la commande Slash /
     const lastSlashIndex = textBefore.lastIndexOf('/');
 
     if (lastSlashIndex !== -1) {
@@ -2458,6 +2574,73 @@ const NotesView = {
     }
 
     this.closeSlashMenu();
+  },
+
+  openInlineIconMenu(query = '', rect = null, textNode = null, range = null, startIndex = -1) {
+    if (typeof SvgIconsRegistry === 'undefined') return;
+
+    this.closeSlashMenu();
+
+    SvgIconsRegistry.openPicker({
+      anchorRect: rect,
+      title: 'Symbole SVG (::)',
+      currentText: query || (textNode?.textContent ? textNode.textContent.slice(0, startIndex >= 0 ? startIndex : undefined).trim().split(/\s+/).pop() : ''),
+      onSelect: (iconId) => {
+        try {
+          if (textNode && textNode.parentNode && startIndex >= 0) {
+            const currentFullText = textNode.textContent;
+            const before = currentFullText.slice(0, startIndex);
+            const after = currentFullText.slice(range ? range.startOffset : startIndex);
+            textNode.textContent = before;
+
+            const span = document.createElement('span');
+            span.innerHTML = `${SvgIconsRegistry.renderInlineHtml(iconId)}&nbsp;`;
+            const parent = textNode.parentNode;
+            if (textNode.nextSibling) {
+              parent.insertBefore(span, textNode.nextSibling);
+            } else {
+              parent.appendChild(span);
+            }
+
+            if (after) {
+              const afterNode = document.createTextNode(after);
+              if (span.nextSibling) {
+                parent.insertBefore(afterNode, span.nextSibling);
+              } else {
+                parent.appendChild(afterNode);
+              }
+            }
+
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            const newRange = document.createRange();
+            newRange.setStartAfter(span);
+            newRange.collapse(true);
+            sel.addRange(newRange);
+          } else {
+            const iconHtml = `${SvgIconsRegistry.renderInlineHtml(iconId)}&nbsp;`;
+            document.execCommand('insertHTML', false, iconHtml);
+          }
+        } catch (err) {
+          console.warn('Erreur insertion inline icon:', err);
+          const iconHtml = `${SvgIconsRegistry.renderInlineHtml(iconId)}&nbsp;`;
+          document.execCommand('insertHTML', false, iconHtml);
+        }
+
+        this.pushHistoryState();
+        this.triggerAutoSave();
+      }
+    });
+
+    if (query) {
+      setTimeout(() => {
+        const inp = document.getElementById('svg-picker-input');
+        if (inp) {
+          inp.value = query;
+          inp.dispatchEvent(new Event('input'));
+        }
+      }, 40);
+    }
   },
 
   openSlashMenu(query = '', rect = null) {
@@ -2642,6 +2825,22 @@ const NotesView = {
 
     if (['h1', 'h2', 'h3', 'text', 'paragraph', 'quote', 'callout', 'bullet', 'number', 'task'].includes(action)) {
       this.setBlockType(action);
+    } else if (action === 'svg-icon' || action === 'insert-svg-icon') {
+      const rect = this.slashAnchorRange ? this.slashAnchorRange.getBoundingClientRect() : null;
+      if (typeof SvgIconsRegistry !== 'undefined') {
+        SvgIconsRegistry.openPicker({
+          anchorRect: rect,
+          title: 'Insérer une icône SVG',
+          currentText: this.slashQuery || '',
+          onSelect: (iconId) => {
+            const iconHtml = `${SvgIconsRegistry.renderInlineHtml(iconId)}&nbsp;`;
+            document.execCommand('insertHTML', false, iconHtml);
+            this.pushHistoryState();
+            this.triggerAutoSave();
+          }
+        });
+      }
+      return;
     } else if (action === 'scripture') {
       this.insertScriptureQuote();
     } else if (action === 'table') {
@@ -2681,12 +2880,18 @@ const NotesView = {
     this.closeSlashMenu();
 
     if (this.isPreviewMode) {
-      if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Éditer</span>';
+      if (btn) {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+        btn.title = 'Basculer en Mode Édition (Ctrl+P)';
+      }
       this.contentInput?.classList.add('hidden');
       this.previewContainer?.classList.remove('hidden');
       this.renderPreview();
     } else {
-      if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Aperçu</span>';
+      if (btn) {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+        btn.title = 'Basculer en Prévisualisation Markdown (Ctrl+P)';
+      }
       this.previewContainer?.classList.add('hidden');
       this.contentInput?.classList.remove('hidden');
     }

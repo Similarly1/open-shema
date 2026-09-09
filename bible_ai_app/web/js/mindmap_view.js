@@ -879,7 +879,16 @@ const MindMapView = {
 
       // Si l'utilisateur est en train de taper dans un champ de saisie HTML
       const activeTag = document.activeElement?.tagName;
-      if (['INPUT', 'TEXTAREA'].includes(activeTag)) return;
+      if (['INPUT', 'TEXTAREA'].includes(activeTag) || document.activeElement?.isContentEditable) return;
+
+      // Raccourci direct 'I' pour la palette d'icônes SVG sur le nœud sélectionné
+      if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'i' || e.key === 'I')) {
+        if (this.selectedNodeId) {
+          e.preventDefault();
+          this.openIconPicker(this.selectedNodeId);
+          return;
+        }
+      }
 
       // Annuler (Ctrl+Z) / Rétablir (Ctrl+Y ou Ctrl+Shift+Z)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
@@ -1015,9 +1024,30 @@ const MindMapView = {
     this.connectorStyle = connector;
     this.nodeShape = shape;
 
+    let rootIcon = null;
+    let rootTitle = (title || 'CONCEPT CENTRAL').toUpperCase();
+    if (markdownContent) {
+      const rootIconMatch = markdownContent.match(/<!--\s*mindmap-root-icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+      if (rootIconMatch) {
+        rootIcon = rootIconMatch[1].trim().toLowerCase();
+      }
+    }
+    const titleIconMatch = rootTitle.match(/::([a-zA-Z0-9_-]+):?/i);
+    if (titleIconMatch && typeof SvgIconsRegistry !== 'undefined') {
+      const cand = titleIconMatch[1].toLowerCase();
+      if (SvgIconsRegistry.has(cand)) {
+        rootIcon = cand;
+        rootTitle = rootTitle.replace(titleIconMatch[0], '').trim() || SvgIconsRegistry.get(cand)?.label?.toUpperCase();
+      }
+    }
+    if (!rootIcon && this.currentNote && this.currentNote.rootIcon) {
+      rootIcon = this.currentNote.rootIcon;
+    }
+
     const root = {
       id: 'root',
-      text: (title || 'CONCEPT CENTRAL').toUpperCase(),
+      text: rootTitle,
+      icon: rootIcon,
       ref: '',
       children: [],
       side: 'center',
@@ -1085,6 +1115,21 @@ const MindMapView = {
           }
         }
 
+        // Extraction d'une icône <!-- icon: ... --> ou ::icon::
+        let icon = null;
+        const iconCommentMatch = text.match(/<!--\s*icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+        if (iconCommentMatch) {
+          icon = iconCommentMatch[1].trim().toLowerCase();
+          text = text.replace(iconCommentMatch[0], '').trim();
+        }
+        if (!icon) {
+          const iconTokenMatch = text.match(/^::([a-zA-Z0-9_-]+)::\s*/i) || text.match(/\s*::([a-zA-Z0-9_-]+)::$/i);
+          if (iconTokenMatch) {
+            icon = iconTokenMatch[1].trim().toLowerCase();
+            text = text.replace(iconTokenMatch[0], '').trim();
+          }
+        }
+
         // Extraction d'une référence biblique entre crochets [Jean 3:16] ou [Romains 3:21-31]
         let refMatch = text.match(/\[([A-Za-z0-9À-ÿ\s:.,\-–—]+)\]\s*$/);
         if (refMatch) {
@@ -1102,6 +1147,7 @@ const MindMapView = {
           id: `node_${idCounter++}`,
           text: text.toUpperCase(), // Loi 4 de Buzan : MAJUSCULES
           marker: marker,
+          icon: icon,
           ref: ref,
           note: noteText,
           children: [],
@@ -1365,14 +1411,18 @@ const MindMapView = {
     if (this.nodeShape && this.nodeShape !== 'underline') {
       md += `<!-- mindmap-node-shape: ${this.nodeShape} -->\n`;
     }
+    if (tree && tree.icon) {
+      md += `<!-- mindmap-root-icon: ${tree.icon} -->\n`;
+    }
     const serializeChildren = (node, indentLevel) => {
       if (!node || !node.children) return;
       for (const child of node.children) {
         const indent = '  '.repeat(indentLevel);
         const markerPart = child.marker ? ` <!-- marker: ${child.marker} -->` : '';
+        const iconPart = child.icon ? ` <!-- icon: ${child.icon} -->` : '';
         const refPart = child.ref ? ` [${child.ref}]` : '';
         const notePart = child.note ? ` <!-- note: ${child.note.replace(/\r?\n/g, ' ')} -->` : '';
-        md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}\n`;
+        md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}${iconPart}\n`;
         serializeChildren(child, indentLevel + 1);
       }
     };
@@ -1633,16 +1683,18 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = markerW + textW + refW + noteW;
+      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
       node.width = Math.max(92, node.contentWidth + 32);
       node.height = 32;
     } else if (node.level === 0) {
-      // NIVEAU 0 (Thème général / Noyau central dominant)
+      // NIVEAU 0 (Thème général / Noyau central dominant - icône grande et majestueuse)
       const textW = this.getTextWidth(node.text, 16, '900');
       node.textWidth = textW;
       node.markerWidth = 0;
-      node.width = Math.max(130, textW + 56);
-      node.height = 52;
+      const iconW = node.icon ? 38 : 0;
+      node.iconWidth = iconW;
+      node.width = Math.max(140, textW + iconW + (node.icon ? 60 : 54));
+      node.height = node.icon ? 58 : 52;
     } else if (node.level === 1) {
       // NIVEAU 1 (BOIs - Règles de Buzan : mots-clés forces, affirmé et contrasté)
       const textW = this.getTextWidth(node.text, 14, '800');
@@ -1778,8 +1830,10 @@ const MindMapView = {
       const textW = this.getTextWidth(node.text, 16, '900');
       node.textWidth = textW;
       node.markerWidth = 0;
-      node.width = Math.max(130, textW + 56);
-      node.height = 52;
+      const iconW = node.icon ? 38 : 0;
+      node.iconWidth = iconW;
+      node.width = Math.max(140, textW + iconW + (node.icon ? 60 : 54));
+      node.height = node.icon ? 58 : 52;
     } else if (node.level === 1) {
       const textW = this.getTextWidth(node.text, 14, '800');
       node.textWidth = textW;
@@ -1879,7 +1933,10 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = markerW + textW + refW + noteW;
+      const iconW = node.icon ? 20 : 0;
+      node.iconWidth = iconW;
+
+      node.contentWidth = markerW + iconW + textW + refW + noteW;
       node.width = Math.max(68, node.contentWidth + 26);
       node.height = 24;
     }
@@ -2086,17 +2143,14 @@ const MindMapView = {
 
     // 1. Bouton en-tête des notes
     const headerBtn = document.getElementById('btn-toggle-mindmap-mode');
-    const headerLabel = document.getElementById('label-mm-mode');
     if (headerBtn) {
       headerBtn.classList.toggle('btn-primary', isOutline);
       headerBtn.classList.toggle('btn-secondary', !isOutline);
       headerBtn.title = isOutline ? 'Basculer en Vue Carte Mind Map (Alt+P)' : 'Basculer en Vue Plan Outliner (Alt+P)';
       headerBtn.innerHTML = isOutline ? `
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
-        <span id="label-mm-mode">Vue Carte</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
       ` : `
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        <span id="label-mm-mode">Vue Plan</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       `;
     }
 
@@ -2148,13 +2202,18 @@ const MindMapView = {
           <div class="mm-outline-sheet">
             <!-- Titre Noyau Central -->
             <div class="mm-outline-root-header">
-              <div class="mm-outline-root-badge">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
+              <div class="mm-outline-root-badge" data-id="root" style="cursor: pointer;" title="Changer l'icône du concept central (I)">
+                ${this.tree.icon && typeof SvgIconsRegistry !== 'undefined' && SvgIconsRegistry.get(this.tree.icon)
+                  ? SvgIconsRegistry.getSvg(this.tree.icon, 20)
+                  : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>'}
               </div>
               <div class="mm-outline-root-title" data-id="root" title="Cliquer pour modifier le concept central">
                 ${this.escapeHtml(this.tree.text)}
               </div>
               <div class="mm-outline-actions root-actions" style="opacity: 1;">
+                <button type="button" class="btn-icon-subtle" data-action="svg-icon" data-id="root" title="Associer une icône SVG (I)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M7 8h10"/></svg>
+                </button>
                 <button type="button" class="btn-icon-subtle" data-action="edit-node" data-id="root" title="Modifier le titre">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                 </button>
@@ -2224,6 +2283,7 @@ const MindMapView = {
               <span class="mm-outline-dot-bullet" style="background: ${color};"></span>
             `}
             ${this.renderOutlineMarkerPill(boi)}
+            ${this.renderOutlineIconPill(boi)}
             <span class="mm-outline-text boi-text" data-id="${boi.id}" title="Cliquer pour modifier">${this.escapeHtml(boi.text)}</span>
             ${boi.ref ? `
               <span class="mm-outline-ref-pill" data-ref="${this.escapeHtml(boi.ref)}" title="Cliquer pour lire le passage biblique">
@@ -2289,6 +2349,7 @@ const MindMapView = {
               <span class="mm-outline-sub-bullet"></span>
             `}
             ${this.renderOutlineMarkerPill(node)}
+            ${this.renderOutlineIconPill(node)}
             <span class="mm-outline-text sub-text" data-id="${node.id}" title="Cliquer pour modifier">${this.escapeHtml(node.text)}</span>
             ${node.ref ? `
               <span class="mm-outline-ref-pill" data-ref="${this.escapeHtml(node.ref)}" title="Cliquer pour lire le passage biblique">
@@ -2455,10 +2516,35 @@ const MindMapView = {
           case 'delete':
             this.deleteNode(nodeId);
             break;
+          case 'svg-icon':
+            this.openIconPicker(nodeId, e.clientX, e.clientY);
+            break;
           case 'edit-node':
             const targetText = outlineEl.querySelector(`.mm-outline-text[data-id="${nodeId}"], .mm-outline-root-title[data-id="${nodeId}"]`);
             if (targetText) this.startOutlineInlineEdit(nodeId, targetText);
             break;
+        }
+      });
+    });
+
+    // Clic direct sur une pastille d'icône SVG (nœud ou racine) dans la vue plan
+    outlineEl.querySelectorAll('.mm-outline-icon-badge, .mm-outline-root-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nodeId = badge.getAttribute('data-id') || 'root';
+        this.openIconPicker(nodeId, e.clientX, e.clientY);
+      });
+    });
+
+    // Clic droit dans la vue plan pour ouvrir le menu contextuel
+    outlineEl.querySelectorAll('.mm-outline-root-header, .mm-outline-row, [data-node-id]').forEach(el => {
+      el.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const nodeId = el.getAttribute('data-node-id') || el.querySelector('[data-id]')?.getAttribute('data-id') || (el.classList.contains('mm-outline-root-header') ? 'root' : null);
+        if (nodeId) {
+          this.selectNode(nodeId);
+          this.showContextMenu(e.clientX, e.clientY, nodeId);
         }
       });
     });
@@ -2731,12 +2817,23 @@ const MindMapView = {
     const commit = () => {
       if (committed) return;
       committed = true;
-      const val = input.value.trim().toUpperCase() || originalText;
-      node.text = val;
+      let val = input.value.trim().toUpperCase() || originalText;
+      const iconMatch = val.match(/::([a-zA-Z0-9_-]+):?/i);
+      if (iconMatch && typeof SvgIconsRegistry !== 'undefined') {
+        const candidate = iconMatch[1].toLowerCase();
+        if (SvgIconsRegistry.has(candidate)) {
+          node.icon = candidate;
+          val = val.replace(iconMatch[0], '').trim();
+          if (nodeId === 'root' && this.currentNote) {
+            this.currentNote.rootIcon = candidate;
+          }
+        }
+      }
+      node.text = val || (node.icon ? SvgIconsRegistry.get(node.icon)?.label?.toUpperCase() : originalText);
       if (nodeId === 'root' && this.currentNote) {
-        this.currentNote.title = val;
+        this.currentNote.title = node.text;
         const titleInput = document.getElementById('note-edit-title');
-        if (titleInput) titleInput.value = val;
+        if (titleInput) titleInput.value = node.text;
       }
       this.layoutTree();
       this.renderOutlineView();
@@ -3137,10 +3234,60 @@ const MindMapView = {
 
       // Titre central en capitales
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('text-anchor', 'middle');
       text.setAttribute('dominant-baseline', 'central');
       text.setAttribute('class', 'mm-root-text');
       text.textContent = node.text;
+
+      // Icône SVG majestueuse et plus grande sur le concept central si présente
+      if (node.icon && typeof SvgIconsRegistry !== 'undefined') {
+        const iconDef = SvgIconsRegistry.get(node.icon);
+        if (iconDef) {
+          const iconSize = 28;
+          const textW = node.textWidth || 60;
+          const spacing = 10;
+          const totalContent = iconSize + spacing + textW;
+          const startX = -totalContent / 2;
+          const iconX = startX + iconSize / 2;
+          const textX = startX + iconSize + spacing;
+
+          text.setAttribute('text-anchor', 'start');
+          text.setAttribute('x', textX);
+
+          const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          iconG.setAttribute('transform', `translate(${iconX}, 0)`);
+          iconG.setAttribute('class', 'mm-node-icon-badge mm-root-icon-badge');
+          iconG.setAttribute('style', 'cursor: pointer;');
+          iconG.setAttribute('title', `Icône SVG : ${iconDef.label} (Cliquer pour changer ou [I])`);
+
+          const iHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          iHit.setAttribute('r', 18);
+          iHit.setAttribute('fill', 'transparent');
+          iconG.appendChild(iHit);
+
+          const svgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          svgWrap.setAttribute('transform', 'translate(-14, -14) scale(1.16)');
+          svgWrap.setAttribute('fill', 'none');
+          svgWrap.setAttribute('stroke', nodeColor || 'var(--accent-blue, #2563eb)');
+          svgWrap.setAttribute('stroke-width', '2.3');
+          svgWrap.setAttribute('stroke-linecap', 'round');
+          svgWrap.setAttribute('stroke-linejoin', 'round');
+          svgWrap.innerHTML = iconDef.path;
+          iconG.appendChild(svgWrap);
+
+          iconG.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openIconPicker(node.id, e.clientX, e.clientY);
+          });
+          g.appendChild(iconG);
+        } else {
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('x', 0);
+        }
+      } else {
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('x', 0);
+      }
+
       g.appendChild(text);
 
       // Bouton contextuel + pour ajouter un BOI
@@ -3243,17 +3390,22 @@ const MindMapView = {
       const markerW = node.marker ? ((isWideMarker ? 22 : 18) + 6) : 0;
       const markerHalf = isWideMarker ? 11 : 9;
 
+      const iconW = node.icon ? 22 : 0;
+      const iconHalf = 10;
+      let iconX = null;
+
       const displayRef = node.ref ? this.formatScripturePillRef(node.ref) : '';
       const refPillW = node.ref ? (node.refPillWidth || Math.max(38, this.getTextWidth(displayRef, 9.5, '700') + 14)) : 0;
       const notePillW = node.note ? 18 : 0;
 
       if (node.isFloating) {
-        if (!node.marker && !node.ref && !node.note) {
+        if (!node.marker && !node.icon && !node.ref && !node.note) {
           text.setAttribute('text-anchor', 'middle');
           text.setAttribute('x', 0);
         } else {
           let totalContent = textW;
           if (node.marker) totalContent += markerW;
+          if (node.icon) totalContent += iconW;
           if (node.ref) totalContent += refPillW + 6;
           if (node.note) totalContent += notePillW + 6;
 
@@ -3261,6 +3413,10 @@ const MindMapView = {
           if (node.marker) {
             markerX = curX + markerHalf;
             curX += markerW;
+          }
+          if (node.icon) {
+            iconX = curX + iconHalf;
+            curX += iconW;
           }
           textX = curX;
           text.setAttribute('text-anchor', 'start');
@@ -3279,9 +3435,10 @@ const MindMapView = {
           }
         }
       } else if (isTopDown || node.side === 'right') {
-        // De gauche à droite : [Marker] -> Texte -> [Ref] -> [Note]
+        // De gauche à droite : [Marker] -> [Icon] -> Texte -> [Ref] -> [Note]
         let totalContent = textW;
         if (node.marker) totalContent += markerW;
+        if (node.icon) totalContent += iconW;
         if (node.ref) totalContent += refPillW + 6;
         if (node.note) totalContent += notePillW + 6;
 
@@ -3289,6 +3446,10 @@ const MindMapView = {
         if (node.marker) {
           markerX = curX + markerHalf;
           curX += markerW;
+        }
+        if (node.icon) {
+          iconX = curX + iconHalf;
+          curX += iconW;
         }
         textX = curX;
         text.setAttribute('text-anchor', 'start');
@@ -3306,12 +3467,12 @@ const MindMapView = {
           curX += notePillW;
         }
       } else {
-        // Branche à gauche : De gauche à droite [Note] -> [Ref] -> [Marker] -> Texte
-        // L'icône de note et la pastille sont côté extérieur gauche, le texte à droite vers la branche
+        // Branche à gauche : De gauche à droite [Note] -> [Ref] -> [Marker] -> [Icon] -> Texte
         let totalContent = textW;
         if (node.note) totalContent += notePillW + 6;
         if (node.ref) totalContent += refPillW + 6;
         if (node.marker) totalContent += markerW;
+        if (node.icon) totalContent += iconW;
 
         let curX = -totalContent / 2;
         if (node.note) {
@@ -3325,6 +3486,10 @@ const MindMapView = {
         if (node.marker) {
           markerX = curX + markerHalf;
           curX += markerW;
+        }
+        if (node.icon) {
+          iconX = curX + iconHalf;
+          curX += iconW;
         }
         textX = curX;
         text.setAttribute('text-anchor', 'start');
@@ -3381,6 +3546,41 @@ const MindMapView = {
           });
 
           g.appendChild(markerG);
+        }
+      }
+
+      // Badge Icône SVG vectorielle (pur SVG sans emoji)
+      if (node.icon && iconX !== null && typeof SvgIconsRegistry !== 'undefined') {
+        const iconDef = SvgIconsRegistry.get(node.icon);
+        if (iconDef) {
+          const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          iconG.setAttribute('transform', `translate(${iconX}, ${isBox ? 0 : 2})`);
+          iconG.setAttribute('class', 'mm-node-icon-badge');
+          iconG.setAttribute('style', 'cursor: pointer;');
+          iconG.setAttribute('title', `Icône SVG : ${iconDef.label} (Cliquer pour modifier ou [I])`);
+
+          // Zone tactile de clic
+          const iHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          iHit.setAttribute('r', 11);
+          iHit.setAttribute('fill', 'transparent');
+          iconG.appendChild(iHit);
+
+          const svgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          svgWrap.setAttribute('transform', 'translate(-7.5, -7.5) scale(0.64)');
+          svgWrap.setAttribute('fill', 'none');
+          svgWrap.setAttribute('stroke', isBox ? (node.color || 'var(--text-main)') : (node.color || 'var(--accent-blue)'));
+          svgWrap.setAttribute('stroke-width', '2.2');
+          svgWrap.setAttribute('stroke-linecap', 'round');
+          svgWrap.setAttribute('stroke-linejoin', 'round');
+          svgWrap.innerHTML = iconDef.path;
+          iconG.appendChild(svgWrap);
+
+          iconG.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openIconPicker(node.id);
+          });
+
+          g.appendChild(iconG);
         }
       }
 
@@ -4120,7 +4320,17 @@ const MindMapView = {
       }
 
       if (newText !== null) {
-        node.text = newText;
+        // Détection intelligente d'un mot-clé d'icône SVG tapé : ::croix, ::bible, etc.
+        const iconMatch = newText.match(/::([a-zA-Z0-9_-]+):?/i);
+        if (iconMatch && typeof SvgIconsRegistry !== 'undefined') {
+          const candidate = iconMatch[1].toLowerCase();
+          if (SvgIconsRegistry.has(candidate)) {
+            node.icon = candidate;
+            newText = newText.replace(iconMatch[0], '').trim();
+          }
+        }
+
+        node.text = newText || (node.icon ? SvgIconsRegistry.get(node.icon)?.label?.toUpperCase() : 'MOT-CLÉ');
         if (nodeId === 'root' && this.currentNote) {
           this.currentNote.title = newText;
           const titleInput = document.getElementById('note-edit-title');
@@ -4959,6 +5169,12 @@ const MindMapView = {
 
     let itemsHtml = '';
 
+    const nodeText = isRoot ? (this.tree?.text || 'Sujet Central') : (node?.text || '');
+    const topSuggestions = (typeof SvgIconsRegistry !== 'undefined' && nodeText)
+      ? SvgIconsRegistry.suggestIconsForText(nodeText, 1)
+      : [];
+    const topSuggestion = topSuggestions[0] || null;
+
     if (isBranch) {
       // 1. Clic droit sur une BRANCHE / SOUS-BRANCHE
       itemsHtml = `
@@ -5022,6 +5238,20 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Marqueur / Priorité...</span>
           <span class="mm-ctx-shortcut">1-9</span>
+        </div>
+        ${(topSuggestion && topSuggestion.id !== node?.icon) ? `
+          <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
+            <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
+            <span class="mm-ctx-label">✨ Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+            <span class="mm-ctx-shortcut">1-clic</span>
+          </div>
+        ` : ''}
+        <div class="mm-ctx-item" data-action="svg-icon">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
+          </span>
+          <span class="mm-ctx-label">${node?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
+          <span class="mm-ctx-shortcut">I</span>
         </div>
         ${(node?.offsetX || node?.offsetY) ? `
           <div class="mm-ctx-item" data-action="reset-position">
@@ -5089,6 +5319,20 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Renommer le concept central</span>
           <span class="mm-ctx-shortcut">Double-clic</span>
+        </div>
+        ${(topSuggestion && topSuggestion.id !== this.tree?.icon) ? `
+          <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
+            <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
+            <span class="mm-ctx-label">✨ Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+            <span class="mm-ctx-shortcut">1-clic</span>
+          </div>
+        ` : ''}
+        <div class="mm-ctx-item" data-action="svg-icon">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
+          </span>
+          <span class="mm-ctx-label">${this.tree?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
+          <span class="mm-ctx-shortcut">I</span>
         </div>
         ${this.clipboardNode ? `
           <div class="mm-ctx-item" data-action="paste">
@@ -5353,6 +5597,18 @@ const MindMapView = {
               this.toggleMarkerPopover(true);
             }
             break;
+          case 'svg-icon':
+            if (targetNodeId) {
+              this.openIconPicker(targetNodeId, clientX, clientY);
+            }
+            break;
+          case 'auto-suggest-icon': {
+            const iconId = item.getAttribute('data-icon-id');
+            if (targetNodeId && iconId) {
+              this.setNodeIcon(targetNodeId, iconId);
+            }
+            break;
+          }
           case 'reset-position':
             if (node) {
               node.offsetX = 0;
@@ -5610,6 +5866,91 @@ const MindMapView = {
         ${def.label}
       </span>
     `;
+  },
+
+  renderOutlineIconPill(node) {
+    if (!node || !node.icon || typeof SvgIconsRegistry === 'undefined') return '';
+    const def = SvgIconsRegistry.get(node.icon);
+    if (!def) return '';
+    return `
+      <span class="mm-outline-icon-badge" data-id="${node.id}" title="Icône SVG : ${def.label} (Cliquer pour changer ou [I])">
+        ${SvgIconsRegistry.getSvg(node.icon, 14)}
+      </span>
+    `;
+  },
+
+  openIconPicker(nodeId, fallbackX = null, fallbackY = null) {
+    if (!nodeId) return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+
+    let anchorRect = null;
+    const nodeEl = document.querySelector(`.mm-node-g[data-id="${nodeId}"]`);
+    if (nodeEl) {
+      const r = nodeEl.getBoundingClientRect();
+      if (r && (r.width > 0 || r.height > 0)) {
+        anchorRect = r;
+      }
+    }
+    if (!anchorRect) {
+      const outlineEl = document.querySelector(`.mm-outline-item[data-id="${nodeId}"], [data-node-id="${nodeId}"]`);
+      if (outlineEl) {
+        const r = outlineEl.getBoundingClientRect();
+        if (r && (r.width > 0 || r.height > 0)) {
+          anchorRect = r;
+        }
+      }
+    }
+    if (!anchorRect && fallbackX !== null && fallbackY !== null) {
+      anchorRect = {
+        left: fallbackX,
+        top: fallbackY,
+        width: 0,
+        height: 0,
+        right: fallbackX,
+        bottom: fallbackY
+      };
+    }
+
+    if (typeof SvgIconsRegistry !== 'undefined') {
+      SvgIconsRegistry.openPicker({
+        anchorRect: anchorRect,
+        title: `Icône SVG : ${node.text || 'Nœud'}`,
+        currentText: node.text || '',
+        currentValue: node.icon || null,
+        onSelect: (iconId) => {
+          this.setNodeIcon(nodeId, iconId);
+        },
+        onRemove: () => {
+          this.setNodeIcon(nodeId, null);
+        }
+      });
+    }
+  },
+
+  setNodeIcon(nodeId, iconId) {
+    if (!nodeId) return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+
+    const cleanIcon = iconId ? String(iconId).trim().toLowerCase() : null;
+    node.icon = cleanIcon;
+    if (nodeId === 'root' && this.currentNote) {
+      this.currentNote.rootIcon = cleanIcon;
+    }
+    this.layoutTree();
+    this.draw();
+    this.syncAndAutoSave();
+    if (this.viewMode === 'outline') {
+      this.renderOutlineView();
+    }
+    if (typeof App !== 'undefined' && App.showToast) {
+      if (cleanIcon && typeof SvgIconsRegistry !== 'undefined' && SvgIconsRegistry.get(cleanIcon)) {
+        App.showToast(`Icône SVG « ${SvgIconsRegistry.get(cleanIcon).label} » appliquée`);
+      } else {
+        App.showToast('Icône SVG retirée');
+      }
+    }
   },
 
   // =========================================================================
@@ -7073,8 +7414,6 @@ const MindMapView = {
       headerBtn.title = isActive ? 'Quitter le plein écran (Échap ou F11)' : 'Mode Plein Écran (F11 ou F)';
       headerBtn.querySelector('.icon-mm-fullscreen-enter')?.classList.toggle('hidden', isActive);
       headerBtn.querySelector('.icon-mm-fullscreen-exit')?.classList.toggle('hidden', !isActive);
-      const label = headerBtn.querySelector('#label-mm-fullscreen');
-      if (label) label.textContent = isActive ? 'Réduire' : 'Plein écran';
     }
 
     // 2. Bouton du dock flottant inférieur

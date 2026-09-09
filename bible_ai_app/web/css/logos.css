@@ -36313,7 +36313,7 @@ body.theme-dark .note-badge-inline-input {
   color: #f8fafc;
 }
 
-/* Adaptation responsive des actions de note pour maximiser l'espace titre & tags */
+/* Adaptation des actions de note : boutons compacts en icône seule pour maximiser l'espace titre & tags */
 .note-actions {
   display: flex;
   align-items: center;
@@ -36321,20 +36321,39 @@ body.theme-dark .note-badge-inline-input {
   flex-shrink: 0;
 }
 
-@media (max-width: 1350px) {
+.note-actions .btn-secondary,
+.note-actions #btn-toggle-mindmap-mode,
+.note-actions #btn-toggle-mindmap-fullscreen,
+.note-actions #btn-toggle-note-preview,
+.note-actions #btn-note-undo,
+.note-actions #btn-note-redo {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.note-actions #btn-export-mindmap {
+  width: auto;
+  min-width: 34px;
+  height: 32px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 6px;
+}
+
+@media (max-width: 1200px) {
   #note-edit-ai-toggle-label span {
     display: none;
   }
   #note-autosave-indicator span {
-    display: none;
-  }
-}
-
-@media (max-width: 1180px) {
-  #btn-notes-markdown-guide span {
-    display: none;
-  }
-  #btn-toggle-note-preview span {
     display: none;
   }
 }
@@ -37040,3 +37059,544 @@ body[class*="palette-dark"] .mm-export-preview-box {
   background: #0f172a;
   border-color: #334155;
 }
+
+/* =========================================================================
+   SYSTÈME D'ICÔNES VECTORIELLES SVG (NOTES & MIND MAP) - 100% PUR SVG
+   ========================================================================= */
+
+.svg-picker-popover {
+  position: fixed;
+  z-index: 99999;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: svgPickerFadeIn 0.16s ease-out;
+  overflow: hidden;
+  user-select: none;
+  font-family: inherit;
+}
+
+.svg-picker-popover.centered {
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  animation: svgPickerFadeInCenter 0.16s ease-out !important;
+}
+
+body.theme-dark .svg-picker-popover,
+body[class*="palette-dark"] .svg-picker-popover {
+  background: #181e29;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+@keyframes svgPickerFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes svgPickerFadeInCenter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.svg-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+}
+
+body.theme-dark .svg-picker-header,
+body[class*="palette-dark"] .svg-picker-header {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.svg-picker-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main, #1e293b);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+body.theme-dark .svg-picker-title,
+body[class*="palette-dark"] .svg-picker-title {
+  color: #f1f5f9;
+}
+
+.svg-picker-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--text-muted, #64748b);
+  transition: all 0.15s ease;
+}
+
+.svg-picker-close-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-main, #0f172a);
+}
+
+body.theme-dark .svg-picker-close-btn:hover,
+body[class*="palette-dark"] .svg-picker-close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+
+.svg-picker-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  position: relative;
+}
+
+body.theme-dark .svg-picker-search-bar,
+body[class*="palette-dark"] .svg-picker-search-bar {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.svg-picker-search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--text-main, #0f172a);
+  font-family: inherit;
+}
+
+body.theme-dark .svg-picker-search-bar input,
+body[class*="palette-dark"] .svg-picker-search-bar input {
+  color: #f8fafc;
+}
+
+.svg-picker-search-bar input::placeholder {
+  color: var(--text-muted, #94a3b8);
+  font-size: 12px;
+}
+
+.svg-picker-hint {
+  font-size: 10px;
+  color: var(--text-muted, #64748b);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.svg-picker-hint kbd {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+  font-size: 9px;
+  font-family: inherit;
+}
+
+body.theme-dark .svg-picker-hint kbd,
+body[class*="palette-dark"] .svg-picker-hint kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+.svg-picker-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  max-height: 320px;
+}
+
+.svg-picker-category-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted, #94a3b8);
+  margin: 10px 0 6px 4px;
+}
+
+.svg-picker-category-title:first-child {
+  margin-top: 2px;
+}
+
+.svg-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.svg-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 4px;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-main, #334155);
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+body.theme-dark .svg-picker-item,
+body[class*="palette-dark"] .svg-picker-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+}
+
+.svg-picker-item:hover,
+.svg-picker-item.selected {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: var(--accent-blue, #3b82f6);
+  color: var(--accent-blue, #3b82f6);
+  transform: translateY(-1px);
+}
+
+body.theme-dark .svg-picker-item:hover,
+body[class*="palette-dark"] .svg-picker-item:hover,
+body.theme-dark .svg-picker-item.selected,
+body[class*="palette-dark"] .svg-picker-item.selected {
+  background: rgba(96, 165, 250, 0.16);
+  border-color: #60a5fa;
+  color: #93c5fd;
+}
+
+.svg-picker-item.active {
+  border-color: var(--accent-blue, #3b82f6);
+  background: rgba(59, 130, 246, 0.18);
+  font-weight: 700;
+}
+
+.svg-picker-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+}
+
+.svg-picker-item-label {
+  font-size: 11px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 95%;
+}
+
+.svg-picker-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.svg-picker-footer {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+}
+
+body.theme-dark .svg-picker-footer,
+body[class*="palette-dark"] .svg-picker-footer {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.svg-picker-remove-btn {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  color: #ef4444;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.svg-picker-remove-btn:hover {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: #ef4444;
+}
+
+/* =========================================================================
+   ICÔNES SVG INLINE DANS L'ÉDITEUR DE NOTES & APERÇU
+   ========================================================================= */
+
+.note-svg-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: -0.22em;
+  margin: 0 0.28em;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--accent-blue, #2563eb);
+  user-select: all;
+  line-height: 1;
+  transition: all 0.15s ease;
+  cursor: default;
+}
+
+body.theme-dark .note-svg-icon,
+body[class*="palette-dark"] .note-svg-icon {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+}
+
+.note-svg-icon:hover {
+  background: rgba(59, 130, 246, 0.16);
+}
+
+body.theme-dark .note-svg-icon:hover,
+body[class*="palette-dark"] .note-svg-icon:hover {
+  background: rgba(96, 165, 250, 0.22);
+}
+
+.note-svg-icon svg {
+  display: block;
+}
+
+/* =========================================================================
+   BADGES D'ICÔNES SVG DANS LA MIND MAP
+   ========================================================================= */
+
+.mm-node-icon-badge {
+  cursor: pointer;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease;
+}
+
+.mm-node-icon-badge:hover {
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 6px var(--node-color, rgba(59, 130, 246, 0.6)));
+}
+
+.mm-root-icon-badge {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mm-root-icon-badge:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 10px var(--node-color, rgba(59, 130, 246, 0.8)));
+}
+
+.mm-outline-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  vertical-align: middle;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue, #3b82f6);
+  transition: all 0.15s ease;
+}
+
+.mm-outline-icon-badge:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.1);
+}
+
+body.theme-dark .mm-outline-icon-badge,
+body[class*="palette-dark"] .mm-outline-icon-badge {
+  background: rgba(96, 165, 250, 0.14);
+  color: #60a5fa;
+}
+
+/* ==========================================================================
+   SUGGESTIONS AUTOMATIQUES DE SYMBOLES SVG (100% LOCAL, SANS LLM)
+   ========================================================================== */
+
+.mm-ctx-item.mm-ctx-item-suggest {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08));
+  border: 1px dashed rgba(59, 130, 246, 0.35);
+  margin-bottom: 3px;
+  color: var(--accent-blue, #2563eb);
+}
+
+.mm-ctx-item.mm-ctx-item-suggest:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.18));
+  border-color: rgba(59, 130, 246, 0.7);
+  color: var(--accent-blue, #1d4ed8);
+}
+
+body.theme-dark .mm-ctx-item.mm-ctx-item-suggest,
+body[class*="palette-dark"] .mm-ctx-item.mm-ctx-item-suggest {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.14), rgba(167, 139, 250, 0.14));
+  border-color: rgba(96, 165, 250, 0.4);
+  color: #93c5fd;
+}
+
+body.theme-dark .mm-ctx-item.mm-ctx-item-suggest:hover,
+body[class*="palette-dark"] .mm-ctx-item.mm-ctx-item-suggest:hover {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(167, 139, 250, 0.25));
+  border-color: rgba(96, 165, 250, 0.8);
+  color: #bfdbfe;
+}
+
+.mm-ctx-item.mm-ctx-item-suggest .mm-ctx-shortcut {
+  font-size: 10px;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.16);
+  color: #2563eb;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+body.theme-dark .mm-ctx-item.mm-ctx-item-suggest .mm-ctx-shortcut,
+body[class*="palette-dark"] .mm-ctx-item.mm-ctx-item-suggest .mm-ctx-shortcut {
+  background: rgba(96, 165, 250, 0.22);
+  color: #93c5fd;
+}
+
+/* Palette SVG Picker - Section Suggestions */
+.svg-picker-suggestions-section {
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+  background: rgba(59, 130, 246, 0.04);
+}
+
+body.theme-dark .svg-picker-suggestions-section,
+body[class*="palette-dark"] .svg-picker-suggestions-section {
+  border-bottom-color: #334155;
+  background: rgba(96, 165, 250, 0.06);
+}
+
+.svg-picker-suggestions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.svg-picker-suggestions-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue, #2563eb);
+}
+
+body.theme-dark .svg-picker-suggestions-badge,
+body[class*="palette-dark"] .svg-picker-suggestions-badge {
+  color: #93c5fd;
+}
+
+.svg-picker-suggestions-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.svg-picker-suggestion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #0f172a);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+body.theme-dark .svg-picker-suggestion-chip,
+body[class*="palette-dark"] .svg-picker-suggestion-chip {
+  background: #1e293b;
+  border-color: rgba(96, 165, 250, 0.25);
+  color: #f1f5f9;
+}
+
+.svg-picker-suggestion-chip:hover {
+  background: var(--accent-blue, #2563eb);
+  border-color: var(--accent-blue, #2563eb);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+}
+
+body.theme-dark .svg-picker-suggestion-chip:hover,
+body[class*="palette-dark"] .svg-picker-suggestion-chip:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.35);
+}
+
+.svg-picker-suggestion-chip .svg-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.svg-picker-suggestion-chip .svg-chip-label {
+  line-height: 1;
+}
+
+
