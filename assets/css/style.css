@@ -7072,3 +7072,266 @@ html:not([data-theme="light"]) .comm-body-box {
   }
 }
 
+/* ==========================================================================
+   Section Mindmap (Cartes Mentales & Icônes Vectorielles)
+   ========================================================================== */
+.section-mindmap {
+  background: var(--bg-surface);
+  padding: 100px 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.section-mindmap::before {
+  content: '';
+  position: absolute;
+  top: -150px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(14, 165, 233, 0) 70%);
+  pointer-events: none;
+}
+
+.section-mindmap::after {
+  content: '';
+  position: absolute;
+  bottom: -150px;
+  left: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.10) 0%, rgba(217, 119, 6, 0) 70%);
+  pointer-events: none;
+}
+
+.mindmap-showcase-wrapper {
+  margin: 40px auto 55px;
+  max-width: 1100px;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.mindmap-window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg-surface-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mindmap-window-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mindmap-window-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.mindmap-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+.mindmap-dot.red { background: #ef4444; }
+.mindmap-dot.yellow { background: #f59e0b; }
+.mindmap-dot.green { background: #10b981; }
+
+.mindmap-window-title {
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mindmap-window-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mindmap-view-toggle {
+  display: flex;
+  background: var(--bg-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.mindmap-toggle-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mindmap-toggle-btn.active,
+.mindmap-toggle-btn:hover {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.mindmap-export-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mindmap-export-badge-btn:hover {
+  background: var(--accent-cyan);
+  color: #0b0f17;
+}
+
+/* Stage de Dessin SVG interactif */
+.mindmap-canvas-stage {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  background: radial-gradient(circle at center, rgba(15, 23, 42, 0.6) 0%, rgba(11, 15, 23, 0.98) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: background 0.4s ease;
+}
+
+[data-theme="light"] .mindmap-canvas-stage {
+  background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+}
+
+.mindmap-canvas-stage.paper-mode {
+  background: #fbf7ee !important;
+}
+
+.mindmap-svg-art {
+  width: 100%;
+  height: 100%;
+  max-width: 1050px;
+}
+
+/* Grille des 4 Piliers Mind Map */
+.mindmap-features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 30px;
+}
+
+@media (max-width: 1024px) {
+  .mindmap-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .mindmap-features-grid {
+    grid-template-columns: 1fr;
+  }
+  .mindmap-canvas-stage {
+    height: 400px;
+  }
+}
+
+.mm-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 26px 22px;
+  transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+}
+
+.mm-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.mm-card-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.mm-card-icon-wrap.cyan { background: rgba(14, 165, 233, 0.12); color: var(--accent-cyan); }
+.mm-card-icon-wrap.gold { background: rgba(245, 158, 11, 0.12); color: var(--accent-gold); }
+.mm-card-icon-wrap.emerald { background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); }
+.mm-card-icon-wrap.purple { background: rgba(168, 85, 247, 0.12); color: var(--accent-purple); }
+
+.mm-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.mm-card-desc {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Barre de raccourcis sous la carte */
+.mindmap-shortcuts-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 36px;
+  padding: 14px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 30px;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+}
+
+.mindmap-shortcuts-bar kbd {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+

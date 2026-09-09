@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLightboxModal();
   initTerminalTabs();
   initMobileMenu();
+  initMindmapShowcase();
 });
 
 /* ==========================================================================
@@ -1544,5 +1545,56 @@ function initMobileMenu() {
       toggleBtn.setAttribute('aria-expanded', 'false');
     }
   });
+}
+
+/* ==========================================================================
+   9. MINDMAP SHOWCASE INTERACTIONS
+   ========================================================================== */
+function initMindmapShowcase() {
+  const stage = document.getElementById('mm-canvas-stage');
+  const btnDark = document.getElementById('btn-mm-theme-dark');
+  const btnPaper = document.getElementById('btn-mm-theme-paper');
+  const btnPdf = document.getElementById('btn-mm-demo-pdf');
+  const btnPng = document.getElementById('btn-mm-demo-png');
+  if (!stage) return;
+
+  if (btnDark && btnPaper) {
+    btnPaper.addEventListener('click', () => {
+      stage.classList.add('paper-mode');
+      btnPaper.classList.add('active');
+      btnDark.classList.remove('active');
+    });
+
+    btnDark.addEventListener('click', () => {
+      stage.classList.remove('paper-mode');
+      btnDark.classList.add('active');
+      btnPaper.classList.remove('active');
+    });
+  }
+
+  const showToast = (msg) => {
+    let toast = document.getElementById('mm-toast-notice');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'mm-toast-notice';
+      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);color:#38bdf8;padding:12px 24px;border:1px solid rgba(56,189,248,0.4);border-radius:30px;font-size:0.88rem;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:9999;transition:opacity 0.3s ease;pointer-events:none;display:flex;align-items:center;gap:8px;';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> ${msg}`;
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 3200);
+  };
+
+  if (btnPdf) {
+    btnPdf.addEventListener('click', () => {
+      showToast("Démonstration : Export PDF vectoriel HD généré (prêt pour impression traceur/cours)");
+    });
+  }
+
+  if (btnPng) {
+    btnPng.addEventListener('click', () => {
+      showToast("Démonstration : Image PNG transparente haute résolution prête pour vos diaporamas");
+    });
+  }
 }
 

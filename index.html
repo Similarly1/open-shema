@@ -53,10 +53,11 @@
         <span class="brand-badge">Open Source</span>
       </a>
 
-      <!-- Menu supérieur épuré à 4 liens clés -->
+      <!-- Menu supérieur épuré à 5 liens clés -->
       <nav>
         <ul class="nav-links">
           <li><a href="#features" class="nav-link">Fonctionnalités</a></li>
+          <li><a href="#mindmap" class="nav-link">Cartes Mentales</a></li>
           <li><a href="#ia-personnalisee" class="nav-link">IA & RAG</a></li>
           <li><a href="#comparatif" class="nav-link">Comparatif</a></li>
           <li><a href="#galerie" class="nav-link">Captures</a></li>
@@ -1773,6 +1774,260 @@
           </button>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Cartes Mentales (Mind Maps) & 121 Icônes Vectorielles -->
+  <section class="section section-mindmap" id="mindmap">
+    <div class="container">
+      <div class="section-header reveal-on-scroll">
+        <span class="section-eyebrow">Pensée Visuelle &amp; Exégèse Arborescente</span>
+        <h2 class="section-title">Cartes Mentales &amp; 121 Icônes Vectorielles</h2>
+        <p class="section-desc">
+          Structurez vos synthèses théologiques, plans de prédication et analyses textuelles en cartes mentales interactives. Conçues selon les principes organiques de Tony Buzan, enrichies de 121 icônes chrétiennes sans émoji et exportables en un clic en PDF vectoriel haute définition.
+        </p>
+      </div>
+
+      <!-- Showcase Interactif Mind Map -->
+      <div class="mindmap-showcase-wrapper reveal-on-scroll">
+        <!-- Barre de fenêtre -->
+        <div class="mindmap-window-header">
+          <div class="mindmap-window-title-wrap">
+            <div class="mindmap-window-dots">
+              <span class="mindmap-dot red"></span>
+              <span class="mindmap-dot yellow"></span>
+              <span class="mindmap-dot green"></span>
+            </div>
+            <div class="mindmap-window-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>Éphésiens 6:10-18 — L'Armure de Dieu (Carte Exégétique)</span>
+            </div>
+          </div>
+
+          <div class="mindmap-window-tools">
+            <!-- Sélecteur de Vue -->
+            <div class="mindmap-view-toggle">
+              <button type="button" class="mindmap-toggle-btn active" id="btn-mm-theme-dark">Mode Sombre</button>
+              <button type="button" class="mindmap-toggle-btn" id="btn-mm-theme-paper">Mode Papier Sépia</button>
+            </div>
+
+            <!-- Boutons d'export rapide -->
+            <button type="button" class="mindmap-export-badge-btn" id="btn-mm-demo-pdf" title="Exporter en PDF Vectoriel">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>PDF Vectoriel HD</span>
+            </button>
+            <button type="button" class="mindmap-export-badge-btn" id="btn-mm-demo-png" title="Exporter en PNG Transparent">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>PNG Transparent</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scène Interactive SVG (Arborescence Buzan) -->
+        <div class="mindmap-canvas-stage" id="mm-canvas-stage">
+          <svg class="mindmap-svg-art" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Filtre de lueur subtile -->
+              <filter id="mm-glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="6" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+              <!-- Dégradés de branches -->
+              <linearGradient id="grad-truth" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#38bdf8" />
+                <stop offset="100%" stop-color="#0284c7" />
+              </linearGradient>
+              <linearGradient id="grad-justice" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#34d399" />
+                <stop offset="100%" stop-color="#059669" />
+              </linearGradient>
+              <linearGradient id="grad-peace" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#fbbf24" />
+                <stop offset="100%" stop-color="#d97706" />
+              </linearGradient>
+              <linearGradient id="grad-faith" x1="100%" y1="0%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#818cf8" />
+                <stop offset="100%" stop-color="#4f46e5" />
+              </linearGradient>
+              <linearGradient id="grad-salvation" x1="100%" y1="0%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#c084fc" />
+                <stop offset="100%" stop-color="#9333ea" />
+              </linearGradient>
+              <linearGradient id="grad-sword" x1="100%" y1="0%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#fb7185" />
+                <stop offset="100%" stop-color="#e11d48" />
+              </linearGradient>
+            </defs>
+
+            <!-- Lignes de branches organiques (Courbes de Buzan) -->
+            <!-- 1. Nord-Est : Vérité -->
+            <path d="M 500 220 C 560 150, 630 115, 710 110" fill="none" stroke="url(#grad-truth)" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M 780 110 C 815 85, 835 75, 875 75" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M 780 110 C 815 130, 840 145, 880 145" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" />
+
+            <!-- 2. Est : Justice -->
+            <path d="M 610 250 C 670 250, 710 250, 750 250" fill="none" stroke="url(#grad-justice)" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M 825 250 C 855 228, 875 220, 905 220" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M 825 250 C 855 272, 875 280, 910 280" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" />
+
+            <!-- 3. Sud-Est : Zèle de l'Évangile -->
+            <path d="M 500 280 C 560 350, 630 385, 710 390" fill="none" stroke="url(#grad-peace)" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M 780 390 C 815 365, 835 355, 875 355" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M 780 390 C 815 410, 840 425, 880 425" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" />
+
+            <!-- 4. Sud-Ouest : Foi -->
+            <path d="M 500 280 C 440 350, 370 385, 290 390" fill="none" stroke="url(#grad-faith)" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M 220 390 C 185 365, 165 355, 125 355" fill="none" stroke="#818cf8" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M 220 390 C 185 410, 160 425, 120 425" fill="none" stroke="#818cf8" stroke-width="2.2" stroke-linecap="round" />
+
+            <!-- 5. Ouest : Salut -->
+            <path d="M 390 250 C 330 250, 290 250, 250 250" fill="none" stroke="url(#grad-salvation)" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M 175 250 C 145 228, 125 220, 95 220" fill="none" stroke="#c084fc" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M 175 250 C 145 272, 125 280, 90 280" fill="none" stroke="#c084fc" stroke-width="2.2" stroke-linecap="round" />
+
+            <!-- 6. Nord-Ouest : Épée de l'Esprit -->
+            <path d="M 500 220 C 440 150, 370 115, 290 110" fill="none" stroke="url(#grad-sword)" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M 220 110 C 185 85, 165 75, 125 75" fill="none" stroke="#fb7185" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M 220 110 C 185 130, 160 145, 120 145" fill="none" stroke="#fb7185" stroke-width="2.2" stroke-linecap="round" />
+
+            <!-- ================= NŒUD CENTRAL ================= -->
+            <g class="mm-node-root" style="cursor: pointer;">
+              <!-- Halo rayonnant -->
+              <rect x="382" y="217" width="236" height="66" rx="16" fill="rgba(14, 165, 233, 0.15)" filter="url(#mm-glow)" />
+              <rect x="385" y="220" width="230" height="60" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-width="2.2" />
+              <!-- Icône Bouclier Centrée -->
+              <path d="M 412 242 C 412 236, 424 233, 424 233 C 424 233, 436 236, 436 242 C 436 254, 424 263, 424 265 C 424 263, 412 254, 412 242 Z" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round" />
+              <text x="448" y="246" font-family="'Cinzel', 'EB Garamond', serif" font-size="14" font-weight="700" fill="#f8fafc" letter-spacing="1">L'ARMURE DE DIEU</text>
+              <text x="448" y="264" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#38bdf8">Éphésiens 6:10-18</text>
+            </g>
+
+            <!-- ================= NŒUDS DE BRANCHES NORD-EST (VÉRITÉ) ================= -->
+            <g class="mm-branch-group" style="cursor: pointer;">
+              <rect x="690" y="93" width="135" height="34" rx="17" fill="#0f172a" stroke="#0284c7" stroke-width="1.8" />
+              <!-- Icône Ceinture -->
+              <circle cx="708" cy="110" r="6" fill="none" stroke="#38bdf8" stroke-width="1.6" />
+              <line x1="705" y1="110" x2="711" y2="110" stroke="#38bdf8" stroke-width="1.6" />
+              <text x="722" y="115" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#e2e8f0">VÉRITÉ (v.14)</text>
+              <!-- Feuilles -->
+              <text x="885" y="79" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Intégrité du cœur</text>
+              <text x="890" y="149" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Révélation divine</text>
+            </g>
+
+            <!-- ================= NŒUDS DE BRANCHES EST (JUSTICE) ================= -->
+            <g class="mm-branch-group" style="cursor: pointer;">
+              <rect x="735" y="233" width="145" height="34" rx="17" fill="#0f172a" stroke="#059669" stroke-width="1.8" />
+              <!-- Icône Cuirasse -->
+              <path d="M 750 242 L 758 242 L 762 249 L 754 257 L 746 249 Z" fill="none" stroke="#34d399" stroke-width="1.6" />
+              <text x="769" y="255" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#e2e8f0">JUSTICE (v.14)</text>
+              <!-- Feuilles -->
+              <text x="915" y="224" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Justice de Christ</text>
+              <text x="920" y="284" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Sainteté pratique</text>
+            </g>
+
+            <!-- ================= NŒUDS DE BRANCHES SUD-EST (ZÈLE / ÉVANGILE) ================= -->
+            <g class="mm-branch-group" style="cursor: pointer;">
+              <rect x="690" y="373" width="135" height="34" rx="17" fill="#0f172a" stroke="#d97706" stroke-width="1.8" />
+              <!-- Icône Chaussures / Marche -->
+              <path d="M 703 394 C 707 394 713 392 715 387" fill="none" stroke="#fbbf24" stroke-width="1.6" />
+              <text x="724" y="395" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#e2e8f0">LE ZÈLE (v.15)</text>
+              <!-- Feuilles -->
+              <text x="885" y="359" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Préparation active</text>
+              <text x="890" y="429" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Évangile de Paix</text>
+            </g>
+
+            <!-- ================= NŒUDS DE BRANCHES SUD-OUEST (FOI) ================= -->
+            <g class="mm-branch-group" style="cursor: pointer;">
+              <rect x="175" y="373" width="135" height="34" rx="17" fill="#0f172a" stroke="#4f46e5" stroke-width="1.8" />
+              <!-- Icône Bouclier -->
+              <path d="M 191 385 C 191 381 198 379 198 379 C 198 379 205 381 205 385 C 205 393 198 398 198 399 C 198 398 191 393 191 385 Z" fill="none" stroke="#818cf8" stroke-width="1.6" />
+              <text x="214" y="395" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#e2e8f0">LA FOI (v.16)</text>
+              <!-- Feuilles -->
+              <text x="3" y="359" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Traits enflammés éteints</text>
+              <text x="5" y="429" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Confiance inébranlable</text>
+            </g>
+
+            <!-- ================= NŒUDS DE BRANCHES OUEST (SALUT) ================= -->
+            <g class="mm-branch-group" style="cursor: pointer;">
+              <rect x="120" y="233" width="145" height="34" rx="17" fill="#0f172a" stroke="#9333ea" stroke-width="1.8" />
+              <!-- Icône Casque -->
+              <path d="M 136 254 C 136 244 148 244 148 254 Z" fill="none" stroke="#c084fc" stroke-width="1.6" />
+              <text x="156" y="255" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#e2e8f0">LE SALUT (v.17)</text>
+              <!-- Feuilles -->
+              <text x="2" y="224" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Garde des pensées</text>
+              <text x="15" y="284" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Espérance vivante</text>
+            </g>
+
+            <!-- ================= NŒUDS DE BRANCHES NORD-OUEST (ÉPÉE / PAROLE) ================= -->
+            <g class="mm-branch-group" style="cursor: pointer;">
+              <rect x="175" y="93" width="135" height="34" rx="17" fill="#0f172a" stroke="#e11d48" stroke-width="1.8" />
+              <!-- Icône Épée -->
+              <line x1="193" y1="117" x2="203" y2="103" stroke="#fb7185" stroke-width="1.8" />
+              <line x1="192" y1="113" x2="197" y2="117" stroke="#fb7185" stroke-width="1.8" />
+              <text x="214" y="115" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#e2e8f0">L'ÉPÉE (v.17)</text>
+              <!-- Feuilles -->
+              <text x="18" y="79" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Parole de Dieu (Rhêma)</text>
+              <text x="32" y="149" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8">Combat par la prière</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Grille des 4 Piliers Clés de la Carte Mentale -->
+      <div class="mindmap-features-grid reveal-on-scroll">
+        <!-- 1. 121 Icônes Vectorielles -->
+        <div class="mm-card">
+          <div class="mm-card-icon-wrap cyan">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 16 12 12 8"></polygon></svg>
+          </div>
+          <h3 class="mm-card-title">121 Icônes Vectorielles (0% Émoji)</h3>
+          <p class="mm-card-desc">
+            Symboles chrétiens et théologiques nobles tracés au trait fin, auto-colorés selon votre thème. Saisie instantanée <code>::id</code>, thésaurus de 296 correspondances et raccourci dédié <kbd>I</kbd>.
+          </p>
+        </div>
+
+        <!-- 2. Courbes de Buzan & Enclos -->
+        <div class="mm-card">
+          <div class="mm-card-icon-wrap emerald">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"></path><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+          </div>
+          <h3 class="mm-card-title">Courbes Organiques &amp; Enclos</h3>
+          <p class="mm-card-desc">
+            Branches effilées inspirées de Tony Buzan pour stimuler la mémorisation naturelle. Isolez vos doctrines dans des enclos visuels délimités et ajoutez des sujets flottants détachés en un clic.
+          </p>
+        </div>
+
+        <!-- 3. Export Multi-Formats -->
+        <div class="mm-card">
+          <div class="mm-card-icon-wrap gold">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          </div>
+          <h3 class="mm-card-title">Export Natif PDF Vectoriel &amp; PNG</h3>
+          <p class="mm-card-desc">
+            Exportez vos cartes en <strong>PDF vectoriel ultra-haute résolution</strong> prêt pour impression traceur/cours de chaire, en image PNG transparente pour vos diaporamas, ou en JPG.
+          </p>
+        </div>
+
+        <!-- 4. Markdown Pur & Zéro Verrouillage -->
+        <div class="mm-card">
+          <div class="mm-card-icon-wrap purple">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <h3 class="mm-card-title">100% Markdown Standard (.md)</h3>
+          <p class="mm-card-desc">
+            Vos cartes mentales sont de simples fichiers Markdown stockés localement sur votre machine. Compatible nativement avec Obsidian, Markmap, Logseq et les agents IA locaux.
+          </p>
+        </div>
+      </div>
+
+      <!-- Raccourcis Clavier Pratiques -->
+      <div class="mindmap-shortcuts-bar reveal-on-scroll">
+        <span>Raccourcis productivité en carte mentale :</span>
+        <span><kbd>I</kbd> Palette 121 icônes</span>
+        <span><kbd>Tab</kbd> Nouvelle sous-branche</span>
+        <span><kbd>Entrée</kbd> Branche voisine</span>
+        <span><kbd>Espace</kbd> Déplier / Replier</span>
+        <span><kbd>F</kbd> Plein Écran</span>
       </div>
     </div>
   </section>
