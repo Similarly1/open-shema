@@ -1548,7 +1548,7 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   9. MINDMAP SHOWCASE INTERACTIONS
+   9. MINDMAP SHOWCASE INTERACTIONS (Épître aux Romains - Tony Buzan)
    ========================================================================== */
 function initMindmapShowcase() {
   const stage = document.getElementById('mm-canvas-stage');
@@ -1556,8 +1556,11 @@ function initMindmapShowcase() {
   const btnPaper = document.getElementById('btn-mm-theme-paper');
   const btnPdf = document.getElementById('btn-mm-demo-pdf');
   const btnPng = document.getElementById('btn-mm-demo-png');
+  const tooltip = document.getElementById('mm-floating-tooltip');
+  const tooltipContent = document.getElementById('mm-tooltip-content');
   if (!stage) return;
 
+  // Toggle Mode Papier Sépia / Mode Sombre
   if (btnDark && btnPaper) {
     btnPaper.addEventListener('click', () => {
       stage.classList.add('paper-mode');
@@ -1572,6 +1575,7 @@ function initMindmapShowcase() {
     });
   }
 
+  // Toast interactif réutilisable
   const showToast = (msg) => {
     let toast = document.getElementById('mm-toast-notice');
     if (!toast) {
@@ -1596,5 +1600,155 @@ function initMindmapShowcase() {
       showToast("Démonstration : Image PNG transparente haute résolution prête pour vos diaporamas");
     });
   }
+
+  // Gestion des Infobulles Flottantes (Captures 2 et 3)
+  const positionTooltip = (targetEl, html) => {
+    if (!tooltip || !tooltipContent) return;
+    const stageRect = stage.getBoundingClientRect();
+    const targetRect = targetEl.getBoundingClientRect();
+
+    tooltipContent.innerHTML = html;
+    tooltip.style.display = 'block';
+
+    const left = targetRect.left - stageRect.left + (targetRect.width / 2);
+    const top = targetRect.top - stageRect.top - 12;
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+  };
+
+  const hideTooltip = () => {
+    if (tooltip) tooltip.style.display = 'none';
+  };
+
+  // 1. Infobulle du passage biblique Romains 3:21-5:21 (Capture 2)
+  const verseBadgeJustif = document.getElementById('badge-verse-justif');
+  if (verseBadgeJustif) {
+    const verseHtml = `
+      <div class="mm-tooltip-header">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>Verset (Segond 21)</span>
+      </div>
+      <div class="mm-tooltip-ref">Romains 3:21-5:21</div>
+      <div class="mm-tooltip-verse-text">« Mais maintenant, la justice de Dieu dont témoignent la loi et les prophètes a été manifestée indépendamment de la loi: »</div>
+      <div class="mm-tooltip-hint">Cliquer pour ouvrir dans le lecteur biblique</div>
+    `;
+
+    verseBadgeJustif.addEventListener('mouseenter', () => positionTooltip(verseBadgeJustif, verseHtml));
+    verseBadgeJustif.addEventListener('mouseleave', hideTooltip);
+    verseBadgeJustif.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showToast("Lecteur biblique : Ouverture de Romains 3:21-5:21 (Segond 21)");
+    });
+  }
+
+  // 2. Infobulle de la note de branche (Capture 3)
+  const noteBadgeJustif = document.getElementById('badge-note-justif');
+  if (noteBadgeJustif) {
+    const noteHtml = `
+      <div class="mm-tooltip-header">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Note de branche</span>
+      </div>
+      <div class="mm-tooltip-body">Révélation de la justice salvifique indépendamment des mérites légaux par l'œuvre expiatoire du Christ.</div>
+      <div class="mm-tooltip-hint">Cliquer ou F4 pour modifier</div>
+    `;
+
+    noteBadgeJustif.addEventListener('mouseenter', () => positionTooltip(noteBadgeJustif, noteHtml));
+    noteBadgeJustif.addEventListener('mouseleave', hideTooltip);
+    noteBadgeJustif.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showToast("Éditeur : Note de branche ouverte pour modification");
+    });
+  }
+
+  // 3. Gestion de la sélection et affichage des boutons d'actions (+ et ×) (Capture 4 & Capture 3)
+  const rootNode = document.getElementById('mm-node-root');
+  const justifNode = document.getElementById('mm-node-justification');
+  const rootAddBtn = document.getElementById('btn-root-add');
+  const justifActions = document.getElementById('actions-justif');
+
+  const allSelectableNodes = [
+    rootNode,
+    justifNode,
+    document.getElementById('mm-node-condamnation'),
+    document.getElementById('mm-node-liberation'),
+    document.getElementById('mm-node-israel'),
+    document.getElementById('mm-node-ethique'),
+    document.getElementById('mm-node-contexte')
+  ].filter(Boolean);
+
+  const selectNode = (selectedEl) => {
+    allSelectableNodes.forEach(node => node.classList.remove('is-selected'));
+    if (!selectedEl) return;
+
+    selectedEl.classList.add('is-selected');
+
+    if (selectedEl === rootNode) {
+      // Capture 4 : Racine sélectionnée, bouton '+' affiché à droite
+      if (rootAddBtn) rootAddBtn.style.display = 'block';
+      if (justifActions) justifActions.classList.add('is-hidden');
+    } else if (selectedEl === justifNode) {
+      // Capture 3 : Nœud JUSTIFICATION sélectionné, boutons '×' et '+' affichés à gauche
+      if (rootAddBtn) rootAddBtn.style.display = 'none';
+      if (justifActions) justifActions.classList.remove('is-hidden');
+    } else {
+      if (rootAddBtn) rootAddBtn.style.display = 'none';
+      if (justifActions) justifActions.classList.add('is-hidden');
+    }
+  };
+
+  // Sélection par défaut : Racine ROMAINS avec halo lumineux rayonnant (Capture 4)
+  if (rootNode) {
+    selectNode(rootNode);
+
+    rootNode.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectNode(rootNode);
+    });
+  }
+
+  if (justifNode) {
+    justifNode.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectNode(justifNode);
+    });
+  }
+
+  // Clic sur les autres nœuds majeurs
+  ['mm-node-condamnation', 'mm-node-liberation', 'mm-node-israel', 'mm-node-ethique', 'mm-node-contexte'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectNode(el);
+      });
+    }
+  });
+
+  // Actions des boutons '+' et '×'
+  if (rootAddBtn) {
+    rootAddBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showToast("Nouvelle branche maîtresse ajoutée à ROMAINS");
+    });
+  }
+
+  const justifAddBtn = document.getElementById('btn-justif-add');
+  if (justifAddBtn) {
+    justifAddBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showToast("Nouvelle sous-branche ajoutée sous JUSTIFICATION");
+    });
+  }
+
+  const justifDelBtn = document.getElementById('btn-justif-del');
+  if (justifDelBtn) {
+    justifDelBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showToast("Branche supprimée de la carte mentale");
+    });
+  }
 }
+
 

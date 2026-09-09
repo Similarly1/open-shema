@@ -4847,6 +4847,8 @@ h1, h2, h3, h4, .font-title {
    ========================================================================== */
 
 /* Mode Sombre (Par défaut & [data-theme="dark"]) */
+
+/* Slide 1: Volet d'étude 360° */
 html:not([data-theme="light"]) .drawer-360-container {
   background: #0B1220;
   border-color: #1E293B;
@@ -4865,6 +4867,16 @@ html:not([data-theme="light"]) .drawer-nav-btn {
   background: #162032;
   border-color: #26354D;
   color: #E2E8F0;
+}
+html:not([data-theme="light"]) .drawer-nav-btn:hover {
+  background: #1E2B42;
+  border-color: #F59E0B;
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .drawer-badge-lie {
+  background: rgba(2, 132, 199, 0.18);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38BDF8;
 }
 html:not([data-theme="light"]) .drawer-counter-pill {
   background: #162032;
@@ -4896,6 +4908,15 @@ html:not([data-theme="light"]) .drawer-acc-body {
   background: #0B1220;
   border-color: #F59E0B;
 }
+html:not([data-theme="light"]) .drawer-bp-name {
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .drawer-bp-sub {
+  color: #94A3B8;
+}
+html:not([data-theme="light"]) .drawer-bp-sub.purple {
+  color: #C084FC;
+}
 html:not([data-theme="light"]) .drawer-list-item {
   background: #162032;
   border-color: #26354D;
@@ -4909,10 +4930,16 @@ html:not([data-theme="light"]) .drawer-item-sub {
 }
 
 /* Slide 2: Morphologie en Mode Sombre */
+html:not([data-theme="light"]) .morpho-card-container,
 html:not([data-theme="light"]) .morpho-card {
   background: #0B1220;
   border-color: #1E293B;
   color: #F8FAFC;
+}
+html:not([data-theme="light"]) .morpho-strong-badge {
+  background: rgba(2, 132, 199, 0.18);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38BDF8;
 }
 html:not([data-theme="light"]) .morpho-greek-title {
   color: #FBBF24;
@@ -4925,6 +4952,16 @@ html:not([data-theme="light"]) .morpho-audio-btn {
   border-color: #26354D;
   color: #E2E8F0;
 }
+html:not([data-theme="light"]) .morpho-audio-btn:hover {
+  background: #1E2B42;
+  border-color: #F59E0B;
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .morpho-audio-btn.speaking {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #F59E0B;
+  color: #FBBF24;
+}
 html:not([data-theme="light"]) .morpho-section-title {
   color: #94A3B8;
 }
@@ -4932,11 +4969,38 @@ html:not([data-theme="light"]) .morpho-grid-card {
   background: #162032;
   border-color: #26354D;
 }
+html:not([data-theme="light"]) .morpho-grid-card:hover {
+  border-color: #F59E0B;
+}
 html:not([data-theme="light"]) .morpho-card-label {
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .morpho-info-trigger {
+  color: #94A3B8;
+}
+html:not([data-theme="light"]) .morpho-info-trigger:hover {
   color: #FBBF24;
 }
 html:not([data-theme="light"]) .morpho-card-val {
   color: #F8FAFC;
+}
+html:not([data-theme="light"]) .morpho-card-val.purple-val {
+  color: #C084FC;
+}
+html:not([data-theme="light"]) .morpho-defs-list {
+  background: #162032;
+  border-color: #26354D;
+  color: #E2E8F0;
+}
+html:not([data-theme="light"]) .morpho-chip {
+  background: #162032;
+  border-color: #26354D;
+  color: #E2E8F0;
+}
+html:not([data-theme="light"]) .morpho-chip:hover {
+  background: #1E2B42;
+  border-color: #F59E0B;
+  color: #FBBF24;
 }
 html:not([data-theme="light"]) .morpho-lemma-row {
   background: #10192A;
@@ -4946,6 +5010,32 @@ html:not([data-theme="light"]) .morpho-lemma-label {
   color: #94A3B8;
 }
 html:not([data-theme="light"]) .morpho-lemma-val {
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .morpho-btn-occurrences {
+  background: #162032;
+  border-color: #26354D;
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .morpho-btn-occurrences:hover {
+  background: #1E2B42;
+  border-color: #F59E0B;
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .morpho-btn-occurrences svg {
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .morpho-btn-copy {
+  background: #26354D;
+  border-color: #3B4E6B;
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .morpho-btn-copy:hover {
+  background: #334460;
+  border-color: #F59E0B;
+  color: #FFFFFF;
+}
+html:not([data-theme="light"]) .morpho-btn-copy svg {
   color: #F8FAFC;
 }
 
@@ -4960,11 +5050,23 @@ html:not([data-theme="light"]) .ebook-hub-card .ui-mockup-header {
   border-bottom-color: #1E293B;
   color: #F8FAFC;
 }
+html:not([data-theme="light"]) .ebook-hub-card .badge {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38BDF8;
+}
 html:not([data-theme="light"]) .ebook-hub-content {
   background: #0B1220;
 }
 html:not([data-theme="light"]) .book-card-mini {
   background: #162032;
+  border-color: #26354D;
+}
+html:not([data-theme="light"]) .book-card-mini:hover {
+  border-color: #F59E0B;
+}
+html:not([data-theme="light"]) .book-cover-wrap {
+  background: #10192A;
   border-color: #26354D;
 }
 html:not([data-theme="light"]) .book-title {
@@ -4976,13 +5078,41 @@ html:not([data-theme="light"]) .book-author {
 html:not([data-theme="light"]) .book-store {
   color: #94A3B8;
 }
-html:not([data-theme="light"]) .format-chip {
+html:not([data-theme="light"]) .hub-sources-container {
+  border-top-color: #1E293B;
+}
+html:not([data-theme="light"]) .hub-sources-title {
+  color: #94A3B8;
+}
+html:not([data-theme="light"]) .hub-pill-chip {
   background: #162032;
   border-color: #26354D;
-  color: #CBD5E1;
+  color: #F8FAFC !important;
+}
+html:not([data-theme="light"]) .hub-pill-chip:hover {
+  background: #1E2B42;
+  border-color: #F59E0B;
+}
+html:not([data-theme="light"]) .pill-name {
+  color: #F8FAFC !important;
+}
+html:not([data-theme="light"]) .pill-price {
+  background: rgba(245, 158, 11, 0.18);
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .pill-price.free {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34D399;
+}
+html:not([data-theme="light"]) .pill-price.pub {
+  background: rgba(2, 132, 199, 0.18);
+  color: #38BDF8;
+}
+html:not([data-theme="light"]) .hub-footnote {
+  color: #94A3B8;
 }
 
-/* Slide 5: Illustrations en Mode Sombre */
+/* Slide 5: Illustrations en Mode Sombre (Correction Lisibilité Fiches) */
 html:not([data-theme="light"]) .illustrations-reservoir-card {
   background: #0B1220;
   border-color: #1E293B;
@@ -4996,6 +5126,11 @@ html:not([data-theme="light"]) .ill-reservoir-header {
 html:not([data-theme="light"]) .ill-header-title {
   color: #F8FAFC;
 }
+html:not([data-theme="light"]) .ill-count-badge {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #FBBF24;
+}
 html:not([data-theme="light"]) .ill-reservoir-body {
   background: #0B1220;
 }
@@ -5006,29 +5141,111 @@ html:not([data-theme="light"]) .ill-search-wrap {
 html:not([data-theme="light"]) .ill-search-input {
   color: #F8FAFC;
 }
+html:not([data-theme="light"]) .ill-search-input::placeholder {
+  color: #94A3B8;
+}
 html:not([data-theme="light"]) .ill-cat-pill {
   background: #162032;
   border-color: #26354D;
   color: #CBD5E1;
 }
+html:not([data-theme="light"]) .ill-cat-pill:hover {
+  border-color: #F59E0B;
+  color: #FBBF24;
+}
 html:not([data-theme="light"]) .ill-cat-pill.active {
   background: #F59E0B;
-  color: #000;
+  border-color: #F59E0B;
+  color: #0B1220;
   font-weight: 700;
 }
-html:not([data-theme="light"]) .ill-card {
+/* Fiches d'illustrations en mode sombre (Évite le fond blanc avec texte blanc) */
+html:not([data-theme="light"]) .ill-card-item {
   background: #162032;
   border-color: #26354D;
   color: #F8FAFC;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+html:not([data-theme="light"]) .ill-card-item:hover {
+  border-color: #F59E0B;
+  background: #1C283F;
+}
+html:not([data-theme="light"]) .ill-card-item.open {
+  border-color: #F59E0B;
+  background: #182338;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 html:not([data-theme="light"]) .ill-card-title {
   color: #F8FAFC;
 }
-html:not([data-theme="light"]) .ill-card-quote {
-  color: #CBD5E1;
-}
 html:not([data-theme="light"]) .ill-card-author {
   color: #94A3B8;
+}
+html:not([data-theme="light"]) .ill-card-chevron {
+  color: #94A3B8;
+}
+html:not([data-theme="light"]) .ill-card-item.open .ill-card-chevron {
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .ill-card-passage {
+  color: #FBBF24;
+}
+/* Badges des illustrations en mode sombre */
+html:not([data-theme="light"]) .ill-badge-type.story {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .ill-badge-type.bio {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34D399;
+}
+html:not([data-theme="light"]) .ill-badge-type.metaphor {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38BDF8;
+}
+html:not([data-theme="light"]) .ill-badge-type.parable {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(167, 139, 250, 0.4);
+  color: #A78BFA;
+}
+html:not([data-theme="light"]) .ill-badge-usage.never {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34D399;
+}
+html:not([data-theme="light"]) .ill-badge-usage.used {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(167, 139, 250, 0.4);
+  color: #A78BFA;
+}
+/* Dépliables fiches */
+html:not([data-theme="light"]) .ill-card-expandable {
+  border-top-color: #26354D;
+}
+html:not([data-theme="light"]) .ill-unfolded-quote {
+  background: #0F172A;
+  border-color: #26354D;
+  color: #E2E8F0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+html:not([data-theme="light"]) .ill-unfolded-callout {
+  color: #CBD5E1;
+}
+html:not([data-theme="light"]) .ill-unfolded-callout strong {
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .ill-copy-btn-showcase {
+  background: #26354D;
+  border-color: #3B4E6B;
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .ill-copy-btn-showcase:hover {
+  background: #334460;
+  border-color: #F59E0B;
+  color: #FFFFFF;
 }
 
 /* Slide 6: Moteur IA & RAG en Mode Sombre */
@@ -5042,6 +5259,9 @@ html:not([data-theme="light"]) .engine-options-header {
   border-bottom-color: #1E293B;
   color: #F8FAFC;
 }
+html:not([data-theme="light"]) .engine-options-header .engine-header-title {
+  color: #F8FAFC;
+}
 html:not([data-theme="light"]) .engine-options-body {
   background: #0B1220;
 }
@@ -5053,16 +5273,79 @@ html:not([data-theme="light"]) .engine-select {
   border-color: #26354D;
   color: #F8FAFC;
 }
+html:not([data-theme="light"]) .engine-subbox {
+  background: #162032;
+  border-color: #26354D;
+}
+html:not([data-theme="light"]) .engine-checkbox-row {
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .engine-check {
+  background: #10192A;
+  border-color: #26354D;
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .engine-check.checked {
+  background: #F59E0B;
+  border-color: #D97706;
+  color: #0B1220;
+}
+html:not([data-theme="light"]) .engine-slider-track {
+  background: #1E293B;
+}
+html:not([data-theme="light"]) .engine-slider-labels {
+  color: #94A3B8;
+}
+html:not([data-theme="light"]) .engine-slider-labels span.active {
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .engine-slider-callout {
+  background: #162032;
+  border-color: #26354D;
+}
+html:not([data-theme="light"]) .engine-callout-tokens {
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .engine-callout-time {
+  color: #94A3B8;
+}
+html:not([data-theme="light"]) .engine-callout-desc {
+  color: #CBD5E1;
+}
 html:not([data-theme="light"]) .engine-profile-card {
   background: #162032;
   border-color: #26354D;
   color: #F8FAFC;
 }
 html:not([data-theme="light"]) .engine-profile-title {
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .engine-profile-text {
   color: #F8FAFC;
 }
-html:not([data-theme="light"]) .engine-profile-desc {
+html:not([data-theme="light"]) .engine-profile-text strong {
+  color: #FFFFFF;
+}
+html:not([data-theme="light"]) .engine-profile-text em {
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .engine-profile-sub {
+  color: #94A3B8;
+}
+html:not([data-theme="light"]) .engine-passport-box {
+  background: #10192A;
+  border-color: rgba(245, 158, 11, 0.4);
   color: #CBD5E1;
+}
+html:not([data-theme="light"]) .engine-btn-modify {
+  background: #26354D;
+  border-color: #3B4E6B;
+  color: #E2E8F0;
+}
+html:not([data-theme="light"]) .engine-btn-modify:hover {
+  background: #334460;
+  border-color: #F59E0B;
+  color: #FFFFFF;
 }
 
 /* Slide 7: Commentaires Croisés en Mode Sombre */
@@ -5091,19 +5374,58 @@ html:not([data-theme="light"]) .comm-author-title {
 html:not([data-theme="light"]) .comm-author-sub {
   color: #94A3B8;
 }
-html:not([data-theme="light"]) .comm-tab-pill {
+html:not([data-theme="light"]) .comm-count-select {
   background: #162032;
   border-color: #26354D;
   color: #CBD5E1;
 }
-html:not([data-theme="light"]) .comm-tab-pill.active {
-  background: #0284C7;
-  color: #FFF;
-}
-html:not([data-theme="light"]) .comm-body-box {
+html:not([data-theme="light"]) .comm-tab-btn {
   background: #162032;
   border-color: #26354D;
+  color: #CBD5E1;
+}
+html:not([data-theme="light"]) .comm-tab-btn:hover {
+  border-color: #0284C7;
+  color: #F8FAFC;
+}
+html:not([data-theme="light"]) .comm-tab-btn.active {
+  background: #0284C7;
+  border-color: #38BDF8;
+  color: #FFFFFF;
+}
+html:not([data-theme="light"]) .comm-content-panel {
+  background: #0B1220;
+}
+html:not([data-theme="light"]) .comm-panel-header {
+  border-bottom-color: #1E293B;
+}
+html:not([data-theme="light"]) .comm-passage-badge {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FBBF24;
+}
+html:not([data-theme="light"]) .comm-action-btn {
+  background: #162032;
+  border: 1px solid #26354D;
   color: #E2E8F0;
+}
+html:not([data-theme="light"]) .comm-action-btn:hover {
+  background: #1E2B42;
+  border-color: #0284C7;
+  color: #FFFFFF;
+}
+html:not([data-theme="light"]) .comm-body-text {
+  color: #E2E8F0;
+}
+html:not([data-theme="light"]) .comm-ref-pill {
+  background: #162032;
+  border-color: #26354D;
+  color: #CBD5E1;
+}
+html:not([data-theme="light"]) .comm-ref-pill:hover {
+  background: #C47B2B;
+  border-color: #F59E0B;
+  color: #FFFFFF;
 }
 
 /* --- Gallery & Screenshots Lightbox --- */
@@ -7216,8 +7538,8 @@ html:not([data-theme="light"]) .comm-body-box {
 .mindmap-canvas-stage {
   position: relative;
   width: 100%;
-  height: 520px;
-  background: radial-gradient(circle at center, rgba(15, 23, 42, 0.6) 0%, rgba(11, 15, 23, 0.98) 100%);
+  height: 560px;
+  background: #0d131f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7226,17 +7548,205 @@ html:not([data-theme="light"]) .comm-body-box {
 }
 
 [data-theme="light"] .mindmap-canvas-stage {
-  background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+  background: #faf8f5;
 }
 
 .mindmap-canvas-stage.paper-mode {
-  background: #fbf7ee !important;
+  background: #faf8f5 !important;
 }
 
 .mindmap-svg-art {
   width: 100%;
   height: 100%;
-  max-width: 1050px;
+  max-width: 1160px;
+  user-select: none;
+}
+
+/* Styles des Nœuds et Sélections */
+.mm-root-rect {
+  fill: #ffffff;
+  stroke: #3b82f6;
+  stroke-width: 2.8px;
+  transition: all 0.25s ease;
+}
+
+.mindmap-canvas-stage:not(.paper-mode) .mm-root-rect {
+  fill: #0f172a;
+  stroke: #60a5fa;
+}
+
+.mindmap-canvas-stage:not(.paper-mode) .mm-root-title {
+  fill: #ffffff;
+}
+
+/* Nœud sélectionné avec halo lumineux rayonnant (Capture 4) */
+.mm-node-root-group.is-selected .mm-root-rect,
+.mm-branch-node.is-selected .mm-branch-rect {
+  filter: url(#mm-select-glow);
+  stroke: #2563eb !important;
+  stroke-width: 3.2px !important;
+}
+
+/* Boutons d'actions circulaires (+) et (×) rattachés aux nœuds (Captures 3 & 4) */
+.mm-action-btn {
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mm-action-btn:hover {
+  transform: scale(1.18);
+}
+
+.mm-action-circle {
+  fill: #ffffff;
+  stroke: #64748b;
+  stroke-width: 1.4px;
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+
+.mm-action-text {
+  fill: #1e293b;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  pointer-events: none;
+  transition: fill 0.15s ease;
+}
+
+.mm-action-btn:hover .mm-action-circle {
+  fill: #2563eb;
+  stroke: #1d4ed8;
+}
+
+.mm-action-btn:hover .mm-action-text {
+  fill: #ffffff;
+}
+
+.mm-action-btn.danger:hover .mm-action-circle {
+  fill: #ef4444;
+  stroke: #dc2626;
+}
+
+.mm-action-btn.danger:hover .mm-action-text {
+  fill: #ffffff;
+}
+
+/* Visibilité dynamique des boutons d'actions */
+.mm-node-actions {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.mm-node-actions.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Pastilles Scripturaires et Notes au survol (Captures 2 & 3) */
+.mm-scripture-pill,
+.mm-note-pill {
+  cursor: pointer;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.mm-scripture-pill:hover,
+.mm-note-pill:hover {
+  transform: scale(1.12);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* Infobulle Interactive Flottante Superposée (Captures 2 & 3) */
+@keyframes mmTooltipPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -85%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+.mm-interactive-tooltip {
+  position: absolute;
+  z-index: 120;
+  min-width: 280px;
+  max-width: 350px;
+  background: #161c28;
+  color: #f8fafc;
+  border: 1px solid #2a3449;
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 3px 10px rgba(0, 0, 0, 0.3);
+  padding: 12px 14px;
+  pointer-events: none;
+  animation: mmTooltipPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Flèche triangulaire vers le bas */
+.mm-interactive-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: #161c28;
+  border-right: 1px solid #2a3449;
+  border-bottom: 1px solid #2a3449;
+}
+
+.mm-tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #60a5fa;
+  margin-bottom: 4px;
+}
+
+.mm-tooltip-header svg {
+  flex-shrink: 0;
+  stroke: #60a5fa;
+}
+
+.mm-tooltip-ref {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 3px;
+}
+
+.mm-tooltip-verse-text {
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.45;
+  color: #cbd5e1;
+  margin: 6px 0 4px 0;
+  padding: 6px 10px;
+  background: rgba(15, 23, 42, 0.75);
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+}
+
+.mm-tooltip-body {
+  font-size: 12.5px;
+  color: #f8fafc;
+  line-height: 1.45;
+  margin: 4px 0;
+  font-weight: 500;
+}
+
+.mm-tooltip-hint {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 6px;
+  border-top: 1px solid #26334d;
+  padding-top: 5px;
 }
 
 /* Grille des 4 Piliers Mind Map */
@@ -7258,7 +7768,7 @@ html:not([data-theme="light"]) .comm-body-box {
     grid-template-columns: 1fr;
   }
   .mindmap-canvas-stage {
-    height: 400px;
+    height: 440px;
   }
 }
 
@@ -7305,33 +7815,6 @@ html:not([data-theme="light"]) .comm-body-box {
   line-height: 1.6;
   color: var(--text-secondary);
   margin: 0;
-}
-
-/* Barre de raccourcis sous la carte */
-.mindmap-shortcuts-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 36px;
-  padding: 14px 24px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 30px;
-  font-size: 0.86rem;
-  color: var(--text-secondary);
-}
-
-.mindmap-shortcuts-bar kbd {
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  padding: 2px 7px;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--accent-cyan);
-  font-weight: 700;
 }
 
 
