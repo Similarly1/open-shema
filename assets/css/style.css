@@ -7562,28 +7562,74 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
   user-select: none;
 }
 
-/* Styles des Nœuds et Sélections */
+/* Styles des Nœuds et Sélections — Thème Dynamique Papier vs Sombre */
+/* 1. Nœud Racine Central ROMAINS */
 .mm-root-rect {
-  fill: #ffffff;
-  stroke: #3b82f6;
+  fill: #ffffff !important;
+  stroke: #2563eb !important;
   stroke-width: 2.8px;
   transition: all 0.25s ease;
 }
 
+.mm-root-cross line {
+  stroke: #2563eb !important;
+}
+
+.mm-root-title {
+  fill: #0f172a !important;
+}
+
+/* En Mode Sombre : Contraste blanc éclatant pour ROMAINS */
 .mindmap-canvas-stage:not(.paper-mode) .mm-root-rect {
-  fill: #0f172a;
-  stroke: #60a5fa;
+  fill: #1e293b !important;
+  stroke: #38bdf8 !important;
+}
+
+.mindmap-canvas-stage:not(.paper-mode) .mm-root-cross line {
+  stroke: #38bdf8 !important;
 }
 
 .mindmap-canvas-stage:not(.paper-mode) .mm-root-title {
-  fill: #ffffff;
+  fill: #ffffff !important;
 }
+
+/* 2. Styles de branches en Mode Papier Sépia */
+.mindmap-canvas-stage.paper-mode .justif-rect { fill: #eef2ff !important; stroke: #4f46e5 !important; stroke-width: 2.5px; }
+.mindmap-canvas-stage.paper-mode .condem-rect { fill: #fef2f2 !important; stroke: #dc2626 !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage.paper-mode .lib-rect { fill: #f0f9ff !important; stroke: #0284c7 !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage.paper-mode .israel-rect { fill: #faf5ff !important; stroke: #7c3aed !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage.paper-mode .eth-rect { fill: #ecfdf5 !important; stroke: #059669 !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage.paper-mode .ctx-rect { fill: #fffbeb !important; stroke: #d97706 !important; stroke-width: 2px; }
+
+.mindmap-canvas-stage.paper-mode .mm-node-title,
+.mindmap-canvas-stage.paper-mode .mm-node-text { fill: #0f172a !important; }
+.mindmap-canvas-stage.paper-mode .mm-leaf-text { fill: #475569 !important; }
+.mindmap-canvas-stage.paper-mode .mm-sub-rect { fill: #ffffff !important; stroke: #818cf8 !important; stroke-width: 1.4px; }
+.mindmap-canvas-stage.paper-mode .mm-sub-text { fill: #1e293b !important; }
+.mindmap-canvas-stage.paper-mode .mm-scripture-rect { fill: #e0e7ff !important; stroke: #818cf8 !important; stroke-width: 1.2px; }
+.mindmap-canvas-stage.paper-mode .mm-note-circle { fill: #ffffff !important; stroke: #b45309 !important; stroke-width: 1.8px; }
+
+/* 3. Styles de branches en Mode Sombre */
+.mindmap-canvas-stage:not(.paper-mode) .justif-rect { fill: #1e1b4b !important; stroke: #6366f1 !important; stroke-width: 2.5px; }
+.mindmap-canvas-stage:not(.paper-mode) .condem-rect { fill: #450a0a !important; stroke: #ef4444 !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage:not(.paper-mode) .lib-rect { fill: #082f49 !important; stroke: #38bdf8 !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage:not(.paper-mode) .israel-rect { fill: #2e1065 !important; stroke: #a855f7 !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage:not(.paper-mode) .eth-rect { fill: #022c22 !important; stroke: #34d399 !important; stroke-width: 2.2px; }
+.mindmap-canvas-stage:not(.paper-mode) .ctx-rect { fill: #451a03 !important; stroke: #fbbf24 !important; stroke-width: 2px; }
+
+.mindmap-canvas-stage:not(.paper-mode) .mm-node-title,
+.mindmap-canvas-stage:not(.paper-mode) .mm-node-text { fill: #ffffff !important; }
+.mindmap-canvas-stage:not(.paper-mode) .mm-leaf-text { fill: #94a3b8 !important; }
+.mindmap-canvas-stage:not(.paper-mode) .mm-sub-rect { fill: #0f172a !important; stroke: #6366f1 !important; stroke-width: 1.4px; }
+.mindmap-canvas-stage:not(.paper-mode) .mm-sub-text { fill: #f8fafc !important; }
+.mindmap-canvas-stage:not(.paper-mode) .mm-scripture-rect { fill: #1e1b4b !important; stroke: #6366f1 !important; stroke-width: 1.2px; }
+.mindmap-canvas-stage:not(.paper-mode) .mm-note-circle { fill: #1e293b !important; stroke: #d97706 !important; stroke-width: 1.8px; }
 
 /* Nœud sélectionné avec halo lumineux rayonnant (Capture 4) */
 .mm-node-root-group.is-selected .mm-root-rect,
 .mm-branch-node.is-selected .mm-branch-rect {
   filter: url(#mm-select-glow);
-  stroke: #2563eb !important;
+  stroke: #3b82f6 !important;
   stroke-width: 3.2px !important;
 }
 
