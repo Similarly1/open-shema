@@ -1601,12 +1601,12 @@ function initMindmapShowcase() {
     });
   }
 
-  // Gestion des Infobulles Flottantes (Captures 2 et 3 - Stabilisées contre tout scintillement)
+  // Gestion des Infobulles Flottantes (Stabilisées contre tout scintillement)
   let activeTooltipTarget = null;
 
   const showTooltip = (targetEl, html) => {
     if (!tooltip || !tooltipContent) return;
-    if (activeTooltipTarget === targetEl) return; // Verrou : Ne pas rejouer si déjà actif
+    if (activeTooltipTarget === targetEl) return;
     activeTooltipTarget = targetEl;
 
     const stageRect = stage.getBoundingClientRect();
@@ -1634,134 +1634,303 @@ function initMindmapShowcase() {
     }
   };
 
-  // 1. Infobulle du passage biblique Romains 3:21-5:21 (Capture 2)
-  const verseBadgeJustif = document.getElementById('badge-verse-justif');
-  if (verseBadgeJustif) {
-    const verseHtml = `
-      <div class="mm-tooltip-header">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        <span>Verset (Segond 21)</span>
-      </div>
-      <div class="mm-tooltip-ref">Romains 3:21-5:21</div>
-      <div class="mm-tooltip-verse-text">« Mais maintenant, la justice de Dieu dont témoignent la loi et les prophètes a été manifestée indépendamment de la loi: »</div>
-      <div class="mm-tooltip-hint">Cliquer pour ouvrir dans le lecteur biblique</div>
-    `;
-
-    verseBadgeJustif.addEventListener('mouseenter', () => showTooltip(verseBadgeJustif, verseHtml));
-    verseBadgeJustif.addEventListener('mouseleave', hideTooltip);
-    verseBadgeJustif.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showToast("Lecteur biblique : Ouverture de Romains 3:21-5:21 (Segond 21)");
-    });
-  }
-
-  // 2. Infobulle de la note de branche (Capture 3)
-  const noteBadgeJustif = document.getElementById('badge-note-justif');
-  if (noteBadgeJustif) {
-    const noteHtml = `
-      <div class="mm-tooltip-header">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span>Note de branche</span>
-      </div>
-      <div class="mm-tooltip-body">Révélation de la justice salvifique indépendamment des mérites légaux par l'œuvre expiatoire du Christ.</div>
-      <div class="mm-tooltip-hint">Cliquer ou F4 pour modifier</div>
-    `;
-
-    noteBadgeJustif.addEventListener('mouseenter', () => showTooltip(noteBadgeJustif, noteHtml));
-    noteBadgeJustif.addEventListener('mouseleave', hideTooltip);
-    noteBadgeJustif.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showToast("Éditeur : Note de branche ouverte pour modification");
-    });
-  }
-
-  // 3. Gestion de la sélection et affichage des boutons d'actions (+ et ×) (Capture 4 & Capture 3)
-  const rootNode = document.getElementById('mm-node-root');
-  const justifNode = document.getElementById('mm-node-justification');
-  const rootAddBtn = document.getElementById('btn-root-add');
-  const justifActions = document.getElementById('actions-justif');
-
-  const allSelectableNodes = [
-    rootNode,
-    justifNode,
-    document.getElementById('mm-node-condamnation'),
-    document.getElementById('mm-node-liberation'),
-    document.getElementById('mm-node-israel'),
-    document.getElementById('mm-node-ethique'),
-    document.getElementById('mm-node-contexte')
-  ].filter(Boolean);
-
-  const selectNode = (selectedEl) => {
-    allSelectableNodes.forEach(node => node.classList.remove('is-selected'));
-    if (!selectedEl) return;
-
-    selectedEl.classList.add('is-selected');
-
-    if (selectedEl === rootNode) {
-      // Capture 4 : Racine sélectionnée, bouton '+' affiché à droite
-      if (rootAddBtn) rootAddBtn.style.display = 'block';
-      if (justifActions) justifActions.classList.add('is-hidden');
-    } else if (selectedEl === justifNode) {
-      // Capture 3 : Nœud JUSTIFICATION sélectionné, boutons '×' et '+' affichés à gauche
-      if (rootAddBtn) rootAddBtn.style.display = 'none';
-      if (justifActions) justifActions.classList.remove('is-hidden');
-    } else {
-      if (rootAddBtn) rootAddBtn.style.display = 'none';
-      if (justifActions) justifActions.classList.add('is-hidden');
+  // Dictionnaire Complet des Infobulles Exégétiques et Bibliques
+  const tooltipsData = {
+    // 1. JUSTIFICATION
+    'badge-verse-justif': {
+      header: 'Verset (Segond 21)',
+      ref: 'Romains 3:21-5:21',
+      text: '« Mais maintenant, la justice de Dieu dont témoignent la loi et les prophètes a été manifestée indépendamment de la loi: justice de Dieu par la foi en Jésus-Christ pour tous ceux qui croient. »',
+      hint: 'Cliquer pour ouvrir dans le lecteur biblique',
+      toast: 'Lecteur biblique : Romains 3:21-5:21 (Segond 21)'
+    },
+    'badge-note-justif': {
+      header: 'Note de branche',
+      isNote: true,
+      body: 'Révélation de la justice salvifique indépendamment des mérites légaux par l\'œuvre expiatoire du Christ (Sola Fide).',
+      hint: 'Cliquer ou F4 pour modifier',
+      toast: 'Éditeur : Note de branche JUSTIFICATION ouverte'
+    },
+    // 2. CONDAMNATION
+    'badge-verse-condem': {
+      header: 'Verset (Segond 21)',
+      ref: 'Romains 1:18-3:20',
+      text: '« La colère de Dieu se révèle du ciel contre toute impiété et toute injustice des hommes qui retiennent injustement la vérité captive... Il n\'y a pas de juste, pas même un seul. »',
+      hint: 'Cliquer pour ouvrir dans le lecteur biblique',
+      toast: 'Lecteur biblique : Romains 1:18-3:20 (Segond 21)'
+    },
+    'badge-note-condem': {
+      header: 'Note de branche',
+      isNote: true,
+      body: 'Diagnostic universel de l\'apostasie humaine : païens sans loi et juifs sous la Loi sont sans excuse devant la sainteté divine.',
+      hint: 'Cliquer ou F4 pour modifier',
+      toast: 'Éditeur : Note de branche CONDAMNATION ouverte'
+    },
+    // 3. LIBÉRATION
+    'badge-verse-lib': {
+      header: 'Verset (Segond 21)',
+      ref: 'Romains 6:1-8:39',
+      text: '« Il n\'y a donc maintenant aucune condamnation pour ceux qui sont en Jésus-Christ. La loi de l\'Esprit de vie en Jésus-Christ m\'a libéré de la loi du péché et de la mort. »',
+      hint: 'Cliquer pour ouvrir dans le lecteur biblique',
+      toast: 'Lecteur biblique : Romains 6:1-8:39 (Segond 21)'
+    },
+    'badge-note-lib': {
+      header: 'Note de branche',
+      isNote: true,
+      body: 'Sanctification trinitaire : union mystique par le baptême (Rm 6), affranchissement de la tyrannie légale (Rm 7), vie triomphante par l\'Esprit (Rm 8).',
+      hint: 'Cliquer ou F4 pour modifier',
+      toast: 'Éditeur : Note de branche LIBÉRATION ouverte'
+    },
+    // 4. ISRAËL
+    'badge-verse-israel': {
+      header: 'Verset (Segond 21)',
+      ref: 'Romains 9:1-11:36',
+      text: '« Car les dons et l\'appel de Dieu sont irrévocables. Ô profondeur de la richesse, de la sagesse et de la connaissance de Dieu ! »',
+      hint: 'Cliquer pour ouvrir dans le lecteur biblique',
+      toast: 'Lecteur biblique : Romains 9:1-11:36 (Segond 21)'
+    },
+    'badge-note-israel': {
+      header: 'Note de branche',
+      isNote: true,
+      body: 'Théodicée historique : la fidélité de Dieu envers ses alliances, l\'endurcissement partiel pour le salut des nations et la réintégration eschatologique.',
+      hint: 'Cliquer ou F4 pour modifier',
+      toast: 'Éditeur : Note de branche ISRAËL ouverte'
+    },
+    // 5. ÉTHIQUE
+    'badge-verse-ethique': {
+      header: 'Verset (Segond 21)',
+      ref: 'Romains 12:1-16:27',
+      text: '« Je vous encourage donc par les compassions de Dieu à offrir votre corps comme un sacrifice vivant, saint, agréable à Dieu: ce sera de votre part un culte raisonnable. »',
+      hint: 'Cliquer pour ouvrir dans le lecteur biblique',
+      toast: 'Lecteur biblique : Romains 12:1-16:27 (Segond 21)'
+    },
+    'badge-note-ethique': {
+      header: 'Note de branche',
+      isNote: true,
+      body: 'Orthopraxie évangélique : l\'éthique vécue comme offrande sacerdotale, gestion chrétienne de la cité, amour fraternel et communion sans jugement.',
+      hint: 'Cliquer ou F4 pour modifier',
+      toast: 'Éditeur : Note de branche ÉTHIQUE ouverte'
+    },
+    // 6. CONTEXTE CORINTHE 57
+    'badge-note-contexte': {
+      header: 'Note historique & exégétique',
+      isNote: true,
+      body: 'Rédigée pendant le séjour de Paul à Corinthe (chez Gaïus), transcrite par l\'amanuensis Tertius (Rm 16:22) et confiée à Phœbé diaconesse de Cenchrées.',
+      hint: 'Cliquer ou F4 pour modifier',
+      toast: 'Éditeur : Note historique de CONTEXTE ouverte'
+    },
+    // SOUS-BRANCHES CLÉS
+    'badge-sub-foi': {
+      header: 'Doctrine (Rm 3:28)',
+      ref: 'Romains 3:28',
+      text: '« Car nous estimons que l\'homme est justifié par la foi, sans les œuvres de la loi. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 3:28'
+    },
+    'badge-sub-abraham': {
+      header: 'Typologie biblique (Rm 4:3)',
+      ref: 'Romains 4:3',
+      text: '« Abraham crut à Dieu, et cela lui fut imputé à justice. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 4:3'
+    },
+    'badge-sub-paix': {
+      header: 'Fruit salvifique (Rm 5:1)',
+      ref: 'Romains 5:1',
+      text: '« Étant donc justifiés par la foi, nous avons la paix avec Dieu par notre Seigneur Jésus-Christ. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 5:1'
+    },
+    'badge-sub-redaction': {
+      header: 'Contexte géographique (Ac 20:2-3)',
+      ref: 'Actes 20:2-3',
+      text: '« Il parcourut ces contrées en adressant aux disciples de nombreuses exhortations. Puis il se rendit en Grèce, où il séjourna trois mois. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Actes 20:2-3'
+    },
+    'badge-sub-espagne': {
+      header: 'Vision missionnaire (Rm 15:24)',
+      ref: 'Romains 15:24',
+      text: '« J\'espère vous voir en passant, quand je me rendrai en Espagne, et y être accompagné par vous... »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 15:24'
+    },
+    'badge-sub-paiens': {
+      header: 'Passage exégétique',
+      ref: 'Romains 1:18-32',
+      text: '« En effet, les perfections invisibles de Dieu, sa puissance éternelle et sa divinité, se voient comme à l\'œil nu depuis la création du monde... »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 1:18-32'
+    },
+    'badge-sub-juifs': {
+      header: 'Passage exégétique',
+      ref: 'Romains 2:1-3:8',
+      text: '« Qui que tu sois, homme, toi qui juges, tu es inexcusable; car en jugeant les autres, tu te condamnes toi-même... »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 2:1-3:8'
+    },
+    'badge-sub-verdict': {
+      header: 'Passage exégétique',
+      ref: 'Romains 3:9-20',
+      text: '« Quoi donc! Sommes-nous plus excellents? Nullement. Car nous avons déjà prouvé que tous, Juifs et Grecs, sont sous l\'empire du péché. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 3:9-20'
+    },
+    'badge-sub-bapteme': {
+      header: 'Passage exégétique',
+      ref: 'Romains 6:3-4',
+      text: '« Ignorez-vous que nous tous qui avons été baptisés en Jésus-Christ, c\'est en sa mort que nous avons été baptisés? »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 6'
+    },
+    'badge-sub-loi': {
+      header: 'Passage exégétique',
+      ref: 'Romains 7:6',
+      text: '« Mais maintenant, nous avons été dégagés de la loi, étant morts à cette loi sous laquelle nous étions retenus... »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 7'
+    },
+    'badge-sub-esprit': {
+      header: 'Passage exégétique',
+      ref: 'Romains 8:14-16',
+      text: '« Car tous ceux qui sont conduits par l\'Esprit de Dieu sont fils de Dieu. Et vous n\'avez pas reçu un esprit de servitude pour être encore dans la crainte... »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 8'
+    },
+    'badge-sub-election': {
+      header: 'Passage exégétique',
+      ref: 'Romains 9:15-16',
+      text: '« Car il dit à Moïse: Je ferai miséricorde à qui je fais miséricorde... Ainsi donc, cela ne dépend ni de celui qui veut, ni de celui qui court, mais de Dieu qui fait miséricorde. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 9'
+    },
+    'badge-sub-trebuchement': {
+      header: 'Passage exégétique',
+      ref: 'Romains 10:9-10',
+      text: '« Si tu confesses de ta bouche le Seigneur Jésus, et si tu crois dans ton cœur que Dieu l\'a ressuscité des morts, tu seras sauvé. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 10'
+    },
+    'badge-sub-restauration': {
+      header: 'Passage exégétique',
+      ref: 'Romains 11:25-26',
+      text: '« L\'endurcissement d\'une partie d\'Israël durera jusqu\'à ce que la totalité des païens soit entrée. Et ainsi tout Israël sera sauvé. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 11'
+    },
+    'badge-sub-consecration': {
+      header: 'Passage exégétique',
+      ref: 'Romains 12:2',
+      text: '« Ne vous conformez pas au siècle présent, mais soyez transformés par le renouvellement de l\'intelligence... »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 12'
+    },
+    'badge-sub-cite': {
+      header: 'Passage exégétique',
+      ref: 'Romains 13:1-7',
+      text: '« Que toute personne soit soumise aux autorités supérieures; car il n\'y a point d\'autorité qui ne vienne de Dieu... »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 13'
+    },
+    'badge-sub-unite': {
+      header: 'Passage exégétique',
+      ref: 'Romains 14:1; 15:7',
+      text: '« Accueillez celui qui est faible dans la foi, sans discuter les opinions... Accueillez-vous donc les uns les autres, comme Christ vous a accueillis, pour la gloire de Dieu. »',
+      hint: 'Cliquer pour ouvrir le verset',
+      toast: 'Lecteur biblique : Romains 14-16'
     }
   };
 
-  // Sélection par défaut : Racine ROMAINS avec halo lumineux rayonnant (Capture 4)
-  if (rootNode) {
-    selectNode(rootNode);
+  // Câblage de toutes les infobulles
+  Object.keys(tooltipsData).forEach(badgeId => {
+    const el = document.getElementById(badgeId);
+    if (!el) return;
+    const item = tooltipsData[badgeId];
 
-    rootNode.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectNode(rootNode);
-    });
-  }
-
-  if (justifNode) {
-    justifNode.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectNode(justifNode);
-    });
-  }
-
-  // Clic sur les autres nœuds majeurs
-  ['mm-node-condamnation', 'mm-node-liberation', 'mm-node-israel', 'mm-node-ethique', 'mm-node-contexte'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectNode(el);
-      });
+    let html = '';
+    if (item.isNote) {
+      const noteSvg = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
+      html = `
+        <div class="mm-tooltip-header">${noteSvg}<span>${item.header}</span></div>
+        <div class="mm-tooltip-body">${item.body}</div>
+        <div class="mm-tooltip-hint">${item.hint}</div>
+      `;
+    } else {
+      const bibleSvg = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+      html = `
+        <div class="mm-tooltip-header">${bibleSvg}<span>${item.header}</span></div>
+        <div class="mm-tooltip-ref">${item.ref}</div>
+        <div class="mm-tooltip-verse-text">${item.text}</div>
+        <div class="mm-tooltip-hint">${item.hint}</div>
+      `;
     }
+
+    el.addEventListener('mouseenter', () => showTooltip(el, html));
+    el.addEventListener('mouseleave', hideTooltip);
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (item.toast) showToast(item.toast);
+    });
   });
 
-  // Actions des boutons '+' et '×'
-  if (rootAddBtn) {
-    rootAddBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showToast("Nouvelle branche maîtresse ajoutée à ROMAINS");
+  // Sélection Universelle au Clic sur N'IMPORTE QUELLE Capsule (Captures 3 & 4)
+  const selectableNodeIds = [
+    'mm-node-root',
+    'mm-node-contexte',
+    'mm-node-justification',
+    'mm-node-israel',
+    'mm-node-condamnation',
+    'mm-node-liberation',
+    'mm-node-ethique'
+  ];
+
+  const selectNode = (selectedEl) => {
+    selectableNodeIds.forEach(id => {
+      const node = document.getElementById(id);
+      if (node) node.classList.remove('is-selected');
     });
+    if (selectedEl) {
+      selectedEl.classList.add('is-selected');
+    }
+  };
+
+  // Écouteur de clic sur chaque capsule pour révéler les boutons Ajouter et Supprimer
+  selectableNodeIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.mm-action-btn, .mm-scripture-pill, .mm-note-pill')) return;
+      selectNode(el);
+    });
+  });
+
+  // Sélection initiale : ROMAINS (mot central)
+  const rootNode = document.getElementById('mm-node-root');
+  if (rootNode) {
+    selectNode(rootNode);
   }
 
-  const justifAddBtn = document.getElementById('btn-justif-add');
-  if (justifAddBtn) {
-    justifAddBtn.addEventListener('click', (e) => {
+  // Écouteurs pour tous les boutons d'action '+' (Ajouter une branche / sous-branche)
+  document.querySelectorAll('.mm-action-btn:not(.danger)').forEach(btn => {
+    btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      showToast("Nouvelle sous-branche ajoutée sous JUSTIFICATION");
+      const parentNode = btn.closest('.mm-branch-node, .mm-node-root-group');
+      const titleEl = parentNode ? parentNode.querySelector('.mm-node-title, .mm-root-title, .mm-node-text') : null;
+      const title = titleEl ? titleEl.textContent.trim() : 'cette branche';
+      showToast(`Nouvelle sous-branche ajoutée sous « ${title} »`);
     });
-  }
+  });
 
-  const justifDelBtn = document.getElementById('btn-justif-del');
-  if (justifDelBtn) {
-    justifDelBtn.addEventListener('click', (e) => {
+  // Écouteurs pour tous les boutons d'action '×' (Supprimer)
+  document.querySelectorAll('.mm-action-btn.danger').forEach(btn => {
+    btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      showToast("Branche supprimée de la carte mentale");
+      const parentNode = btn.closest('.mm-branch-node, .mm-node-root-group');
+      const titleEl = parentNode ? parentNode.querySelector('.mm-node-title, .mm-root-title, .mm-node-text') : null;
+      const title = titleEl ? titleEl.textContent.trim() : 'cette branche';
+      showToast(`Branche « ${title} » supprimée de la démonstration`);
     });
-  }
+  });
 }
 
 

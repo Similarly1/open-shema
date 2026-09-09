@@ -7636,18 +7636,13 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
 /* Boutons d'actions circulaires (+) et (×) rattachés aux nœuds (Captures 3 & 4) */
 .mm-action-btn {
   cursor: pointer;
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.mm-action-btn:hover {
-  transform: scale(1.18);
 }
 
 .mm-action-circle {
   fill: #ffffff;
   stroke: #64748b;
   stroke-width: 1.4px;
-  transition: fill 0.15s ease, stroke 0.15s ease;
+  transition: fill 0.15s ease, stroke 0.15s ease, r 0.15s ease;
 }
 
 .mm-action-text {
@@ -7661,6 +7656,7 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
 }
 
 .mm-action-btn:hover .mm-action-circle {
+  r: 12.5px;
   fill: #2563eb;
   stroke: #1d4ed8;
 }
@@ -7670,6 +7666,7 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
 }
 
 .mm-action-btn.danger:hover .mm-action-circle {
+  r: 12.5px;
   fill: #ef4444;
   stroke: #dc2626;
 }
@@ -7678,15 +7675,36 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
   fill: #ffffff;
 }
 
-/* Visibilité dynamique des boutons d'actions */
-.mm-node-actions {
-  opacity: 1;
-  transition: opacity 0.2s ease;
+/* Thème sombre : style des boutons d'actions */
+.mindmap-canvas-stage:not(.paper-mode) .mm-action-circle {
+  fill: #1e293b;
+  stroke: #475569;
 }
 
-.mm-node-actions.is-hidden {
+.mindmap-canvas-stage:not(.paper-mode) .mm-action-text {
+  fill: #f8fafc;
+}
+
+.mindmap-canvas-stage:not(.paper-mode) .mm-action-btn:hover .mm-action-circle {
+  fill: #3b82f6;
+  stroke: #60a5fa;
+}
+
+.mindmap-canvas-stage:not(.paper-mode) .mm-action-btn.danger:hover .mm-action-circle {
+  fill: #ef4444;
+  stroke: #f87171;
+}
+
+/* Visibilité dynamique des boutons d'actions (+ et ×) au clic sur N'IMPORTE QUELLE capsule */
+.mm-node-actions {
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.is-selected .mm-node-actions {
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 /* Pastilles Scripturaires et Notes au survol (Captures 2 & 3 - Stabilisées) */
