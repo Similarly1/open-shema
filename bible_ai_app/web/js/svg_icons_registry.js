@@ -3,7 +3,7 @@
  * 100% SVG purs, nobles, sans aucun émoji.
  * Compatible mode sombre et clair via currentColor.
  * Utilisable indifféremment au clavier et à la souris.
- * Répertoire étendu : 118 symboles vectoriels théologiques, bibliques et d'exégèse.
+ * Répertoire étendu : 121 symboles vectoriels théologiques, bibliques et d'exégèse.
  */
 
 const SvgIconsRegistry = {
@@ -582,6 +582,25 @@ const SvgIconsRegistry = {
               "nomade"
           ],
           "path": "<path d=\"m12 3 9 17H3L12 3zM12 3v17M8 20l4-7 4 7\"/>"
+      },
+      {
+          "id": "cite",
+          "label": "Cité / Ville / Jérusalem",
+          "category": "Histoire Sainte & Symboles",
+          "keywords": [
+              "cite",
+              "ville",
+              "jerusalem",
+              "sion",
+              "babylone",
+              "cite celeste",
+              "murailles",
+              "remparts",
+              "porte",
+              "city",
+              "town"
+          ],
+          "path": "<path d=\"M2 21h20M3 21V9l3-2 3 2v12M9 11h6V7l3-2 3 2v14M9 21v-5a3 3 0 0 1 6 0v5M6 13h.01M18 13h.01\"/>"
       },
       {
           "id": "cle",
@@ -1343,6 +1362,24 @@ const SvgIconsRegistry = {
           "path": "<circle cx=\"12\" cy=\"12\" r=\"8\"/><circle cx=\"9\" cy=\"9\" r=\"2\" fill=\"currentColor\"/>"
       },
       {
+          "id": "tour",
+          "label": "Tour Forte / Citadelle",
+          "category": "Marche & Combat",
+          "keywords": [
+              "tour",
+              "citadelle",
+              "forteresse",
+              "refuge",
+              "rempart",
+              "haute retraite",
+              "protection",
+              "securite",
+              "tour forte",
+              "chateau"
+          ],
+          "path": "<path d=\"M6 21h12M7 21V7l1-1h1v2h2V6h2v2h2V6h1l1 1v14M10 11h4M10 15h4M10 21v-3a2 2 0 0 1 4 0v3\"/>"
+      },
+      {
           "id": "lumiere",
           "label": "Lumière / Soleil",
           "category": "Création & Paraboles",
@@ -1675,6 +1712,23 @@ const SvgIconsRegistry = {
               "soin"
           ],
           "path": "<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><path d=\"M9 22V12h6v10\"/><path d=\"M12 7v2\"/>"
+      },
+      {
+          "id": "village",
+          "label": "Village / Bourgade",
+          "category": "Communauté & Organisation",
+          "keywords": [
+              "village",
+              "bourg",
+              "bourgade",
+              "campagne",
+              "hameau",
+              "maisons",
+              "communaute",
+              "localite",
+              "villageois"
+          ],
+          "path": "<path d=\"M2 20h20M3 20v-7l4-4 4 4v7M11 20v-5l3-3 3 3v5M17 20v-7l2.5-2.5 2.5 2.5v7M7 14h.01M14 15h.01\"/>"
       },
       {
           "id": "chariot-ble",
@@ -3350,6 +3404,71 @@ const SvgIconsRegistry = {
           "voile-dechire",
           "temple",
           "ciel-ouvert"
+      ],
+      "cite": [
+          "cite",
+          "tour",
+          "temple"
+      ],
+      "cité": [
+          "cite",
+          "tour",
+          "temple"
+      ],
+      "ville": [
+          "cite",
+          "temple",
+          "tour"
+      ],
+      "village": [
+          "village",
+          "cite",
+          "famille"
+      ],
+      "campagne": [
+          "village",
+          "arbre",
+          "semence"
+      ],
+      "jerusalem": [
+          "cite",
+          "temple",
+          "montagne"
+      ],
+      "sion": [
+          "cite",
+          "montagne",
+          "temple"
+      ],
+      "citadelle": [
+          "tour",
+          "cite",
+          "bouclier"
+      ],
+      "forteresse": [
+          "tour",
+          "bouclier",
+          "rocher"
+      ],
+      "rempart": [
+          "tour",
+          "cite",
+          "bouclier"
+      ],
+      "murailles": [
+          "cite",
+          "tour",
+          "bouclier"
+      ],
+      "tour": [
+          "tour",
+          "phare",
+          "bouclier"
+      ],
+      "tour forte": [
+          "tour",
+          "bouclier",
+          "rocher"
       ]
   },
 
@@ -3393,7 +3512,7 @@ const SvgIconsRegistry = {
 
     // 1. Correspondance directe sur la phrase complète
     if (this.THESAURUS[normalized]) {
-      this.THESAURUS[normalized].forEach((id, idx) => addScore(id, 24 - idx * 3));
+      this.THESAURUS[normalized].forEach((id, idx) => addScore(id, 28 - idx * 3));
     }
 
     // 2. Découpage en mots signifiants
@@ -3407,13 +3526,13 @@ const SvgIconsRegistry = {
     words.forEach(word => {
       // 2a. Match direct dans le thésaurus
       if (this.THESAURUS[word]) {
-        this.THESAURUS[word].forEach((id, idx) => addScore(id, 18 - idx * 2));
+        this.THESAURUS[word].forEach((id, idx) => addScore(id, 20 - idx * 2));
       }
 
-      // 2b. Match partiel / préfixe dans le thésaurus
+      // 2b. Match partiel / préfixe dans le thésaurus (mot >= 4 caractères)
       if (word.length >= 4) {
         for (const [key, iconIds] of Object.entries(this.THESAURUS)) {
-          if (key !== word && (key.startsWith(word) || word.startsWith(key))) {
+          if (key !== word && (key.startsWith(word) || (key.length >= 4 && word.startsWith(key)))) {
             iconIds.forEach((id, idx) => addScore(id, 12 - idx));
           }
         }
@@ -3423,18 +3542,22 @@ const SvgIconsRegistry = {
       this.icons.forEach(ic => {
         const icNormId = this.normalizeText(ic.id);
         const icNormLabel = this.normalizeText(ic.label);
+        const labelWords = icNormLabel.split(/\s+/);
 
         if (icNormId === word) {
-          addScore(ic.id, 20);
-        } else if (icNormLabel.includes(word)) {
-          addScore(ic.id, 14);
+          addScore(ic.id, 24);
+        } else if (labelWords.includes(word)) {
+          addScore(ic.id, 16);
+        } else if (word.length >= 4 && labelWords.some(lw => lw.startsWith(word))) {
+          addScore(ic.id, 10);
         }
 
         ic.keywords.forEach(kw => {
           const normKw = this.normalizeText(kw);
-          if (normKw === word) {
+          const kwWords = normKw.split(/\s+/);
+          if (kwWords.includes(word)) {
             addScore(ic.id, 16);
-          } else if (word.length >= 4 && (normKw.includes(word) || word.includes(normKw))) {
+          } else if (word.length >= 4 && kwWords.some(kwToken => kwToken.startsWith(word))) {
             addScore(ic.id, 8);
           }
         });
@@ -3475,15 +3598,41 @@ const SvgIconsRegistry = {
   },
 
   search(query = '') {
-    const q = String(query || '').trim().toLowerCase();
+    const q = String(query || '').trim();
     if (!q) return this.icons;
+    const normQ = this.normalizeText(q);
+    if (!normQ) return this.icons;
 
-    return this.icons.filter(ic => {
-      if (ic.id.toLowerCase().includes(q)) return true;
-      if (ic.label.toLowerCase().includes(q)) return true;
-      if (ic.category.toLowerCase().includes(q)) return true;
-      return ic.keywords.some(kw => kw.toLowerCase().includes(q));
+    const matches = [];
+    this.icons.forEach(ic => {
+      const normId = this.normalizeText(ic.id);
+      const normLabel = this.normalizeText(ic.label);
+      const labelWords = normLabel.split(/\s+/);
+      const normKws = ic.keywords.map(k => this.normalizeText(k));
+
+      let score = 0;
+      if (normId === normQ) score += 50;
+      else if (normId.startsWith(normQ)) score += 30;
+      else if (normId.includes(normQ)) score += 10;
+
+      if (labelWords.includes(normQ)) score += 40;
+      else if (labelWords.some(w => w.startsWith(normQ))) score += 25;
+      else if (normLabel.includes(normQ)) score += 12;
+
+      if (normKws.includes(normQ)) score += 35;
+      else if (normKws.some(k => k.startsWith(normQ))) score += 20;
+      else if (normKws.some(k => k.includes(normQ))) score += 5;
+
+      const normCat = this.normalizeText(ic.category);
+      if (normCat.includes(normQ)) score += 8;
+
+      if (score > 0) {
+        matches.push({ ic, score });
+      }
     });
+
+    matches.sort((a, b) => b.score - a.score);
+    return matches.map(m => m.ic);
   },
 
   /**
@@ -3548,14 +3697,14 @@ const SvgIconsRegistry = {
           <div class="svg-picker-suggestions-header">
             <span class="svg-picker-suggestions-badge">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/></svg>
-              Suggestions pour « ${this.escapeHtml(currentText.trim().length > 22 ? currentText.trim().substring(0, 22) + '…' : currentText.trim())} »
+              Suggestions pour « ${this.escapeHtml(currentText)} »
             </span>
           </div>
           <div class="svg-picker-suggestions-chips">
             ${suggestions.map(ic => `
               <button type="button" class="svg-picker-suggestion-chip" data-id="${ic.id}" title="${this.escapeHtml(ic.label)} (${this.escapeHtml(ic.category)})">
-                <span class="svg-chip-icon">${this.getSvg(ic.id, 16)}</span>
-                <span class="svg-chip-label">${this.escapeHtml(ic.label)}</span>
+                <div class="svg-picker-suggestion-chip-icon">${this.getSvg(ic.id, 16)}</div>
+                <span class="svg-picker-suggestion-chip-label">${this.escapeHtml(ic.label)}</span>
               </button>
             `).join('')}
           </div>
@@ -3565,7 +3714,7 @@ const SvgIconsRegistry = {
       ${hasRemove ? `
         <div class="svg-picker-footer">
           <button type="button" class="svg-picker-remove-btn" id="svg-picker-remove">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             <span>Retirer l'icône</span>
           </button>
         </div>
@@ -3581,7 +3730,7 @@ const SvgIconsRegistry = {
     const removeBtn = modal.querySelector('#svg-picker-remove');
     const suggestionsSection = modal.querySelector('#svg-picker-suggestions');
 
-    // Clics sur les chips de suggestion
+    // Clic sur une suggestion
     if (suggestionsSection) {
       suggestionsSection.querySelectorAll('.svg-picker-suggestion-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
@@ -3601,7 +3750,7 @@ const SvgIconsRegistry = {
     );
 
     if (isValidAnchor) {
-      const modalW = 360;
+      const modalW = 390;
       const modalH = hasSuggestions ? 460 : 400;
       const vpW = window.innerWidth;
       const vpH = window.innerHeight;
@@ -3641,7 +3790,7 @@ const SvgIconsRegistry = {
         return;
       }
 
-      // Regroupement par catégories
+      // Grouper par catégorie ordonnée
       const categories = {};
       items.forEach(ic => {
         if (!categories[ic.category]) categories[ic.category] = [];
@@ -3810,4 +3959,7 @@ const SvgIconsRegistry = {
 
 if (typeof window !== 'undefined') {
   window.SvgIconsRegistry = SvgIconsRegistry;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SvgIconsRegistry;
 }

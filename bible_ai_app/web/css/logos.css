@@ -37067,8 +37067,8 @@ body[class*="palette-dark"] .mm-export-preview-box {
 .svg-picker-popover {
   position: fixed;
   z-index: 99999;
-  width: 360px;
-  max-width: calc(100vw - 32px);
+  width: 390px;
+  max-width: calc(100vw - 24px);
   max-height: 480px;
   display: flex;
   flex-direction: column;
@@ -37082,6 +37082,7 @@ body[class*="palette-dark"] .mm-export-preview-box {
   overflow: hidden;
   user-select: none;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .svg-picker-popover.centered {
@@ -37127,6 +37128,7 @@ body[class*="palette-dark"] .svg-picker-popover {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
   background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+  box-sizing: border-box;
 }
 
 body.theme-dark .svg-picker-header,
@@ -37183,6 +37185,7 @@ body[class*="palette-dark"] .svg-picker-close-btn:hover {
   background: var(--bg-hover, rgba(0, 0, 0, 0.02));
   border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
   position: relative;
+  box-sizing: border-box;
 }
 
 body.theme-dark .svg-picker-search-bar,
@@ -37239,8 +37242,10 @@ body[class*="palette-dark"] .svg-picker-hint kbd {
 .svg-picker-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px 12px;
   max-height: 320px;
+  box-sizing: border-box;
 }
 
 .svg-picker-category-title {
@@ -37258,9 +37263,11 @@ body[class*="palette-dark"] .svg-picker-hint kbd {
 
 .svg-picker-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
   margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .svg-picker-item {
@@ -37277,6 +37284,9 @@ body[class*="palette-dark"] .svg-picker-hint kbd {
   color: var(--text-main, #334155);
   transition: all 0.15s ease;
   outline: none;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 body.theme-dark .svg-picker-item,
@@ -37322,7 +37332,11 @@ body[class*="palette-dark"] .svg-picker-item.selected {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 95%;
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: block;
 }
 
 .svg-picker-empty {
