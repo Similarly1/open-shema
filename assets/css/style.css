@@ -7927,4 +7927,18 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
   margin: 0;
 }
 
+/* Cadres et Enclos Théologiques Solidairement Déplaçables */
+.mm-boundary {
+  cursor: grab;
+}
+
+.mm-boundary.is-dragging,
+.mindmap-canvas-stage.is-dragging .mm-boundary {
+  cursor: grabbing !important;
+}
+
+.mm-boundary:not(.is-dragging) {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 

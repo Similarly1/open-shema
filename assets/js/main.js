@@ -2082,6 +2082,23 @@ function initMindmapShowcase() {
     }
   };
 
+  // Association entre chaque branche et son cadre / enclos délimité
+  const nodeBoundaryMap = {
+    'mm-node-justification': 'boundary-soteriologie',
+    'mm-node-condamnation': 'boundary-verdict',
+    'mm-node-liberation': 'boundary-liberation',
+    'mm-node-israel': 'boundary-israel',
+    'mm-node-ethique': 'boundary-ethique'
+  };
+
+  const boundaryNodeMap = {
+    'boundary-soteriologie': 'mm-node-justification',
+    'boundary-verdict': 'mm-node-condamnation',
+    'boundary-liberation': 'mm-node-liberation',
+    'boundary-israel': 'mm-node-israel',
+    'boundary-ethique': 'mm-node-ethique'
+  };
+
   // Drag & Drop interactif des capsules sélectionnées
   let activeDragNode = null;
   let dragStartCoords = { x: 0, y: 0 };
@@ -2112,6 +2129,11 @@ function initMindmapShowcase() {
     if (!hasMoved && (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3)) {
       hasMoved = true;
       activeDragNode.classList.add('is-dragging');
+      const bId = nodeBoundaryMap[activeDragNode.id];
+      if (bId) {
+        const bEl = document.getElementById(bId);
+        if (bEl) bEl.classList.add('is-dragging');
+      }
       stage.classList.add('is-dragging');
     }
 
@@ -2121,6 +2143,14 @@ function initMindmapShowcase() {
       const newDy = Math.round(nodeStartOffset.dy + deltaY);
       nodeOffsets[nodeId] = { dx: newDx, dy: newDy };
       activeDragNode.setAttribute('transform', `translate(${newDx}, ${newDy})`);
+
+      // Déplacement solidaire du cadre / enclos associé
+      const bId = nodeBoundaryMap[nodeId];
+      if (bId) {
+        const bEl = document.getElementById(bId);
+        if (bEl) bEl.setAttribute('transform', `translate(${newDx}, ${newDy})`);
+      }
+
       updateMindmapCurves();
     }
   };
@@ -2128,6 +2158,13 @@ function initMindmapShowcase() {
   const onPointerUp = (e) => {
     if (!activeDragNode) return;
     const wasDragging = hasMoved;
+
+    const bId = nodeBoundaryMap[activeDragNode.id];
+    if (bId) {
+      const bEl = document.getElementById(bId);
+      if (bEl) bEl.classList.remove('is-dragging');
+    }
+
     activeDragNode.classList.remove('is-dragging');
     stage.classList.remove('is-dragging');
     activeDragNode = null;
@@ -2157,7 +2194,18 @@ function initMindmapShowcase() {
     });
   });
 
-  // Bouton de réinitialisation de la disposition
+  // Possibilité de glisser également depuis le cadre / enclos lui-même
+  document.querySelectorAll('.mm-boundary').forEach(bEl => {
+    bEl.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.mm-action-btn, .mm-scripture-pill, .mm-note-pill, .mm-leaf-text, .mm-sub-node, .mm-branch-node')) return;
+      const targetNodeId = boundaryNodeMap[bEl.id];
+      if (targetNodeId) {
+        onPointerDown(e, targetNodeId);
+      }
+    });
+  });
+
+  // Bouton de réinitialisation de la disposition (nœuds + cadres)
   const btnResetPos = document.getElementById('btn-mm-reset-pos');
   if (btnResetPos) {
     btnResetPos.addEventListener('click', () => {
@@ -2166,6 +2214,13 @@ function initMindmapShowcase() {
         const el = document.getElementById(id);
         if (el) {
           el.removeAttribute('transform');
+        }
+      });
+      Object.values(nodeBoundaryMap).forEach(bId => {
+        const bEl = document.getElementById(bId);
+        if (bEl) {
+          bEl.removeAttribute('transform');
+          bEl.classList.remove('is-dragging');
         }
       });
       updateMindmapCurves();
