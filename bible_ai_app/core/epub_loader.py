@@ -3,6 +3,7 @@ import re
 import zipfile
 import tempfile
 import logging
+import posixpath
 import xml.etree.ElementTree as ET
 from typing import List, Dict, Any, Optional, Tuple
 from bs4 import BeautifulSoup
@@ -185,8 +186,14 @@ class EpubLoader:
                     book_author=metadata.get("author", "")
                 )
                 
+                # Détection complémentaire par nom de fichier (ex: note.html, notes.xhtml, endnotes.html)
+                if classification["source_type"] != "endnotes" and file_zip_path:
+                    base_fn = os.path.basename(file_zip_path).lower()
+                    if base_fn in ["note.html", "notes.html", "note.xhtml", "notes.xhtml", "endnotes.html", "endnotes.xhtml", "footnotes.html", "footnotes.xhtml"]:
+                        classification["source_type"] = "endnotes"
+
                 # Propagation contextuelle intelligente pour les sous-sections
-                if classification["source_type"] != "appendix":
+                if classification["source_type"] not in ["appendix", "endnotes"]:
                     if classification["book_code"]:
                         current_active_scope = classification["corpus_scope"]
                         current_active_book_code = classification["book_code"]
@@ -203,11 +210,11 @@ class EpubLoader:
                 # Règle d'inclusion par défaut :
                 # - Les sections / parties sont TOUJOURS incluses pour préserver la structure
                 # - Tout livre ou chapitre de contenu (> 50 caractères) est coché d'office
-                # - Les annexes/front-matter/boilerplate sont décochés d'office
+                # - Les annexes/notes de fin/front-matter/boilerplate sont décochés d'office
                 if is_section:
                     include_default = True
                     classification["source_type"] = "general"
-                elif classification["source_type"] == "appendix" or is_boilerplate:
+                elif classification["source_type"] in ["appendix", "endnotes"] or is_boilerplate:
                     include_default = False
                 elif classification["book_code"] is not None:
                     include_default = True
@@ -259,6 +266,12 @@ class EpubLoader:
         if re.search(r'\b(john|jean|james|peter|pierre|paul|marc|mark|luke|luc|matthew|matthieu)\s+[a-z]+', norm):
             if not _has_word(["evangile", "epitre", "lettre", "gospel", "epistle", "selon"]):
                 return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
+
+        # Détection spécifique des sections de notes (notes de bas de page, notes de fin, endnotes)
+        norm_clean = re.sub(r'^[0-9ivxlcdm\.\:\-\s]+', '', norm).strip()
+        if (norm_clean in ["notes", "notes de fin", "notes de fin de texte", "notes de bas de page", "endnotes", "footnotes", "chapter notes", "notes des chapitres"] 
+            or _has_word(["endnotes", "footnotes", "notes de fin", "notes de bas de page"])):
+            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "endnotes"}
 
         # 1. Boilerplate / Front matter / Annexes
         if _has_word(BOILERPLATE_KEYWORDS):
@@ -350,6 +363,224 @@ class EpubLoader:
         }
 
     @classmethod
+    def process_chapter_html(
+        cls, 
+        z: zipfile.ZipFile, 
+        zip_file: str, 
+        html_content: str
+    ) -> Tuple[List[str], List[Dict[str, str]]]:
+        """
+        Analyse universelle du HTML d'un chapitre EPUB :
+        - Résout et extrait les notes de bas de page (inter-fichiers et intra-fichiers)
+        - Normalise les appels de notes en marqueurs markdown standardisés [^id]
+        - Extrait les paragraphes structurés, titres et citations
+        - Retourne (paragraphs, footnotes)
+        """
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # 1. Nettoyer les éléments indésirables (scripts, styles, nav)
+        for tag in soup(["script", "style", "nav"]):
+            tag.decompose()
+
+        # 2. Supprimer les balises de pagination papier InDesign (ex: <span class="page-papier">[14]</span>)
+        for p_tag in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["page-papier", "page_papier", "pagenum", "pagebreak", "page-number"])}):
+            p_tag.decompose()
+
+        # Cache de parsing des fichiers du zip référencés pour ce chapitre
+        zip_soups_cache = {zip_file: soup}
+        def get_file_soup(target_zip):
+            if target_zip not in zip_soups_cache:
+                if target_zip in z.namelist():
+                    content = z.read(target_zip).decode('utf-8', errors='ignore')
+                    zip_soups_cache[target_zip] = BeautifulSoup(content, 'html.parser')
+                else:
+                    zip_soups_cache[target_zip] = None
+            return zip_soups_cache[target_zip]
+
+        # Identifier tous les liens candidats d'appels de notes
+        candidate_links = []
+        seen_a = set()
+
+        for tag in soup.find_all(['a', 'sup']):
+            a_tag = tag if tag.name == 'a' else tag.find('a')
+            if not a_tag or a_tag in seen_a:
+                continue
+
+            href = a_tag.get('href', '').strip()
+            epub_type = (a_tag.get('epub:type') or tag.get('epub:type') or '').lower()
+            cls_str = (' '.join(a_tag.get('class', [])) + ' ' + ' '.join(tag.get('class', []))).lower()
+
+            is_fn = False
+            if any(k in epub_type for k in ['noteref', 'footnote']):
+                is_fn = True
+            elif any(k in cls_str for k in ['footnote', 'noteref', 'fnref', '_idfootnotelink', 'footnote-link', 'notelink', 'ref-note']):
+                is_fn = True
+            elif href and '#' in href:
+                target_rel, _, anchor = href.partition('#')
+                h_lower = href.lower()
+                if any(k in h_lower for k in ['note', 'fn', 'ftn', 'foot', 'endnote']):
+                    is_fn = True
+                elif target_rel and any(k in target_rel.lower() for k in ['note', 'fn', 'endnote']):
+                    is_fn = True
+                elif tag.name == 'sup':
+                    is_fn = True
+                elif re.match(r'^(?:ch\d+)?(?:fn|note|ftn|endnote)\d*', anchor, re.I):
+                    is_fn = True
+                elif a_tag.get_text(strip=True).isdigit() or (a_tag.get_text(strip=True).startswith('[') and a_tag.get_text(strip=True).rstrip(']').isdigit()):
+                    is_fn = True
+
+            if is_fn:
+                seen_a.add(a_tag)
+                candidate_links.append((tag, a_tag, href))
+
+        extracted_footnotes = {}
+        footnote_elements_to_skip = set()
+        fn_counter = 0
+
+        base_ch_filename = zip_file.split('/')[-1]
+
+        for wrapper_tag, a_tag, href in candidate_links:
+            callout_text = a_tag.get_text(strip=True) or wrapper_tag.get_text(strip=True)
+            target_file_rel, _, anchor = href.partition('#')
+            if target_file_rel:
+                target_zip = posixpath.normpath(posixpath.join(posixpath.dirname(zip_file), target_file_rel))
+            else:
+                target_zip = zip_file
+
+            target_soup = get_file_soup(target_zip)
+            note_text = ""
+
+            if target_soup and anchor:
+                target_el = target_soup.find(attrs={'id': anchor}) or target_soup.find(attrs={'name': anchor})
+                if target_el:
+                    # Trouver le conteneur de bloc de la note
+                    container = target_el
+                    if container.name in ['a', 'span', 'b', 'i', 'sup', 'sub', 'em', 'strong', 'cite']:
+                        block_parent = container.find_parent(['p', 'li', 'dd', 'aside', 'div', 'tr', 'td', 'blockquote'])
+                        if block_parent:
+                            container = block_parent
+
+                    if target_zip == zip_file:
+                        footnote_elements_to_skip.add(container)
+                        if container.name in ['div', 'aside'] or 'footnote' in ' '.join(container.get('class', [])).lower():
+                            footnote_elements_to_skip.add(container)
+
+                    # Cloner le conteneur pour extraire le texte et préserver la mise en forme
+                    c_copy = BeautifulSoup(str(container), 'html.parser')
+
+                    # Supprimer les liens retours (backlinks)
+                    for bl in c_copy.find_all('a'):
+                        bl_href = bl.get('href', '')
+                        bl_txt = bl.get_text(strip=True)
+                        if (base_ch_filename in bl_href) or (bl_txt in ['↩', '↑', '^', '[retour]', 'retour', 'back']) or (bl.get('id') == anchor):
+                            bl.decompose()
+
+                    # Convertir les balises de style en Markdown portable
+                    for it_tag in c_copy.find_all(['i', 'em', 'cite']):
+                        it_text = it_tag.get_text()
+                        if it_text.strip():
+                            it_tag.replace_with(f"*{it_text}*")
+                    for bd_tag in c_copy.find_all(['b', 'strong']):
+                        bd_text = bd_tag.get_text()
+                        if bd_text.strip():
+                            bd_tag.replace_with(f"**{bd_text}**")
+
+                    raw_txt = c_copy.get_text(separator=' ', strip=True)
+                    # Nettoyer les préfixes numériques résiduels ("1.", "[1]", "1 ")
+                    note_text = re.sub(r'^(?:\[\^?\d+\]|\b\d+\b)\s*[\.\:\-\)]*\s*', '', raw_txt).strip()
+
+            # Déterminer l'ID propre de la note
+            clean_num = re.sub(r'[^\w\d]', '', callout_text)
+            if clean_num:
+                fn_id = clean_num
+            else:
+                fn_counter += 1
+                fn_id = str(fn_counter)
+
+            # Remplacer l'appel par le marqueur propre [^id]
+            replace_target = wrapper_tag if (wrapper_tag.name == 'sup' and wrapper_tag != a_tag) else a_tag
+            replace_target.replace_with(f" [^{fn_id}] ")
+
+            if note_text and fn_id not in extracted_footnotes:
+                extracted_footnotes[fn_id] = note_text
+
+        # Détecter également les conteneurs de notes dédiés dans le fichier courant
+        for fn_cont in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["_idfootnotes", "footnotes", "theol-footnotes"])}):
+            footnote_elements_to_skip.add(fn_cont)
+            for child in fn_cont.find_all(['div', 'p', 'li', 'aside']):
+                footnote_elements_to_skip.add(child)
+
+        for aside in soup.find_all('aside'):
+            if aside.get('epub:type') == 'footnote' or 'footnote' in str(aside.get('class', [])).lower():
+                footnote_elements_to_skip.add(aside)
+
+        # Extraire les paragraphes du corps de texte
+        paragraphs = []
+        for el in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "blockquote", "aside"]):
+            if el in footnote_elements_to_skip or any(parent in footnote_elements_to_skip for parent in el.parents):
+                continue
+
+            tag_name = el.name.lower()
+            classes = " ".join(el.get("class", [])) if el.get("class") else ""
+            classes_lower = classes.lower()
+
+            # Vérifier si cet élément est une définition de note de fin non liée
+            is_fn_def = False
+            if ("footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or
+                el.find_parent(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["footnote", "notes", "noteref"])})):
+                is_fn_def = True
+
+            txt = el.get_text(separator=" ", strip=True)
+            if not txt or txt == "[Retour au livre]" or len(txt) < 2:
+                continue
+
+            txt = re.sub(r'\s*\[\^([a-zA-Z0-9_\-]+)\]\s*', r' [^\1] ', txt)
+            txt = re.sub(r'[ \t]+', ' ', txt).strip()
+
+            if is_fn_def:
+                m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*[\.\:\-\)]*\s*(.*)', txt)
+                if m_fn:
+                    fn_id = m_fn.group(1) or m_fn.group(2)
+                    fn_body = m_fn.group(3).strip()
+                    if fn_id not in extracted_footnotes:
+                        extracted_footnotes[fn_id] = fn_body
+                continue
+
+            is_h1 = tag_name == "h1" or "chapter-title" in classes_lower or "ch-title" in classes_lower
+            is_h2 = tag_name == "h2" or "section-title" in classes_lower or "part-title" in classes_lower or "titre1" in classes_lower
+            is_h3 = tag_name == "h3" or "subsection-title" in classes_lower or "subheading" in classes_lower or "titre2" in classes_lower
+            is_h4 = tag_name in ["h4", "h5", "h6"] or "titre3" in classes_lower or "rubrique" in classes_lower
+
+            if not (is_h1 or is_h2 or is_h3 or is_h4) and tag_name in ["p", "div"]:
+                if any(k in classes_lower for k in ["title", "titre", "heading", "head", "subhead", "sectiontitle"]):
+                    is_h3 = True
+
+            if is_h1:
+                txt = f"# {txt}"
+            elif is_h2:
+                txt = f"## {txt}"
+            elif is_h3:
+                txt = f"### {txt}"
+            elif is_h4:
+                txt = f"#### {txt}"
+            elif tag_name == "blockquote":
+                txt = f"> {txt}"
+
+            paragraphs.append(txt)
+
+        if not paragraphs:
+            full_txt = soup.get_text(separator="\n", strip=True)
+            if full_txt:
+                paragraphs = [p.strip() for p in full_txt.split("\n") if p.strip()]
+
+        footnotes = []
+        sorted_fn_ids = sorted(extracted_footnotes.keys(), key=lambda x: int(x) if str(x).isdigit() else str(x))
+        for fid in sorted_fn_ids:
+            footnotes.append({"id": fid, "text": extracted_footnotes[fid]})
+
+        return paragraphs, footnotes
+
+    @classmethod
     def extract_chapters_and_chunks(
         cls, 
         epub_path: str, 
@@ -390,89 +621,12 @@ class EpubLoader:
 
                 try:
                     html_content = z.read(zip_file).decode('utf-8', errors='ignore')
-                    soup = BeautifulSoup(html_content, 'html.parser')
+                    paragraphs, footnotes = cls.process_chapter_html(z, zip_file, html_content)
 
-                    # Nettoyer les éléments indésirables (scripts, styles, nav)
-                    for tag in soup(["script", "style", "nav"]):
-                        tag.decompose()
-
-                    # Supprimer les balises de pagination papier InDesign (ex: <span class="page-papier">[14]</span>)
-                    for p_tag in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["page-papier", "page_papier", "pagenum", "pagebreak", "page-number"])}):
-                        p_tag.decompose()
-
-                    # Convertir les appels de notes (sup, a noteref, etc.) en marqueurs propres [^n]
-                    for fn_ref in soup.find_all(["sup", "a"]):
-                        is_fn = False
-                        if fn_ref.name == "sup":
-                            is_fn = True
-                        elif fn_ref.get("epub:type") == "noteref" or "footnote" in str(fn_ref.get("class", [])).lower() or "noteref" in str(fn_ref.get("class", [])).lower():
-                            is_fn = True
-                        elif fn_ref.get("href") and ("#fn" in fn_ref.get("href", "").lower() or "#note" in fn_ref.get("href", "").lower() or "note" in fn_ref.get("href", "").lower() or "footnote" in fn_ref.get("href", "").lower()):
-                            is_fn = True
-                        
-                        if is_fn:
-                            fn_txt = fn_ref.get_text(strip=True)
-                            fn_clean = re.sub(r'[^\w\d]', '', fn_txt)
-                            if fn_clean and (fn_clean.isdigit() or len(fn_clean) <= 4):
-                                fn_ref.replace_with(f" [^{fn_clean}] ")
-
-                    # Récupérer les blocs de texte structurés (paragraphes, titres, listes, citations)
-                    paragraphs = []
-                    for el in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "blockquote", "aside"]):
-                        tag_name = el.name.lower()
-                        classes = " ".join(el.get("class", [])) if el.get("class") else ""
-                        classes_lower = classes.lower()
-
-                        # Détection de titre
-                        is_h1 = tag_name == "h1" or "chapter-title" in classes_lower or "ch-title" in classes_lower
-                        is_h2 = tag_name == "h2" or "section-title" in classes_lower or "part-title" in classes_lower or "titre1" in classes_lower
-                        is_h3 = tag_name == "h3" or "subsection-title" in classes_lower or "subheading" in classes_lower or "titre2" in classes_lower
-                        is_h4 = tag_name in ["h4", "h5", "h6"] or "titre3" in classes_lower or "rubrique" in classes_lower
-
-                        # Titre via classe ou style si balise p ou div
-                        if not (is_h1 or is_h2 or is_h3 or is_h4) and tag_name in ["p", "div"]:
-                            if any(k in classes_lower for k in ["title", "titre", "heading", "head", "subhead", "sectiontitle"]):
-                                is_h3 = True
-
-                        txt = el.get_text(separator=" ", strip=True)
-                        if not txt or txt == "[Retour au livre]" or len(txt) < 2:
-                            continue
-
-                        # Nettoyer et normaliser les espaces
-                        txt = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', txt)
-                        txt = re.sub(r'[ \t]+', ' ', txt).strip()
-
-                        # Détection si c'est un paragraphe de note de bas de page (au bas du document)
-                        is_footnote_def = False
-                        if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or el.find_parent(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["footnote", "notes", "noteref"])}):
-                            is_footnote_def = True
-                        elif re.match(r'^\[\^(\d+)\]\s*:', txt):
-                            is_footnote_def = True
-
-                        if is_footnote_def:
-                            m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*[\.\:\-\)]*\s*(.*)', txt)
-                            if m_fn:
-                                fn_id = m_fn.group(1) or m_fn.group(2)
-                                fn_body = m_fn.group(3).strip()
-                                txt = f"[^{fn_id}]: {fn_body}"
-                        elif is_h1:
-                            txt = f"# {txt}"
-                        elif is_h2:
-                            txt = f"## {txt}"
-                        elif is_h3:
-                            txt = f"### {txt}"
-                        elif is_h4:
-                            txt = f"#### {txt}"
-                        elif tag_name == "blockquote":
-                            txt = f"> {txt}"
-
-                        paragraphs.append(txt)
-
-                    if not paragraphs:
-                        # Fallback texte global
-                        full_txt = soup.get_text(separator="\n", strip=True)
-                        if full_txt:
-                            paragraphs = [p.strip() for p in full_txt.split("\n") if p.strip()]
+                    # Ajouter les définitions de notes à la fin du texte pour enrichir l'indexation sémantique
+                    if footnotes:
+                        for fn in footnotes:
+                            paragraphs.append(f"[^{fn['id']}]: {fn['text']}")
 
                     # Assembler en morceaux sémantiques équilibrés (~1200-1600 caractères)
                     current_chunk_text = []
