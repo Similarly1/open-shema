@@ -1,4 +1,4 @@
-> N’aimez point le monde, ni les choses qui sont dans le monde. Si quelqu’un aime le monde, l’amour du Père n’est point en lui ; car tout ce qui est dans le monde, la convoitise de la chair, la convoitise des yeux, et l’orgueil de la vie, ne vient point du Père, mais vient du monde. Et le monde passe, et sa convoitise aussi ; mais celui qui fait la volonté de Dieu demeure éternellement.
+> N’aimez point le monde, ni les choses qui sont dans le monde. Si quelqu’un aime le monde, l’amour du Père n’est point en lui  ; car tout ce qui est dans le monde, la convoitise de la chair, la convoitise des yeux, et l’orgueil de la vie, ne vient point du Père, mais vient du monde. Et le monde passe, et sa convoitise aussi  ; mais celui qui fait la volonté de Dieu demeure éternellement.
 
 Jean ne dit pas seulement  : « Ne faites pas comme le monde. » Il va beaucoup plus loin  : « N’aimez pas le monde. »
 
@@ -114,7 +114,7 @@ Quels désirs ces œuvres produiront-elles dans notre cœur  ? Nous pousseron
 
 Dieu veut notre cœur et notre maturité. Il veut que nous discernions ce qui peut nous éloigner de lui et que, par amour pour lui, nous sachions y renoncer.
 
-Si nous sentons qu’une série ou qu’un film nous éloigne de Dieu, notre réponse devrait être simple  : « Parce que mon amour pour Dieu est plus important, j’y renonce avec joie. Je n’aurai rien perdu lorsque le FOMO du monde sera passé. »
+Si nous sentons qu’une série ou qu’un film nous éloigne de Dieu, notre réponse devrait être simple  : « Parce que mon amour pour Dieu est plus important, j’y renonce avec joie. Je n’aurai rien perdu lorsque le FOMO [^1] du monde sera passé. »
 
 Pourquoi notre cœur est-il si souvent sec lorsque nous ouvrons la Bible ou chantons des cantiques, après avoir passé des heures à faire défiler des contenus qui nourrissent notre amour du monde  ?
 
@@ -136,7 +136,7 @@ La convoitise de la chair veut ressentir. La convoitise des yeux veut posséder.
 
 Jean répond  :
 
-> Le monde passe, et sa convoitise aussi ; mais celui qui fait la volonté de Dieu demeure éternellement.
+> Le monde passe, et sa convoitise aussi  ; mais celui qui fait la volonté de Dieu demeure éternellement.
 
 Jean ne dit pas seulement que le monde passera un jour. Il affirme que sa disparition est déjà en cours. Il appartient à un âge condamné. Par la résurrection de Christ, la vie éternelle a déjà fait irruption dans le présent. Jésus a vaincu le monde  ! (Jn 16.33)
 
@@ -164,7 +164,7 @@ Lorsque Dieu nous dit  : « N’aimez pas le monde », désobéir est un p
 
 > Démas m’a abandonné, par amour pour le siècle présent.
 
-> — 2 Tm 4.10
+> — 2 Timothée 4.10
 
 Démas avait travaillé aux côtés de Paul. Il avait pris un bon départ et s’était engagé. Mais il n’a pas rejeté le monde. Il n’a probablement pas abandonné Paul en un jour. L’amour du monde s’est installé par une tolérance, puis par un compromis, puis par un autre, jusqu’au jour où ce qu’il aimait en secret est devenu plus précieux que Jésus. Voici son épitaphe spirituelle  : « Il a aimé le siècle présent. »
 
@@ -172,7 +172,7 @@ Qu’attendez-vous secrètement du monde que vous devriez chercher en Dieu  ?
 
 Confessons-les à Dieu et écoutons ce que Jean nous affirme  :
 
-> Voici comment Dieu a manifesté son amour pour nous : il a envoyé son Fils unique dans le monde pour que, par lui, nous ayons la vie. Voici en quoi consiste l’amour : ce n’est pas nous qui avons aimé Dieu, mais c’est lui qui nous a aimés ; aussi a-t-il envoyé son Fils pour expier nos péchés.
+> Voici comment Dieu a manifesté son amour pour nous  : il a envoyé son Fils unique dans le monde pour que, par lui, nous ayons la vie. Voici en quoi consiste l’amour  : ce n’est pas nous qui avons aimé Dieu, mais c’est lui qui nous a aimés  ; aussi a-t-il envoyé son Fils pour expier nos péchés.
 
 > — *1 Jean 4.9-10, BDS*
 
@@ -181,3 +181,4 @@ Ce qui orientera vos pensées, vos affections et vos actes, bref, votre vie enti
 Ne donnons notre cœur à rien ni à personne d’autre qu’à Dieu.
 
 Le monde passe avec ses désirs. Mais celui qui fait la volonté de Dieu demeure éternellement.
+1. FOMO : *Fear of missing out* . Désigne la peur constante et anxiogène de rater une information, un événement ou une opportunité sociale. [↩︎](#1526902a-214f-4a33-bcfa-94dc3982fb22-link)

@@ -794,7 +794,7 @@ const TheologyView = {
               <li class="theol-fn-item" id="theol-fn-${fn.id}" data-fn-id="${fn.id}">
                 <span class="theol-fn-num">${fn.id}.</span>
                 <div class="theol-fn-content">
-                  <span class="theol-fn-text">${this.linkifyUrls(this.highlightScriptureReferences(cleanFnText))}</span>
+                  <span class="theol-fn-text">${this.linkifyUrls(this.highlightScriptureReferences(this.renderInlineMarkdown(cleanFnText)))}</span>
                   <a href="#theol-fnref-${fn.id}" class="theol-fn-backref" data-target-id="theol-fnref-${fn.id}" title="Retour au passage">↩</a>
                 </div>
               </li>
@@ -1151,15 +1151,24 @@ const TheologyView = {
     }).join('');
   },
 
+  renderInlineMarkdown(txt) {
+    if (!txt) return '';
+    let res = txt;
+    res = res.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+    res = res.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+    res = res.replace(/(^|[^\w])_([^_]+)_([^\w]|$)/g, '$1<em>$2</em>$3');
+    return res;
+  },
+
   formatFootnoteReferences(html, footnoteMap = {}) {
     if (!html) return '';
-    // 1. Remplacer les marqueurs explicites [^1] ou [^14]
-    let result = html.replace(/\[\^(\d+)\]/g, (match, id) => {
+    // 1. Remplacer les marqueurs explicites [^1] ou [^14] ou alphanumériques [^ch1fn1]
+    let result = html.replace(/\[\^([a-zA-Z0-9_\-]+)\]/g, (match, id) => {
       return `<sup class="theol-fn-badge" data-fn-id="${id}" id="theol-fnref-${id}"><a href="#theol-fn-${id}" title="Note ${id}">${id}</a></sup>`;
     });
 
     // 2. Remplacer les [1] ou [14] si l'id existe dans footnoteMap
-    result = result.replace(/\[(\d+)\]/g, (match, id) => {
+    result = result.replace(/\[([a-zA-Z0-9_\-]+)\]/g, (match, id) => {
       if (footnoteMap && footnoteMap[String(id)]) {
         return `<sup class="theol-fn-badge" data-fn-id="${id}" id="theol-fnref-${id}"><a href="#theol-fn-${id}" title="Note ${id}">${id}</a></sup>`;
       }
@@ -2531,9 +2540,18 @@ const FootnoteTooltip = {
     this.activeTarget = targetEl;
     this.activeFnId = fnId;
 
-    const formattedText = (typeof TheologyView !== 'undefined' && TheologyView.linkifyUrls)
-      ? TheologyView.linkifyUrls(TheologyView.highlightScriptureReferences(text))
-      : text;
+    let formattedText = text;
+    if (typeof TheologyView !== 'undefined') {
+      if (TheologyView.renderInlineMarkdown) {
+        formattedText = TheologyView.renderInlineMarkdown(formattedText);
+      }
+      if (TheologyView.highlightScriptureReferences) {
+        formattedText = TheologyView.highlightScriptureReferences(formattedText);
+      }
+      if (TheologyView.linkifyUrls) {
+        formattedText = TheologyView.linkifyUrls(formattedText);
+      }
+    }
 
     this.tooltipEl.innerHTML = `
       <div class="theol-fn-popover-header">

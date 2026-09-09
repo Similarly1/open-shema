@@ -498,7 +498,6 @@ class TheologyReaderManager:
         elif fpath and os.path.exists(fpath) and fpath.lower().endswith(".epub"):
             try:
                 import zipfile
-                from bs4 import BeautifulSoup
                 from core.epub_loader import EpubLoader
                 inspect_data = EpubLoader.inspect_epub(fpath)
                 ch_info = next((c for c in inspect_data.get("chapters", []) if c.get("id") == cid_query or str(c.get("id")) == str(cid_query)), None)
@@ -506,80 +505,8 @@ class TheologyReaderManager:
                     with zipfile.ZipFile(fpath, 'r') as z:
                         if ch_info["zip_file"] in z.namelist():
                             html_content = z.read(ch_info["zip_file"]).decode('utf-8', errors='ignore')
-                            soup = BeautifulSoup(html_content, 'html.parser')
-                            for tag in soup(["script", "style", "nav"]):
-                                tag.decompose()
-                            
-                            for p_tag in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["page-papier", "page_papier", "pagenum", "pagebreak", "page-number"])}):
-                                p_tag.decompose()
+                            direct_paragraphs, direct_footnotes = EpubLoader.process_chapter_html(z, ch_info["zip_file"], html_content)
 
-                            direct_paragraphs = []
-                            # Convertir les appels de notes (sup, a noteref, etc.) en marqueurs propres [^n]
-                            for fn_ref in soup.find_all(["sup", "a"]):
-                                is_fn = False
-                                if fn_ref.name == "sup":
-                                    is_fn = True
-                                elif fn_ref.get("epub:type") == "noteref" or "footnote" in str(fn_ref.get("class", [])).lower() or "noteref" in str(fn_ref.get("class", [])).lower():
-                                    is_fn = True
-                                elif fn_ref.get("href") and ("#fn" in fn_ref.get("href", "").lower() or "#note" in fn_ref.get("href", "").lower() or "note" in fn_ref.get("href", "").lower() or "footnote" in fn_ref.get("href", "").lower()):
-                                    is_fn = True
-                                
-                                if is_fn:
-                                    fn_txt = fn_ref.get_text(strip=True)
-                                    fn_clean = re.sub(r'[^\w\d]', '', fn_txt)
-                                    if fn_clean and (fn_clean.isdigit() or len(fn_clean) <= 4):
-                                        fn_ref.replace_with(f" [^{fn_clean}] ")
-
-                            for el in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "blockquote", "aside"]):
-                                tag_name = el.name.lower()
-                                classes = " ".join(el.get("class", [])) if el.get("class") else ""
-                                classes_lower = classes.lower()
-
-                                is_h1 = tag_name == "h1" or "chapter-title" in classes_lower or "ch-title" in classes_lower
-                                is_h2 = tag_name == "h2" or "section-title" in classes_lower or "part-title" in classes_lower or "titre-niveau-1" in classes_lower
-                                is_h3 = tag_name == "h3" or "subsection-title" in classes_lower or "subheading" in classes_lower or "titre-niveau-2" in classes_lower
-                                is_h4 = tag_name in ["h4", "h5", "h6"] or "rubrique" in classes_lower or "titre-niveau-3" in classes_lower
-
-                                if not (is_h1 or is_h2 or is_h3 or is_h4) and tag_name in ["p", "div"]:
-                                    if any(k in classes_lower for k in ["title", "titre", "heading", "head", "subhead"]):
-                                        is_h3 = True
-
-                                txt = el.get_text(separator=" ", strip=True)
-                                if not txt or txt == "[Retour au livre]" or len(txt) < 2:
-                                    continue
-
-                                txt = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', txt)
-                                txt = re.sub(r'[ \t]+', ' ', txt).strip()
-
-                                is_footnote_def = False
-                                if "footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or el.find_parent(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["footnote", "notes", "noteref"])}):
-                                    is_footnote_def = True
-                                elif re.match(r'^\[\^(\d+)\]\s*:', txt):
-                                    is_footnote_def = True
-
-                                if is_footnote_def:
-                                    m_fn = re.match(r'^(?:\[\^?(\d+)\]|\b(\d+)\b)\s*[\.\:\-\)]*\s*(.*)', txt)
-                                    if m_fn:
-                                        fn_id = m_fn.group(1) or m_fn.group(2)
-                                        fn_body = m_fn.group(3).strip()
-                                        txt = f"[^{fn_id}]: {fn_body}"
-                                elif is_h1:
-                                    txt = f"# {txt}"
-                                elif is_h2:
-                                    txt = f"## {txt}"
-                                elif is_h3:
-                                    txt = f"### {txt}"
-                                elif is_h4:
-                                    txt = f"#### {txt}"
-                                elif tag_name == "blockquote":
-                                    txt = f"> {txt}"
-
-                                direct_paragraphs.append(txt)
-
-                            if not direct_paragraphs:
-                                full_txt = soup.get_text(separator="\n", strip=True)
-                                direct_paragraphs = [p.strip() for p in full_txt.split("\n") if p.strip()]
-                            
                             for idx_p, p_text in enumerate(direct_paragraphs):
                                 chunks.append((f"{book_name}_direct_{idx_p}", {
                                     "chapter_title": ch_info.get("title", ""),
@@ -587,7 +514,15 @@ class TheologyReaderManager:
                                     "title": book_meta.get("title", book_name),
                                     "author": book_meta.get("author", "")
                                 }, p_text))
-                            
+
+                            for fn in direct_footnotes:
+                                chunks.append((f"{book_name}_direct_fn_{fn['id']}", {
+                                    "chapter_title": ch_info.get("title", ""),
+                                    "name": book_name,
+                                    "title": book_meta.get("title", book_name),
+                                    "author": book_meta.get("author", "")
+                                }, f"[^{fn['id']}]: {fn['text']}"))
+
                             chapter_meta = {
                                 "chapter_title": ch_info.get("title", ""),
                                 "name": book_name,
@@ -726,8 +661,8 @@ class TheologyReaderManager:
 
         # 1ère passe : identifier les notes explicites [^n]: ...
         for p in raw_paragraphs:
-            if re.search(r'\[\^(\d+)\]:\s*', p):
-                fn_matches = list(re.finditer(r'\[\^(\d+)\]:\s*(.+?)(?=(?:\n\[\^\d+\]:|\Z))', p, re.DOTALL))
+            if re.search(r'\[\^([a-zA-Z0-9_\-]+)\]:\s*', p):
+                fn_matches = list(re.finditer(r'\[\^([a-zA-Z0-9_\-]+)\]:\s*(.+?)(?=(?:\n\[\^[a-zA-Z0-9_\-]+\]:|\Z))', p, re.DOTALL))
                 if fn_matches:
                     for m in fn_matches:
                         fn_id = m.group(1)
@@ -738,7 +673,7 @@ class TheologyReaderManager:
                             footnotes.append({"id": fn_id, "text": fn_text})
                     # Si le paragraphe ne contient que des notes ou commence par ### Notes, ne pas l'ajouter au corps de texte
                     lines = [l.strip() for l in p.split('\n') if l.strip()]
-                    non_note_lines = [l for l in lines if not re.match(r'^(?:\[\^\d+\]:|###|---\s*$|\*\*\*\s*$|Notes de bas de page)', l, re.IGNORECASE)]
+                    non_note_lines = [l for l in lines if not re.match(r'^(?:\[\^[a-zA-Z0-9_\-]+\]:|###|---\s*$|\*\*\*\s*$|Notes de bas de page)', l, re.IGNORECASE)]
                     if non_note_lines:
                         body_paragraphs.append("\n".join(non_note_lines))
                     continue
@@ -803,10 +738,11 @@ class TheologyReaderManager:
             if footnotes:
                 for fid in fn_ids_list:
                     # Remplacer uniquement les marqueurs déjà entre crochets : [fid] ou [^fid]
-                    p_mod = re.sub(r'\[\^?' + fid + r'\]', f' [^{fid}] ', p_mod)
+                    p_mod = re.sub(r'\[\^?' + re.escape(fid) + r'\]', f' [^{fid}] ', p_mod)
                 
                 # Nettoyer les espaces superflus autour des marqueurs
-                p_mod = re.sub(r'\s*\[\^(\d+)\]\s*', r' [^\1] ', p_mod)
+                p_mod = re.sub(r'\s*\[\^([a-zA-Z0-9_\-]+)\]\s*', r' [^\1] ', p_mod)
+                p_mod = re.sub(r'[ \t]+', ' ', p_mod).strip()
                 p_mod = re.sub(r'[ \t]+', ' ', p_mod).strip()
 
             normalized_body.append(p_mod)

@@ -89,7 +89,8 @@ def build():
                 "gospel_parallels.json",             # Harmonie des évangiles
                 "french_accent_map.json",            # Traitement linguistique
                 "french_words.json",
-                "config.example.json"
+                "config.example.json",
+                "bibleproject_fr.json"
             ]
             for fname in essential_files:
                 src_f = os.path.join(src_data_dir, fname)

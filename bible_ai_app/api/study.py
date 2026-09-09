@@ -14,6 +14,7 @@ import webview
 import threading
 import time
 import shutil
+import base64
 from typing import Dict, List, Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -593,4 +594,120 @@ class StudyMixin:
         if isinstance(result, (list, tuple)):
             result = result[0]
         return {"success": True, "path": result}
+
+    def export_mindmap_file(self, data_base64: str, filename: str, format_type: str = "png", pdf_options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Exporte une Mind Map au format PDF, PNG ou JPG avec dialogue de sauvegarde natif Windows (pywebview).
+        """
+        win = get_active_window()
+        if not win:
+            return {"success": False, "error": "Fenêtre introuvable"}
+
+        fmt = (format_type or "png").lower()
+        if fmt == "pdf":
+            file_types = ('Documents PDF (*.pdf)', 'Tous les fichiers (*.*)')
+            ext = ".pdf"
+        elif fmt in ("jpg", "jpeg"):
+            file_types = ('Images JPEG (*.jpg;*.jpeg)', 'Tous les fichiers (*.*)')
+            ext = ".jpg"
+        else:
+            file_types = ('Images PNG (*.png)', 'Tous les fichiers (*.*)')
+            ext = ".png"
+
+        now_str = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        clean_name = filename.strip() if filename and filename.strip() else f"mindmap_{now_str}"
+        # Remplacer les caractères interdits dans les noms de fichiers Windows
+        clean_name = re.sub(r'[\\/*?:"<>|]', '_', clean_name)
+        if not clean_name.lower().endswith(ext):
+            clean_name += ext
+
+        save_path = win.create_file_dialog(
+            webview.SAVE_DIALOG,
+            save_filename=clean_name,
+            file_types=file_types
+        )
+        if not save_path:
+            return {"cancelled": True}
+
+        if isinstance(save_path, (list, tuple)):
+            save_path = save_path[0]
+
+        try:
+            # Nettoyer l'en-tête data URL si présent (ex: data:image/png;base64,...)
+            if "," in data_base64:
+                raw_b64 = data_base64.split(",", 1)[1]
+            else:
+                raw_b64 = data_base64
+            binary_data = base64.b64decode(raw_b64)
+
+            if fmt == "pdf":
+                import fitz
+                opts = pdf_options or {}
+                page_format = opts.get("pageFormat", "a4_landscape") # "a4_landscape" | "fit"
+                title = opts.get("title", "")
+                reference = opts.get("reference", "")
+                include_header = opts.get("includeHeader", True)
+
+                # Dimensions de l'image
+                img_doc = fitz.open(stream=binary_data, filetype="png")
+                img_rect = img_doc[0].rect
+                img_w = float(img_rect.width) if img_rect.width > 0 else 1000.0
+                img_h = float(img_rect.height) if img_rect.height > 0 else 700.0
+
+                pdf_doc = fitz.open()
+                margin = 28.0 # ~10mm de marge
+
+                if page_format == "fit":
+                    header_h = 36.0 if (include_header and (title or reference)) else 0.0
+                    page_w = img_w + (margin * 2)
+                    page_h = img_h + (margin * 2) + header_h
+                    page = pdf_doc.new_page(width=page_w, height=page_h)
+
+                    if header_h > 0:
+                        if title:
+                            page.insert_text(fitz.Point(margin, margin + 14), title, fontsize=13, color=(0.12, 0.12, 0.12))
+                        if reference:
+                            ref_text = f"Passage : {reference}"
+                            txt_len = fitz.get_text_length(ref_text, fontsize=10)
+                            page.insert_text(fitz.Point(page_w - margin - txt_len, margin + 14), ref_text, fontsize=10, color=(0.35, 0.35, 0.35))
+
+                    target_rect = fitz.Rect(margin, margin + header_h, margin + img_w, margin + header_h + img_h)
+                    page.insert_image(target_rect, stream=binary_data)
+                else:
+                    # A4 Paysage standard (841.89 x 595.28 pt)
+                    a4_w, a4_h = 841.89, 595.28
+                    page = pdf_doc.new_page(width=a4_w, height=a4_h)
+                    header_h = 32.0 if (include_header and (title or reference)) else 0.0
+
+                    if header_h > 0:
+                        if title:
+                            page.insert_text(fitz.Point(margin, margin + 12), title, fontsize=12, color=(0.12, 0.12, 0.12))
+                        if reference:
+                            ref_text = f"Passage : {reference}"
+                            txt_len = fitz.get_text_length(ref_text, fontsize=9.5)
+                            page.insert_text(fitz.Point(a4_w - margin - txt_len, margin + 12), ref_text, fontsize=9.5, color=(0.35, 0.35, 0.35))
+                        page.draw_line(fitz.Point(margin, margin + 18), fitz.Point(a4_w - margin, margin + 18), color=(0.85, 0.85, 0.85), width=0.6)
+
+                    avail_w = a4_w - (margin * 2)
+                    avail_h = a4_h - (margin * 2) - header_h
+                    ratio = min(avail_w / img_w, avail_h / img_h, 1.0)
+                    scaled_w = img_w * ratio
+                    scaled_h = img_h * ratio
+                    offset_x = margin + (avail_w - scaled_w) / 2.0
+                    offset_y = margin + header_h + (avail_h - scaled_h) / 2.0
+
+                    target_rect = fitz.Rect(offset_x, offset_y, offset_x + scaled_w, offset_y + scaled_h)
+                    page.insert_image(target_rect, stream=binary_data)
+
+                pdf_doc.save(save_path)
+                pdf_doc.close()
+            else:
+                with open(save_path, "wb") as f:
+                    f.write(binary_data)
+
+            return {"success": True, "path": save_path, "format": fmt}
+        except Exception as e:
+            logger.error("Erreur export mindmap (%s): %s", fmt, e, exc_info=True)
+            return {"success": False, "error": str(e)}
+
 

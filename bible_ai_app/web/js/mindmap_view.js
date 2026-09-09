@@ -131,6 +131,20 @@ const MindMapView = {
         <!-- Vue Plan (Outliner hiérarchique interactif) -->
         <div id="mindmap-outline-view" class="mindmap-outline-container hidden"></div>
 
+        <!-- Bandeau supérieur discret en plein écran -->
+        <div class="mm-fullscreen-bar" id="mm-fullscreen-bar">
+          <div class="mm-fs-bar-left">
+            <span class="mm-fs-note-title" id="mm-fs-note-title">Mind Map</span>
+            <span class="mm-fs-note-ref" id="mm-fs-note-ref" style="display: none;"></span>
+          </div>
+          <div class="mm-fs-bar-right">
+            <button type="button" class="mm-fs-exit-btn" id="mm-fs-btn-exit" title="Quitter le plein écran (Échap ou F11)">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/></svg>
+              <span>Quitter le plein écran</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Bannière d'indication mode liaison -->
         <div id="mm-connecting-banner" class="mm-connecting-banner hidden">
           <div class="mm-connecting-badge">
@@ -183,6 +197,9 @@ const MindMapView = {
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-export" title="Exporter la carte mentale en PDF / PNG / JPG (Ctrl+E)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button type="button" class="mm-dock-btn" id="mm-btn-fullscreen" title="Mode Plein Écran (F11 ou F)">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
           </button>
           <button type="button" class="mm-dock-btn" id="mm-btn-help" title="Aide raccourcis clavier (?)">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -597,6 +614,14 @@ const MindMapView = {
     document.getElementById('mm-btn-theme')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.togglePaperMode(); });
     document.getElementById('mm-btn-palette')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cyclePalette(); });
     document.getElementById('mm-btn-export')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.openExportModal(); });
+    document.getElementById('mm-btn-fullscreen')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleFullscreen(); });
+    document.getElementById('mm-fs-btn-exit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleFullscreen(false); });
+    document.addEventListener('fullscreenchange', () => {
+      const isNativeFs = !!document.fullscreenElement;
+      if (!isNativeFs && document.body.classList.contains('mindmap-fullscreen-active')) {
+        this.toggleFullscreen(false);
+      }
+    });
     document.getElementById('mm-btn-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(); });
     document.getElementById('mm-btn-close-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(false); });
     document.getElementById('mm-btn-open-markdown-guide')?.addEventListener('click', (e) => {
@@ -845,9 +870,25 @@ const MindMapView = {
         return;
       }
 
+      // Bascule Plein Écran (F11)
+      if (e.key === 'F11') {
+        e.preventDefault();
+        this.toggleFullscreen();
+        return;
+      }
+
       // Si l'utilisateur est en train de taper dans un champ de saisie HTML
       const activeTag = document.activeElement?.tagName;
-      if (['INPUT', 'TEXTAREA'].includes(activeTag)) return;
+      if (['INPUT', 'TEXTAREA'].includes(activeTag) || document.activeElement?.isContentEditable) return;
+
+      // Raccourci direct 'I' pour la palette d'icônes SVG sur le nœud sélectionné
+      if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'i' || e.key === 'I')) {
+        if (this.selectedNodeId) {
+          e.preventDefault();
+          this.openIconPicker(this.selectedNodeId);
+          return;
+        }
+      }
 
       // Annuler (Ctrl+Z) / Rétablir (Ctrl+Y ou Ctrl+Shift+Z)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
@@ -887,6 +928,16 @@ const MindMapView = {
         if (this.selectedNodeId) this.startInlineEdit(this.selectedNodeId);
       } else if (e.key === 'r' || e.key === 'R') {
         this.fitView();
+      } else if (e.key === 'Escape') {
+        if (document.body.classList.contains('mindmap-fullscreen-active')) {
+          e.preventDefault();
+          this.toggleFullscreen(false);
+          return;
+        }
+      } else if (!e.ctrlKey && !e.altKey && !e.metaKey && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        this.toggleFullscreen();
+        return;
       } else if (!e.ctrlKey && !e.altKey && !e.metaKey && (e.key === 'm' || e.key === 'M')) {
         e.preventDefault();
         this.toggleMarkerPopover();
@@ -973,9 +1024,30 @@ const MindMapView = {
     this.connectorStyle = connector;
     this.nodeShape = shape;
 
+    let rootIcon = null;
+    let rootTitle = (title || 'CONCEPT CENTRAL').toUpperCase();
+    if (markdownContent) {
+      const rootIconMatch = markdownContent.match(/<!--\s*mindmap-root-icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+      if (rootIconMatch) {
+        rootIcon = rootIconMatch[1].trim().toLowerCase();
+      }
+    }
+    const titleIconMatch = rootTitle.match(/::([a-zA-Z0-9_-]+):?/i);
+    if (titleIconMatch && typeof SvgIconsRegistry !== 'undefined') {
+      const cand = titleIconMatch[1].toLowerCase();
+      if (SvgIconsRegistry.has(cand)) {
+        rootIcon = cand;
+        rootTitle = rootTitle.replace(titleIconMatch[0], '').trim() || SvgIconsRegistry.get(cand)?.label?.toUpperCase();
+      }
+    }
+    if (!rootIcon && this.currentNote && this.currentNote.rootIcon) {
+      rootIcon = this.currentNote.rootIcon;
+    }
+
     const root = {
       id: 'root',
-      text: (title || 'CONCEPT CENTRAL').toUpperCase(),
+      text: rootTitle,
+      icon: rootIcon,
       ref: '',
       children: [],
       side: 'center',
@@ -1043,6 +1115,21 @@ const MindMapView = {
           }
         }
 
+        // Extraction d'une icône <!-- icon: ... --> ou ::icon::
+        let icon = null;
+        const iconCommentMatch = text.match(/<!--\s*icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
+        if (iconCommentMatch) {
+          icon = iconCommentMatch[1].trim().toLowerCase();
+          text = text.replace(iconCommentMatch[0], '').trim();
+        }
+        if (!icon) {
+          const iconTokenMatch = text.match(/^::([a-zA-Z0-9_-]+)::\s*/i) || text.match(/\s*::([a-zA-Z0-9_-]+)::$/i);
+          if (iconTokenMatch) {
+            icon = iconTokenMatch[1].trim().toLowerCase();
+            text = text.replace(iconTokenMatch[0], '').trim();
+          }
+        }
+
         // Extraction d'une référence biblique entre crochets [Jean 3:16] ou [Romains 3:21-31]
         let refMatch = text.match(/\[([A-Za-z0-9À-ÿ\s:.,\-–—]+)\]\s*$/);
         if (refMatch) {
@@ -1060,6 +1147,7 @@ const MindMapView = {
           id: `node_${idCounter++}`,
           text: text.toUpperCase(), // Loi 4 de Buzan : MAJUSCULES
           marker: marker,
+          icon: icon,
           ref: ref,
           note: noteText,
           children: [],
@@ -1323,14 +1411,18 @@ const MindMapView = {
     if (this.nodeShape && this.nodeShape !== 'underline') {
       md += `<!-- mindmap-node-shape: ${this.nodeShape} -->\n`;
     }
+    if (tree && tree.icon) {
+      md += `<!-- mindmap-root-icon: ${tree.icon} -->\n`;
+    }
     const serializeChildren = (node, indentLevel) => {
       if (!node || !node.children) return;
       for (const child of node.children) {
         const indent = '  '.repeat(indentLevel);
         const markerPart = child.marker ? ` <!-- marker: ${child.marker} -->` : '';
+        const iconPart = child.icon ? ` <!-- icon: ${child.icon} -->` : '';
         const refPart = child.ref ? ` [${child.ref}]` : '';
         const notePart = child.note ? ` <!-- note: ${child.note.replace(/\r?\n/g, ' ')} -->` : '';
-        md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}\n`;
+        md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}${iconPart}\n`;
         serializeChildren(child, indentLevel + 1);
       }
     };
@@ -1591,18 +1683,21 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = markerW + textW + refW + noteW;
+      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
       node.width = Math.max(92, node.contentWidth + 32);
       node.height = 32;
     } else if (node.level === 0) {
-      const textW = this.getTextWidth(node.text, 14, '800');
+      // NIVEAU 0 (Thème général / Noyau central dominant - icône grande et majestueuse)
+      const textW = this.getTextWidth(node.text, 16, '900');
       node.textWidth = textW;
       node.markerWidth = 0;
-      node.width = Math.max(120, textW + 48);
-      node.height = 46;
+      const iconW = node.icon ? 38 : 0;
+      node.iconWidth = iconW;
+      node.width = Math.max(140, textW + iconW + (node.icon ? 60 : 54));
+      node.height = node.icon ? 58 : 52;
     } else if (node.level === 1) {
-      // NIVEAU 1 (BOIs - Règles de Buzan : plus gros, majuscules, autoritaire)
-      const textW = this.getTextWidth(node.text, 13.5, '800');
+      // NIVEAU 1 (BOIs - Règles de Buzan : mots-clés forces, affirmé et contrasté)
+      const textW = this.getTextWidth(node.text, 14, '800');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1633,10 +1728,10 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(90, node.contentWidth + 34);
-      node.height = 34; // Plus gros que les niveaux inférieurs (34px vs 28px/24px)
+      node.width = Math.max(96, node.contentWidth + 36);
+      node.height = 36; // Plus imposant que les niveaux inférieurs (36px vs 28px/24px)
     } else if (node.level === 2) {
-      // NIVEAU 2 (Sous-branches)
+      // NIVEAU 2 (Sous-branches subordonnées)
       const textW = this.getTextWidth(node.text, 11.5, '700');
       node.textWidth = textW;
 
@@ -1668,11 +1763,11 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(76, node.contentWidth + 30);
+      node.width = Math.max(82, node.contentWidth + 30);
       node.height = 28;
     } else {
-      // NIVEAU 3+ (Détails fins)
-      const textW = this.getTextWidth(node.text, 10.5, '600');
+      // NIVEAU 3+ (Détails fins légers)
+      const textW = this.getTextWidth(node.text, 10, '600');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1732,13 +1827,15 @@ const MindMapView = {
 
   measureTopDown(node) {
     if (node.level === 0) {
-      const textW = this.getTextWidth(node.text, 14, '800');
+      const textW = this.getTextWidth(node.text, 16, '900');
       node.textWidth = textW;
       node.markerWidth = 0;
-      node.width = Math.max(120, textW + 48);
-      node.height = 46;
+      const iconW = node.icon ? 38 : 0;
+      node.iconWidth = iconW;
+      node.width = Math.max(140, textW + iconW + (node.icon ? 60 : 54));
+      node.height = node.icon ? 58 : 52;
     } else if (node.level === 1) {
-      const textW = this.getTextWidth(node.text, 13.5, '800');
+      const textW = this.getTextWidth(node.text, 14, '800');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1769,8 +1866,8 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(90, node.contentWidth + 34);
-      node.height = 34;
+      node.width = Math.max(96, node.contentWidth + 36);
+      node.height = 36;
     } else if (node.level === 2) {
       const textW = this.getTextWidth(node.text, 11.5, '700');
       node.textWidth = textW;
@@ -1803,10 +1900,10 @@ const MindMapView = {
       }
 
       node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(76, node.contentWidth + 30);
+      node.width = Math.max(82, node.contentWidth + 30);
       node.height = 28;
     } else {
-      const textW = this.getTextWidth(node.text, 10.5, '600');
+      const textW = this.getTextWidth(node.text, 10, '600');
       node.textWidth = textW;
 
       let markerW = 0;
@@ -1836,7 +1933,10 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = markerW + textW + refW + noteW;
+      const iconW = node.icon ? 20 : 0;
+      node.iconWidth = iconW;
+
+      node.contentWidth = markerW + iconW + textW + refW + noteW;
       node.width = Math.max(68, node.contentWidth + 26);
       node.height = 24;
     }
@@ -1983,6 +2083,15 @@ const MindMapView = {
     this.updateViewModeUI();
     this.updateStructureUI();
     this.updateStylesUI();
+
+    const fsTitleEl = document.getElementById('mm-fs-note-title');
+    const fsRefEl = document.getElementById('mm-fs-note-ref');
+    if (fsTitleEl) fsTitleEl.textContent = note.title || 'Mind Map';
+    if (fsRefEl) {
+      const ref = (note.reference || '').trim();
+      fsRefEl.textContent = ref ? `Passage : ${ref}` : '';
+      fsRefEl.style.display = ref ? 'inline' : 'none';
+    }
   },
 
   refreshView() {
@@ -2034,17 +2143,14 @@ const MindMapView = {
 
     // 1. Bouton en-tête des notes
     const headerBtn = document.getElementById('btn-toggle-mindmap-mode');
-    const headerLabel = document.getElementById('label-mm-mode');
     if (headerBtn) {
       headerBtn.classList.toggle('btn-primary', isOutline);
       headerBtn.classList.toggle('btn-secondary', !isOutline);
       headerBtn.title = isOutline ? 'Basculer en Vue Carte Mind Map (Alt+P)' : 'Basculer en Vue Plan Outliner (Alt+P)';
       headerBtn.innerHTML = isOutline ? `
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
-        <span id="label-mm-mode">Vue Carte</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
       ` : `
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        <span id="label-mm-mode">Vue Plan</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       `;
     }
 
@@ -2096,13 +2202,18 @@ const MindMapView = {
           <div class="mm-outline-sheet">
             <!-- Titre Noyau Central -->
             <div class="mm-outline-root-header">
-              <div class="mm-outline-root-badge">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
+              <div class="mm-outline-root-badge" data-id="root" style="cursor: pointer;" title="Changer l'icône du concept central (I)">
+                ${this.tree.icon && typeof SvgIconsRegistry !== 'undefined' && SvgIconsRegistry.get(this.tree.icon)
+                  ? SvgIconsRegistry.getSvg(this.tree.icon, 20)
+                  : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>'}
               </div>
               <div class="mm-outline-root-title" data-id="root" title="Cliquer pour modifier le concept central">
                 ${this.escapeHtml(this.tree.text)}
               </div>
               <div class="mm-outline-actions root-actions" style="opacity: 1;">
+                <button type="button" class="btn-icon-subtle" data-action="svg-icon" data-id="root" title="Associer une icône SVG (I)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M7 8h10"/></svg>
+                </button>
                 <button type="button" class="btn-icon-subtle" data-action="edit-node" data-id="root" title="Modifier le titre">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                 </button>
@@ -2172,6 +2283,7 @@ const MindMapView = {
               <span class="mm-outline-dot-bullet" style="background: ${color};"></span>
             `}
             ${this.renderOutlineMarkerPill(boi)}
+            ${this.renderOutlineIconPill(boi)}
             <span class="mm-outline-text boi-text" data-id="${boi.id}" title="Cliquer pour modifier">${this.escapeHtml(boi.text)}</span>
             ${boi.ref ? `
               <span class="mm-outline-ref-pill" data-ref="${this.escapeHtml(boi.ref)}" title="Cliquer pour lire le passage biblique">
@@ -2237,6 +2349,7 @@ const MindMapView = {
               <span class="mm-outline-sub-bullet"></span>
             `}
             ${this.renderOutlineMarkerPill(node)}
+            ${this.renderOutlineIconPill(node)}
             <span class="mm-outline-text sub-text" data-id="${node.id}" title="Cliquer pour modifier">${this.escapeHtml(node.text)}</span>
             ${node.ref ? `
               <span class="mm-outline-ref-pill" data-ref="${this.escapeHtml(node.ref)}" title="Cliquer pour lire le passage biblique">
@@ -2403,10 +2516,35 @@ const MindMapView = {
           case 'delete':
             this.deleteNode(nodeId);
             break;
+          case 'svg-icon':
+            this.openIconPicker(nodeId, e.clientX, e.clientY);
+            break;
           case 'edit-node':
             const targetText = outlineEl.querySelector(`.mm-outline-text[data-id="${nodeId}"], .mm-outline-root-title[data-id="${nodeId}"]`);
             if (targetText) this.startOutlineInlineEdit(nodeId, targetText);
             break;
+        }
+      });
+    });
+
+    // Clic direct sur une pastille d'icône SVG (nœud ou racine) dans la vue plan
+    outlineEl.querySelectorAll('.mm-outline-icon-badge, .mm-outline-root-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nodeId = badge.getAttribute('data-id') || 'root';
+        this.openIconPicker(nodeId, e.clientX, e.clientY);
+      });
+    });
+
+    // Clic droit dans la vue plan pour ouvrir le menu contextuel
+    outlineEl.querySelectorAll('.mm-outline-root-header, .mm-outline-row, [data-node-id]').forEach(el => {
+      el.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const nodeId = el.getAttribute('data-node-id') || el.querySelector('[data-id]')?.getAttribute('data-id') || (el.classList.contains('mm-outline-root-header') ? 'root' : null);
+        if (nodeId) {
+          this.selectNode(nodeId);
+          this.showContextMenu(e.clientX, e.clientY, nodeId);
         }
       });
     });
@@ -2679,12 +2817,23 @@ const MindMapView = {
     const commit = () => {
       if (committed) return;
       committed = true;
-      const val = input.value.trim().toUpperCase() || originalText;
-      node.text = val;
+      let val = input.value.trim().toUpperCase() || originalText;
+      const iconMatch = val.match(/::([a-zA-Z0-9_-]+):?/i);
+      if (iconMatch && typeof SvgIconsRegistry !== 'undefined') {
+        const candidate = iconMatch[1].toLowerCase();
+        if (SvgIconsRegistry.has(candidate)) {
+          node.icon = candidate;
+          val = val.replace(iconMatch[0], '').trim();
+          if (nodeId === 'root' && this.currentNote) {
+            this.currentNote.rootIcon = candidate;
+          }
+        }
+      }
+      node.text = val || (node.icon ? SvgIconsRegistry.get(node.icon)?.label?.toUpperCase() : originalText);
       if (nodeId === 'root' && this.currentNote) {
-        this.currentNote.title = val;
+        this.currentNote.title = node.text;
         const titleInput = document.getElementById('note-edit-title');
-        if (titleInput) titleInput.value = val;
+        if (titleInput) titleInput.value = node.text;
       }
       this.layoutTree();
       this.renderOutlineView();
@@ -2800,19 +2949,42 @@ const MindMapView = {
 
           if (isRoot) {
             isTapered = true;
-            const w1 = 1.4;
-            const w2 = 4.2;
-            const leftX1 = (x1 - w1 / 2).toFixed(2);
-            const rightX1 = (x1 + w1 / 2).toFixed(2);
-            const leftX2 = (x2 - w2 / 2).toFixed(2);
-            const rightX2 = (x2 + w2 / 2).toFixed(2);
+            const w1 = 3.6;
+            const wm = 6.2;
+            const w2 = 2.6;
+            const xm = (x1 + x2) / 2;
+            const ym = (y1 + y2) / 2;
 
-            const leftCx1 = (cx1 - w1 / 2).toFixed(2);
-            const rightCx1 = (cx1 + w1 / 2).toFixed(2);
-            const leftCx2 = (cx2 - w2 / 2).toFixed(2);
-            const rightCx2 = (cx2 + w2 / 2).toFixed(2);
+            // Vecteur tangent et normale pour top-down
+            const tx = 1.5 * (x2 - x1);
+            const ty = 0.9 * (y2 - y1);
+            const lenT = Math.sqrt(tx * tx + ty * ty) || 1;
+            const nx = ty / lenT;
+            const ny = -tx / lenT;
 
-            pathD = `M ${leftX1} ${y1.toFixed(2)} C ${leftCx1} ${cy1.toFixed(2)}, ${leftCx2} ${cy2.toFixed(2)}, ${leftX2} ${y2.toFixed(2)} L ${rightX2} ${y2.toFixed(2)} C ${rightCx2} ${cy2.toFixed(2)}, ${rightCx1} ${cy1.toFixed(2)}, ${rightX1} ${y1.toFixed(2)} Z`;
+            const p1Left = { x: x1 - w1 / 2, y: y1 };
+            const p1Right = { x: x1 + w1 / 2, y: y1 };
+            const pmLeft = { x: xm - nx * (wm / 2), y: ym - ny * (wm / 2) };
+            const pmRight = { x: xm + nx * (wm / 2), y: ym + ny * (wm / 2) };
+            const p2Left = { x: x2 - w2 / 2, y: y2 };
+            const p2Right = { x: x2 + w2 / 2, y: y2 };
+
+            const c1aLeft = { x: x1 - w1 / 2, y: y1 + dy * 0.22 };
+            const c1bLeft = { x: pmLeft.x - (tx / lenT) * (dy * 0.14), y: pmLeft.y - (ty / lenT) * (dy * 0.14) };
+            const c1aRight = { x: x1 + w1 / 2, y: y1 + dy * 0.22 };
+            const c1bRight = { x: pmRight.x - (tx / lenT) * (dy * 0.14), y: pmRight.y - (ty / lenT) * (dy * 0.14) };
+
+            const c2aLeft = { x: pmLeft.x + (tx / lenT) * (dy * 0.14), y: pmLeft.y + (ty / lenT) * (dy * 0.14) };
+            const c2bLeft = { x: x2 - w2 / 2, y: y2 - dy * 0.22 };
+            const c2aRight = { x: pmRight.x + (tx / lenT) * (dy * 0.14), y: pmRight.y + (ty / lenT) * (dy * 0.14) };
+            const c2bRight = { x: x2 + w2 / 2, y: y2 - dy * 0.22 };
+
+            pathD = `M ${p1Left.x.toFixed(2)} ${p1Left.y.toFixed(2)} ` +
+              `C ${c1aLeft.x.toFixed(2)} ${c1aLeft.y.toFixed(2)}, ${c1bLeft.x.toFixed(2)} ${c1bLeft.y.toFixed(2)}, ${pmLeft.x.toFixed(2)} ${pmLeft.y.toFixed(2)} ` +
+              `C ${c2aLeft.x.toFixed(2)} ${c2aLeft.y.toFixed(2)}, ${c2bLeft.x.toFixed(2)} ${c2bLeft.y.toFixed(2)}, ${p2Left.x.toFixed(2)} ${p2Left.y.toFixed(2)} ` +
+              `L ${p2Right.x.toFixed(2)} ${p2Right.y.toFixed(2)} ` +
+              `C ${c2bRight.x.toFixed(2)} ${c2bRight.y.toFixed(2)}, ${c2aRight.x.toFixed(2)} ${c2aRight.y.toFixed(2)}, ${pmRight.x.toFixed(2)} ${pmRight.y.toFixed(2)} ` +
+              `C ${c1bRight.x.toFixed(2)} ${c1bRight.y.toFixed(2)}, ${c1aRight.x.toFixed(2)} ${c1aRight.y.toFixed(2)}, ${p1Right.x.toFixed(2)} ${p1Right.y.toFixed(2)} Z`;
           } else {
             pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
           }
@@ -2906,9 +3078,22 @@ const MindMapView = {
         if (connStyle === 'straight') {
           if (isRoot) {
             isTapered = true;
-            const w1 = 1.4;
-            const w2 = 4.2;
-            pathD = `M ${x1.toFixed(2)} ${(y1 - w1 / 2).toFixed(2)} L ${x2.toFixed(2)} ${(y2 - w2 / 2).toFixed(2)} L ${x2.toFixed(2)} ${(y2 + w2 / 2).toFixed(2)} L ${x1.toFixed(2)} ${(y1 + w1 / 2).toFixed(2)} Z`;
+            const w1 = 3.6;
+            const wm = 6.2;
+            const w2 = 2.6;
+            const xm = (x1 + x2) / 2;
+            const ym = (y1 + y2) / 2;
+            const dxS = x2 - x1;
+            const dyS = y2 - y1;
+            const lenS = Math.sqrt(dxS * dxS + dyS * dyS) || 1;
+            const nxS = -dyS / lenS;
+            const nyS = dxS / lenS;
+            pathD = `M ${(x1 - nxS * (w1 / 2)).toFixed(2)} ${(y1 - nyS * (w1 / 2)).toFixed(2)} ` +
+              `L ${(xm - nxS * (wm / 2)).toFixed(2)} ${(ym - nyS * (wm / 2)).toFixed(2)} ` +
+              `L ${(x2 - nxS * (w2 / 2)).toFixed(2)} ${(y2 - nyS * (w2 / 2)).toFixed(2)} ` +
+              `L ${(x2 + nxS * (w2 / 2)).toFixed(2)} ${(y2 + nyS * (w2 / 2)).toFixed(2)} ` +
+              `L ${(xm + nxS * (wm / 2)).toFixed(2)} ${(ym + nyS * (wm / 2)).toFixed(2)} ` +
+              `L ${(x1 + nxS * (w1 / 2)).toFixed(2)} ${(y1 + nyS * (w1 / 2)).toFixed(2)} Z`;
           } else {
             pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
           }
@@ -2935,21 +3120,51 @@ const MindMapView = {
           const cy2 = y2;
 
           if (isRoot) {
-            // Effet d'effilement Tony Buzan : liaison fine à la racine (1.4px) puis s'épaississant vers le niveau 1 (4.2px)
+            // Effet d'effilement Tony Buzan (mots-clés forces) :
+            // La branche maîtresse part avec une assise solide (3.6px),
+            // atteint son épaisseur maximale à la moitié de la longueur (6.2px),
+            // puis s'affine harmonieusement pour se raccorder au nœud de niveau 1 (2.6px).
             isTapered = true;
-            const w1 = 1.4;
-            const w2 = 4.2;
-            const topY1 = (y1 - w1 / 2).toFixed(2);
-            const botY1 = (y1 + w1 / 2).toFixed(2);
-            const topY2 = (y2 - w2 / 2).toFixed(2);
-            const botY2 = (y2 + w2 / 2).toFixed(2);
+            const w1 = 3.6;
+            const wm = 6.2;
+            const w2 = 2.6;
 
-            const topCy1 = (cy1 - w1 / 2).toFixed(2);
-            const botCy1 = (cy1 + w1 / 2).toFixed(2);
-            const topCy2 = (cy2 - w2 / 2).toFixed(2);
-            const botCy2 = (cy2 + w2 / 2).toFixed(2);
+            const xm = (x1 + x2) / 2;
+            const ym = (y1 + y2) / 2;
 
-            pathD = `M ${x1.toFixed(2)} ${topY1} C ${cx1.toFixed(2)} ${topCy1}, ${cx2.toFixed(2)} ${topCy2}, ${x2.toFixed(2)} ${topY2} L ${x2.toFixed(2)} ${botY2} C ${cx2.toFixed(2)} ${botCy2}, ${cx1.toFixed(2)} ${botCy1}, ${x1.toFixed(2)} ${botY1} Z`;
+            // Vecteur tangent et normale au milieu de la courbe
+            const tx = 0.9 * (x2 - x1);
+            const ty = 1.5 * (y2 - y1);
+            const lenT = Math.sqrt(tx * tx + ty * ty) || 1;
+            const nx = -ty / lenT;
+            const ny = tx / lenT;
+
+            // Points extrêmes et médians
+            const p1Top = { x: x1, y: y1 - w1 / 2 };
+            const p1Bot = { x: x1, y: y1 + w1 / 2 };
+            const pmTop = { x: xm - nx * (wm / 2), y: ym - ny * (wm / 2) };
+            const pmBot = { x: xm + nx * (wm / 2), y: ym + ny * (wm / 2) };
+            const p2Top = { x: x2, y: y2 - w2 / 2 };
+            const p2Bot = { x: x2, y: y2 + w2 / 2 };
+
+            // Points de contrôle de la moitié amont (Root -> Milieu)
+            const c1aTop = { x: x1 + dir * dx * 0.22, y: y1 - w1 / 2 };
+            const c1bTop = { x: pmTop.x - (tx / lenT) * (dx * 0.14), y: pmTop.y - (ty / lenT) * (dx * 0.14) };
+            const c1aBot = { x: x1 + dir * dx * 0.22, y: y1 + w1 / 2 };
+            const c1bBot = { x: pmBot.x - (tx / lenT) * (dx * 0.14), y: pmBot.y - (ty / lenT) * (dx * 0.14) };
+
+            // Points de contrôle de la moitié aval (Milieu -> Niveau 1)
+            const c2aTop = { x: pmTop.x + (tx / lenT) * (dx * 0.14), y: pmTop.y + (ty / lenT) * (dx * 0.14) };
+            const c2bTop = { x: x2 - dir * dx * 0.22, y: y2 - w2 / 2 };
+            const c2aBot = { x: pmBot.x + (tx / lenT) * (dx * 0.14), y: pmBot.y + (ty / lenT) * (dx * 0.14) };
+            const c2bBot = { x: x2 - dir * dx * 0.22, y: y2 + w2 / 2 };
+
+            pathD = `M ${p1Top.x.toFixed(2)} ${p1Top.y.toFixed(2)} ` +
+              `C ${c1aTop.x.toFixed(2)} ${c1aTop.y.toFixed(2)}, ${c1bTop.x.toFixed(2)} ${c1bTop.y.toFixed(2)}, ${pmTop.x.toFixed(2)} ${pmTop.y.toFixed(2)} ` +
+              `C ${c2aTop.x.toFixed(2)} ${c2aTop.y.toFixed(2)}, ${c2bTop.x.toFixed(2)} ${c2bTop.y.toFixed(2)}, ${p2Top.x.toFixed(2)} ${p2Top.y.toFixed(2)} ` +
+              `L ${p2Bot.x.toFixed(2)} ${p2Bot.y.toFixed(2)} ` +
+              `C ${c2bBot.x.toFixed(2)} ${c2bBot.y.toFixed(2)}, ${c2aBot.x.toFixed(2)} ${c2aBot.y.toFixed(2)}, ${pmBot.x.toFixed(2)} ${pmBot.y.toFixed(2)} ` +
+              `C ${c1bBot.x.toFixed(2)} ${c1bBot.y.toFixed(2)}, ${c1aBot.x.toFixed(2)} ${c1aBot.y.toFixed(2)}, ${p1Bot.x.toFixed(2)} ${p1Bot.y.toFixed(2)} Z`;
           } else {
             pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
           }
@@ -3012,17 +3227,67 @@ const MindMapView = {
       rect.setAttribute('y', -node.height / 2);
       rect.setAttribute('width', node.width);
       rect.setAttribute('height', node.height);
-      rect.setAttribute('rx', 23);
+      rect.setAttribute('rx', node.height / 2);
       rect.setAttribute('class', 'mm-root-rect');
       rect.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'url(#mm-glow)');
       g.appendChild(rect);
 
       // Titre central en capitales
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('text-anchor', 'middle');
       text.setAttribute('dominant-baseline', 'central');
       text.setAttribute('class', 'mm-root-text');
       text.textContent = node.text;
+
+      // Icône SVG majestueuse et plus grande sur le concept central si présente
+      if (node.icon && typeof SvgIconsRegistry !== 'undefined') {
+        const iconDef = SvgIconsRegistry.get(node.icon);
+        if (iconDef) {
+          const iconSize = 28;
+          const textW = node.textWidth || 60;
+          const spacing = 10;
+          const totalContent = iconSize + spacing + textW;
+          const startX = -totalContent / 2;
+          const iconX = startX + iconSize / 2;
+          const textX = startX + iconSize + spacing;
+
+          text.setAttribute('text-anchor', 'start');
+          text.setAttribute('x', textX);
+
+          const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          iconG.setAttribute('transform', `translate(${iconX}, 0)`);
+          iconG.setAttribute('class', 'mm-node-icon-badge mm-root-icon-badge');
+          iconG.setAttribute('style', 'cursor: pointer;');
+          iconG.setAttribute('title', `Icône SVG : ${iconDef.label} (Cliquer pour changer ou [I])`);
+
+          const iHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          iHit.setAttribute('r', 18);
+          iHit.setAttribute('fill', 'transparent');
+          iconG.appendChild(iHit);
+
+          const svgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          svgWrap.setAttribute('transform', 'translate(-14, -14) scale(1.16)');
+          svgWrap.setAttribute('fill', 'none');
+          svgWrap.setAttribute('stroke', nodeColor || 'var(--accent-blue, #2563eb)');
+          svgWrap.setAttribute('stroke-width', '2.3');
+          svgWrap.setAttribute('stroke-linecap', 'round');
+          svgWrap.setAttribute('stroke-linejoin', 'round');
+          svgWrap.innerHTML = iconDef.path;
+          iconG.appendChild(svgWrap);
+
+          iconG.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openIconPicker(node.id, e.clientX, e.clientY);
+          });
+          g.appendChild(iconG);
+        } else {
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('x', 0);
+        }
+      } else {
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('x', 0);
+      }
+
       g.appendChild(text);
 
       // Bouton contextuel + pour ajouter un BOI
@@ -3036,10 +3301,10 @@ const MindMapView = {
     } else {
       const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
       const isPill = node.isFloating || this.nodeShape === 'pill';
-      const rx = isPill ? (isLvl1 ? 17 : 14) : (isLvl1 ? 8 : 5);
+      const rx = isPill ? (isLvl1 ? 18 : (isLvl2 ? 14 : 12)) : (isLvl1 ? 9 : (isLvl2 ? 6 : 4));
       const boxW = node.width;
-      const boxH = node.height || (isLvl1 ? 34 : 28);
-      const strokeW = node.isFloating ? '2' : (isLvl1 ? '2.2' : (isLvl2 ? '1.6' : '1.2'));
+      const boxH = node.height || (isLvl1 ? 36 : (isLvl2 ? 28 : 24));
+      const strokeW = node.isFloating ? '2' : (isLvl1 ? '2.4' : (isLvl2 ? '1.5' : '1.1'));
 
       if (isBox) {
         // Boîte d'arrière-plan avec bordure colorée (Style XMind & Buzan : Niveau 1 plus imposant)
@@ -3064,7 +3329,7 @@ const MindMapView = {
         tintRect.setAttribute('height', boxH);
         tintRect.setAttribute('rx', rx);
         tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
-        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.10' : '0.07'));
+        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.14' : (isLvl2 ? '0.07' : '0.05')));
         g.appendChild(tintRect);
       } else {
         // Mode souligné (underline) : halo d'illumination discret visible uniquement à la sélection
@@ -3099,15 +3364,17 @@ const MindMapView = {
       text.setAttribute('class', 'mm-branch-text');
       text.setAttribute('fill', 'var(--text-primary)');
       if (isLvl1) {
-        text.setAttribute('font-size', '13.5px');
+        text.setAttribute('font-size', '14px');
         text.setAttribute('font-weight', '800');
-        text.setAttribute('letter-spacing', '0.5px');
+        text.setAttribute('letter-spacing', '0.6px');
       } else if (isLvl2) {
         text.setAttribute('font-size', '11.5px');
         text.setAttribute('font-weight', '700');
+        text.setAttribute('letter-spacing', '0.3px');
       } else {
-        text.setAttribute('font-size', '10.5px');
+        text.setAttribute('font-size', '10px');
         text.setAttribute('font-weight', '600');
+        text.setAttribute('letter-spacing', '0.2px');
       }
       text.textContent = node.text;
 
@@ -3116,24 +3383,29 @@ const MindMapView = {
       let noteX = null;
       let textX = 0;
 
-      const baseFontSize = node.isFloating ? 12 : (isLvl1 ? 13.5 : (isLvl2 ? 11.5 : 10.5));
+      const baseFontSize = node.isFloating ? 12 : (isLvl1 ? 14 : (isLvl2 ? 11.5 : 10));
       const baseFontWeight = node.isFloating || isLvl1 ? '800' : (isLvl2 ? '700' : '600');
       const textW = node.textWidth || this.getTextWidth(node.text, baseFontSize, baseFontWeight);
       const isWideMarker = node.marker && String(node.marker).toLowerCase().startsWith('p');
       const markerW = node.marker ? ((isWideMarker ? 22 : 18) + 6) : 0;
       const markerHalf = isWideMarker ? 11 : 9;
 
+      const iconW = node.icon ? 22 : 0;
+      const iconHalf = 10;
+      let iconX = null;
+
       const displayRef = node.ref ? this.formatScripturePillRef(node.ref) : '';
       const refPillW = node.ref ? (node.refPillWidth || Math.max(38, this.getTextWidth(displayRef, 9.5, '700') + 14)) : 0;
       const notePillW = node.note ? 18 : 0;
 
       if (node.isFloating) {
-        if (!node.marker && !node.ref && !node.note) {
+        if (!node.marker && !node.icon && !node.ref && !node.note) {
           text.setAttribute('text-anchor', 'middle');
           text.setAttribute('x', 0);
         } else {
           let totalContent = textW;
           if (node.marker) totalContent += markerW;
+          if (node.icon) totalContent += iconW;
           if (node.ref) totalContent += refPillW + 6;
           if (node.note) totalContent += notePillW + 6;
 
@@ -3141,6 +3413,10 @@ const MindMapView = {
           if (node.marker) {
             markerX = curX + markerHalf;
             curX += markerW;
+          }
+          if (node.icon) {
+            iconX = curX + iconHalf;
+            curX += iconW;
           }
           textX = curX;
           text.setAttribute('text-anchor', 'start');
@@ -3159,9 +3435,10 @@ const MindMapView = {
           }
         }
       } else if (isTopDown || node.side === 'right') {
-        // De gauche à droite : [Marker] -> Texte -> [Ref] -> [Note]
+        // De gauche à droite : [Marker] -> [Icon] -> Texte -> [Ref] -> [Note]
         let totalContent = textW;
         if (node.marker) totalContent += markerW;
+        if (node.icon) totalContent += iconW;
         if (node.ref) totalContent += refPillW + 6;
         if (node.note) totalContent += notePillW + 6;
 
@@ -3169,6 +3446,10 @@ const MindMapView = {
         if (node.marker) {
           markerX = curX + markerHalf;
           curX += markerW;
+        }
+        if (node.icon) {
+          iconX = curX + iconHalf;
+          curX += iconW;
         }
         textX = curX;
         text.setAttribute('text-anchor', 'start');
@@ -3186,12 +3467,12 @@ const MindMapView = {
           curX += notePillW;
         }
       } else {
-        // Branche à gauche : De gauche à droite [Note] -> [Ref] -> [Marker] -> Texte
-        // L'icône de note et la pastille sont côté extérieur gauche, le texte à droite vers la branche
+        // Branche à gauche : De gauche à droite [Note] -> [Ref] -> [Marker] -> [Icon] -> Texte
         let totalContent = textW;
         if (node.note) totalContent += notePillW + 6;
         if (node.ref) totalContent += refPillW + 6;
         if (node.marker) totalContent += markerW;
+        if (node.icon) totalContent += iconW;
 
         let curX = -totalContent / 2;
         if (node.note) {
@@ -3205,6 +3486,10 @@ const MindMapView = {
         if (node.marker) {
           markerX = curX + markerHalf;
           curX += markerW;
+        }
+        if (node.icon) {
+          iconX = curX + iconHalf;
+          curX += iconW;
         }
         textX = curX;
         text.setAttribute('text-anchor', 'start');
@@ -3222,6 +3507,12 @@ const MindMapView = {
           markerG.setAttribute('class', 'mm-node-marker-badge');
           markerG.setAttribute('style', 'cursor: pointer;');
           markerG.setAttribute('title', `Marqueur : ${def.label} (Cliquer pour faire défiler)`);
+
+          // Zone tactile de survol stable
+          const mHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          mHit.setAttribute('r', def.isWide ? 14 : 12);
+          mHit.setAttribute('fill', 'transparent');
+          markerG.appendChild(mHit);
 
           if (def.isWide) {
             const mRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -3245,6 +3536,7 @@ const MindMapView = {
           mText.setAttribute('font-size', def.isWide ? '9px' : '9.5px');
           mText.setAttribute('font-weight', '800');
           mText.setAttribute('fill', def.text);
+          mText.setAttribute('pointer-events', 'none');
           mText.textContent = def.label;
           markerG.appendChild(mText);
 
@@ -3254,6 +3546,41 @@ const MindMapView = {
           });
 
           g.appendChild(markerG);
+        }
+      }
+
+      // Badge Icône SVG vectorielle (pur SVG sans emoji)
+      if (node.icon && iconX !== null && typeof SvgIconsRegistry !== 'undefined') {
+        const iconDef = SvgIconsRegistry.get(node.icon);
+        if (iconDef) {
+          const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          iconG.setAttribute('transform', `translate(${iconX}, ${isBox ? 0 : 2})`);
+          iconG.setAttribute('class', 'mm-node-icon-badge');
+          iconG.setAttribute('style', 'cursor: pointer;');
+          iconG.setAttribute('title', `Icône SVG : ${iconDef.label} (Cliquer pour modifier ou [I])`);
+
+          // Zone tactile de clic
+          const iHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          iHit.setAttribute('r', 11);
+          iHit.setAttribute('fill', 'transparent');
+          iconG.appendChild(iHit);
+
+          const svgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          svgWrap.setAttribute('transform', 'translate(-7.5, -7.5) scale(0.64)');
+          svgWrap.setAttribute('fill', 'none');
+          svgWrap.setAttribute('stroke', isBox ? (node.color || 'var(--text-main)') : (node.color || 'var(--accent-blue)'));
+          svgWrap.setAttribute('stroke-width', '2.2');
+          svgWrap.setAttribute('stroke-linecap', 'round');
+          svgWrap.setAttribute('stroke-linejoin', 'round');
+          svgWrap.innerHTML = iconDef.path;
+          iconG.appendChild(svgWrap);
+
+          iconG.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openIconPicker(node.id);
+          });
+
+          g.appendChild(iconG);
         }
       }
 
@@ -3309,11 +3636,12 @@ const MindMapView = {
         noteG.appendChild(noteCircle);
 
         // Petite icône carnet / note SVG épurée
+        const noteIconColor = node.color || 'var(--accent-blue, #2563eb)';
         const noteIconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         noteIconG.setAttribute('transform', 'translate(-5, -5) scale(0.42)');
-        noteIconG.innerHTML = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="currentColor" stroke-width="2.5"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2.5"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2.5"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2.5"/>';
-        noteIconG.setAttribute('stroke', node.color || 'var(--accent-blue)');
+        noteIconG.setAttribute('stroke', noteIconColor);
         noteIconG.setAttribute('fill', 'none');
+        noteIconG.innerHTML = `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="${noteIconColor}" stroke-width="2.5"/><polyline points="14 2 14 8 20 8" fill="none" stroke="${noteIconColor}" stroke-width="2.5"/><line x1="16" y1="13" x2="8" y2="13" stroke="${noteIconColor}" stroke-width="2.5"/><line x1="16" y1="17" x2="8" y2="17" stroke="${noteIconColor}" stroke-width="2.5"/>`;
         noteG.appendChild(noteIconG);
 
         noteG.addEventListener('mouseenter', () => this.showNoteTooltip(noteG, node.note));
@@ -3992,7 +4320,17 @@ const MindMapView = {
       }
 
       if (newText !== null) {
-        node.text = newText;
+        // Détection intelligente d'un mot-clé d'icône SVG tapé : ::croix, ::bible, etc.
+        const iconMatch = newText.match(/::([a-zA-Z0-9_-]+):?/i);
+        if (iconMatch && typeof SvgIconsRegistry !== 'undefined') {
+          const candidate = iconMatch[1].toLowerCase();
+          if (SvgIconsRegistry.has(candidate)) {
+            node.icon = candidate;
+            newText = newText.replace(iconMatch[0], '').trim();
+          }
+        }
+
+        node.text = newText || (node.icon ? SvgIconsRegistry.get(node.icon)?.label?.toUpperCase() : 'MOT-CLÉ');
         if (nodeId === 'root' && this.currentNote) {
           this.currentNote.title = newText;
           const titleInput = document.getElementById('note-edit-title');
@@ -4831,6 +5169,12 @@ const MindMapView = {
 
     let itemsHtml = '';
 
+    const nodeText = isRoot ? (this.tree?.text || 'Sujet Central') : (node?.text || '');
+    const topSuggestions = (typeof SvgIconsRegistry !== 'undefined' && nodeText)
+      ? SvgIconsRegistry.suggestIconsForText(nodeText, 1)
+      : [];
+    const topSuggestion = topSuggestions[0] || null;
+
     if (isBranch) {
       // 1. Clic droit sur une BRANCHE / SOUS-BRANCHE
       itemsHtml = `
@@ -4894,6 +5238,20 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Marqueur / Priorité...</span>
           <span class="mm-ctx-shortcut">1-9</span>
+        </div>
+        ${(topSuggestion && topSuggestion.id !== node?.icon) ? `
+          <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
+            <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
+            <span class="mm-ctx-label">✨ Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+            <span class="mm-ctx-shortcut">1-clic</span>
+          </div>
+        ` : ''}
+        <div class="mm-ctx-item" data-action="svg-icon">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
+          </span>
+          <span class="mm-ctx-label">${node?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
+          <span class="mm-ctx-shortcut">I</span>
         </div>
         ${(node?.offsetX || node?.offsetY) ? `
           <div class="mm-ctx-item" data-action="reset-position">
@@ -4961,6 +5319,20 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">Renommer le concept central</span>
           <span class="mm-ctx-shortcut">Double-clic</span>
+        </div>
+        ${(topSuggestion && topSuggestion.id !== this.tree?.icon) ? `
+          <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
+            <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
+            <span class="mm-ctx-label">✨ Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+            <span class="mm-ctx-shortcut">1-clic</span>
+          </div>
+        ` : ''}
+        <div class="mm-ctx-item" data-action="svg-icon">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
+          </span>
+          <span class="mm-ctx-label">${this.tree?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
+          <span class="mm-ctx-shortcut">I</span>
         </div>
         ${this.clipboardNode ? `
           <div class="mm-ctx-item" data-action="paste">
@@ -5225,6 +5597,18 @@ const MindMapView = {
               this.toggleMarkerPopover(true);
             }
             break;
+          case 'svg-icon':
+            if (targetNodeId) {
+              this.openIconPicker(targetNodeId, clientX, clientY);
+            }
+            break;
+          case 'auto-suggest-icon': {
+            const iconId = item.getAttribute('data-icon-id');
+            if (targetNodeId && iconId) {
+              this.setNodeIcon(targetNodeId, iconId);
+            }
+            break;
+          }
           case 'reset-position':
             if (node) {
               node.offsetX = 0;
@@ -5482,6 +5866,91 @@ const MindMapView = {
         ${def.label}
       </span>
     `;
+  },
+
+  renderOutlineIconPill(node) {
+    if (!node || !node.icon || typeof SvgIconsRegistry === 'undefined') return '';
+    const def = SvgIconsRegistry.get(node.icon);
+    if (!def) return '';
+    return `
+      <span class="mm-outline-icon-badge" data-id="${node.id}" title="Icône SVG : ${def.label} (Cliquer pour changer ou [I])">
+        ${SvgIconsRegistry.getSvg(node.icon, 14)}
+      </span>
+    `;
+  },
+
+  openIconPicker(nodeId, fallbackX = null, fallbackY = null) {
+    if (!nodeId) return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+
+    let anchorRect = null;
+    const nodeEl = document.querySelector(`.mm-node-g[data-id="${nodeId}"]`);
+    if (nodeEl) {
+      const r = nodeEl.getBoundingClientRect();
+      if (r && (r.width > 0 || r.height > 0)) {
+        anchorRect = r;
+      }
+    }
+    if (!anchorRect) {
+      const outlineEl = document.querySelector(`.mm-outline-item[data-id="${nodeId}"], [data-node-id="${nodeId}"]`);
+      if (outlineEl) {
+        const r = outlineEl.getBoundingClientRect();
+        if (r && (r.width > 0 || r.height > 0)) {
+          anchorRect = r;
+        }
+      }
+    }
+    if (!anchorRect && fallbackX !== null && fallbackY !== null) {
+      anchorRect = {
+        left: fallbackX,
+        top: fallbackY,
+        width: 0,
+        height: 0,
+        right: fallbackX,
+        bottom: fallbackY
+      };
+    }
+
+    if (typeof SvgIconsRegistry !== 'undefined') {
+      SvgIconsRegistry.openPicker({
+        anchorRect: anchorRect,
+        title: `Icône SVG : ${node.text || 'Nœud'}`,
+        currentText: node.text || '',
+        currentValue: node.icon || null,
+        onSelect: (iconId) => {
+          this.setNodeIcon(nodeId, iconId);
+        },
+        onRemove: () => {
+          this.setNodeIcon(nodeId, null);
+        }
+      });
+    }
+  },
+
+  setNodeIcon(nodeId, iconId) {
+    if (!nodeId) return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+
+    const cleanIcon = iconId ? String(iconId).trim().toLowerCase() : null;
+    node.icon = cleanIcon;
+    if (nodeId === 'root' && this.currentNote) {
+      this.currentNote.rootIcon = cleanIcon;
+    }
+    this.layoutTree();
+    this.draw();
+    this.syncAndAutoSave();
+    if (this.viewMode === 'outline') {
+      this.renderOutlineView();
+    }
+    if (typeof App !== 'undefined' && App.showToast) {
+      if (cleanIcon && typeof SvgIconsRegistry !== 'undefined' && SvgIconsRegistry.get(cleanIcon)) {
+        App.showToast(`Icône SVG « ${SvgIconsRegistry.get(cleanIcon).label} » appliquée`);
+      } else {
+        App.showToast('Icône SVG retirée');
+      }
+    }
   },
 
   // =========================================================================
@@ -6460,55 +6929,100 @@ const MindMapView = {
 
   getDiagramBoundingBox() {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    let bbox = null;
-    try {
-      if (this.viewportG && typeof this.viewportG.getBBox === 'function') {
-        bbox = this.viewportG.getBBox();
-      }
-    } catch (e) {
-      bbox = null;
+
+    // 1. Parcours géométrique analytique complet de tous les éléments du diagramme
+    const traverse = (node) => {
+      if (!node) return;
+      const w = (node.width || 120) / 2 + 65; // Marge pour pastilles versets/notes et actions
+      const h = (node.height || 36) / 2 + 25;
+      minX = Math.min(minX, node.x - w);
+      maxX = Math.max(maxX, node.x + w);
+      minY = Math.min(minY, node.y - h);
+      maxY = Math.max(maxY, node.y + h);
+      if (node.children) node.children.forEach(traverse);
+    };
+    if (this.tree) traverse(this.tree);
+
+    // Sujets flottants
+    if (this.floatingTopics && this.floatingTopics.length > 0) {
+      this.floatingTopics.forEach(ft => {
+        const w = (ft.width || 120) / 2 + 65;
+        const h = (ft.height || 36) / 2 + 25;
+        minX = Math.min(minX, ft.x - w);
+        maxX = Math.max(maxX, ft.x + w);
+        minY = Math.min(minY, ft.y - h);
+        maxY = Math.max(maxY, ft.y + h);
+        if (ft.children) ft.children.forEach(traverse);
+      });
     }
 
-    if (bbox && bbox.width > 20 && bbox.height > 20 && isFinite(bbox.x) && isFinite(bbox.y)) {
-      minX = bbox.x;
-      maxX = bbox.x + bbox.width;
-      minY = bbox.y;
-      maxY = bbox.y + bbox.height;
-    } else {
-      const traverse = (node) => {
-        if (!node) return;
-        const w = (node.width || 120) / 2 + 30;
-        const h = (node.height || 36) / 2 + 20;
-        minX = Math.min(minX, node.x - w);
-        maxX = Math.max(maxX, node.x + w);
-        minY = Math.min(minY, node.y - h);
-        maxY = Math.max(maxY, node.y + h);
-        if (node.children) node.children.forEach(traverse);
-      };
-      traverse(this.tree);
+    // Enclos (Boundaries)
+    if (this.boundaries && this.boundaries.length > 0) {
+      this.boundaries.forEach(bnd => {
+        const b = this.getBoundaryBBox(bnd);
+        if (b) {
+          minX = Math.min(minX, b.x - 15);
+          maxX = Math.max(maxX, b.x + b.width + 15);
+          minY = Math.min(minY, b.y - 25); // Marge pour l'étiquette pilule supérieure
+          maxY = Math.max(maxY, b.y + b.height + 15);
+        }
+      });
+    }
 
-      if (this.boundaries && this.boundaries.length > 0) {
-        this.boundaries.forEach(bnd => {
-          const b = this.getBoundaryBBox(bnd);
-          if (b) {
-            minX = Math.min(minX, b.x);
-            maxX = Math.max(maxX, b.x + b.width);
-            minY = Math.min(minY, b.y - 14);
-            maxY = Math.max(maxY, b.y + b.height);
-          }
-        });
+    // Liaisons (Relationships) avec courbures Bézier et étiquettes flottantes
+    if (this.relationships && this.relationships.length > 0) {
+      this.relationships.forEach(rel => {
+        const fromNode = this.findNode(rel.fromId);
+        const toNode = this.findNode(rel.toId);
+        if (!fromNode || !toNode) return;
+        const p1 = this.getNodeConnectionPoint(fromNode, { x: toNode.x, y: toNode.y });
+        const p2 = this.getNodeConnectionPoint(toNode, { x: fromNode.x, y: fromNode.y });
+        minX = Math.min(minX, p1.x, p2.x);
+        maxX = Math.max(maxX, p1.x, p2.x);
+        minY = Math.min(minY, p1.y, p2.y);
+        maxY = Math.max(maxY, p1.y, p2.y);
+
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const curvature = Math.min(85, Math.max(30, dist * 0.2));
+        let cx = (p1.x + p2.x) / 2 + (-dy / dist) * curvature;
+        let cy = (p1.y + p2.y) / 2 + (dx / dist) * curvature;
+        if (rel.customControl) {
+          cx = rel.customControl.x;
+          cy = rel.customControl.y;
+        }
+        minX = Math.min(minX, cx - 30);
+        maxX = Math.max(maxX, cx + 30);
+        minY = Math.min(minY, cy - 20);
+        maxY = Math.max(maxY, cy + 20);
+
+        // Étiquette pilule de la liaison
+        const lx = 0.25 * p1.x + 0.5 * cx + 0.25 * p2.x;
+        const ly = 0.25 * p1.y + 0.5 * cy + 0.25 * p2.y;
+        const labelText = (rel.label || 'VOIR AUSSI').toUpperCase();
+        const textW = this.getTextWidth(labelText, 9.5, '700');
+        const pillW = Math.max(54, textW + 24);
+        minX = Math.min(minX, lx - pillW / 2 - 15);
+        maxX = Math.max(maxX, lx + pillW / 2 + 15);
+        minY = Math.min(minY, ly - 20);
+        maxY = Math.max(maxY, ly + 20);
+      });
+    }
+
+    // 2. Fusion avec le BBox DOM réel si disponible
+    try {
+      if (this.viewportG && typeof this.viewportG.getBBox === 'function') {
+        const bbox = this.viewportG.getBBox();
+        if (bbox && bbox.width > 20 && bbox.height > 20 && isFinite(bbox.x) && isFinite(bbox.y)) {
+          minX = Math.min(minX, bbox.x);
+          maxX = Math.max(maxX, bbox.x + bbox.width);
+          minY = Math.min(minY, bbox.y);
+          maxY = Math.max(maxY, bbox.y + bbox.height);
+        }
       }
-      if (this.floatingTopics && this.floatingTopics.length > 0) {
-        this.floatingTopics.forEach(ft => {
-          const w = (ft.width || 100) / 2 + 30;
-          const h = (ft.height || 34) / 2 + 20;
-          minX = Math.min(minX, ft.x - w);
-          maxX = Math.max(maxX, ft.x + w);
-          minY = Math.min(minY, ft.y - h);
-          maxY = Math.max(maxY, ft.y + h);
-          if (ft.children) ft.children.forEach(traverse);
-        });
-      }
+    } catch (e) {
+      // Ignorer si échec getBBox
     }
 
     if (!isFinite(minX) || !isFinite(maxX) || minX >= maxX) {
@@ -6529,7 +7043,7 @@ const MindMapView = {
 
     const scope = options.scope || 'fit';
     const bg = options.bg || 'white';
-    const padding = options.padding !== undefined ? options.padding : 50;
+    const padding = options.padding !== undefined ? options.padding : 70;
 
     let exportX, exportY, exportW, exportH;
 
@@ -6550,49 +7064,128 @@ const MindMapView = {
 
     const cloneG = this.viewportG.cloneNode(true);
 
-    // Supprimer les contrôles interactifs de l'interface
-    cloneG.querySelectorAll('.mm-node-actions, .reparent-drop-target, #mm-connecting-preview-group').forEach(el => el.remove());
-    cloneG.querySelectorAll('.mm-selected-node, .mm-selected-rel, .mm-selected-boundary').forEach(el => {
-      el.classList.remove('mm-selected-node', 'mm-selected-rel', 'mm-selected-boundary');
+    // CRUCIAL : Supprimer le transform de navigation interactif (pan/zoom d'écran)
+    // afin que les coordonnées internes du clone correspondent exactement au repère diagramme !
+    cloneG.removeAttribute('transform');
+    cloneG.removeAttribute('id');
+
+    // Supprimer tous les contrôles interactifs de l'interface
+    cloneG.querySelectorAll(`
+      .mm-node-actions,
+      .reparent-drop-target,
+      #mm-connecting-preview-group,
+      .mm-rel-del-btn,
+      .mm-boundary-del-btn,
+      .mm-rel-handle,
+      .mm-root-plus,
+      .mm-node-plus,
+      .mm-rel-hit-path,
+      .mm-rel-del-circle,
+      .mm-boundary-del-circle,
+      rect[fill="transparent"]
+    `).forEach(el => el.remove());
+
+    // Retirer les surbrillances de sélection
+    cloneG.querySelectorAll('.selected, .mm-selected-node, .mm-selected-rel, .mm-selected-boundary').forEach(el => {
+      el.classList.remove('selected', 'mm-selected-node', 'mm-selected-rel', 'mm-selected-boundary');
     });
 
     const bodyStyle = window.getComputedStyle(document.body);
-    const themeBgCard = bodyStyle.getPropertyValue('--bg-card').trim() || '#ffffff';
-    const themeTextPrimary = bodyStyle.getPropertyValue('--text-primary').trim() || '#0f172a';
+    const themeBgCard = bodyStyle.getPropertyValue('--bg-card').trim() || '#1e293b';
+    const themeBgSurface = bodyStyle.getPropertyValue('--bg-surface').trim() || bodyStyle.getPropertyValue('--bg-main').trim() || '#0f172a';
+    const themeTextPrimary = bodyStyle.getPropertyValue('--text-primary').trim() || '#f8fafc';
+    const themeTextSecondary = bodyStyle.getPropertyValue('--text-secondary').trim() || '#94a3b8';
+    const themeBorder = bodyStyle.getPropertyValue('--border-color').trim() || '#334155';
 
-    // Inliner les styles pour autonomie totale du SVG hors DOM
     const isWhiteBg = (bg === 'white');
+    const cardBgColor = isWhiteBg ? '#ffffff' : themeBgCard;
+    const textColor = isWhiteBg ? '#0f172a' : themeTextPrimary;
+    const textSecColor = isWhiteBg ? '#475569' : themeTextSecondary;
+    const borderColor = isWhiteBg ? '#cbd5e1' : themeBorder;
+
+    // Inliner explicitement styles et attributs SVG pour autonomie 100% hors DOM :
+
+    // 1. Nœud central (Root)
+    cloneG.querySelectorAll('.mm-root-rect').forEach(r => {
+      r.setAttribute('fill', cardBgColor);
+      r.setAttribute('stroke', '#2563eb');
+      r.setAttribute('stroke-width', '3.2');
+    });
+    cloneG.querySelectorAll('.mm-root-text').forEach(t => {
+      t.setAttribute('fill', textColor);
+      t.setAttribute('font-size', '16px');
+      t.setAttribute('font-weight', '900');
+      t.setAttribute('letter-spacing', '0.8px');
+    });
+
+    // 2. Boîtes de branches et sujets flottants
+    cloneG.querySelectorAll('.mm-branch-box, .mm-floating-box').forEach(b => {
+      b.setAttribute('fill', cardBgColor);
+      const curStroke = b.getAttribute('stroke');
+      if (!curStroke || curStroke.includes('var(')) {
+        b.setAttribute('stroke', '#2563eb');
+      }
+    });
+
+    // 3. Étiquettes de liaisons (Relations) - Élimination radicale des rectangles noirs
+    cloneG.querySelectorAll('.mm-rel-label-rect').forEach(rect => {
+      rect.setAttribute('fill', cardBgColor);
+      rect.setAttribute('stroke', borderColor);
+      rect.setAttribute('stroke-width', '1.2');
+    });
+    cloneG.querySelectorAll('.mm-rel-label-text').forEach(t => {
+      t.setAttribute('fill', textSecColor);
+      t.setAttribute('font-size', '9.5px');
+      t.setAttribute('font-weight', '700');
+      t.setAttribute('letter-spacing', '0.4px');
+    });
+
+    // 4. Enclos (Boundaries)
+    cloneG.querySelectorAll('.mm-boundary-label-pill').forEach(pill => {
+      pill.setAttribute('fill', cardBgColor);
+    });
+    cloneG.querySelectorAll('.mm-boundary-label-text').forEach(t => {
+      t.setAttribute('font-size', '9.5px');
+      t.setAttribute('font-weight', '700');
+    });
+
+    // 5. Pastilles de notes
+    cloneG.querySelectorAll('.mm-note-pill circle').forEach(c => {
+      c.setAttribute('fill', cardBgColor);
+    });
+
+    // 6. Pastilles de versets bibliques
+    cloneG.querySelectorAll('.mm-scripture-pill text').forEach(t => {
+      const curFill = t.getAttribute('fill');
+      if (curFill && curFill.includes('var(')) {
+        t.setAttribute('fill', '#2563eb');
+      }
+      t.setAttribute('font-weight', '700');
+    });
+    cloneG.querySelectorAll('.mm-scripture-pill rect').forEach(r => {
+      const curFill = r.getAttribute('fill');
+      if (curFill && curFill.includes('var(')) {
+        r.setAttribute('fill', '#2563eb');
+      }
+    });
+
+    // 7. Tous les autres éléments texte
     cloneG.querySelectorAll('text').forEach(t => {
       const curFill = t.getAttribute('fill');
       if (!curFill || curFill.includes('var(') || curFill === 'currentColor') {
-        t.setAttribute('fill', isWhiteBg ? '#0f172a' : themeTextPrimary);
+        t.setAttribute('fill', textColor);
       }
       if (!t.getAttribute('font-family')) {
         t.setAttribute('font-family', 'Inter, system-ui, -apple-system, sans-serif');
       }
     });
 
-    cloneG.querySelectorAll('.mm-node-box').forEach(b => {
-      const curFill = b.getAttribute('fill');
-      if (!curFill || curFill.includes('var(')) {
-        b.setAttribute('fill', isWhiteBg ? '#ffffff' : themeBgCard);
-      }
-    });
-
-    cloneG.querySelectorAll('.mm-scripture-pill circle, .mm-note-pill circle').forEach(c => {
-      const curFill = c.getAttribute('fill');
-      if (!curFill || curFill.includes('var(')) {
-        c.setAttribute('fill', isWhiteBg ? '#f8fafc' : themeBgCard);
-      }
-    });
-
-    // Fond SVG selon choix
+    // Fond SVG selon le choix de l'utilisateur
     let bgRectSvg = '';
     if (bg === 'white') {
       bgRectSvg = `<rect x="${exportX}" y="${exportY}" width="${exportW}" height="${exportH}" fill="#ffffff" />`;
     } else if (bg === 'theme') {
-      const themeBg = bodyStyle.getPropertyValue('--bg-surface').trim() || bodyStyle.getPropertyValue('--bg-main').trim() || '#0f172a';
-      bgRectSvg = `<rect x="${exportX}" y="${exportY}" width="${exportW}" height="${exportH}" fill="${themeBg}" />`;
+      bgRectSvg = `<rect x="${exportX}" y="${exportY}" width="${exportW}" height="${exportH}" fill="${themeBgSurface}" />`;
     }
 
     const defsEl = this.svg.querySelector('defs');
@@ -6606,9 +7199,15 @@ const MindMapView = {
         ${defsContent}
         <style>
           text { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-          .mm-node-text { font-weight: 700; }
-          .mm-central-node-text { font-weight: 800; }
-          .mm-node-actions { display: none !important; }
+          .mm-root-text { font-weight: 900 !important; font-size: 16px !important; letter-spacing: 0.8px !important; }
+          .mm-branch-text { font-family: Inter, system-ui, sans-serif; }
+          .mm-rel-label-rect { fill: ${cardBgColor} !important; stroke: ${borderColor} !important; stroke-width: 1.2px !important; }
+          .mm-rel-label-text { font-weight: 700 !important; font-size: 9.5px !important; fill: ${textSecColor} !important; letter-spacing: 0.4px !important; }
+          .mm-boundary-label-pill { fill: ${cardBgColor} !important; }
+          .mm-boundary-label-text { font-weight: 700 !important; font-size: 9.5px !important; }
+          .mm-root-rect { fill: ${cardBgColor} !important; stroke: #2563eb !important; stroke-width: 3.2px !important; }
+          .mm-branch-box, .mm-floating-box { fill: ${cardBgColor} !important; }
+          .mm-node-actions, .mm-rel-del-btn, .mm-boundary-del-btn, .mm-rel-handle, .reparent-drop-target, #mm-connecting-preview-group { display: none !important; }
         </style>
       </defs>
       ${bgRectSvg}
@@ -6757,6 +7356,80 @@ const MindMapView = {
       if (typeof App !== 'undefined' && App.showToast) {
         App.showToast(`Erreur export : ${err.message || 'inconnue'}`, 'error');
       }
+    }
+  },
+
+  toggleFullscreen(forceState) {
+    const isCurrentlyFs = document.body.classList.contains('mindmap-fullscreen-active');
+    const targetState = (typeof forceState === 'boolean') ? forceState : !isCurrentlyFs;
+
+    if (targetState) {
+      document.body.classList.add('mindmap-fullscreen-active');
+      // Demande de plein écran physique OS si disponible
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+
+      // Mettre à jour titre et passage dans le bandeau flottant supérieur
+      const titleEl = document.getElementById('mm-fs-note-title');
+      const refEl = document.getElementById('mm-fs-note-ref');
+      if (titleEl) titleEl.textContent = this.currentNote?.title || 'Mind Map';
+      if (refEl) {
+        const ref = (this.currentNote?.reference || '').trim();
+        refEl.textContent = ref ? `Passage : ${ref}` : '';
+        refEl.style.display = ref ? 'inline' : 'none';
+      }
+
+      this.updateFullscreenButtons(true);
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Mode plein écran activé (Échap ou F11 pour quitter)');
+      }
+    } else {
+      document.body.classList.remove('mindmap-fullscreen-active');
+      // Sortie du plein écran natif système si actif
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+
+      this.updateFullscreenButtons(false);
+    }
+
+    // Recentrage doux et adaptation de l'espace de dessin
+    setTimeout(() => {
+      if (this.viewMode === 'map') {
+        this.fitView();
+      }
+    }, 140);
+  },
+
+  updateFullscreenButtons(isActive) {
+    // 1. Bouton de la barre supérieure de la note
+    const headerBtn = document.getElementById('btn-toggle-mindmap-fullscreen');
+    if (headerBtn) {
+      headerBtn.classList.toggle('active', isActive);
+      headerBtn.title = isActive ? 'Quitter le plein écran (Échap ou F11)' : 'Mode Plein Écran (F11 ou F)';
+      headerBtn.querySelector('.icon-mm-fullscreen-enter')?.classList.toggle('hidden', isActive);
+      headerBtn.querySelector('.icon-mm-fullscreen-exit')?.classList.toggle('hidden', !isActive);
+    }
+
+    // 2. Bouton du dock flottant inférieur
+    const dockBtn = document.getElementById('mm-btn-fullscreen');
+    if (dockBtn) {
+      dockBtn.classList.toggle('active', isActive);
+      dockBtn.title = isActive ? 'Quitter le plein écran (Échap ou F11)' : 'Mode Plein Écran (F11 ou F)';
+      dockBtn.innerHTML = isActive ? `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/>
+        </svg>
+      ` : `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      `;
     }
   }
 };

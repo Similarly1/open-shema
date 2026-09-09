@@ -1220,6 +1220,7 @@ const ImportModal = {
           <option value="systematic_theology" ${ch.source_type === 'systematic_theology' || ch.source_type === 'biblical_theology' ? 'selected' : ''}>Théol.</option>
           <option value="ot_context" ${ch.source_type === 'ot_context' || ch.source_type === 'nt_context' ? 'selected' : ''}>Contexte</option>
           <option value="commentary_verse" ${ch.source_type === 'commentary_verse' ? 'selected' : ''}>Commentaire</option>
+          <option value="endnotes" ${ch.source_type === 'endnotes' ? 'selected' : ''}>Notes</option>
           <option value="appendix" ${ch.source_type === 'appendix' ? 'selected' : ''}>Annexe</option>
         </select>
       `;
@@ -1250,7 +1251,7 @@ const ImportModal = {
 
   selectRagOnlyChapters() {
     this.chapters.forEach((ch, idx) => {
-      const isApp = ch.source_type === 'appendix' || (ch.size && ch.size < 60) || (ch.size_chars && ch.size_chars < 60);
+      const isApp = ch.source_type === 'appendix' || ch.source_type === 'endnotes' || (ch.size && ch.size < 60) || (ch.size_chars && ch.size_chars < 60);
       ch.include = !isApp;
       const cb = document.getElementById(`ch-cb-${idx}`);
       if (cb) cb.checked = !isApp;
