@@ -34021,20 +34021,26 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-re
 
 /* ── Indicateur Fold / Unfold (Mode Mémorisation Buzan) ─────────────────── */
 .mm-fold-indicator {
-  opacity: 0.28;
-  transition: opacity 0.18s ease;
+  opacity: 0.35;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s ease;
   cursor: pointer;
   pointer-events: all;
 }
 
-/* Toujours visible quand replié */
-.mm-fold-indicator.is-folded {
+/* Apparaît nettement au survol de la branche ou au survol direct */
+.mm-node-g:hover .mm-fold-indicator,
+.mm-fold-indicator:hover {
   opacity: 1 !important;
 }
 
-/* Apparaît au survol direct de l'indicateur */
 .mm-fold-indicator:hover {
-  opacity: 1;
+  transform: scale(1.22);
+}
+
+/* Toujours 100% visible quand la branche est repliée avec badge relief */
+.mm-fold-indicator.is-folded {
+  opacity: 1 !important;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.28));
 }
 
 .mm-branch-text {
