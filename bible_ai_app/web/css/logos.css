@@ -34148,17 +34148,41 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-action-
   fill: #ffffff;
 }
 
-/* Pastilles Scripturaires */
+/* Pastilles Scripturaires - Contraste élevé */
 .mm-scripture-pill {
   cursor: pointer;
 }
 
 .mm-scripture-pill rect {
-  transition: opacity 0.15s ease, stroke 0.15s ease;
+  transition: opacity 0.15s ease, fill 0.15s ease, stroke 0.15s ease;
+}
+
+/* Texte blanc lumineux en mode sombre pour lisibilité maximale (WCAG AAA) */
+body:not(.theme-light) .mm-scripture-pill text,
+body.theme-dark .mm-scripture-pill text,
+body[class*="palette-dark"] .mm-scripture-pill text {
+  fill: #f8fafc !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.3px;
+}
+
+body:not(.theme-light) .mm-scripture-pill rect,
+body.theme-dark .mm-scripture-pill rect,
+body[class*="palette-dark"] .mm-scripture-pill rect {
+  fill: rgba(255, 255, 255, 0.14) !important;
+  stroke: rgba(255, 255, 255, 0.28) !important;
+  stroke-width: 1px !important;
+  opacity: 1 !important;
 }
 
 .mm-scripture-pill:hover rect {
-  opacity: 0.38 !important;
+  fill: rgba(255, 255, 255, 0.26) !important;
+  stroke: var(--node-color, #60a5fa) !important;
+  opacity: 1 !important;
+}
+
+.mm-scripture-pill:hover text {
+  fill: #ffffff !important;
 }
 
 /* Éditeur inline flottant sur branche */
@@ -37948,16 +37972,22 @@ body[class*="palette-dark"] .note-svg-icon:hover {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.8)) !important;
 }
 
-/* ── 4. Fond interactif & aura sur les icônes de branches ── */
+/* ── 4. Fond interactif & aura sur les icônes de branches (tracé blanc sur verre dépoli) ── */
 .mm-node-icon-badge:hover circle:first-child {
-  fill: var(--node-color, rgba(59, 130, 246, 0.2)) !important;
-  stroke: var(--node-color, #3b82f6) !important;
-  stroke-width: 1.4px !important;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+  fill: rgba(255, 255, 255, 0.22) !important;
+  stroke: var(--node-color, #60a5fa) !important;
+  stroke-width: 1.5px !important;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.3));
 }
 
-.mm-node-icon-badge:hover g path {
-  filter: drop-shadow(0 0 6px var(--node-color, rgba(59, 130, 246, 0.85))) !important;
+.mm-node-icon-badge:hover g path,
+.mm-node-icon-badge:hover g circle,
+.mm-node-icon-badge:hover g line,
+.mm-node-icon-badge:hover g polyline,
+.mm-node-icon-badge:hover g rect {
+  stroke: #ffffff !important;
+  stroke-width: 2.3 !important;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)) !important;
 }
 
 .mm-outline-icon-badge {

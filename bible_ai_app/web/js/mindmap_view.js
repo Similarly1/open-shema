@@ -3875,16 +3875,25 @@ const MindMapView = {
         refRect.setAttribute('width', pillW);
         refRect.setAttribute('height', 16);
         refRect.setAttribute('rx', 4);
-        refRect.setAttribute('fill', node.color || 'var(--accent-blue)');
-        refRect.setAttribute('opacity', '0.18');
+        const isDarkTheme = typeof document !== 'undefined' && !document.body.classList.contains('theme-light');
+        if (isBox) {
+          refRect.setAttribute('fill', 'rgba(255, 255, 255, 0.14)');
+          refRect.setAttribute('stroke', 'rgba(255, 255, 255, 0.28)');
+          refRect.setAttribute('stroke-width', '1');
+          refRect.setAttribute('opacity', '1');
+        } else {
+          refRect.setAttribute('fill', node.color || 'var(--accent-blue)');
+          refRect.setAttribute('opacity', '0.18');
+        }
         refG.appendChild(refRect);
 
         const refText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         refText.setAttribute('text-anchor', 'middle');
         refText.setAttribute('dominant-baseline', 'central');
         refText.setAttribute('font-size', '9px');
-        refText.setAttribute('font-weight', '700');
-        refText.setAttribute('fill', node.color || 'var(--accent-blue)');
+        refText.setAttribute('font-weight', '800');
+        refText.setAttribute('letter-spacing', '0.3px');
+        refText.setAttribute('fill', isDarkTheme ? '#f8fafc' : (isBox ? '#0f172a' : (node.color || '#2563eb')));
         refText.textContent = displayRef;
         refG.appendChild(refText);
 
