@@ -131,8 +131,11 @@ def push_task_update(event_type: str, task_data: dict):
     win = get_global_window()
     try:
         if win:
+            # json.dumps() produit un littéral JS sûr avec guillemets doubles et
+            # échappe tous les caractères spéciaux — élimine tout risque d'injection JS.
+            safe_event_type = json.dumps(str(event_type))
             json_str = json.dumps(task_data)
-            win.evaluate_js(f"window.TaskManager && window.TaskManager.handleTaskEvent('{event_type}', {json_str})")
+            win.evaluate_js(f"window.TaskManager && window.TaskManager.handleTaskEvent({safe_event_type}, {json_str})")
     except Exception as e:
         logger.debug(f"push_task_update error: {e}")
 

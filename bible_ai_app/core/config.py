@@ -257,7 +257,72 @@ Règles impératives :
 3. RESPECT DES NOUVEAUX TITRES ET TYPES : Chaque section du nouveau canevas doit recevoir son titre cible, son type (intro, scripture, point, conclusion) et le contenu qui lui correspond logiquement sous forme HTML (paragraphes <p>, listes, etc.).
 4. FORMAT DE SORTIE : Renvoie UNIQUEMENT un objet JSON valide contenant la clé "sections" (tableau d'objets avec "id", "type", "title", "contentHtml"). N'ajoute aucun texte ou markdown autour du JSON."""
 
+DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT = """Tu es un cartographe conceptuel et théologien expert des lois de la pensée radiante de Tony Buzan.
+Ta mission est de transformer l'étude, l'analyse exégétique ou la réponse biblique fournie en une véritable CARTE MENTALE RADIANTE (Mind Map) de haut niveau pour Open Shema.
+
+RÈGLES D'OR DE TONY BUZAN & STRUCTURE OPEN SHEMA :
+1. SUJET CENTRAL (title) :
+   - 1 à 4 mots maximum, concis, percutant et en MAJUSCULES (ex: "JUSTIFICATION PAR LA FOI", "SALUT EN JÉSUS-CHRIST").
+   - Identifie une icône racine vectorielle pertinente (root_icon) parmi : bible, croix, bouclier, cle, coeur, ancre, flamme, couronne, epee, agneau, colombe, lampe, temple, balance, vigne, tour, cite.
+   - Choisis une palette chromatique adaptée parmi : nature, ocean, automne, royal.
+
+2. BRANCHES PRINCIPALES (BOIs - Basic Ordering Ideas) :
+   - 3 à 6 BOIs maximum (Loi de Miller 7 ± 2).
+   - Chaque BOI doit être formulée en MOTS-CLÉS EN MAJUSCULES (1 à 3 mots max, ex: "- FONDEMENT DIVIN [Rm 3:21] <!-- marker: 1 --> <!-- icon: bible -->").
+   - Numérote les BOIs séquentiellement via <!-- marker: 1 -->, <!-- marker: 2 -->, etc.
+
+3. HIÉRARCHIE & PENSÉE RADIANTE (Sous-branches niveaux 2 et 3) :
+   - Formule chaque nœud enfant par un mot-clé ou un syntagme court (jamais de longues phrases rédigées sur l'arbre).
+   - Niveau 2 : les articulations conceptuelles directes (ex: "  - JUSTICE DE DIEU").
+   - Niveau 3 : les preuves, termes originaux grecs/hébreux, ou détails concrets (ex: "    - MANIFESTÉE SANS LA LOI").
+   - EXIGENCE ABSOLUE SUR LES NOTES DE BRANCHES (<!-- note: ... -->) :
+     Sur la carte graphique, les libellés de branches doivent rester très concis (mots-clés en majuscules pour une lisibilité Buzan optimale).
+     EN REVANCHE, CHAQUE NOTE DE BRANCHE DOIT OBLIGATOIREMENT FORMER UN VÉRITABLE PARAGRAPHE DENSE DE 3 À 6 PHRASES COMPLÈTES (50 à 120 mots par note).
+     Chaque note d'infobulle doit constituer un développement théologique et exégétique poussé :
+     * Développe l'argumentation exégétique précise et le raisonnement de l'auteur biblique.
+     * Cite et analyse les termes originaux en grec (avec alphabet grec, translittération phonétique et nuance sémantique exacte) ou en hébreu (avec translittération et champ lexical).
+     * Explicite l'arrière-plan historique, culturel ou canonique antique.
+     * Conclus par les implications doctrinales et l'application pastorale ou pratique pour la foi chrétienne.
+     INTERDICTION FORMELLE ET STRICTE de rédiger des notes courtes d'une seule phrase ou d'un simple fragment de phrase. Chaque note est une mini-fiche d'étude approfondie sous forme de paragraphe rédigé !
+
+4. ANCRAGE SCRIPTURAIRE :
+   - Place les références bibliques clés entre crochets à la fin des nœuds : [Livre Ch:V] (ex: [Jean 3:16], [Romains 8:28]).
+
+5. REGROUPEMENT & LIAISON TRANSVERSALE :
+   - Inclus 1 directive d'enclos / frontière thématique autour de la branche la plus essentielle :
+     <!-- mindmap-boundary: NOM_EXACT_DU_BOI | label: TITRE DU GROUPE | color: #0284c7 -->
+   - Inclus 1 directive de relation transversale reliant deux branches complémentaires :
+     <!-- mindmap-rel: BRANCHE_A -> BRANCHE_B | label: RELATION | color: #059669 -->
+
+6. DIRECTIVES D'EN-TÊTE :
+   Inclus impérativement en tête du corps markdown :
+   <!-- mindmap-layout: radiant -->
+   <!-- mindmap-connector: curve -->
+   <!-- mindmap-node-shape: underline -->
+
+FORMAT DE SORTIE IMPÉRATIF :
+Tu dois renvoyer UNIQUEMENT un objet JSON valide sans balises Markdown autour (aucun ```json).
+Schéma JSON :
+{
+  "title": "JUSTIFICATION PAR LA FOI",
+  "root_icon": "bible",
+  "palette": "ocean",
+  "tags": ["mindmap", "théologie", "grâce", "romains"],
+  "markdown": "<!-- mindmap-layout: radiant -->\\n<!-- mindmap-connector: curve -->\\n<!-- mindmap-node-shape: underline -->\\n\\n- JUSTICE DIVINE [Rm 3:21] <!-- marker: 1 --> <!-- icon: bible -->\\n  - MANIFESTATION SANS LA LOI\\n    - ACCOMPLISSEMENT PROPHÉTIQUE <!-- note: Le terme grec dikaiosynē Theou (δικαιοσύνη Θεοῦ) ne désigne pas ici un attribut passif de Dieu mais Son action salvatrice et souveraine par laquelle Il déclare juste le croyant. L'apôtre Paul insiste sur le fait que cette justice s'est révélée 'sans la loi' (chōris nomou), brisant radicalement tout espoir d'auto-justification légaliste par les œuvres méritoires. Pourtant, loin d'être une anomalie théologique, elle constitue le sommet attendu et prophétisé par l'ensemble du corpus scripturaire de l'Ancien Testament. Sur le plan pastoral, cette certitude ancre la paix du chrétien non pas dans sa propre fidélité chancelante, mais dans l'initiative gracieuse et inébranlable du Créateur. -->\\n- RÉDEMPTION EN CHRIST [Rm 3:24] <!-- marker: 2 --> <!-- icon: croix -->\\n  - PROPITIATION SACRIFICIELLE <!-- note: Le mot hilastērion (ἱλαστήριον) évoque directement le propitiatoire de l'arche de l'alliance lors du Jour des Expiations (Yom Kippour), sur lequel le sang était aspergé pour purifier le peuple. En livrant Jésus-Christ comme victime expiatoire, Dieu démontre la cohérence absolue de Sa sainteté intransigeante et de Son amour débordant. La rédemption (apolytrōsis) paie la rançon définitive qui affranchit le pécheur de l'esclavage du péché et de la condamnation légitime de la loi. Pour le disciple contemporain, cela implique une adoration renouvelée et une délivrance définitive de toute terreur du jugement dernier. -->\\n\\n<!-- mindmap-boundary: JUSTICE DIVINE | label: DOCTRINE FONDAMENTALE | color: #0284c7 -->\\n<!-- mindmap-rel: JUSTICE DIVINE -> RÉDEMPTION EN CHRIST | label: ACCOMPLISSEMENT | color: #059669 -->"
+}"""
+
+DEFAULT_CURATOR_SYSTEM_PROMPT = """Vous êtes un assistant expert en épuration et synthèse théologique.
+Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une synthèse ultra-dense et précise en conservant fidèlement toutes les définitions théologiques, arguments et références bibliques, tout en supprimant les bavardages et informations redondantes."""
+
 DEFAULTS = {
+    "curator_model": "mistralai/Ministral-3-14B-Instruct-2512",
+    "curator_fallback_model": "gemini-3.5-flash-lite",
+    "rag_curation_model": "mistralai/Ministral-3-14B-Instruct-2512",
+    "rag_curation_fallback_model": "gemini-3.5-flash-lite",
+    "curator_system_prompt": DEFAULT_CURATOR_SYSTEM_PROMPT,
+    "mindmap_ai_model": "gemini-3.7-flash",
+    "mindmap_ai_fallback_model": "gemini-3.5-flash-lite",
+    "mindmap_system_prompt": DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT,
     "mistral_api_key": "",
     "gemini_api_key": "",
     "infomaniak_token": "",
@@ -311,6 +376,12 @@ DEFAULTS = {
     "sermon_evaluation_model": "gemini-3.7-flash",
     "sermon_evaluation_fallback_model": "gemini-3.5-flash-lite",
     "prompt_sermon_evaluation": DEFAULT_SERMON_EVALUATION_SYSTEM_PROMPT,
+    "mindmap_ai_model": "gemini-3.7-flash",
+    "mindmap_ai_fallback_model": "gemini-3.5-flash-lite",
+    "mindmap_system_prompt": DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT,
+    "discovered_gemini_models": [],
+    "discovered_mistral_models": [],
+    "discovered_infomaniak_models": [],
     "disabled_models": [],
     "summary_system_prompt": DEFAULT_SUMMARY_SYSTEM_PROMPT,
     "prompt_exegesis": DEFAULT_EXEGESIS_SYSTEM_PROMPT,
@@ -366,6 +437,17 @@ def load_config():
             )
             config = dict(DEFAULTS)
 
+    # Synchroniser les alias de modèle curateur pour rétrocompatibilité
+    if "rag_curation_model" in config and "curator_model" not in config:
+        config["curator_model"] = config["rag_curation_model"]
+    elif "curator_model" in config and "rag_curation_model" not in config:
+        config["rag_curation_model"] = config["curator_model"]
+
+    if "rag_curation_fallback_model" in config and "curator_fallback_model" not in config:
+        config["curator_fallback_model"] = config["rag_curation_fallback_model"]
+    elif "curator_fallback_model" in config and "rag_curation_fallback_model" not in config:
+        config["rag_curation_fallback_model"] = config["curator_fallback_model"]
+
     # Compléter les clés manquantes avec les valeurs par défaut
     for key, default_val in DEFAULTS.items():
         if key not in config:
@@ -381,11 +463,27 @@ def load_config():
     return config
 
 def save_config(config_dict):
+    """Sauvegarde la configuration sur disque.
+
+    Sécurité : purge automatiquement les clés secrètes avant écriture pour garantir
+    qu'une clé API injectée en mémoire via load_secrets_into_config() ne soit jamais
+    persistée en clair dans config.json, même si l'appelant l'a oublié.
+    """
     target_path = get_config_path()
     try:
+        # Purge des secrets avant écriture (filet de sécurité systématique)
+        try:
+            from core.secrets_manager import _SECRET_KEYS
+            clean_dict = dict(config_dict)
+            for k in _SECRET_KEYS:
+                if clean_dict.get(k):
+                    clean_dict[k] = ""
+        except Exception:
+            clean_dict = dict(config_dict)
+
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
         with open(target_path, "w", encoding="utf-8") as f:
-            json.dump(config_dict, f, indent=4)
+            json.dump(clean_dict, f, indent=4)
     except OSError as e:
         logger.error(
             "Impossible de sauvegarder la configuration (%s) : %s. "

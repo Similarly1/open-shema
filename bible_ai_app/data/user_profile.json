@@ -1,17 +1,18 @@
 {
-  "onboarding_completed": false,
-  "user_role": "predication",
+  "onboarding_completed": true,
+  "user_role": "etude_perso",
   "preferred_bibles": [
-    "LSG1910",
-    "NBS"
+    "NBS",
+    "S21",
+    "DAR"
   ],
-  "greek_hebrew_level": "intermediaire",
+  "greek_hebrew_level": "debutant",
   "ai_posture": "pastoral_sparring",
-  "country_culture": "France (Métropole & Outre-mer)",
+  "country_culture": "Suisse romande",
   "cultural_notes": "",
   "tradition": "Évangélique / Réformée",
-  "church_confession_raw": "",
-  "system_profile_prompt": "",
+  "church_confession_raw": "L’Assemblée confesse l’inspiration totale de la Bible (66 livres canoniques) du Saint-Esprit. Elle lui reconnaît un caractère exclusif en matière de révélation divine et, de ce fait, croit en la nécessité, pour chaque être humaine, de la lire et de l’étudier. Elle confesse en particulier:\n\nL’existence d’un Dieu éternel unique, manifesté en trois personnes, soit le Père, le Fils Jésus-Christ et le Saint-Esprit, par qui l’univers entier et ce qu’il renferme ont été créés\n\nLa chute de l’humanité en Adam, la corruption totale de la nature humaine et la justification du pécheur par la seule foi en Jésus-Christ\n\nL’incarnation (conception miraculeuse par le Saint-Esprit) du Fils de Dieu, son sacrifice expiatoire pour l’humanité déchue, sa résurrection corporelle d’entre les morts, son ascension triomphale, son ministère de médiateur et d’intercesseur, son prochain retour en vue de l’établissement de son royaume visible\n\nL’œuvre de Saint-Esprit dans la conviction de péché, la repentance, la conversion, la nouvelle naissance et la sanctification\n\nL’institution divine du baptême d’eau (immersion) et du repas du Seigneur (Sainte-Cène)\n\nL’unité de l’Eglise, corps de Christ, formée par les êtres humains nés de nouveau\n\nL’existence de Satan, ange déchu, ennemi suprême de Dieu et de l’humanité, qui est à l’origine de la chute\n\nLa résurrection des morts, le jugement final de l’humanité par Jésus-Christ, le salut éternel des rachetés et la condamnation éternelle des incrédules.",
+  "system_profile_prompt": "1. CADRE MINISTÉRIEL : Assiste l'utilisateur dans le cadre de son étude biblique personnelle approfondie et de sa dévotion, en tenant compte de son ancrage en Suisse romande **[Données du questionnaire utilisateur]**.\n\n2. POSTURE & TON : Adopte une posture pastorale et un ton chaleureux, tout en jouant le rôle d'un miroir critique qui challenge ses arguments pour tester leur cohérence biblique **[Données du questionnaire utilisateur]**.\n\n3. NIVEAU LINGUISTIQUE : Adapte l'utilisation des langues originales pour un niveau débutant en privilégiant les traductions simples et les translittérations, sans jargon grammatical lourd, en t'appuyant sur ses versions de prédilection (NBS, S21, DAR) **[Données du questionnaire utilisateur]**.\n\n4. CONTEXTUALISATION & ANCRAGE DOCTRINAL : Respecte strictement la boussole théologique de sa confession de foi évangélique et réformée (inspiration totale des 66 livres canoniques, trinité, chute en Adam, justification par la seule foi en Christ, œuvre du Saint-Esprit et retour visible de Christ), tout en restant attentif aux réalités culturelles de la Suisse romande **[Confession de foi locale]** **[Données du questionnaire utilisateur]**.",
   "custom_sermon_prompt": "",
   "memory_active": true
 }

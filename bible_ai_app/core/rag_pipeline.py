@@ -13,9 +13,31 @@ class RAGPipeline:
     3. Curation / Normalisation du contexte (Optionnel)
     4. Synthèse exégétique et Rédaction sourcée (Grand LLM)
     """
-    def __init__(self, db, config=None):
+    _instance = None
+
+    @classmethod
+    def get_instance(cls, db=None, config=None):
+        if cls._instance is None:
+            from core.config import load_config
+            cfg = config or load_config()
+            cls._instance = cls(db=db, config=cfg)
+        else:
+            if config:
+                cls._instance.config = config
+            if db:
+                cls._instance.db = db
+        return cls._instance
+
+    def __init__(self, db=None, config=None):
         self.db = db
-        self.config = config or {}
+        if config is None:
+            try:
+                from core.config import load_config
+                self.config = load_config()
+            except Exception:
+                self.config = {}
+        else:
+            self.config = config
         self.reranker = LocalReranker.get_instance()
 
     def retrieve_candidates(self, query: str, top_k: int = 25, embedding_model: str = None, active_sources: list = None, where_clause: dict = None) -> list:
@@ -80,22 +102,16 @@ class RAGPipeline:
 
         return self.reranker.rerank(query=query, documents=candidates, top_k=top_k)
 
-    def curate_context(self, query: str, documents: list, curation_model: str = None) -> list:
-        """
-        Étape 3 : Curation et synthèse sémantique du contexte par un LLM intermédiaire
-        (par exemple mistralai/Ministral-3-14B-Instruct-2512 sur Infomaniak ou mistral-small ou gemini-flash-lite).
-        """
-        if not documents:
-            return documents
-            
-        curation_model = curation_model or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
-        
-        # Résolution du provider et de la clé
-        if "infomaniak" in curation_model.lower() or "ministral" in curation_model.lower() or "qwen" in curation_model.lower() or "bge" in curation_model.lower():
+    def _resolve_llm_client(self, model_name: str):
+        """Résout le provider, la clé et instancie un LLMClient pour un modèle donné."""
+        if not model_name:
+            return None, None
+        m_lower = model_name.lower()
+        if "infomaniak" in m_lower or "ministral" in m_lower or "qwen" in m_lower or "bge" in m_lower:
             provider = "infomaniak"
             api_key = self.config.get("infomaniak_token", "")
             product_id = self.config.get("infomaniak_product_id", "251")
-        elif "mistral" in curation_model.lower():
+        elif "mistral" in m_lower:
             provider = "mistral"
             api_key = self.config.get("mistral_api_key", "")
             product_id = None
@@ -105,44 +121,71 @@ class RAGPipeline:
             product_id = None
 
         if not api_key:
-            return documents
+            return None, None
 
         try:
-            llm = LLMClient(api_key=api_key, model=curation_model, provider=provider, product_id=product_id)
-            
-            raw_excerpts = []
-            for i, doc in enumerate(documents, 1):
-                meta = doc.get("metadata", {})
-                title = meta.get("name") or meta.get("source") or f"Doc {i}"
-                raw_excerpts.append(f"[{title}]\n{doc['text']}")
-            
-            combined_text = "\n\n".join(raw_excerpts)
-            
-            sys_prompt = (
-                "Vous êtes un assistant expert en épuration et synthèse théologique.\n"
-                "Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une synthèse ultra-dense et précise "
-                "en conservant fidèlement toutes les définitions théologiques, arguments et références bibliques, "
-                "tout en supprimant les bavardages et informations redondantes."
-            )
-            
-            curated_output = llm.ask_question(
-                context=combined_text, 
-                question=f"Synthétise et épure les points clés utiles pour répondre à : '{query}'", 
-                system_prompt=sys_prompt
-            )
-            
-            if curated_output and not str(curated_output).startswith("Erreur"):
-                curated_docs = [dict(d) for d in documents]
-                curated_docs.insert(0, {
-                    "id": "curated_summary",
-                    "text": f"--- SYNTHÈSE ÉPURÉE PAR LE MODÈLE INTERMÉDIAIRE ({curation_model.split('/')[-1]}) ---\n{curated_output}",
-                    "metadata": {"name": f"Synthèse Curée ({curation_model.split('/')[-1]})"},
-                    "rerank_score": 1.0
-                })
-                return curated_docs
+            return LLMClient(api_key=api_key, model=model_name, provider=provider, product_id=product_id), model_name
         except Exception as e:
-            logger.error("[RAGPipeline] Erreur lors de la curation IA : %s", e)
-            
+            logger.warning("[RAGPipeline] Impossible d'initialiser le client LLM pour %s : %s", model_name, e)
+            return None, None
+
+    def curate_context(self, query: str, documents: list, curation_model: str = None, fallback_model: str = None) -> list:
+        """
+        Étape 3 : Curation et synthèse sémantique du contexte par un LLM intermédiaire
+        (par exemple mistralai/Ministral-3-14B-Instruct-2512 sur Infomaniak ou mistral-small ou gemini-3.5-flash-lite).
+        Supporte un modèle principal et un modèle de secours (fallback).
+        """
+        if not documents:
+            return documents
+
+        curation_model = curation_model or self.config.get("curator_model") or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
+        fallback_model = fallback_model or self.config.get("curator_fallback_model") or self.config.get("rag_curation_fallback_model", "gemini-3.5-flash-lite")
+
+        raw_excerpts = []
+        for i, doc in enumerate(documents, 1):
+            meta = doc.get("metadata", {})
+            title = meta.get("name") or meta.get("source") or f"Doc {i}"
+            raw_excerpts.append(f"[{title}]\n{doc.get('text', '')}")
+
+        combined_text = "\n\n".join(raw_excerpts)
+
+        sys_prompt = self.config.get("curator_system_prompt") or (
+            "Vous êtes un assistant expert en épuration et synthèse théologique.\n"
+            "Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une synthèse ultra-dense et précise "
+            "en conservant fidèlement toutes les définitions théologiques, arguments et références bibliques, "
+            "tout en supprimant les bavardages et informations redondantes."
+        )
+
+        models_to_try = [curation_model]
+        if fallback_model and fallback_model != curation_model:
+            models_to_try.append(fallback_model)
+
+        for m in models_to_try:
+            try:
+                llm, model_used = self._resolve_llm_client(m)
+                if not llm:
+                    continue
+
+                curated_output = llm.ask_question(
+                    context=combined_text,
+                    question=f"Synthétise et épure les points clés utiles pour répondre à : '{query}'",
+                    system_prompt=sys_prompt
+                )
+
+                if curated_output and not str(curated_output).startswith("Erreur"):
+                    curated_docs = [dict(d) for d in documents]
+                    curated_docs.insert(0, {
+                        "id": "curated_summary",
+                        "text": f"--- SYNTHÈSE ÉPURÉE PAR LE MODÈLE INTERMÉDIAIRE ({model_used.split('/')[-1]}) ---\n{curated_output}",
+                        "metadata": {"name": f"Synthèse Curée ({model_used.split('/')[-1]})"},
+                        "rerank_score": 1.0
+                    })
+                    return curated_docs
+                else:
+                    logger.warning("[RAGPipeline] Curation infructueuse avec %s : %s", m, str(curated_output)[:100])
+            except Exception as e:
+                logger.error("[RAGPipeline] Erreur lors de la curation IA avec %s : %s", m, e)
+
         return documents
 
     def build_structured_context(self, documents: list, screen_context: str = None, exegetical_context: str = None, pericope_context: str = None) -> str:
@@ -198,6 +241,7 @@ class RAGPipeline:
                 enable_rerank: bool = True, 
                 enable_curation: bool = False, 
                 curation_model: str = None,
+                fallback_model: str = None,
                 embedding_model: str = None,
                 chat_model: str = None,
                 thinking_budget: int = None,
@@ -316,12 +360,13 @@ class RAGPipeline:
             t_rerank_ms = 0.0
 
         # 3. Curation de contexte par LLM intermédiaire
-        curation_model_used = curation_model or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
+        curation_model_used = curation_model or self.config.get("curator_model") or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
+        fallback_model_used = fallback_model or self.config.get("curator_fallback_model") or self.config.get("rag_curation_fallback_model", "gemini-3.5-flash-lite")
         t_curation_ms = 0.0
         if enable_curation and reranked_docs:
             _notify("curation", f"Curation du contexte ({curation_model_used.split('/')[-1]})...", "running")
             t_cur_0 = time.time()
-            final_docs = self.curate_context(query=query, documents=reranked_docs, curation_model=curation_model_used)
+            final_docs = self.curate_context(query=query, documents=reranked_docs, curation_model=curation_model_used, fallback_model=fallback_model_used)
             t_curation_ms = (time.time() - t_cur_0) * 1000
             _notify("curation", "Curation terminée avec succès", "done")
         else:

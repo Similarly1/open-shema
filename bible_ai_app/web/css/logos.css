@@ -33568,12 +33568,18 @@ body[class*="palette-dark"] .mm-inline-editor.paper-mode {
 }
 
 .note-mindmap-container.paper-mode .mm-relationship-g:hover .mm-rel-label-rect,
-.note-mindmap-container.paper-mode .mm-relationship-g.selected .mm-rel-label-rect {
+.note-mindmap-container.paper-mode .mm-relationship-g.selected .mm-rel-label-rect,
+.note-mindmap-container.paper-mode .mm-rel-label-g:hover .mm-rel-label-rect,
+.note-mindmap-container.paper-mode .mm-rel-label-g.hovered .mm-rel-label-rect,
+.note-mindmap-container.paper-mode .mm-rel-label-g.selected .mm-rel-label-rect {
   stroke: #2563eb !important;
 }
 
 .note-mindmap-container.paper-mode .mm-relationship-g:hover .mm-rel-label-text,
-.note-mindmap-container.paper-mode .mm-relationship-g.selected .mm-rel-label-text {
+.note-mindmap-container.paper-mode .mm-relationship-g.selected .mm-rel-label-text,
+.note-mindmap-container.paper-mode .mm-rel-label-g:hover .mm-rel-label-text,
+.note-mindmap-container.paper-mode .mm-rel-label-g.hovered .mm-rel-label-text,
+.note-mindmap-container.paper-mode .mm-rel-label-g.selected .mm-rel-label-text {
   fill: #2563eb !important;
 }
 
@@ -35669,12 +35675,18 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-rel-lab
 }
 
 .mm-relationship-g:hover .mm-rel-label-rect,
-.mm-relationship-g.selected .mm-rel-label-rect {
+.mm-relationship-g.selected .mm-rel-label-rect,
+.mm-rel-label-g:hover .mm-rel-label-rect,
+.mm-rel-label-g.hovered .mm-rel-label-rect,
+.mm-rel-label-g.selected .mm-rel-label-rect {
   stroke: #2563eb;
 }
 
 .mm-relationship-g:hover .mm-rel-label-text,
-.mm-relationship-g.selected .mm-rel-label-text {
+.mm-relationship-g.selected .mm-rel-label-text,
+.mm-rel-label-g:hover .mm-rel-label-text,
+.mm-rel-label-g.hovered .mm-rel-label-text,
+.mm-rel-label-g.selected .mm-rel-label-text {
   fill: #2563eb;
 }
 
@@ -37800,24 +37812,30 @@ body[class*="palette-dark"] .note-svg-icon:hover {
 
 .mm-node-icon-badge {
   cursor: pointer;
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.mm-node-icon-badge * {
+  pointer-events: none;
+}
+
+.mm-node-icon-badge circle:first-child {
+  pointer-events: all;
 }
 
 .mm-node-icon-badge:hover {
-  transform: scale(1.18);
-  filter: drop-shadow(0 0 6px var(--node-color, rgba(59, 130, 246, 0.6)));
+  filter: brightness(1.25);
+  opacity: 0.9;
 }
 
 .mm-root-icon-badge {
-  transform-box: fill-box;
-  transform-origin: center;
+  cursor: pointer;
+  transition: opacity 0.15s ease, filter 0.15s ease;
 }
 
 .mm-root-icon-badge:hover {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 10px var(--node-color, rgba(59, 130, 246, 0.8)));
+  filter: brightness(1.2);
+  opacity: 0.95;
 }
 
 .mm-outline-icon-badge {
@@ -37982,5 +38000,344 @@ body[class*="palette-dark"] .svg-picker-suggestion-chip:hover {
 .svg-picker-suggestion-chip .svg-chip-label {
   line-height: 1;
 }
+
+/* =========================================================================
+   MODAL DE PRÉVISUALISATION INTERMÉDIAIRE MIND MAP (Lecture Seule)
+   ========================================================================= */
+
+.mm-preview-modal-card {
+  width: 90vw;
+  max-width: 1440px;
+  height: 88vh;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  transition: width 0.2s ease, height 0.2s ease, max-width 0.2s ease, max-height 0.2s ease, border-radius 0.2s ease;
+}
+
+.mm-preview-modal-card.is-expanded {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.mm-preview-modal-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card, #ffffff);
+  user-select: none;
+}
+
+.mm-preview-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mm-preview-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.theme-dark .mm-preview-icon-badge,
+body[class*="palette-dark"] .mm-preview-icon-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.mm-preview-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mm-preview-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-preview-modal-header .modal-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.mm-preview-badge-readonly {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--bg-surface, #f1f5f9);
+  color: var(--text-muted, #64748b);
+  border: 1px solid var(--border-color, #cbd5e1);
+}
+
+.mm-preview-ref-subtitle {
+  font-size: 11.5px;
+  color: var(--text-muted, #64748b);
+}
+
+.mm-preview-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mm-preview-modal-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface, #f8fafc);
+}
+
+.mm-preview-canvas-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  flex: 1;
+}
+
+/* Conteneur principal reparenté en mode prévisualisation */
+.note-mindmap-container.is-preview-mode {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+/* Masquage strict des éléments d'édition dans le conteneur de prévisualisation et en lecture seule */
+.is-preview-mode .mm-node-actions,
+.is-preview-mode .mm-node-action-btn,
+.is-preview-mode .mm-root-plus,
+.is-preview-mode .mm-rel-del-btn,
+.is-preview-mode .mm-rel-handle,
+.is-preview-mode .mm-boundary-del-btn,
+.is-preview-mode .mm-connecting-banner,
+.is-read-only .mm-node-actions,
+.is-read-only .mm-node-action-btn,
+.is-read-only .mm-root-plus,
+.is-read-only .mm-rel-del-btn,
+.is-read-only .mm-rel-handle,
+.is-read-only .mm-boundary-del-btn,
+.is-read-only .mm-connecting-banner,
+.mm-preview-canvas-container .mm-node-actions,
+.mm-preview-canvas-container .mm-node-action-btn,
+.mm-preview-canvas-container .mm-root-plus,
+.mm-preview-canvas-container .mm-rel-del-btn,
+.mm-preview-canvas-container .mm-rel-handle,
+.mm-preview-canvas-container .mm-boundary-del-btn,
+.mm-preview-canvas-container .mm-rel-delete-badge,
+.mm-preview-canvas-container .mm-boundary-delete-btn,
+.mm-preview-canvas-container #mm-btn-toggle-outline,
+.mm-preview-canvas-container #mm-btn-structure,
+.mm-preview-canvas-container #mm-btn-styles,
+.mm-preview-canvas-container #mm-btn-reorganize,
+.mm-preview-canvas-container #mm-btn-relationship,
+.mm-preview-canvas-container #mm-btn-boundary,
+.mm-preview-canvas-container #mm-btn-floating,
+.mm-preview-canvas-container #mm-btn-marker,
+.mm-preview-canvas-container #mm-btn-palette,
+.mm-preview-canvas-container #mm-btn-export,
+.mm-preview-canvas-container #mm-btn-fullscreen,
+.mm-preview-canvas-container .mm-fullscreen-bar,
+.mm-preview-canvas-container .mm-connecting-banner,
+.mm-preview-canvas-container .mm-structure-popover,
+.mm-preview-canvas-container .mm-styles-popover,
+.mm-preview-canvas-container .mm-marker-popover {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.mm-preview-canvas-container .mindmap-dock {
+  bottom: 16px;
+  right: 16px;
+  z-index: 20;
+}
+
+.mm-preview-canvas-container .mindmap-svg-canvas {
+  cursor: grab !important;
+}
+
+.mm-preview-canvas-container .mindmap-svg-canvas:active,
+.mm-preview-canvas-container.is-panning .mindmap-svg-canvas {
+  cursor: grabbing !important;
+}
+
+.mm-preview-canvas-container .mm-node-g {
+  cursor: grab !important;
+}
+
+/* Loading overlay avec pulsation */
+.mm-preview-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--bg-card-rgb, 15, 23, 42), 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.25s ease;
+}
+
+.mm-preview-loading-overlay.hidden {
+  display: none !important;
+}
+
+.mm-preview-spinner-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px 40px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+  max-width: 440px;
+}
+
+.mm-preview-pulsing-brain {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  animation: pulseBrain 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseBrain {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 16px rgba(37, 99, 235, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+.mm-preview-loading-title {
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mm-preview-loading-desc {
+  margin: 0 0 16px 0;
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+  line-height: 1.4;
+}
+
+.mm-preview-loading-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-surface, #e2e8f0);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mm-preview-loading-progress {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  border-radius: 2px;
+  position: absolute;
+  animation: barProgress 1.5s infinite ease-in-out;
+}
+
+@keyframes barProgress {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.mm-preview-modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card, #ffffff);
+  user-select: none;
+}
+
+.mm-preview-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-preview-meta-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--bg-surface, #f1f5f9);
+  color: var(--text-muted, #64748b);
+  border: 1px solid var(--border-color, #cbd5e1);
+}
+
+.mm-preview-meta-count {
+  font-size: 11.5px;
+  color: var(--text-muted, #64748b);
+}
+
+.mm-preview-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-save-edit-mm {
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
+}
+
 
 

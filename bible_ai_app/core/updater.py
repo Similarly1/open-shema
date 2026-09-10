@@ -11,6 +11,7 @@ import time
 import json
 import ssl
 import shutil
+import hashlib
 import zipfile
 import logging
 import tempfile
@@ -18,6 +19,13 @@ import threading
 import subprocess
 import urllib.request
 from typing import Dict, Any, Optional, Tuple
+
+
+def _make_ssl_context() -> ssl.SSLContext:
+    """Retourne un contexte SSL strict (vérifie les certificats serveur).
+    Utilisé pour toutes les connexions réseau critiques (GitHub API, téléchargements).
+    """
+    return ssl.create_default_context()
 
 logger = logging.getLogger("open_shema_updater")
 
@@ -117,9 +125,7 @@ def check_for_updates(repo: str = GITHUB_REPO, timeout: int = 6) -> Dict[str, An
         }
     )
 
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+    ctx = _make_ssl_context()
 
     try:
         with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
@@ -235,19 +241,18 @@ def _run_download_and_stage(download_url: str, target_version: str):
             shutil.rmtree(staged_dir, ignore_errors=True)
         os.makedirs(staged_dir, exist_ok=True)
 
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
+        ctx = _make_ssl_context()
         req = urllib.request.Request(
             download_url,
             headers={"User-Agent": f"OpenShema/{APP_VERSION} (Windows)"}
         )
 
-        with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
+        with urllib.request.urlopen(req, timeout=60, context=ctx) as response:
             total_size = int(response.headers.get("content-length", 0))
             downloaded = 0
             start_time = time.time()
             last_update_time = start_time
+            sha256 = hashlib.sha256()
 
             with open(zip_path, "wb") as out_file:
                 chunk_size = 128 * 1024
@@ -256,6 +261,7 @@ def _run_download_and_stage(download_url: str, target_version: str):
                     if not chunk:
                         break
                     out_file.write(chunk)
+                    sha256.update(chunk)
                     downloaded += len(chunk)
 
                     now = time.time()
@@ -272,8 +278,17 @@ def _run_download_and_stage(download_url: str, target_version: str):
                         )
                         last_update_time = now
 
+        archive_hash = sha256.hexdigest()
+        logger.info(f"Archive téléchargée — SHA-256 : {archive_hash} ({format_bytes(downloaded)})")
+        _set_update_state(archive_sha256=archive_hash)
+
+        # Vérification de l'intégrité : s'assurer que l'archive est un ZIP valide
+        _set_update_state(percent=92.0, speed_str="", downloaded_str="Vérification de l'intégrité...")
+        if not zipfile.is_zipfile(zip_path):
+            raise ValueError("Le fichier téléchargé n'est pas une archive ZIP valide (archive corrompue ou substituée).")
+
         # Décompression dans le dossier staged
-        _set_update_state(percent=92.0, speed_str="", downloaded_str="Décompression...")
+        _set_update_state(percent=94.0, speed_str="", downloaded_str="Décompression...")
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(staged_dir)
 
@@ -358,29 +373,33 @@ def apply_update_and_restart() -> Dict[str, Any]:
     exe_target = os.path.join(install_dir, "OpenShema.exe")
     current_pid = os.getpid()
 
-    # Script PowerShell de bascule sécurisée
-    ps_script = f"""
-$pidToWait = {current_pid}
-$sourceDir = '{staged_dir.replace("'", "''")}'
-$targetDir = '{install_dir.replace("'", "''")}'
-$exePath = '{exe_target.replace("'", "''")}'
+    # Script PowerShell de bascule sécurisée.
+    # Les chemins sont passés comme paramètres (-ArgumentList) et non interpolés
+    # directement dans le corps du script, ce qui élimine tout risque d'injection.
+    ps_script = """
+param(
+    [int]$PidToWait,
+    [string]$SourceDir,
+    [string]$TargetDir,
+    [string]$ExePath
+)
 
 # 1. Attente de la fin du processus principal Open Shema
-try {{
-    Wait-Process -Id $pidToWait -Timeout 15 -ErrorAction SilentlyContinue
-}} catch {{}}
+try {
+    Wait-Process -Id $PidToWait -Timeout 15 -ErrorAction SilentlyContinue
+} catch {}
 Start-Sleep -Milliseconds 600
 
 # 2. Synchronisation rapide des fichiers via robocopy natif
-robocopy "$sourceDir" "$targetDir" /E /MT:8 /R:3 /W:1 /NP /NFL /NDL
+robocopy $SourceDir $TargetDir /E /MT:8 /R:3 /W:1 /NP /NFL /NDL
 
 # 3. Nettoyage temporaire du zip
-Remove-Item -Path "$sourceDir" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath $SourceDir -Recurse -Force -ErrorAction SilentlyContinue
 
-# 4. Relance d'Open Shema en version mise à jour
-if (Test-Path "$exePath") {{
-    Start-Process -FilePath "$exePath" -WorkingDirectory "$targetDir"
-}}
+# 4. Relance d'Open Shema en version mise a jour
+if (Test-Path -LiteralPath $ExePath) {
+    Start-Process -FilePath $ExePath -WorkingDirectory $TargetDir
+}
 """
 
     script_path = os.path.join(temp_dir, "apply_update.ps1")
@@ -388,10 +407,21 @@ if (Test-Path "$exePath") {{
         f.write(ps_script)
 
     try:
-        # Lancement en arrière-plan totalement détaché
+        # Lancement en arrière-plan totalement détaché.
+        # Les chemins sont passés proprement comme arguments séparés (-ArgumentList),
+        # jamais interpolés dans le corps du script PowerShell.
         creation_flags = 0x08000000 | 0x00000200  # CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP
         subprocess.Popen(
-            ["powershell", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", script_path],
+            [
+                "powershell",
+                "-ExecutionPolicy", "Bypass",
+                "-WindowStyle", "Hidden",
+                "-File", script_path,
+                "-PidToWait", str(current_pid),
+                "-SourceDir", staged_dir,
+                "-TargetDir", install_dir,
+                "-ExePath", exe_target,
+            ],
             creationflags=creation_flags,
             close_fds=True
         )

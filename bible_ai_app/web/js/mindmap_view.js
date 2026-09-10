@@ -11,6 +11,7 @@
  */
 
 const MindMapView = {
+  isReadOnly: false,
   container: null,
   svg: null,
   viewportG: null,
@@ -110,9 +111,10 @@ const MindMapView = {
     this.container = containerEl || document.getElementById('note-mindmap-container');
     if (!this.container) return;
 
-    this.container.innerHTML = `
-      <div class="mindmap-wrapper">
-        <svg id="mindmap-svg" class="mindmap-svg-canvas" width="100%" height="100%">
+    if (!this.container.querySelector('.mindmap-wrapper')) {
+      this.container.innerHTML = `
+        <div class="mindmap-wrapper">
+          <svg id="mindmap-svg" class="mindmap-svg-canvas" width="100%" height="100%">
           <defs>
             <filter id="mm-glow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.15"/>
@@ -415,22 +417,32 @@ const MindMapView = {
         </div>
       </div>
     `;
+    }
 
-    this.svg = document.getElementById('mindmap-svg');
-    this.viewportG = document.getElementById('mindmap-viewport');
+    this.svg = this.container.querySelector('.mindmap-svg-canvas') || document.getElementById('mindmap-svg');
+    this.viewportG = this.container.querySelector('#mindmap-viewport') || this.svg?.querySelector('g') || document.getElementById('mindmap-viewport');
 
-    this.bindEvents();
+    if (!this._eventsBound) {
+      this.bindEvents();
+      this._eventsBound = true;
+    }
   },
 
   bindEvents() {
     // 1. Panoramique à la souris (Drag)
-    this.svg?.addEventListener('mousedown', (e) => {
+    const onMouseDown = (e) => {
       this.hideTooltip();
       if (this.connectingSourceId && !e.target.closest('.mm-node-g')) {
         this.cancelConnecting();
         return;
       }
-      if (e.target === this.svg || e.target.id === 'mindmap-svg' || e.target === this.viewportG) {
+      if (e.button !== 0) return; // Clic gauche uniquement
+
+      // Autoriser le panoramique si clic sur le fond, le canevas, les branches, ou n'importe où en lecture seule (sauf badges interactifs)
+      const isInteractiveBadge = e.target.closest('.mm-node-icon-badge') || e.target.closest('.mm-scripture-pill') || e.target.closest('.mm-note-pill') || e.target.closest('.mm-action-btn') || e.target.closest('button');
+      const isNode = !!e.target.closest('.mm-node-g');
+
+      if (!isInteractiveBadge && (!isNode || this.isReadOnly)) {
         this.isPanning = true;
         this.panStart = { x: e.clientX - this.viewBox.x, y: e.clientY - this.viewBox.y };
         this.selectedNodeId = null;
@@ -438,7 +450,10 @@ const MindMapView = {
         this.selectedBoundaryId = null;
         this.updateSelectionState();
       }
-    });
+    };
+
+    this.svg?.addEventListener('mousedown', onMouseDown);
+    this.container?.addEventListener('mousedown', onMouseDown);
 
     window.addEventListener('mousemove', (e) => {
       // 1. Panoramique du canevas
@@ -550,17 +565,18 @@ const MindMapView = {
     });
 
     // 2. Zoom à la molette
-    this.svg?.addEventListener('wheel', (e) => {
+    const onWheel = (e) => {
       e.preventDefault();
       const activeEditor = document.querySelector('.mm-inline-editor');
       if (activeEditor) activeEditor.blur();
       this.hideTooltip();
       const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-      const rect = this.svg.getBoundingClientRect();
+      const targetRectEl = this.svg || this.container;
+      const rect = targetRectEl ? targetRectEl.getBoundingClientRect() : { left: 0, top: 0 };
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      const newScale = Math.min(Math.max(0.3, this.viewBox.scale * zoomFactor), 3.0);
+      const newScale = Math.min(Math.max(0.2, this.viewBox.scale * zoomFactor), 3.5);
 
       // Zoom centré sur la souris
       this.viewBox.x = mouseX - (mouseX - this.viewBox.x) * (newScale / this.viewBox.scale);
@@ -568,7 +584,10 @@ const MindMapView = {
       this.viewBox.scale = newScale;
 
       this.applyTransform();
-    }, { passive: false });
+    };
+
+    this.svg?.addEventListener('wheel', onWheel, { passive: false });
+    this.container?.addEventListener('wheel', onWheel, { passive: false });
 
     // 3. Boutons Dock
     document.getElementById('mm-btn-toggle-outline')?.addEventListener('click', () => this.toggleViewMode());
@@ -809,6 +828,42 @@ const MindMapView = {
         return;
       }
 
+      // Bascule Plein Écran (F11)
+      if (e.key === 'F11') {
+        e.preventDefault();
+        this.toggleFullscreen();
+        return;
+      }
+
+      // Si l'utilisateur est en train de taper dans un champ de saisie HTML
+      const activeTag = document.activeElement?.tagName;
+      if (['INPUT', 'TEXTAREA'].includes(activeTag) || document.activeElement?.isContentEditable) return;
+
+      // En mode lecture seule (ex: modale de prévisualisation), n'autoriser QUE la navigation et consultation
+      if (this.isReadOnly) {
+        if (e.key === 'r' || e.key === 'R') {
+          this.fitView();
+        } else if ((e.key === 'p' || e.key === 'P') && e.altKey) {
+          e.preventDefault();
+          this.toggleViewMode();
+        } else if (!e.ctrlKey && !e.altKey && !e.metaKey && (e.key === 'f' || e.key === 'F')) {
+          e.preventDefault();
+          this.toggleFullscreen();
+        } else if (e.key === 'F4' || (e.altKey && (e.key === 'n' || e.key === 'N'))) {
+          if (this.selectedNodeId && this.selectedNodeId !== 'root') {
+            e.preventDefault();
+            this.promptTopicNote(this.selectedNodeId);
+          }
+        } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+          e.preventDefault();
+          this.navigateWithArrows(e.key);
+        } else if (e.key === '?') {
+          e.preventDefault();
+          this.toggleHelpDrawer();
+        }
+        return;
+      }
+
       // Changement de squelette / structure (Alt+S)
       if (e.altKey && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
@@ -869,17 +924,6 @@ const MindMapView = {
         this.createFloatingTopic(centerSvgX + 140 + offset, centerSvgY + 60 + offset);
         return;
       }
-
-      // Bascule Plein Écran (F11)
-      if (e.key === 'F11') {
-        e.preventDefault();
-        this.toggleFullscreen();
-        return;
-      }
-
-      // Si l'utilisateur est en train de taper dans un champ de saisie HTML
-      const activeTag = document.activeElement?.tagName;
-      if (['INPUT', 'TEXTAREA'].includes(activeTag) || document.activeElement?.isContentEditable) return;
 
       // Raccourci direct 'I' pour la palette d'icônes SVG sur le nœud sélectionné
       if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'i' || e.key === 'I')) {
@@ -979,11 +1023,13 @@ const MindMapView = {
     this.svg?.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      if (this.isReadOnly) return;
       this.showContextMenu(e.clientX, e.clientY, null);
     });
 
     // Double-clic sur le fond = créer un sujet flottant indépendant (style XMind)
     this.svg?.addEventListener('dblclick', (e) => {
+      if (this.isReadOnly) return;
       if (e.target === this.svg || e.target === this.viewportG) {
         e.stopPropagation();
         const rect = this.svg.getBoundingClientRect();
@@ -1201,6 +1247,8 @@ const MindMapView = {
         const color = relMatch[4] !== undefined ? relMatch[4].trim() : '';
         const cx = relMatch[5] !== undefined ? parseFloat(relMatch[5]) : null;
         const cy = relMatch[6] !== undefined ? parseFloat(relMatch[6]) : null;
+        // Filtrer les coordonnées factices d'exemples de prompts (ex: cx: 120, cy: -40)
+        const isDummyPlaceholder = (cx !== null && cy !== null && Math.abs(cx - 120) < 3 && Math.abs(cy - (-40)) < 3);
 
         const fromNode = this.findNode(fromRef, root) || this.findNodeByText(fromRef, root);
         const toNode = this.findNode(toRef, root) || this.findNodeByText(toRef, root);
@@ -1212,7 +1260,7 @@ const MindMapView = {
             toId: toNode.id,
             label: label || 'VOIR AUSSI',
             color: color || '',
-            customControl: (cx !== null && cy !== null) ? { x: cx, y: cy } : null
+            customControl: (cx !== null && cy !== null && !isDummyPlaceholder) ? { x: cx, y: cy } : null
           });
         }
       }
@@ -2067,8 +2115,11 @@ const MindMapView = {
     this.historyIndex = -1;
     this.pushHistory();
 
-    const svgEl = document.getElementById('mindmap-svg');
-    const outlineEl = document.getElementById('mindmap-outline-view');
+    this.svg = this.container?.querySelector('.mindmap-svg-canvas') || document.getElementById('mindmap-svg');
+    this.viewportG = this.container?.querySelector('#mindmap-viewport') || this.svg?.querySelector('g') || document.getElementById('mindmap-viewport');
+
+    const svgEl = this.svg;
+    const outlineEl = this.container?.querySelector('.mindmap-outline-container') || document.getElementById('mindmap-outline-view');
 
     if (this.viewMode === 'outline') {
       svgEl?.classList.add('hidden');
@@ -2079,6 +2130,9 @@ const MindMapView = {
       svgEl?.classList.remove('hidden');
       this.draw();
       this.fitView();
+      if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(() => this.fitView());
+      }
     }
     this.updateViewModeUI();
     this.updateStructureUI();
@@ -2105,8 +2159,8 @@ const MindMapView = {
 
   toggleViewMode(targetMode = null) {
     this.viewMode = targetMode || (this.viewMode === 'map' ? 'outline' : 'map');
-    const svgEl = document.getElementById('mindmap-svg');
-    const outlineEl = document.getElementById('mindmap-outline-view');
+    const svgEl = this.container?.querySelector('.mindmap-svg-canvas') || document.getElementById('mindmap-svg');
+    const outlineEl = this.container?.querySelector('.mindmap-outline-container') || document.getElementById('mindmap-outline-view');
 
     if (this.viewMode === 'outline') {
       this.hideTooltip();
@@ -2120,6 +2174,9 @@ const MindMapView = {
       this.layoutTree();
       this.draw();
       this.fitView();
+      if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(() => this.fitView());
+      }
     }
 
     this.updateViewModeUI();
@@ -2799,6 +2856,7 @@ const MindMapView = {
   },
 
   startOutlineInlineEdit(nodeId, targetEl) {
+    if (this.isReadOnly) return;
     const node = this.findNode(nodeId);
     if (!node || targetEl.querySelector('input')) return;
 
@@ -2817,7 +2875,9 @@ const MindMapView = {
     const commit = () => {
       if (committed) return;
       committed = true;
-      let val = input.value.trim().toUpperCase() || originalText;
+      let val = input.value.trim();
+
+      // Prise en charge des raccourcis d'icônes ::icon-name
       const iconMatch = val.match(/::([a-zA-Z0-9_-]+):?/i);
       if (iconMatch && typeof SvgIconsRegistry !== 'undefined') {
         const candidate = iconMatch[1].toLowerCase();
@@ -2855,6 +2915,9 @@ const MindMapView = {
 
   draw() {
     if (!this.viewportG) return;
+    if (this.container) {
+      this.container.classList.toggle('is-read-only', !!this.isReadOnly);
+    }
     this.viewportG.innerHTML = '';
 
     // 1. Dessiner d'abord les enclos / clôtures en arrière-plan (au fond sous les branches et nœuds)
@@ -2868,8 +2931,10 @@ const MindMapView = {
       this.floatingTopics.forEach(ft => this.drawBranches(ft));
     }
 
-    // 3. Dessiner les liaisons transversales inter-branches (Relations style XMind)
-    this.drawRelationships();
+    // 3. Calque dédié aux lignes de liaisons transversales (sous les nœuds)
+    const relsLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    relsLayer.setAttribute('id', 'mm-relationships-layer');
+    this.viewportG.appendChild(relsLayer);
 
     // 4. Dessiner tous les nœuds (textes, boutons contextuels)
     if (this.tree) {
@@ -2878,6 +2943,14 @@ const MindMapView = {
     if (this.floatingTopics && this.floatingTopics.length > 0) {
       this.floatingTopics.forEach(ft => this.drawNodes(ft));
     }
+
+    // 5. Calque dédié aux étiquettes et poignées de liaisons (au premier plan, au-dessus des nœuds)
+    const relsLabelsLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    relsLabelsLayer.setAttribute('id', 'mm-rel-labels-layer');
+    this.viewportG.appendChild(relsLabelsLayer);
+
+    // 6. Dessiner les liaisons transversales inter-branches dans leurs calques respectifs
+    this.drawRelationships();
   },
 
   drawBranches(node) {
@@ -3271,11 +3344,14 @@ const MindMapView = {
           svgWrap.setAttribute('stroke-width', '2.3');
           svgWrap.setAttribute('stroke-linecap', 'round');
           svgWrap.setAttribute('stroke-linejoin', 'round');
+          svgWrap.setAttribute('pointer-events', 'none');
+          svgWrap.style.pointerEvents = 'none';
           svgWrap.innerHTML = iconDef.path;
           iconG.appendChild(svgWrap);
 
           iconG.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (this.isReadOnly) return;
             this.openIconPicker(node.id, e.clientX, e.clientY);
           });
           g.appendChild(iconG);
@@ -3290,13 +3366,15 @@ const MindMapView = {
 
       g.appendChild(text);
 
-      // Bouton contextuel + pour ajouter un BOI
-      const plusX = isTopDown ? 0 : node.width / 2 + 16;
-      const plusY = isTopDown ? node.height / 2 + 16 : 0;
-      const plusBtn = this.createActionButton('+', plusX, plusY, () => this.addChildToNode(node));
-      plusBtn.setAttribute('title', 'Ajouter une idée directrice majeure (BOI)');
-      plusBtn.classList.add('mm-root-plus');
-      g.appendChild(plusBtn);
+      // Bouton contextuel + pour ajouter un BOI (en mode édition uniquement)
+      if (!this.isReadOnly) {
+        const plusX = isTopDown ? 0 : node.width / 2 + 16;
+        const plusY = isTopDown ? node.height / 2 + 16 : 0;
+        const plusBtn = this.createActionButton('+', plusX, plusY, () => this.addChildToNode(node));
+        plusBtn.setAttribute('title', 'Ajouter une idée directrice majeure (BOI)');
+        plusBtn.classList.add('mm-root-plus');
+        g.appendChild(plusBtn);
+      }
 
     } else {
       const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
@@ -3505,8 +3583,8 @@ const MindMapView = {
           const markerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
           markerG.setAttribute('transform', `translate(${markerX}, ${isBox ? 0 : 3})`);
           markerG.setAttribute('class', 'mm-node-marker-badge');
-          markerG.setAttribute('style', 'cursor: pointer;');
-          markerG.setAttribute('title', `Marqueur : ${def.label} (Cliquer pour faire défiler)`);
+          markerG.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
+          markerG.setAttribute('title', this.isReadOnly ? `Marqueur : ${def.label}` : `Marqueur : ${def.label} (Cliquer pour faire défiler)`);
 
           // Zone tactile de survol stable
           const mHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -3542,6 +3620,7 @@ const MindMapView = {
 
           markerG.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (this.isReadOnly) return;
             this.cycleNodeMarker(node.id);
           });
 
@@ -3556,8 +3635,8 @@ const MindMapView = {
           const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
           iconG.setAttribute('transform', `translate(${iconX}, ${isBox ? 0 : 2})`);
           iconG.setAttribute('class', 'mm-node-icon-badge');
-          iconG.setAttribute('style', 'cursor: pointer;');
-          iconG.setAttribute('title', `Icône SVG : ${iconDef.label} (Cliquer pour modifier ou [I])`);
+          iconG.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
+          iconG.setAttribute('title', this.isReadOnly ? `Icône SVG : ${iconDef.label}` : `Icône SVG : ${iconDef.label} (Cliquer pour modifier ou [I])`);
 
           // Zone tactile de clic
           const iHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -3572,11 +3651,14 @@ const MindMapView = {
           svgWrap.setAttribute('stroke-width', '2.2');
           svgWrap.setAttribute('stroke-linecap', 'round');
           svgWrap.setAttribute('stroke-linejoin', 'round');
+          svgWrap.setAttribute('pointer-events', 'none');
+          svgWrap.style.pointerEvents = 'none';
           svgWrap.innerHTML = iconDef.path;
           iconG.appendChild(svgWrap);
 
           iconG.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (this.isReadOnly) return;
             this.openIconPicker(node.id);
           });
 
@@ -3627,6 +3709,8 @@ const MindMapView = {
         const noteG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         noteG.setAttribute('transform', `translate(${noteX}, ${isBox ? 0 : 3})`);
         noteG.setAttribute('class', 'mm-note-pill');
+        noteG.setAttribute('style', 'cursor: pointer;');
+        noteG.setAttribute('title', this.isReadOnly ? 'Note de branche (Cliquer pour agrandir)' : 'Note de branche (Cliquer pour modifier)');
 
         const noteCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         noteCircle.setAttribute('r', 8.5);
@@ -3649,6 +3733,10 @@ const MindMapView = {
 
         noteG.addEventListener('click', (e) => {
           e.stopPropagation();
+          if (this.isReadOnly) {
+            this.showNoteModalReadOnly(node);
+            return;
+          }
           this.hideTooltip();
           this.promptTopicNote(node.id);
         });
@@ -3656,26 +3744,28 @@ const MindMapView = {
         g.appendChild(noteG);
       }
 
-      // Actions au survol ou à la sélection (Loi ergonomie 100% Souris)
-      const actionsG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      actionsG.setAttribute('class', 'mm-node-actions');
+      // Actions au survol ou à la sélection (Loi ergonomie 100% Souris - désactivé en lecture seule)
+      if (!this.isReadOnly) {
+        const actionsG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        actionsG.setAttribute('class', 'mm-node-actions');
 
-      const actionY = isBox ? 0 : 3;
-      const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 14 : -node.width / 2 - 14;
-      const addSubBtn = this.createActionButton('+', endX, actionY, () => this.addChildToNode(node));
-      addSubBtn.setAttribute('title', 'Ajouter une sous-branche');
+        const actionY = isBox ? 0 : 3;
+        const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 14 : -node.width / 2 - 14;
+        const addSubBtn = this.createActionButton('+', endX, actionY, () => this.addChildToNode(node));
+        addSubBtn.setAttribute('title', 'Ajouter une sous-branche');
 
-      const delX = (isTopDown || node.side === 'right') ? node.width / 2 + 34 : -node.width / 2 - 34;
-      const delBtn = this.createActionButton('×', delX, actionY, () => this.deleteNode(node.id), true);
-      delBtn.setAttribute('title', 'Supprimer la branche');
+        const delX = (isTopDown || node.side === 'right') ? node.width / 2 + 34 : -node.width / 2 - 34;
+        const delBtn = this.createActionButton('×', delX, actionY, () => this.deleteNode(node.id), true);
+        delBtn.setAttribute('title', 'Supprimer la branche');
 
-      actionsG.appendChild(addSubBtn);
-      actionsG.appendChild(delBtn);
-      g.appendChild(actionsG);
+        actionsG.appendChild(addSubBtn);
+        actionsG.appendChild(delBtn);
+        g.appendChild(actionsG);
+      }
     }
 
-    // Initialisation du glisser-déplacer spatial pour les branches (non-root)
-    if (!isRoot) {
+    // Initialisation du glisser-déplacer spatial pour les branches (non-root - désactivé en lecture seule)
+    if (!isRoot && !this.isReadOnly) {
       g.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return; // Clic gauche uniquement
         if (this.connectingSourceId) return; // Priorité au mode création de liaison
@@ -3716,6 +3806,7 @@ const MindMapView = {
 
     g.addEventListener('dblclick', (e) => {
       e.stopPropagation();
+      if (this.isReadOnly) return;
       if (this.dragState.hasMoved) return;
       this.startInlineEdit(node.id);
     });
@@ -3723,6 +3814,7 @@ const MindMapView = {
     g.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      if (this.isReadOnly) return;
       this.selectNode(node.id);
       this.showContextMenu(e.clientX, e.clientY, node.id);
     });
@@ -3780,20 +3872,22 @@ const MindMapView = {
         box.setAttribute('filter', isSel ? 'url(#mm-select-glow)' : 'url(#mm-glow)');
       }
     });
-    this.viewportG?.querySelectorAll('.mm-relationship-g').forEach(el => {
+    this.viewportG?.querySelectorAll('.mm-relationship-g, .mm-rel-label-wrap, .mm-rel-label-g').forEach(el => {
       const isRelSel = el.getAttribute('data-rel-id') === this.selectedRelId;
       el.classList.toggle('selected', isRelSel);
-      const handle = el.querySelector('.mm-rel-handle');
-      if (handle) {
-        handle.style.display = isRelSel ? 'inline' : 'none';
-      }
+    });
+    this.viewportG?.querySelectorAll('.mm-rel-handle').forEach(handle => {
+      const wrap = handle.closest('[data-rel-id]');
+      const relId = wrap ? wrap.getAttribute('data-rel-id') : null;
+      const isRelSel = relId === this.selectedRelId;
+      handle.style.display = (isRelSel && !this.isReadOnly) ? 'inline' : 'none';
     });
     this.viewportG?.querySelectorAll('.mm-boundary-g').forEach(el => {
       const isBndSel = el.getAttribute('data-boundary-id') === this.selectedBoundaryId;
       el.classList.toggle('selected', isBndSel);
       const delBtn = el.querySelector('.mm-boundary-del-btn');
       if (delBtn) {
-        delBtn.style.display = isBndSel ? 'inline' : 'none';
+        delBtn.style.display = (isBndSel && !this.isReadOnly) ? 'inline' : 'none';
       }
     });
     this.updateMarkerPopoverUI();
@@ -3855,11 +3949,13 @@ const MindMapView = {
   },
 
   addChildToSelected() {
+    if (this.isReadOnly) return;
     const target = this.selectedNodeId ? this.findNode(this.selectedNodeId) : this.tree;
     if (target) this.addChildToNode(target);
   },
 
   addChildToNode(parentNode) {
+    if (this.isReadOnly) return;
     const newId = `node_${Date.now()}`;
     const newNode = {
       id: newId,
@@ -3886,6 +3982,7 @@ const MindMapView = {
   },
 
   addSiblingToSelected() {
+    if (this.isReadOnly) return;
     if (!this.selectedNodeId || this.selectedNodeId === 'root') {
       this.addChildToNode(this.tree);
       return;
@@ -3927,11 +4024,13 @@ const MindMapView = {
   },
 
   deleteSelected() {
+    if (this.isReadOnly) return;
     if (!this.selectedNodeId || this.selectedNodeId === 'root') return;
     this.deleteNode(this.selectedNodeId);
   },
 
   deleteNode(id) {
+    if (this.isReadOnly) return;
     // Si c'est un sujet flottant racine
     const ftIndex = this.floatingTopics?.findIndex(ft => ft.id === id);
     if (ftIndex !== undefined && ftIndex !== -1) {
@@ -4107,6 +4206,7 @@ const MindMapView = {
   },
 
   createFloatingTopic(x, y, text = 'SUJET FLOTTANT') {
+    if (this.isReadOnly) return null;
     const id = `float_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
     const colors = ['#0284c7', '#2563eb', '#0d9488', '#d97706', '#7c3aed', '#db2777'];
     const color = colors[(this.floatingTopics?.length || 0) % colors.length];
@@ -4149,6 +4249,7 @@ const MindMapView = {
   },
 
   detachAsFloatingTopic(nodeId) {
+    if (this.isReadOnly) return;
     if (!nodeId || nodeId === 'root') return;
     const node = this.findNode(nodeId);
     if (!node || node.isFloating) return;
@@ -4222,6 +4323,7 @@ const MindMapView = {
   },
 
   startInlineEdit(nodeId) {
+    if (this.isReadOnly) return;
     this.hideTooltip();
     const node = this.findNode(nodeId);
     if (!node) return;
@@ -4447,8 +4549,16 @@ const MindMapView = {
 
   fitView() {
     if (!this.svg) return;
-    const rect = this.svg.getBoundingClientRect();
-    if (!rect || rect.width <= 0 || rect.height <= 0) return;
+    let rect = this.svg.getBoundingClientRect();
+    if (!rect || rect.width <= 0 || rect.height <= 0) {
+      const cW = this.container?.clientWidth || this.svg.parentElement?.clientWidth || 0;
+      const cH = this.container?.clientHeight || this.svg.parentElement?.clientHeight || 0;
+      if (cW > 0 && cH > 0) {
+        rect = { width: cW, height: cH };
+      } else {
+        return;
+      }
+    }
 
     // 1. Calcul de l'emprise géométrique réelle de tous les éléments (BBox SVG ou parcours récursif)
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -4527,6 +4637,7 @@ const MindMapView = {
   },
 
   autoReorganize() {
+    if (this.isReadOnly) return;
     if (!this.tree) return;
 
     // Réinitialisation de tous les décalages spatiaux manuels
@@ -4762,13 +4873,14 @@ const MindMapView = {
 
   showNoteTooltip(targetEl, noteText) {
     this.currentTooltipTarget = null;
+    const hintText = this.isReadOnly ? 'Cliquer pour agrandir' : 'Cliquer ou F4 pour modifier';
     const html = `
       <div class="mm-tooltip-header">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         <span>Note de branche</span>
       </div>
       <div class="mm-tooltip-body">${this.escapeHtml(noteText)}</div>
-      <div class="mm-tooltip-hint">Cliquer ou F4 pour modifier</div>
+      <div class="mm-tooltip-hint">${hintText}</div>
     `;
     this.showTooltip(targetEl, html);
   },
@@ -4778,6 +4890,7 @@ const MindMapView = {
   // =========================================================================
 
   syncAndAutoSave(recordHistory = true) {
+    if (this.isReadOnly) return;
     if (!this.currentNote) return;
 
     const newMdContent = this.treeToMarkdown(this.tree);
@@ -4913,6 +5026,7 @@ const MindMapView = {
   },
 
   pasteNode(targetId) {
+    if (this.isReadOnly) return;
     if (!this.clipboardNode) return;
     const target = this.findNode(targetId) || this.tree;
     if (!target) return;
@@ -4950,6 +5064,7 @@ const MindMapView = {
   // =========================================================================
 
   promptScriptureRef(nodeId) {
+    if (this.isReadOnly) return;
     const node = this.findNode(nodeId);
     if (!node) return;
 
@@ -4991,9 +5106,67 @@ const MindMapView = {
   // BOÎTE DE DIALOGUE : NOTE DE BRANCHE (TOPIC NOTE)
   // =========================================================================
 
+  showNoteModalReadOnly(node) {
+    if (!node || !node.note) return;
+    document.getElementById('mm-note-view-modal')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'mm-note-view-modal';
+    overlay.className = 'mm-prompt-overlay';
+    overlay.innerHTML = `
+      <div class="mm-prompt-dialog" style="width: 540px; max-width: 92vw;">
+        <div class="mm-prompt-header">
+          <div class="mm-prompt-header-left">
+            <div class="mm-prompt-icon-badge" style="background: ${node.color || '#3b82f6'}18; color: ${node.color || 'var(--accent-blue)'};">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="mm-prompt-title">
+              <span>Note de branche</span>
+              <span class="mm-prompt-target-tag" style="background: ${node.color || '#3b82f6'}22; color: ${node.color || 'var(--accent-blue)'}; border: 1px solid ${node.color || '#3b82f6'}44;">${this.escapeHtml(node.text || '')}</span>
+            </div>
+          </div>
+          <button type="button" class="mm-prompt-close-btn" id="mm-note-view-x-close" title="Fermer (Échap)">×</button>
+        </div>
+
+        <div class="mm-prompt-readonly-body" style="margin: 16px 0 20px 0; padding: 14px 16px; background: var(--bg-hover, #f8fafc); border-radius: 8px; border: 1px solid var(--border-subtle, #e2e8f0); color: var(--text-main, #1e293b); font-size: 13.5px; line-height: 1.65; max-height: 55vh; overflow-y: auto; white-space: pre-wrap; word-break: break-word;">${this.escapeHtml(node.note || '')}</div>
+
+        <div class="mm-prompt-actions-row" style="justify-content: flex-end;">
+          <button type="button" class="btn-primary" id="mm-note-view-close">Fermer</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeDialog = () => {
+      document.removeEventListener('keydown', handleKey);
+      overlay.remove();
+    };
+
+    overlay.querySelector('#mm-note-view-x-close')?.addEventListener('click', closeDialog);
+    overlay.querySelector('#mm-note-view-close')?.addEventListener('click', closeDialog);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeDialog();
+    });
+
+    const handleKey = (e) => {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        closeDialog();
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+  },
+
   promptTopicNote(nodeId) {
     const node = this.findNode(nodeId);
     if (!node) return;
+    if (this.isReadOnly) {
+      if (node.note) {
+        this.showNoteModalReadOnly(node);
+      }
+      return;
+    }
 
     const overlay = document.createElement('div');
     overlay.className = 'mm-prompt-overlay';
@@ -5086,6 +5259,7 @@ const MindMapView = {
   // =========================================================================
 
   promptChangeColor(nodeId) {
+    if (this.isReadOnly) return;
     const node = this.findNode(nodeId);
     if (!node || node.id === 'root') return;
 
@@ -5154,6 +5328,7 @@ const MindMapView = {
   // =========================================================================
 
   showContextMenu(clientX, clientY, targetNodeId = null) {
+    if (this.isReadOnly) return;
     this.hideTooltip();
     // Supprimer un ancien menu contextuel s'il existe
     document.getElementById('mm-dynamic-context-menu')?.remove();
@@ -5798,6 +5973,7 @@ const MindMapView = {
   },
 
   setNodeMarker(nodeId, marker) {
+    if (this.isReadOnly) return;
     if (!nodeId || nodeId === 'root') return;
     const node = this.findNode(nodeId);
     if (!node) return;
@@ -5820,6 +5996,7 @@ const MindMapView = {
   },
 
   cycleNodeMarker(nodeId) {
+    if (this.isReadOnly) return;
     if (!nodeId || nodeId === 'root') return;
     const node = this.findNode(nodeId);
     if (!node) return;
@@ -5831,6 +6008,7 @@ const MindMapView = {
   },
 
   toggleMarkerPopover(force = null) {
+    if (this.isReadOnly) return;
     if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
     const popover = document.getElementById('mm-marker-popover');
     if (!popover) return;
@@ -5880,6 +6058,7 @@ const MindMapView = {
   },
 
   openIconPicker(nodeId, fallbackX = null, fallbackY = null) {
+    if (this.isReadOnly) return;
     if (!nodeId) return;
     const node = this.findNode(nodeId);
     if (!node) return;
@@ -5929,6 +6108,7 @@ const MindMapView = {
   },
 
   setNodeIcon(nodeId, iconId) {
+    if (this.isReadOnly) return;
     if (!nodeId) return;
     const node = this.findNode(nodeId);
     if (!node) return;
@@ -5988,7 +6168,7 @@ const MindMapView = {
   drawRelationships() {
     if (!this.relationships || this.relationships.length === 0 || !this.viewportG) return;
 
-    // Calque dédié pour les liaisons
+    // Calque dédié pour les lignes de liaisons (sous les nœuds)
     let relsLayer = this.viewportG.querySelector('#mm-relationships-layer');
     if (!relsLayer) {
       relsLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -5996,6 +6176,16 @@ const MindMapView = {
       this.viewportG.appendChild(relsLayer);
     } else {
       relsLayer.innerHTML = '';
+    }
+
+    // Calque dédié pour les étiquettes et poignées de contrôle (au-dessus des nœuds, toujours visibles)
+    let relsLabelsLayer = this.viewportG.querySelector('#mm-rel-labels-layer');
+    if (!relsLabelsLayer) {
+      relsLabelsLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      relsLabelsLayer.setAttribute('id', 'mm-rel-labels-layer');
+      this.viewportG.appendChild(relsLabelsLayer);
+    } else {
+      relsLabelsLayer.innerHTML = '';
     }
 
     this.relationships.forEach(rel => {
@@ -6010,23 +6200,80 @@ const MindMapView = {
       const dy = p2.y - p1.y;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-      // Normale perpendiculaire
-      const nx = -dy / dist;
-      const ny = dx / dist;
+      // Normale perpendiculaire standard
+      let nx = -dy / dist;
+      let ny = dx / dist;
 
-      // Courbure douce et élégante
-      const curvature = Math.min(85, Math.max(30, dist * 0.2));
-      let cx = (p1.x + p2.x) / 2 + nx * curvature;
-      let cy = (p1.y + p2.y) / 2 + ny * curvature;
+      // Paramètres du nœud racine central
+      const rootNode = this.tree;
+      const rootW = rootNode ? (rootNode.width || 180) : 180;
+      const rootH = rootNode ? (rootNode.height || 48) : 48;
+      const rootX = rootNode ? (rootNode.x || 0) : 0;
+      const rootY = rootNode ? (rootNode.y || 0) : 0;
 
-      if (rel.customControl) {
+      // Détecter si la liaison traverse l'arbre de part en part (ex: branche gauche <-> branche droite)
+      const isCrossHemisphere = this.treeStructure !== 'top-down' && (
+        (fromNode.id !== 'root' && toNode.id !== 'root') &&
+        ((fromNode.x < rootX - 20 && toNode.x > rootX + 20) || (fromNode.x > rootX + 20 && toNode.x < rootX - 20))
+      );
+
+      let cx, cy;
+
+      if (rel.customControl && !(Math.abs(rel.customControl.x - 120) < 3 && Math.abs(rel.customControl.y - (-40)) < 3)) {
         cx = rel.customControl.x;
         cy = rel.customControl.y;
+      } else if (isCrossHemisphere) {
+        // Contournement noble du sujet central : arquer au-dessus ou en-dessous du nœud racine
+        const avgY = (fromNode.y + toNode.y) / 2;
+        const archAbove = avgY <= rootY;
+
+        cx = (p1.x + p2.x) / 2;
+
+        if (archAbove) {
+          const clearTop = rootY - rootH / 2 - 38;
+          const minNodeY = Math.min(fromNode.y, toNode.y);
+          const targetLy = Math.min(clearTop, minNodeY - 25);
+          cy = 2 * targetLy - 0.5 * (p1.y + p2.y);
+        } else {
+          const clearBottom = rootY + rootH / 2 + 38;
+          const maxNodeY = Math.max(fromNode.y, toNode.y);
+          const targetLy = Math.max(clearBottom, maxNodeY + 25);
+          cy = 2 * targetLy - 0.5 * (p1.y + p2.y);
+        }
+      } else {
+        // Courbure douce avec orientation élégante vers l'extérieur de l'arbre
+        const curvature = Math.min(85, Math.max(30, dist * 0.2));
+
+        // Sur le côté droit, cambrer vers la droite (nx > 0)
+        if (fromNode.x > rootX + 20 && toNode.x > rootX + 20) {
+          if (nx < 0) { nx = -nx; ny = -ny; }
+        }
+        // Sur le côté gauche, cambrer vers la gauche (nx < 0)
+        else if (fromNode.x < rootX - 20 && toNode.x < rootX - 20) {
+          if (nx > 0) { nx = -nx; ny = -ny; }
+        }
+
+        cx = (p1.x + p2.x) / 2 + nx * curvature;
+        cy = (p1.y + p2.y) / 2 + ny * curvature;
       }
 
       // Milieu exact sur la courbe quadratique de Bézier (t = 0.5)
-      const lx = 0.25 * p1.x + 0.5 * cx + 0.25 * p2.x;
-      const ly = 0.25 * p1.y + 0.5 * cy + 0.25 * p2.y;
+      let lx = 0.25 * p1.x + 0.5 * cx + 0.25 * p2.x;
+      let ly = 0.25 * p1.y + 0.5 * cy + 0.25 * p2.y;
+
+      // Garde-fou absolu contre toute collision de l'étiquette avec le rectangle du nœud racine
+      const isActivelyDraggingRel = this.dragState && this.dragState.active && this.dragState.type === 'rel-curve' && this.dragState.relId === rel.id;
+      if (!isActivelyDraggingRel && rootNode && fromNode.id !== 'root' && toNode.id !== 'root') {
+        const rHalfW = rootW / 2 + 32;
+        const rHalfH = rootH / 2 + 22;
+        if (Math.abs(lx - rootX) < rHalfW && Math.abs(ly - rootY) < rHalfH) {
+          const goAbove = (p1.y + p2.y) / 2 <= rootY;
+          const targetLy = goAbove ? (rootY - rHalfH - 20) : (rootY + rHalfH + 20);
+          cy = 2 * targetLy - 0.5 * (p1.y + p2.y);
+          lx = 0.25 * p1.x + 0.5 * cx + 0.25 * p2.x;
+          ly = 0.25 * p1.y + 0.5 * cy + 0.25 * p2.y;
+        }
+      }
 
       const pathData = `M ${p1.x} ${p1.y} Q ${cx} ${cy}, ${p2.x} ${p2.y}`;
       const isSelected = this.selectedRelId === rel.id;
@@ -6043,10 +6290,11 @@ const MindMapView = {
       hitPath.setAttribute('stroke-width', '18');
       hitPath.setAttribute('fill', 'none');
       hitPath.setAttribute('class', 'mm-rel-hit-path');
-      hitPath.setAttribute('style', 'cursor: pointer;');
+      hitPath.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
 
-      // Possibilité de glisser directement le fil de liaison pour courber
+      // Possibilité de glisser directement le fil de liaison pour courber (désactivé en lecture seule)
       hitPath.addEventListener('mousedown', (e) => {
+        if (this.isReadOnly) return;
         if (e.button !== 0) return;
         e.stopPropagation();
         e.preventDefault();
@@ -6076,49 +6324,57 @@ const MindMapView = {
       visiblePath.setAttribute('class', 'mm-rel-visible-path');
       relG.appendChild(visiblePath);
 
-      // Poignée de contrôle interactive de la courbure Bézier (style XMind)
-      // Toujours attachée au SVG, affichée dynamiquement dès que la liaison est sélectionnée
-      const handleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      handleCircle.setAttribute('cx', cx);
-      handleCircle.setAttribute('cy', cy);
-      handleCircle.setAttribute('r', '6.5');
-      handleCircle.setAttribute('class', 'mm-rel-handle');
-      handleCircle.setAttribute('fill', relColor);
-      handleCircle.setAttribute('stroke', '#ffffff');
-      handleCircle.setAttribute('stroke-width', '2');
-      handleCircle.style.display = isSelected ? 'inline' : 'none';
-      handleCircle.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
-      handleCircle.setAttribute('title', 'Glisser pour ajuster la courbure (Double-clic pour réinitialiser)');
+      relsLayer.appendChild(relG);
 
-      handleCircle.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
-        e.stopPropagation();
-        e.preventDefault();
-        this.selectRelationship(rel.id);
-        this.dragState = {
-          active: true,
-          type: 'rel-curve',
-          nodeId: null,
-          relId: rel.id,
-          startX: e.clientX,
-          startY: e.clientY,
-          hasMoved: false,
-          targetNodeId: null
-        };
-      });
+      // Conteneur au premier plan pour l'étiquette et la poignée de manipulation (au-dessus des nœuds)
+      const labelWrapG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      labelWrapG.setAttribute('class', `mm-rel-label-wrap ${isSelected ? 'selected' : ''}`);
+      labelWrapG.setAttribute('data-rel-id', rel.id);
 
-      handleCircle.addEventListener('dblclick', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        rel.customControl = null;
-        this.drawRelationships();
-        this.syncAndAutoSave();
-        if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast('Courbure de la liaison réinitialisée');
-        }
-      });
+      // Poignée de contrôle interactive de la courbure Bézier (style XMind - masquée en lecture seule)
+      if (!this.isReadOnly) {
+        const handleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        handleCircle.setAttribute('cx', cx);
+        handleCircle.setAttribute('cy', cy);
+        handleCircle.setAttribute('r', '6.5');
+        handleCircle.setAttribute('class', 'mm-rel-handle');
+        handleCircle.setAttribute('fill', relColor);
+        handleCircle.setAttribute('stroke', '#ffffff');
+        handleCircle.setAttribute('stroke-width', '2');
+        handleCircle.style.display = isSelected ? 'inline' : 'none';
+        handleCircle.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
+        handleCircle.setAttribute('title', 'Glisser pour ajuster la courbure (Double-clic pour réinitialiser)');
 
-      relG.appendChild(handleCircle);
+        handleCircle.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return;
+          e.stopPropagation();
+          e.preventDefault();
+          this.selectRelationship(rel.id);
+          this.dragState = {
+            active: true,
+            type: 'rel-curve',
+            nodeId: null,
+            relId: rel.id,
+            startX: e.clientX,
+            startY: e.clientY,
+            hasMoved: false,
+            targetNodeId: null
+          };
+        });
+
+        handleCircle.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          rel.customControl = null;
+          this.drawRelationships();
+          this.syncAndAutoSave();
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Courbure de la liaison réinitialisée');
+          }
+        });
+
+        labelWrapG.appendChild(handleCircle);
+      }
 
       // Étiquette flottante centrale
       const labelText = (rel.label || 'VOIR AUSSI').toUpperCase();
@@ -6128,7 +6384,8 @@ const MindMapView = {
 
       const labelG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       labelG.setAttribute('transform', `translate(${lx}, ${ly})`);
-      labelG.setAttribute('class', 'mm-rel-label-g');
+      labelG.setAttribute('class', `mm-rel-label-g ${isSelected ? 'selected' : ''}`);
+      labelG.setAttribute('data-rel-id', rel.id);
 
       const pillRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       pillRect.setAttribute('x', -pillW / 2);
@@ -6146,52 +6403,88 @@ const MindMapView = {
       labelT.textContent = labelText;
       labelG.appendChild(labelT);
 
-      // Bouton contextuel × au survol
-      const delBtnG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      delBtnG.setAttribute('transform', `translate(${pillW / 2 + 8}, 0)`);
-      delBtnG.setAttribute('class', 'mm-rel-del-btn');
-      delBtnG.setAttribute('title', 'Supprimer cette liaison');
+      // Bouton contextuel × au survol (masqué en mode lecture seule)
+      if (!this.isReadOnly) {
+        const delBtnG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        delBtnG.setAttribute('transform', `translate(${pillW / 2 + 8}, 0)`);
+        delBtnG.setAttribute('class', 'mm-rel-del-btn');
+        delBtnG.setAttribute('title', 'Supprimer cette liaison');
 
-      const delCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      delCircle.setAttribute('r', 7.5);
-      delCircle.setAttribute('class', 'mm-rel-del-circle');
-      delBtnG.appendChild(delCircle);
+        const delCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        delCircle.setAttribute('r', 7.5);
+        delCircle.setAttribute('class', 'mm-rel-del-circle');
+        delBtnG.appendChild(delCircle);
 
-      const delXText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      delXText.setAttribute('text-anchor', 'middle');
-      delXText.setAttribute('dominant-baseline', 'central');
-      delXText.setAttribute('class', 'mm-rel-del-text');
-      delXText.setAttribute('y', -0.5);
-      delXText.textContent = '×';
-      delBtnG.appendChild(delXText);
+        const delXText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        delXText.setAttribute('text-anchor', 'middle');
+        delXText.setAttribute('dominant-baseline', 'central');
+        delXText.setAttribute('class', 'mm-rel-del-text');
+        delXText.setAttribute('y', -0.5);
+        delXText.textContent = '×';
+        delBtnG.appendChild(delXText);
 
-      delBtnG.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.deleteRelationship(rel.id);
+        delBtnG.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.deleteRelationship(rel.id);
+        });
+        labelG.appendChild(delBtnG);
+      }
+
+      // Synchronisation survol entre la ligne et l'étiquette
+      labelG.addEventListener('mouseenter', () => {
+        visiblePath.setAttribute('stroke-width', '2.8');
+        relG.classList.add('hovered');
       });
-      labelG.appendChild(delBtnG);
+      labelG.addEventListener('mouseleave', () => {
+        if (this.selectedRelId !== rel.id) {
+          visiblePath.setAttribute('stroke-width', '2');
+        }
+        relG.classList.remove('hovered');
+      });
+      relG.addEventListener('mouseenter', () => {
+        labelG.classList.add('hovered');
+      });
+      relG.addEventListener('mouseleave', () => {
+        labelG.classList.remove('hovered');
+      });
 
-      // Événements
+      // Événements d'interaction
       relG.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (this.dragState.hasMoved) return;
+        if (this.dragState && this.dragState.hasMoved) return;
+        this.selectRelationship(rel.id);
+      });
+
+      labelG.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (this.dragState && this.dragState.hasMoved) return;
         this.selectRelationship(rel.id);
       });
 
       labelG.addEventListener('dblclick', (e) => {
         e.stopPropagation();
+        if (this.isReadOnly) return;
+        this.promptEditRelationshipLabel(rel.id);
+      });
+
+      labelG.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.isReadOnly) return;
+        this.selectRelationship(rel.id);
         this.promptEditRelationshipLabel(rel.id);
       });
 
       relG.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (this.isReadOnly) return;
         this.selectRelationship(rel.id);
         this.promptEditRelationshipLabel(rel.id);
       });
 
-      relG.appendChild(labelG);
-      relsLayer.appendChild(relG);
+      labelWrapG.appendChild(labelG);
+      relsLabelsLayer.appendChild(labelWrapG);
     });
   },
 
@@ -6202,6 +6495,7 @@ const MindMapView = {
   },
 
   deleteRelationship(relId) {
+    if (this.isReadOnly) return;
     if (!this.relationships) return;
     this.relationships = this.relationships.filter(r => r.id !== relId);
     if (this.selectedRelId === relId) this.selectedRelId = null;
@@ -6213,6 +6507,7 @@ const MindMapView = {
   },
 
   startConnecting(sourceId) {
+    if (this.isReadOnly) return;
     const node = this.findNode(sourceId);
     if (!node) return;
 
@@ -6380,7 +6675,8 @@ const MindMapView = {
   },
 
   promptEditRelationshipLabel(relId) {
-    const rel = this.relationships.find(r => r.id === relId);
+    if (this.isReadOnly) return;
+    const rel = this.relationships?.find(r => r.id === relId);
     if (!rel) return;
 
     const fromNode = this.findNode(rel.fromId);
@@ -6564,7 +6860,7 @@ const MindMapView = {
       rect.setAttribute('stroke', bndColor);
       rect.setAttribute('stroke-width', isSelected ? '2.4' : '1.8');
       rect.setAttribute('stroke-dasharray', isSelected ? '7,3' : '6,4');
-      rect.setAttribute('style', 'cursor: pointer;');
+      rect.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
       bndG.appendChild(rect);
 
       // 2. Étiquette supérieure style pilule XMind
@@ -6578,7 +6874,7 @@ const MindMapView = {
       const labelG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       labelG.setAttribute('transform', `translate(${pillX}, ${pillY})`);
       labelG.setAttribute('class', 'mm-boundary-label-g');
-      labelG.setAttribute('style', 'cursor: pointer;');
+      labelG.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
 
       const pillRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       pillRect.setAttribute('x', 0);
@@ -6602,31 +6898,33 @@ const MindMapView = {
       labelT.textContent = labelText;
       labelG.appendChild(labelT);
 
-      // Bouton supprimer [×] visible au survol ou à la sélection
-      const delBtnG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      delBtnG.setAttribute('transform', `translate(${pillW + 9}, ${pillH / 2})`);
-      delBtnG.setAttribute('class', 'mm-boundary-del-btn');
-      delBtnG.setAttribute('title', 'Supprimer cet enclos');
-      delBtnG.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
+      // Bouton supprimer [×] visible au survol ou à la sélection (masqué en mode lecture seule)
+      if (!this.isReadOnly) {
+        const delBtnG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        delBtnG.setAttribute('transform', `translate(${pillW + 9}, ${pillH / 2})`);
+        delBtnG.setAttribute('class', 'mm-boundary-del-btn');
+        delBtnG.setAttribute('title', 'Supprimer cet enclos');
+        delBtnG.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
 
-      const delCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      delCircle.setAttribute('r', 7.5);
-      delCircle.setAttribute('class', 'mm-boundary-del-circle');
-      delBtnG.appendChild(delCircle);
+        const delCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        delCircle.setAttribute('r', 7.5);
+        delCircle.setAttribute('class', 'mm-boundary-del-circle');
+        delBtnG.appendChild(delCircle);
 
-      const delXText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      delXText.setAttribute('text-anchor', 'middle');
-      delXText.setAttribute('dominant-baseline', 'central');
-      delXText.setAttribute('class', 'mm-boundary-del-text');
-      delXText.setAttribute('y', -0.5);
-      delXText.textContent = '×';
-      delBtnG.appendChild(delXText);
+        const delXText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        delXText.setAttribute('text-anchor', 'middle');
+        delXText.setAttribute('dominant-baseline', 'central');
+        delXText.setAttribute('class', 'mm-boundary-del-text');
+        delXText.setAttribute('y', -0.5);
+        delXText.textContent = '×';
+        delBtnG.appendChild(delXText);
 
-      delBtnG.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.deleteBoundary(bnd.id);
-      });
-      labelG.appendChild(delBtnG);
+        delBtnG.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.deleteBoundary(bnd.id);
+        });
+        labelG.appendChild(delBtnG);
+      }
 
       // Événements sur l'enclos
       bndG.addEventListener('click', (e) => {
@@ -6636,12 +6934,14 @@ const MindMapView = {
 
       labelG.addEventListener('dblclick', (e) => {
         e.stopPropagation();
+        if (this.isReadOnly) return;
         this.promptEditBoundaryLabel(bnd.id);
       });
 
       bndG.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (this.isReadOnly) return;
         this.selectBoundary(bnd.id);
         this.promptEditBoundaryLabel(bnd.id);
       });
@@ -6659,6 +6959,7 @@ const MindMapView = {
   },
 
   createBoundary(rootNodeId, label = null) {
+    if (this.isReadOnly) return;
     if (!rootNodeId || rootNodeId === 'root') return;
     const node = this.findNode(rootNodeId);
     if (!node) return;
@@ -6699,6 +7000,7 @@ const MindMapView = {
   },
 
   deleteBoundary(bndId) {
+    if (this.isReadOnly) return;
     if (!this.boundaries) return;
     this.boundaries = this.boundaries.filter(b => b.id !== bndId);
     if (this.selectedBoundaryId === bndId) this.selectedBoundaryId = null;
@@ -6711,6 +7013,7 @@ const MindMapView = {
   },
 
   promptEditBoundaryLabel(bndId) {
+    if (this.isReadOnly) return;
     const bnd = this.boundaries?.find(b => b.id === bndId);
     if (!bnd) return;
 

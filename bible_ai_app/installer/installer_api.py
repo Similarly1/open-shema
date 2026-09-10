@@ -15,8 +15,23 @@ import threading
 import subprocess
 import urllib.request
 import ssl
-
 import tempfile
+import sys
+import os
+# Ajouter le répertoire parent au path pour accéder à core/ssl_utils
+_installer_dir = os.path.dirname(os.path.abspath(__file__))
+_app_root = os.path.dirname(_installer_dir)
+if _app_root not in sys.path:
+    sys.path.insert(0, _app_root)
+try:
+    from core.ssl_utils import make_relaxed_ssl_context
+except ImportError:
+    # Fallback si ssl_utils n'est pas accessible (env. d'installation minimal)
+    def make_relaxed_ssl_context(url=""):
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx
 
 log_file = os.path.join(tempfile.gettempdir(), "openshema_installer.log")
 logging.basicConfig(
@@ -169,11 +184,9 @@ class InstallerAPI:
             "notes": "Version complète d'Open Shema incluant le moteur biblique et les modules."
         }
 
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-
         url = f"https://api.github.com/repos/{repo}/releases"
+        ctx = make_relaxed_ssl_context(url)
+
         headers = {
             "User-Agent": "OpenShemaInstaller/1.0",
             "Accept": "application/vnd.github.v3+json"
@@ -327,9 +340,7 @@ class InstallerAPI:
                 temp_zip = os.path.join(target_dir, "_download_temp.zip")
                 self._update_progress(5, "Connexion au serveur GitHub...")
                 try:
-                    ctx = ssl.create_default_context()
-                    ctx.check_hostname = False
-                    ctx.verify_mode = ssl.CERT_NONE
+                    ctx = make_relaxed_ssl_context(download_url)
                     req = urllib.request.Request(download_url, headers={"User-Agent": "OpenShemaInstaller/1.0"})
 
                     with urllib.request.urlopen(req, timeout=5, context=ctx) as response:

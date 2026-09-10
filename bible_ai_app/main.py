@@ -26,7 +26,12 @@ def main():
         err_msg = traceback.format_exc()
         print(f"ERREUR FATALE AU LANCEMENT : {err_msg}")
         try:
-            with open("error.log", "w", encoding="utf-8") as f:
+            from core.paths import get_user_data_path
+            log_path = get_user_data_path("error.log")
+        except Exception:
+            log_path = "error.log"
+        try:
+            with open(log_path, "w", encoding="utf-8") as f:
                 f.write(err_msg)
         except Exception:
             pass

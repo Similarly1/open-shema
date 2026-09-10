@@ -6,6 +6,7 @@ import sys
 import re
 import logging
 import json
+import ssl
 import sqlite3
 import traceback
 import asyncio
@@ -14,6 +15,7 @@ import threading
 import time
 import shutil
 from typing import Dict, List, Any, Optional
+from core.ssl_utils import make_relaxed_ssl_context
 
 logger = logging.getLogger(__name__)
 from api._utils import (
@@ -305,12 +307,8 @@ class ImportMixin:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-
             req = urllib.request.Request(download_url, headers=headers)
-            with urllib.request.urlopen(req, context=ctx, timeout=60) as response, open(target_path, "wb") as out_file:
+            with urllib.request.urlopen(req, context=make_relaxed_ssl_context(download_url), timeout=60) as response, open(target_path, "wb") as out_file:
                 shutil.copyfileobj(response, out_file)
 
             # Si c'est un ZIP (cas Logos PB), extraire pour trouver le .docx
@@ -393,16 +391,11 @@ class ImportMixin:
                 file_name = os.path.basename(download_url.split("?")[0])
                 target_path = os.path.join(target_dir, file_name)
 
-            import ssl
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-
             req = urllib.request.Request(
                 download_url,
                 headers={"User-Agent": "OpenShemaApp/1.0 (https://github.com/Similarly1/open-shema)"}
             )
-            with urllib.request.urlopen(req, timeout=60, context=ctx) as response, open(target_path, "wb") as out_file:
+            with urllib.request.urlopen(req, timeout=60, context=make_relaxed_ssl_context(download_url)) as response, open(target_path, "wb") as out_file:
                 shutil.copyfileobj(response, out_file)
 
             # Résolution propre de l'abréviation

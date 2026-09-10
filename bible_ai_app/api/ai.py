@@ -25,6 +25,7 @@ from api._utils import (
     PericopeManager, CommentaryLoader, DictionaryManager, OriginalLanguagesManager,
     NotesManager, load_config, save_config,
     DEFAULT_NOTE_TITLE_SYSTEM_PROMPT, DEFAULT_NOTE_TAGS_SYSTEM_PROMPT,
+    DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT,
     SermonsManager, HighlightsManager, MapsManager,
     load_books_metadata, save_books_metadata, AISessionManager,
     migrate_secrets_from_config, load_secrets_into_config, send_windows_toast,
@@ -751,6 +752,23 @@ class AiMixin:
                 context_chunks = reranker.rerank(query=search_query, documents=context_chunks, top_k=8)
             except Exception as e:
                 logger.info(f"[ask_study_ai] Reranking bypass : {e}")
+
+        # 5b. Curation sémantique intermédiaire du contexte si activée
+        if enable_curator and context_chunks:
+            try:
+                from core.rag_pipeline import RAGPipeline
+                rag_pipe = RAGPipeline.get_instance(config=self.config)
+                search_query = f"{passage_ref} {question}".strip()
+                curator_m = self.config.get("curator_model") or self.config.get("rag_curation_model")
+                curator_fb = self.config.get("curator_fallback_model") or self.config.get("rag_curation_fallback_model")
+                context_chunks = rag_pipe.curate_context(
+                    query=search_query,
+                    documents=context_chunks,
+                    curation_model=curator_m,
+                    fallback_model=curator_fb
+                )
+            except Exception as e:
+                logger.info(f"[ask_study_ai] Curation bypass : {e}")
         # Dédoublonnage et structuration riche des sources mobilisées (avec couvertures et infobulles)
         dedup_sources = []
         seen_source_keys = set()
@@ -1109,4 +1127,108 @@ class AiMixin:
 
     def get_ai_history(self) -> List[Dict[str, Any]]:
         return AISessionManager.get_recent_sessions()
+
+    def generate_mindmap_from_text(self, text: str, passage_ref: str = "", user_question: str = "") -> Dict[str, Any]:
+        """
+        Structure sémantiquement une étude ou réponse IA en une véritable Mind Map radiante (Tony Buzan)
+        conforme aux spécifications Markdown Open Shema, avec Sujet Central, BOIs, sous-branches,
+        notes explicatives, marqueurs, icônes vectorielles, enclos et liaisons transversales.
+        """
+        self.config = load_config()
+        clean_text = (text or "").strip()
+        if not clean_text:
+            return {"success": False, "error": "Le texte à transformer est vide."}
+
+        sys_prompt = self.config.get("mindmap_system_prompt") or DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT
+        primary_model = self.config.get("mindmap_ai_model") or self.config.get("chat_model") or "gemini-3.7-flash"
+        fallback_model = self.config.get("mindmap_ai_fallback_model") or self.config.get("chat_fallback_model") or "gemini-3.5-flash-lite"
+
+        models_to_try = [primary_model]
+        if fallback_model and fallback_model != primary_model:
+            models_to_try.append(fallback_model)
+
+        context_info = []
+        if passage_ref:
+            context_info.append(f"Passage biblique étudié : {passage_ref}")
+        if user_question:
+            context_info.append(f"Question initiale de l'utilisateur : {user_question}")
+        context_header = "\n".join(context_info)
+
+        user_prompt = (
+            f"{context_header}\n\n"
+            f"--- CONTENU DE L'ÉTUDE / ANALYSE BIBLIQUE À RESTRUCTURER EN MIND MAP ---\n"
+            f"{clean_text[:6500]}\n"
+            f"--- FIN DU CONTENU ---\n\n"
+            f"Transforme ce contenu en une Mind Map de Tony Buzan spectaculaire et fidèle au format JSON demandé.\n\n"
+            f"CONSIGNE IMPÉRATIVE SUR LES NOTES DE BRANCHES (<!-- note: ... -->) :\n"
+            f"Chaque note de branche DOIT OBLIGATOIREMENT former un paragraphe complet et substantiel de plusieurs phrases (3 à 5 phrases denses). "
+            f"Développe en profondeur l'exégèse biblique, le contexte historique, les termes grecs ou hébreux avec translittération et nuance sémantique, la doctrine et l'application pastorale. "
+            f"Il est STRICTEMENT INTERDIT de rédiger des notes courtes d'une seule phrase. Rédige un véritable paragraphe riche pour chaque note !"
+        )
+
+        from ai.llm_client import LLMClient
+        used_model = primary_model
+        last_err = None
+        result_mindmap = None
+
+        for cur_model in models_to_try:
+            lower_m = cur_model.lower()
+            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
+                token = self.config.get("infomaniak_token", "")
+                pid = self.config.get("infomaniak_product_id", "251")
+                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
+            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
+                api_key = self.config.get("mistral_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
+            else:
+                api_key = self.config.get("gemini_api_key", "")
+                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+
+            try:
+                out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
+                if out and not str(out).startswith("Erreur"):
+                    clean_res = str(out).strip()
+                    if clean_res.startswith("```"):
+                        clean_res = re.sub(r"^```(?:json)?\s*", "", clean_res, flags=re.IGNORECASE)
+                        clean_res = re.sub(r"\s*```$", "", clean_res)
+                    clean_res = clean_res.strip()
+                    parsed = json.loads(clean_res)
+                    if isinstance(parsed, dict) and "markdown" in parsed:
+                        result_mindmap = parsed
+                        used_model = cur_model
+                        break
+                else:
+                    last_err = out
+            except Exception as e:
+                last_err = str(e)
+                logger.warning(f"Échec génération Mind Map avec modèle {cur_model}: {e}")
+
+        if not result_mindmap:
+            return {"success": False, "error": f"Impossible de générer la Mind Map : {last_err}"}
+
+        # S'assurer des champs essentiels
+        title = (result_mindmap.get("title") or passage_ref or user_question or "SYNTHÈSE").strip().upper()
+        root_icon = (result_mindmap.get("root_icon") or "brain").strip().lower()
+        palette = (result_mindmap.get("palette") or "nature").strip().lower()
+        tags = result_mindmap.get("tags") or ["mindmap", "étude-ia"]
+        if isinstance(tags, str):
+            tags = [t.strip() for t in tags.split(",") if t.strip()]
+        if "mindmap" not in tags:
+            tags.insert(0, "mindmap")
+
+        markdown_body = result_mindmap.get("markdown", "").strip()
+
+        return {
+            "success": True,
+            "mindmap": {
+                "title": title,
+                "root_icon": root_icon,
+                "palette": palette,
+                "tags": tags,
+                "reference": passage_ref or "",
+                "markdown": markdown_body
+            },
+            "model_used": used_model
+        }
+
 

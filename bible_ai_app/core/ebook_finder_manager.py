@@ -12,11 +12,7 @@ import sys
 import re
 import concurrent.futures
 from typing import List, Dict, Any, Optional
-
-# Création d'un contexte SSL sécurisé mais résilient
-ssl_ctx = ssl.create_default_context()
-ssl_ctx.check_hostname = False
-ssl_ctx.verify_mode = ssl.CERT_NONE
+from core.ssl_utils import make_relaxed_ssl_context
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -110,7 +106,7 @@ class EbookFinderManager:
 
             try:
                 req = urllib.request.Request(url, headers=HEADERS)
-                with urllib.request.urlopen(req, context=ssl_ctx, timeout=4.5) as response:
+                with urllib.request.urlopen(req, context=make_relaxed_ssl_context(url), timeout=4.5) as response:
                     if response.status != 200:
                         continue
                     data = json.loads(response.read().decode('utf-8'))
@@ -164,7 +160,7 @@ class EbookFinderManager:
 
         try:
             req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=5.0) as response:
+            with urllib.request.urlopen(req, context=make_relaxed_ssl_context(url), timeout=5.0) as response:
                 if response.status != 200:
                     return results
                 raw = response.read().decode('utf-8', errors='ignore')
@@ -222,7 +218,7 @@ class EbookFinderManager:
 
         try:
             req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=4.5) as response:
+            with urllib.request.urlopen(req, context=make_relaxed_ssl_context(url), timeout=4.5) as response:
                 if response.status != 200:
                     return results
                 data = json.loads(response.read().decode('utf-8'))

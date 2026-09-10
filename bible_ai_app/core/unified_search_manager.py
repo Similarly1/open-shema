@@ -16,7 +16,8 @@ import urllib.parse
 import concurrent.futures
 from typing import List, Dict, Any
 
-from core.ebook_finder_manager import EbookFinderManager, HEADERS, ssl_ctx
+from core.ebook_finder_manager import EbookFinderManager, HEADERS
+from core.ssl_utils import make_relaxed_ssl_context
 
 
 class UnifiedSearchManager:
@@ -87,7 +88,7 @@ class UnifiedSearchManager:
 
         try:
             req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=3.5) as resp:
+            with urllib.request.urlopen(req, context=make_relaxed_ssl_context(url), timeout=3.5) as resp:
                 if resp.status != 200:
                     return results
                 data = json.loads(resp.read().decode('utf-8'))
@@ -188,7 +189,7 @@ class UnifiedSearchManager:
 
         try:
             req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=4.0) as resp:
+            with urllib.request.urlopen(req, context=make_relaxed_ssl_context(url), timeout=4.0) as resp:
                 if resp.status != 200:
                     return results
                 data = json.loads(resp.read().decode('utf-8'))
@@ -248,7 +249,7 @@ class UnifiedSearchManager:
 
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'OpenShemaApp/1.0'})
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=3.5) as resp:
+            with urllib.request.urlopen(req, context=make_relaxed_ssl_context(url), timeout=3.5) as resp:
                 if resp.status != 200:
                     return results
                 data = json.loads(resp.read().decode('utf-8'))

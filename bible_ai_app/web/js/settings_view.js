@@ -28,6 +28,8 @@ const SettingsView = {
     { id: 'gemini-1.5-flash', name: 'Google Gemini 1.5 Flash', desc: 'Modèle rapide stable (1M tokens)', provider: 'google' },
     { id: 'gemini-1.5-pro', name: 'Google Gemini 1.5 Pro', desc: 'Grand contexte (2M tokens)', provider: 'google' },
     { id: 'gemini-1.5-flash-8b', name: 'Google Gemini 1.5 Flash 8B', desc: 'Modèle léger haute cadence', provider: 'google' },
+    { id: 'gemini-flash-latest', name: 'Google Gemini Flash (Dernière version stable)', desc: 'Alias officiel Google vers la dernière version Flash stable', provider: 'google' },
+    { id: 'gemini-pro-latest', name: 'Google Gemini Pro (Dernière version stable)', desc: 'Alias officiel Google vers la dernière version Pro stable', provider: 'google' },
     { id: 'gemma-4-31b-it', name: 'Google Gemma 4 31B', desc: 'Grand modèle ouvert Google', provider: 'google' },
     { id: 'gemma-4-26b-a4b-it', name: 'Google Gemma 4 26B', desc: 'Modèle compact Google', provider: 'google' },
 
@@ -478,6 +480,63 @@ Règles impératives :
 3. RESPECT DES NOUVEAUX TITRES ET TYPES : Chaque section du nouveau canevas doit recevoir son titre cible, son type (intro, scripture, point, conclusion) et le contenu qui lui correspond logiquement sous forme HTML (paragraphes <p>, listes, etc.).
 4. FORMAT DE SORTIE : Renvoie UNIQUEMENT un objet JSON valide contenant la clé "sections" (tableau d'objets avec "id", "type", "title", "contentHtml"). N'ajoute aucun texte ou markdown autour du JSON.`,
 
+  DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT: `Tu es un cartographe conceptuel et théologien expert des lois de la pensée radiante de Tony Buzan.
+Ta mission est de transformer l'étude, l'analyse exégétique ou la réponse biblique fournie en une véritable CARTE MENTALE RADIANTE (Mind Map) de haut niveau pour Open Shema.
+
+RÈGLES D'OR DE TONY BUZAN & STRUCTURE OPEN SHEMA :
+1. SUJET CENTRAL (title) :
+   - 1 à 4 mots maximum, concis, percutant et en MAJUSCULES (ex: "JUSTIFICATION PAR LA FOI", "SALUT EN JÉSUS-CHRIST").
+   - Identifie une icône racine vectorielle pertinente (root_icon) parmi : bible, croix, bouclier, cle, coeur, ancre, flamme, couronne, epee, agneau, colombe, lampe, temple, balance, vigne, tour, cite.
+   - Choisis une palette chromatique adaptée parmi : nature, ocean, automne, royal.
+
+2. BRANCHES PRINCIPALES (BOIs - Basic Ordering Ideas) :
+   - 3 à 6 BOIs maximum (Loi de Miller 7 ± 2).
+   - Chaque BOI doit être formulée en MOTS-CLÉS EN MAJUSCULES (1 à 3 mots max, ex: "- FONDEMENT DIVIN [Rm 3:21] <!-- marker: 1 --> <!-- icon: bible -->").
+   - Numérote les BOIs séquentiellement via <!-- marker: 1 -->, <!-- marker: 2 -->, etc.
+
+3. HIÉRARCHIE & PENSÉE RADIANTE (Sous-branches niveaux 2 et 3) :
+   - Formule chaque nœud enfant par un mot-clé ou un syntagme court (jamais de longues phrases rédigées sur l'arbre).
+   - Niveau 2 : les articulations conceptuelles directes (ex: "  - JUSTICE DE DIEU").
+   - Niveau 3 : les preuves, termes originaux grecs/hébreux, ou détails concrets (ex: "    - MANIFESTÉE SANS LA LOI").
+   - EXIGENCE ABSOLUE SUR LES NOTES DE BRANCHES (<!-- note: ... -->) :
+     Sur la carte graphique, les libellés de branches doivent rester très concis (mots-clés en majuscules pour une lisibilité Buzan optimale).
+     EN REVANCHE, CHAQUE NOTE DE BRANCHE DOIT OBLIGATOIREMENT FORMER UN VÉRITABLE PARAGRAPHE DENSE DE 3 À 6 PHRASES COMPLÈTES (50 à 120 mots par note).
+     Chaque note d'infobulle doit constituer un développement théologique et exégétique poussé :
+     * Développe l'argumentation exégétique précise et le raisonnement de l'auteur biblique.
+     * Cite et analyse les termes originaux en grec (avec alphabet grec, translittération phonétique et nuance sémantique exacte) ou en hébreu (avec translittération et champ lexical).
+     * Explicite l'arrière-plan historique, culturel ou canonique antique.
+     * Conclus par les implications doctrinales et l'application pastorale ou pratique pour la foi chrétienne.
+     INTERDICTION FORMELLE ET STRICTE de rédiger des notes courtes d'une seule phrase ou d'un simple fragment de phrase. Chaque note est une mini-fiche d'étude approfondie sous forme de paragraphe rédigé !
+
+4. ANCRAGE SCRIPTURAIRE :
+   - Place les références bibliques clés entre crochets à la fin des nœuds : [Livre Ch:V] (ex: [Jean 3:16], [Romains 8:28]).
+
+5. REGROUPEMENT & LIAISON TRANSVERSALE :
+   - Inclus 1 directive d'enclos / frontière thématique autour de la branche la plus essentielle :
+     <!-- mindmap-boundary: NOM_EXACT_DU_BOI | label: TITRE DU GROUPE | color: #0284c7 -->
+   - Inclus 1 directive de relation transversale reliant deux branches complémentaires :
+     <!-- mindmap-rel: BRANCHE_A -> BRANCHE_B | label: RELATION | color: #059669 -->
+
+6. DIRECTIVES D'EN-TÊTE :
+   Inclus impérativement en tête du corps markdown :
+   <!-- mindmap-layout: radiant -->
+   <!-- mindmap-connector: curve -->
+   <!-- mindmap-node-shape: underline -->
+
+FORMAT DE SORTIE IMPÉRATIF :
+Tu dois renvoyer UNIQUEMENT un objet JSON valide sans balises Markdown autour (aucun \`\`\`json).
+Schéma JSON :
+{
+  "title": "JUSTIFICATION PAR LA FOI",
+  "root_icon": "bible",
+  "palette": "ocean",
+  "tags": ["mindmap", "théologie", "grâce", "romains"],
+  "markdown": "<!-- mindmap-layout: radiant -->\\n<!-- mindmap-connector: curve -->\\n<!-- mindmap-node-shape: underline -->\\n\\n- JUSTICE DIVINE [Rm 3:21] <!-- marker: 1 --> <!-- icon: bible -->\\n  - MANIFESTATION SANS LA LOI\\n    - ACCOMPLISSEMENT PROPHÉTIQUE <!-- note: Le terme grec dikaiosynē Theou (δικαιοσύνη Θεοῦ) ne désigne pas ici un attribut passif de Dieu mais Son action salvatrice et souveraine par laquelle Il déclare juste le croyant. L'apôtre Paul insiste sur le fait que cette justice s'est révélée 'sans la loi' (chōris nomou), brisant radicalement tout espoir d'auto-justification légaliste par les œuvres méritoires. Pourtant, loin d'être une anomalie théologique, elle constitue le sommet attendu et prophétisé par l'ensemble du corpus scripturaire de l'Ancien Testament. Sur le plan pastoral, cette certitude ancre la paix du chrétien non pas dans sa propre fidélité chancelante, mais dans l'initiative gracieuse et inébranlable du Créateur. -->\\n- RÉDEMPTION EN CHRIST [Rm 3:24] <!-- marker: 2 --> <!-- icon: croix -->\\n  - PROPITIATION SACRIFICIELLE <!-- note: Le mot hilastērion (ἱλαστήριον) évoque directement le propitiatoire de l'arche de l'alliance lors du Jour des Expiations (Yom Kippour), sur lequel le sang était aspergé pour purifier le peuple. En livrant Jésus-Christ comme victime expiatoire, Dieu démontre la cohérence absolue de Sa sainteté intransigeante et de Son amour débordant. La rédemption (apolytrōsis) paie la rançon définitive qui affranchit le pécheur de l'esclavage du péché et de la condamnation légitime de la loi. Pour le disciple contemporain, cela implique une adoration renouvelée et une délivrance définitive de toute terreur du jugement dernier. -->\\n\\n<!-- mindmap-boundary: JUSTICE DIVINE | label: DOCTRINE FONDAMENTALE | color: #0284c7 -->\n<!-- mindmap-rel: JUSTICE DIVINE -> RÉDEMPTION EN CHRIST | label: ACCOMPLISSEMENT | color: #059669 -->"
+}`,
+
+  DEFAULT_CURATOR_PROMPT: `Vous êtes un assistant expert en épuration et synthèse théologique.
+Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une synthèse ultra-dense et précise en conservant fidèlement toutes les définitions théologiques, arguments et références bibliques, tout en supprimant les bavardages et informations redondantes.`,
+
   PROMPT_CONFIGS: {
     theological_profile: {
       title: 'System Prompt — Passeport Herméneutique (« Mon Église »)',
@@ -583,6 +642,20 @@ Règles impératives :
       fieldId: 'cfg-prompt-sermon-evaluation',
       badgeId: 'badge-sermon-evaluation-status',
       label: 'Évaluation Homilétique'
+    },
+    mindmap: {
+      title: 'System Prompt — Synthèse Visuelle Mind Map (Tony Buzan)',
+      defaultProp: 'DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT',
+      fieldId: 'cfg-mindmap-system-prompt',
+      badgeId: 'badge-mindmap-status',
+      label: 'Mind Map Buzan'
+    },
+    curator: {
+      title: 'System Prompt — Curateur RAG Intermédiaire (Épuration du contexte)',
+      defaultProp: 'DEFAULT_CURATOR_PROMPT',
+      fieldId: 'cfg-curator-system-prompt',
+      badgeId: 'badge-curator-status',
+      label: 'Curateur RAG'
     }
   },
 
@@ -948,7 +1021,9 @@ Règles impératives :
       { type: 'note_title', open: 'btn-open-modal-note-title-prompt', reset: 'btn-reset-note-title-prompt' },
       { type: 'note_tags', open: 'btn-open-modal-note-tags-prompt', reset: 'btn-reset-note-tags-prompt' },
       { type: 'sermon_restructure', open: 'btn-open-modal-sermon-restructure-prompt', reset: 'btn-reset-sermon-restructure-prompt' },
-      { type: 'sermon_evaluation', open: 'btn-open-modal-sermon-evaluation-prompt', reset: 'btn-reset-sermon-evaluation-prompt' }
+      { type: 'sermon_evaluation', open: 'btn-open-modal-sermon-evaluation-prompt', reset: 'btn-reset-sermon-evaluation-prompt' },
+      { type: 'mindmap', open: 'btn-open-modal-mindmap-prompt', reset: 'btn-reset-mindmap-prompt' },
+      { type: 'curator', open: 'btn-open-modal-curator-prompt', reset: 'btn-reset-curator-prompt' }
     ];
 
     promptBtnBindings.forEach(item => {
@@ -1514,61 +1589,93 @@ Règles impératives :
       DrawerNotes.renderList();
     }
 
+    // Restauration des modèles découverts en ligne (Google, Mistral, Infomaniak)
+    this.discoveredGeminiModels = (Array.isArray(c.discovered_gemini_models) && c.discovered_gemini_models.length > 0)
+      ? [...c.discovered_gemini_models]
+      : this.getLocalStorageDiscoveredModels('google');
+    this.discoveredMistralModels = (Array.isArray(c.discovered_mistral_models) && c.discovered_mistral_models.length > 0)
+      ? [...c.discovered_mistral_models]
+      : this.getLocalStorageDiscoveredModels('mistral');
+    this.discoveredInfomaniakModels = (Array.isArray(c.discovered_infomaniak_models) && c.discovered_infomaniak_models.length > 0)
+      ? [...c.discovered_infomaniak_models]
+      : this.getLocalStorageDiscoveredModels('infomaniak');
+
+    this.setLocalStorageDiscoveredModels('google', this.discoveredGeminiModels);
+    this.setLocalStorageDiscoveredModels('mistral', this.discoveredMistralModels);
+    this.setLocalStorageDiscoveredModels('infomaniak', this.discoveredInfomaniakModels);
+
     this.config.disabled_models = Array.isArray(c.disabled_models) ? [...c.disabled_models] : [];
     this.updateModelsSummaryBadges();
     this.renderAllModelSelects();
 
-    if (c.chat_model && document.getElementById('cfg-chat-model') && this.isModelEnabled(c.chat_model)) {
+    if (c.chat_model && document.getElementById('cfg-chat-model')) {
       document.getElementById('cfg-chat-model').value = c.chat_model;
     }
-    if (c.chat_fallback_model && document.getElementById('cfg-chat-fallback-model') && this.isModelEnabled(c.chat_fallback_model)) {
+    if (c.chat_fallback_model && document.getElementById('cfg-chat-fallback-model')) {
       document.getElementById('cfg-chat-fallback-model').value = c.chat_fallback_model;
     }
-    if (c.synthesis_model && document.getElementById('cfg-synthesis-model') && this.isModelEnabled(c.synthesis_model)) {
+    if (c.synthesis_model && document.getElementById('cfg-synthesis-model')) {
       document.getElementById('cfg-synthesis-model').value = c.synthesis_model;
     }
-    if (c.synthesis_fallback_model && document.getElementById('cfg-synthesis-fallback-model') && this.isModelEnabled(c.synthesis_fallback_model)) {
+    if (c.synthesis_fallback_model && document.getElementById('cfg-synthesis-fallback-model')) {
       document.getElementById('cfg-synthesis-fallback-model').value = c.synthesis_fallback_model;
     }
     if (c.synthesis_max_verses && document.getElementById('cfg-synthesis-max-verses')) {
       document.getElementById('cfg-synthesis-max-verses').value = c.synthesis_max_verses;
     }
 
-    if (c.translation_model && document.getElementById('cfg-translation-model') && this.isModelEnabled(c.translation_model)) {
+    if (c.translation_model && document.getElementById('cfg-translation-model')) {
       document.getElementById('cfg-translation-model').value = c.translation_model;
     }
-    if (c.translation_fallback_model && document.getElementById('cfg-translation-fallback-model') && this.isModelEnabled(c.translation_fallback_model)) {
+    if (c.translation_fallback_model && document.getElementById('cfg-translation-fallback-model')) {
       document.getElementById('cfg-translation-fallback-model').value = c.translation_fallback_model;
     }
-    if (c.summary_model && document.getElementById('cfg-summary-model') && this.isModelEnabled(c.summary_model)) {
+    if (c.summary_model && document.getElementById('cfg-summary-model')) {
       document.getElementById('cfg-summary-model').value = c.summary_model;
     }
-    if (c.summary_fallback_model && document.getElementById('cfg-summary-fallback-model') && this.isModelEnabled(c.summary_fallback_model)) {
+    if (c.summary_fallback_model && document.getElementById('cfg-summary-fallback-model')) {
       document.getElementById('cfg-summary-fallback-model').value = c.summary_fallback_model;
     }
-    if (c.title_model && document.getElementById('cfg-title-model') && this.isModelEnabled(c.title_model)) {
+    if (c.title_model && document.getElementById('cfg-title-model')) {
       document.getElementById('cfg-title-model').value = c.title_model;
     }
-    if (c.title_fallback_model && document.getElementById('cfg-title-fallback-model') && this.isModelEnabled(c.title_fallback_model)) {
+    if (c.title_fallback_model && document.getElementById('cfg-title-fallback-model')) {
       document.getElementById('cfg-title-fallback-model').value = c.title_fallback_model;
     }
-    if (c.notes_ai_model && document.getElementById('cfg-notes-ai-model') && this.isModelEnabled(c.notes_ai_model)) {
+    if (c.notes_ai_model && document.getElementById('cfg-notes-ai-model')) {
       document.getElementById('cfg-notes-ai-model').value = c.notes_ai_model;
     }
-    if (c.notes_ai_fallback_model && document.getElementById('cfg-notes-ai-fallback-model') && this.isModelEnabled(c.notes_ai_fallback_model)) {
+    if (c.notes_ai_fallback_model && document.getElementById('cfg-notes-ai-fallback-model')) {
       document.getElementById('cfg-notes-ai-fallback-model').value = c.notes_ai_fallback_model;
     }
-    if (c.sermon_restructure_model && document.getElementById('cfg-sermon-restructure-model') && this.isModelEnabled(c.sermon_restructure_model)) {
+    if (c.sermon_restructure_model && document.getElementById('cfg-sermon-restructure-model')) {
       document.getElementById('cfg-sermon-restructure-model').value = c.sermon_restructure_model;
     }
-    if (c.sermon_restructure_fallback_model && document.getElementById('cfg-sermon-restructure-fallback-model') && this.isModelEnabled(c.sermon_restructure_fallback_model)) {
+    if (c.sermon_restructure_fallback_model && document.getElementById('cfg-sermon-restructure-fallback-model')) {
       document.getElementById('cfg-sermon-restructure-fallback-model').value = c.sermon_restructure_fallback_model;
     }
-    if (c.sermon_evaluation_model && document.getElementById('cfg-sermon-evaluation-model') && this.isModelEnabled(c.sermon_evaluation_model)) {
+    if (c.sermon_evaluation_model && document.getElementById('cfg-sermon-evaluation-model')) {
       document.getElementById('cfg-sermon-evaluation-model').value = c.sermon_evaluation_model;
     }
-    if (c.sermon_evaluation_fallback_model && document.getElementById('cfg-sermon-evaluation-fallback-model') && this.isModelEnabled(c.sermon_evaluation_fallback_model)) {
+    if (c.sermon_evaluation_fallback_model && document.getElementById('cfg-sermon-evaluation-fallback-model')) {
       document.getElementById('cfg-sermon-evaluation-fallback-model').value = c.sermon_evaluation_fallback_model;
+    }
+    if (c.mindmap_ai_model && document.getElementById('cfg-mindmap-ai-model')) {
+      document.getElementById('cfg-mindmap-ai-model').value = c.mindmap_ai_model;
+    }
+    if (c.mindmap_ai_fallback_model && document.getElementById('cfg-mindmap-ai-fallback-model')) {
+      document.getElementById('cfg-mindmap-ai-fallback-model').value = c.mindmap_ai_fallback_model;
+    }
+    const curModel = c.curator_model || c.rag_curation_model;
+    if (curModel && document.getElementById('cfg-curator-model')) {
+      document.getElementById('cfg-curator-model').value = curModel;
+    }
+    const curFbModel = c.curator_fallback_model || c.rag_curation_fallback_model;
+    if (curFbModel && document.getElementById('cfg-curator-fallback-model')) {
+      document.getElementById('cfg-curator-fallback-model').value = curFbModel;
+    }
+    if (document.getElementById('cfg-curator-system-prompt')) {
+      document.getElementById('cfg-curator-system-prompt').value = c.curator_system_prompt || this.DEFAULT_CURATOR_PROMPT;
     }
     if (document.getElementById('cfg-summary-word-count')) {
       document.getElementById('cfg-summary-word-count').value = c.summary_word_count || 300;
@@ -1626,6 +1733,25 @@ Règles impératives :
         notifContainer.style.pointerEvents = (nSettings.enabled !== false) ? 'auto' : 'none';
       }
     }
+  },
+
+  getLocalStorageDiscoveredModels(provider) {
+    try {
+      const key = `open_shema_discovered_${provider}_models`;
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (_) {}
+    return [];
+  },
+
+  setLocalStorageDiscoveredModels(provider, list) {
+    try {
+      const key = `open_shema_discovered_${provider}_models`;
+      localStorage.setItem(key, JSON.stringify(list || []));
+    } catch (_) {}
   },
 
   getAllAvailableModels() {
@@ -1858,6 +1984,10 @@ Règles impératives :
       'cfg-sermon-restructure-fallback-model',
       'cfg-sermon-evaluation-model',
       'cfg-sermon-evaluation-fallback-model',
+      'cfg-mindmap-ai-model',
+      'cfg-mindmap-ai-fallback-model',
+      'cfg-curator-model',
+      'cfg-curator-fallback-model',
       'ai-opt-model'
     ];
 
@@ -1940,9 +2070,30 @@ Règles impératives :
         targetVal = this.config.sermon_evaluation_model || currentVal;
       } else if (id === 'cfg-sermon-evaluation-fallback-model') {
         targetVal = this.config.sermon_evaluation_fallback_model || currentVal;
+      } else if (id === 'cfg-mindmap-ai-model') {
+        targetVal = this.config.mindmap_ai_model || currentVal;
+      } else if (id === 'cfg-mindmap-ai-fallback-model') {
+        targetVal = this.config.mindmap_ai_fallback_model || currentVal;
+      } else if (id === 'cfg-curator-model') {
+        targetVal = this.config.curator_model || this.config.rag_curation_model || currentVal;
+      } else if (id === 'cfg-curator-fallback-model') {
+        targetVal = this.config.curator_fallback_model || this.config.rag_curation_fallback_model || currentVal;
       }
 
       if (targetVal && enabledModels.some(m => m.id === targetVal)) {
+        selectEl.value = targetVal;
+      } else if (targetVal && allModels.some(m => m.id === targetVal)) {
+        const found = allModels.find(m => m.id === targetVal);
+        const opt = document.createElement('option');
+        opt.value = targetVal;
+        opt.textContent = `${found ? found.name : targetVal} (Masqué par le filtre)`;
+        selectEl.appendChild(opt);
+        selectEl.value = targetVal;
+      } else if (targetVal) {
+        const opt = document.createElement('option');
+        opt.value = targetVal;
+        opt.textContent = `${targetVal} (Modèle configuré)`;
+        selectEl.appendChild(opt);
         selectEl.value = targetVal;
       } else if (enabledModels.length > 0) {
         selectEl.value = enabledModels[0].id;
@@ -1982,9 +2133,12 @@ Règles impératives :
       const res = await API.call('fetch_gemini_models', { api_key: apiKey });
       if (res && res.success && Array.isArray(res.models)) {
         this.discoveredGeminiModels = res.models;
+        this.setLocalStorageDiscoveredModels('google', res.models);
+        this.config.discovered_gemini_models = res.models;
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
+        this.save();
         App.showToast(`✓ ${res.models.length} modèles Gemini récupérés avec succès depuis Google !`);
       } else {
         App.showToast(`Erreur Google API : ${res?.error || 'Impossible de récupérer les modèles'}`);
@@ -2017,9 +2171,12 @@ Règles impératives :
       const res = await API.call('fetch_mistral_models', { api_key: apiKey });
       if (res && res.success && Array.isArray(res.models)) {
         this.discoveredMistralModels = res.models;
+        this.setLocalStorageDiscoveredModels('mistral', res.models);
+        this.config.discovered_mistral_models = res.models;
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
+        this.save();
         App.showToast(`✓ ${res.models.length} modèles Mistral récupérés avec succès depuis Mistral AI !`);
       } else {
         App.showToast(`Erreur Mistral API : ${res?.error || 'Impossible de récupérer les modèles'}`);
@@ -2054,9 +2211,12 @@ Règles impératives :
       const res = await API.call('fetch_infomaniak_models', { token, product_id: pid });
       if (res && res.success && Array.isArray(res.models)) {
         this.discoveredInfomaniakModels = res.models;
+        this.setLocalStorageDiscoveredModels('infomaniak', res.models);
+        this.config.discovered_infomaniak_models = res.models;
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
+        this.save();
         App.showToast(`✓ ${res.models.length} modèles Infomaniak récupérés avec succès !`);
       } else {
         App.showToast(`Erreur Infomaniak API : ${res?.error || 'Impossible de récupérer les modèles'}`);
@@ -2079,7 +2239,9 @@ Règles impératives :
       { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
       { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' },
       { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' },
-      { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' }
+      { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' },
+      { primary: 'cfg-mindmap-ai-model', fallback: 'cfg-mindmap-ai-fallback-model', label: 'Mind Map' },
+      { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -2117,7 +2279,9 @@ Règles impératives :
       { primary: 'cfg-title-model', fallback: 'cfg-title-fallback-model', label: 'Titres d\'historique' },
       { primary: 'cfg-notes-ai-model', fallback: 'cfg-notes-ai-fallback-model', label: 'Notes (Titres & Tags)' },
       { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' },
-      { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' }
+      { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' },
+      { primary: 'cfg-mindmap-ai-model', fallback: 'cfg-mindmap-ai-fallback-model', label: 'Mind Map' },
+      { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -2591,6 +2755,31 @@ Règles impératives :
       }
       newCfg.sermon_evaluation_fallback_model = fb;
     }
+    if (document.getElementById('cfg-mindmap-ai-model')) {
+      newCfg.mindmap_ai_model = document.getElementById('cfg-mindmap-ai-model').value;
+    }
+    if (document.getElementById('cfg-mindmap-ai-fallback-model')) {
+      let fb = document.getElementById('cfg-mindmap-ai-fallback-model').value;
+      if (fb === newCfg.mindmap_ai_model) {
+        fb = this.getSmartFallbackModel(newCfg.mindmap_ai_model, document.getElementById('cfg-mindmap-ai-fallback-model'));
+        document.getElementById('cfg-mindmap-ai-fallback-model').value = fb;
+      }
+      newCfg.mindmap_ai_fallback_model = fb;
+    }
+    if (document.getElementById('cfg-curator-model')) {
+      const curVal = document.getElementById('cfg-curator-model').value;
+      newCfg.curator_model = curVal;
+      newCfg.rag_curation_model = curVal;
+    }
+    if (document.getElementById('cfg-curator-fallback-model')) {
+      let fb = document.getElementById('cfg-curator-fallback-model').value;
+      if (fb === newCfg.curator_model) {
+        fb = this.getSmartFallbackModel(newCfg.curator_model, document.getElementById('cfg-curator-fallback-model'));
+        document.getElementById('cfg-curator-fallback-model').value = fb;
+      }
+      newCfg.curator_fallback_model = fb;
+      newCfg.rag_curation_fallback_model = fb;
+    }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;
     }
@@ -2641,6 +2830,9 @@ Règles impératives :
       newCfg.infomaniak_product_id = this.config.infomaniak_product_id;
     }
     newCfg.disabled_models = this.getDisabledModels();
+    newCfg.discovered_gemini_models = this.discoveredGeminiModels || [];
+    newCfg.discovered_mistral_models = this.discoveredMistralModels || [];
+    newCfg.discovered_infomaniak_models = this.discoveredInfomaniakModels || [];
     newCfg.sidebar_menu = this.getNavCustomizerConfig();
 
     try {

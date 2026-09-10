@@ -99,7 +99,15 @@ class GeminiClient:
         for current_model in models_to_try:
             url = f"{self.base_url}/{current_model}:generateContent"
             payload = dict(base_payload)
-            if thinking_budget is not None and ("2.5" in current_model or "2.0" in current_model or "3." in current_model):
+            is_thinking_model = (
+                "2.5" in current_model or
+                "2.0" in current_model or
+                "3." in current_model or
+                "flash-latest" in current_model or
+                "pro-latest" in current_model or
+                "-latest" in current_model
+            )
+            if thinking_budget is not None and is_thinking_model:
                 payload["generationConfig"] = {
                     "thinkingConfig": {
                         "thinkingBudget": thinking_budget
@@ -129,7 +137,21 @@ class GeminiClient:
                 data = response.json()
                 try:
                     self.last_used_model = current_model
-                    return data["candidates"][0]["content"]["parts"][0]["text"]
+                    parts = data["candidates"][0]["content"]["parts"]
+                    # Les modèles de réflexion (thinking) retournent parfois plusieurs
+                    # parts : une part 'thought' (trace interne) suivie de la vraie
+                    # réponse. On filtre les parts marquées thought:true et on
+                    # concatène les parts texte restantes.
+                    text_parts = [
+                        p.get("text", "")
+                        for p in parts
+                        if not p.get("thought", False) and "text" in p
+                    ]
+                    answer = "".join(text_parts).strip()
+                    if not answer:
+                        # Fallback : prendre le premier texte disponible quel qu'il soit
+                        answer = parts[0].get("text", "")
+                    return answer
                 except (KeyError, IndexError):
                     return "Erreur lors de la lecture de la réponse Gemini."
             except requests.exceptions.Timeout as e:

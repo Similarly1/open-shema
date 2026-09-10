@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import json
+import ssl
 import sqlite3
 import traceback
 import asyncio
@@ -14,6 +15,7 @@ import time
 import shutil
 import requests
 from typing import Dict, List, Any, Optional
+from core.ssl_utils import make_relaxed_ssl_context
 
 logger = logging.getLogger(__name__)
 from api._utils import (
@@ -205,6 +207,11 @@ class SettingsMixin:
                 return (4, i_id)
             
             valid_models.sort(key=model_sort_key)
+            try:
+                self.config["discovered_gemini_models"] = valid_models
+                save_config(self.config)
+            except Exception as e_save:
+                logger.warning(f"Impossible de sauvegarder discovered_gemini_models: {e_save}")
             return {"success": True, "models": valid_models}
         except Exception as e:
             logger.exception(f"Erreur fetch_gemini_models: {e}")
@@ -301,6 +308,11 @@ class SettingsMixin:
                 return (6, i_id)
             
             valid_models.sort(key=mistral_sort_key)
+            try:
+                self.config["discovered_mistral_models"] = valid_models
+                save_config(self.config)
+            except Exception as e_save:
+                logger.warning(f"Impossible de sauvegarder discovered_mistral_models: {e_save}")
             return {"success": True, "models": valid_models}
         except Exception as e:
             logger.exception(f"Erreur fetch_mistral_models: {e}")
@@ -366,6 +378,11 @@ class SettingsMixin:
                     "provider": "infomaniak"
                 })
             
+            try:
+                self.config["discovered_infomaniak_models"] = valid_models
+                save_config(self.config)
+            except Exception as e_save:
+                logger.warning(f"Impossible de sauvegarder discovered_infomaniak_models: {e_save}")
             return {"success": True, "models": valid_models}
         except Exception as e:
             logger.exception(f"Erreur fetch_infomaniak_models: {e}")
@@ -628,11 +645,7 @@ class SettingsMixin:
                     )
 
                     temp_download = os.path.join(target_dir, f"tmp_{filename}")
-                    ctx = ssl.create_default_context()
-                    ctx.check_hostname = False
-                    ctx.verify_mode = ssl.CERT_NONE
-
-                    with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+                    with urllib.request.urlopen(req, timeout=15, context=make_relaxed_ssl_context(download_url)) as resp:
                         total_size = int(resp.headers.get("Content-Length", 0))
                         downloaded = 0
                         chunk_size = 65536
