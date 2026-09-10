@@ -3312,6 +3312,8 @@ const MindMapView = {
     const isTopDown = this.treeStructure === 'top-down';
     const isLvl1 = node.level === 1;
     const isLvl2 = node.level === 2;
+    // isBox déclaré ici pour être accessible dans tout drawNodes (y compris fold indicator)
+    const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('class', `mm-node-g mm-level-${node.level} ${isRoot ? 'mm-root-node' : ''} ${isFloatingRoot ? 'mm-floating-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
@@ -3430,7 +3432,7 @@ const MindMapView = {
       }
 
     } else {
-      const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
+      // isBox déjà déclaré en tête de fonction
       const isPill = node.isFloating || this.nodeShape === 'pill';
       const rx = isPill ? (isLvl1 ? 18 : (isLvl2 ? 14 : 12)) : (isLvl1 ? 9 : (isLvl2 ? 6 : 4));
       const boxW = node.width;
