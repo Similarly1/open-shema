@@ -123,6 +123,16 @@ const MindMapView = {
               <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#3b82f6" flood-opacity="0.6"/>
               <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4"/>
             </filter>
+            <filter id="mm-root-aura" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="8" result="blur"/>
+              <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.55 0" result="aura"/>
+              <feMerge><feMergeNode in="aura"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <radialGradient id="mm-root-grad" cx="38%" cy="35%" r="62%" fx="38%" fy="35%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+              <stop offset="55%" stop-color="var(--mm-root-color, #2563eb)" stop-opacity="0.92"/>
+              <stop offset="100%" stop-color="var(--mm-root-color, #1d4ed8)" stop-opacity="1"/>
+            </radialGradient>
             <marker id="mm-rel-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
             </marker>
@@ -970,6 +980,17 @@ const MindMapView = {
       } else if (e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
         if (this.selectedNodeId) this.startInlineEdit(this.selectedNodeId);
+      } else if (!e.ctrlKey && !e.altKey && !e.metaKey && (e.key === 'f' || e.key === 'F')) {
+        if (this.selectedNodeId && this.selectedNodeId !== 'root' && !document.body.classList.contains('mindmap-fullscreen-active')) {
+          e.preventDefault();
+          this.toggleNodeCollapse(this.selectedNodeId);
+          return;
+        }
+        if (!this.selectedNodeId || this.selectedNodeId === 'root') {
+          e.preventDefault();
+          this.toggleFullscreen();
+          return;
+        }
       } else if (e.key === 'r' || e.key === 'R') {
         this.fitView();
       } else if (e.key === 'Escape') {
@@ -2955,6 +2976,8 @@ const MindMapView = {
 
   drawBranches(node) {
     if (!node.children || node.children.length === 0) return;
+    // Mode Mémorisation : ne pas tracer les branches des nœuds repliés
+    if (this.collapsedNodes && this.collapsedNodes.has(node.id)) return;
 
     const isBox = this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
     const connStyle = this.connectorStyle || 'curve';
@@ -3258,18 +3281,22 @@ const MindMapView = {
         this.viewportG.appendChild(path);
 
         if (!isBox) {
-          // Trait de soulignement sous le mot (Loi 7 : longueur branche = mot)
+          // Branche organique continue : courbe de Bézier du point d'arrivée jusqu'au bout du texte
+          // (Loi Buzan 7 : longueur branche = exactement le mot-clé, pas de trait rigide)
           const underX2 = childSide === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
-          const underline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          underline.setAttribute('x1', x2);
-          underline.setAttribute('y1', y2);
-          underline.setAttribute('x2', underX2);
-          underline.setAttribute('y2', y2);
-          underline.setAttribute('stroke', strokeColor);
           const underlineW = child.level === 1 ? (totalOnSide >= 4 ? 2.2 : 2.6) : (child.level === 2 ? 1.8 : 1.4);
-          underline.setAttribute('stroke-width', underlineW);
-          underline.setAttribute('stroke-linecap', 'round');
-          this.viewportG.appendChild(underline);
+
+          // Points de contrôle pour que la courbe parte tangentiellement dans le bon sens
+          const ucx1 = x2 + (underX2 - x2) * 0.35;
+          const ucx2 = x2 + (underX2 - x2) * 0.65;
+          const underPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          underPath.setAttribute('d', `M ${x2} ${y2} C ${ucx1} ${y2}, ${ucx2} ${y2}, ${underX2} ${y2}`);
+          underPath.setAttribute('fill', 'none');
+          underPath.setAttribute('stroke', strokeColor);
+          underPath.setAttribute('stroke-width', underlineW);
+          underPath.setAttribute('stroke-linecap', 'round');
+          underPath.classList.add('mm-branch-path');
+          this.viewportG.appendChild(underPath);
         }
       }
 
@@ -3294,58 +3321,79 @@ const MindMapView = {
     g.style.setProperty('--node-color', nodeColor);
 
     if (isRoot) {
-      // Médaillon central arrondi avec icône vectorielle noble
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', -node.width / 2);
-      rect.setAttribute('y', -node.height / 2);
-      rect.setAttribute('width', node.width);
-      rect.setAttribute('height', node.height);
-      rect.setAttribute('rx', node.height / 2);
-      rect.setAttribute('class', 'mm-root-rect');
-      rect.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'url(#mm-glow)');
-      g.appendChild(rect);
+      // ── Médaillon central Buzan ─ cercle polychrome avec aura lumineuse ──────
+      const rootColor = node.color || 'var(--accent-blue, #2563eb)';
+      const rootR = Math.max(node.width, node.height) / 2 + 6; // rayon du cercle
 
-      // Titre central en capitales
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('dominant-baseline', 'central');
-      text.setAttribute('class', 'mm-root-text');
-      text.textContent = node.text;
+      // Injecter la couleur dans le gradient (CSS var ne fonctionne pas dans radialGradient stop en SVG pur)
+      const gradId = `mm-root-grad-${node.id || 'r'}`;
+      const defs = this.svg.querySelector('defs');
+      if (defs && !defs.querySelector(`#${gradId}`)) {
+        const grad = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+        grad.setAttribute('id', gradId);
+        grad.setAttribute('cx', '38%'); grad.setAttribute('cy', '35%');
+        grad.setAttribute('r', '62%'); grad.setAttribute('fx', '38%'); grad.setAttribute('fy', '35%');
+        const s0 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        s0.setAttribute('offset', '0%'); s0.setAttribute('stop-color', '#ffffff'); s0.setAttribute('stop-opacity', '0.32');
+        const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        s1.setAttribute('offset', '55%'); s1.setAttribute('stop-color', rootColor); s1.setAttribute('stop-opacity', '0.9');
+        const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', rootColor); s2.setAttribute('stop-opacity', '1');
+        grad.appendChild(s0); grad.appendChild(s1); grad.appendChild(s2);
+        defs.appendChild(grad);
+      }
 
-      // Icône SVG majestueuse et plus grande sur le concept central si présente
+      // Halo / aura extérieure colorée translucide
+      const auraCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      auraCircle.setAttribute('r', rootR + 12);
+      auraCircle.setAttribute('fill', rootColor);
+      auraCircle.setAttribute('opacity', '0.18');
+      auraCircle.setAttribute('class', 'mm-root-aura');
+      g.appendChild(auraCircle);
+
+      // Anneau de bordure élégant
+      const ringCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      ringCircle.setAttribute('r', rootR + 3);
+      ringCircle.setAttribute('fill', 'none');
+      ringCircle.setAttribute('stroke', rootColor);
+      ringCircle.setAttribute('stroke-width', '2');
+      ringCircle.setAttribute('opacity', '0.55');
+      g.appendChild(ringCircle);
+
+      // Cercle principal avec gradient polychrome
+      const mainCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      mainCircle.setAttribute('r', rootR);
+      mainCircle.setAttribute('fill', `url(#${gradId})`);
+      mainCircle.setAttribute('class', 'mm-root-medallion');
+      mainCircle.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'url(#mm-root-aura)');
+      g.appendChild(mainCircle);
+
+      // ── Icône SVG centrale agrandie (48px) ───────────────────────────────────
+      const iconYOffset = node.icon && typeof SvgIconsRegistry !== 'undefined' ? -10 : 0;
+
       if (node.icon && typeof SvgIconsRegistry !== 'undefined') {
         const iconDef = SvgIconsRegistry.get(node.icon);
         if (iconDef) {
-          const iconSize = 28;
-          const textW = node.textWidth || 60;
-          const spacing = 10;
-          const totalContent = iconSize + spacing + textW;
-          const startX = -totalContent / 2;
-          const iconX = startX + iconSize / 2;
-          const textX = startX + iconSize + spacing;
-
-          text.setAttribute('text-anchor', 'start');
-          text.setAttribute('x', textX);
-
+          const iconSize = 48;
           const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          iconG.setAttribute('transform', `translate(${iconX}, 0)`);
+          iconG.setAttribute('transform', `translate(0, ${iconYOffset - iconSize / 2 + 8})`);
           iconG.setAttribute('class', 'mm-node-icon-badge mm-root-icon-badge');
           iconG.setAttribute('style', 'cursor: pointer;');
           iconG.setAttribute('title', `Icône SVG : ${iconDef.label} (Cliquer pour changer ou [I])`);
 
           const iHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          iHit.setAttribute('r', 18);
+          iHit.setAttribute('r', iconSize / 2 + 4);
           iHit.setAttribute('fill', 'transparent');
           iconG.appendChild(iHit);
 
           const svgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          svgWrap.setAttribute('transform', 'translate(-14, -14) scale(1.16)');
+          svgWrap.setAttribute('transform', `translate(${-iconSize / 2}, ${-iconSize / 2}) scale(${iconSize / 24})`);
           svgWrap.setAttribute('fill', 'none');
-          svgWrap.setAttribute('stroke', nodeColor || 'var(--accent-blue, #2563eb)');
-          svgWrap.setAttribute('stroke-width', '2.3');
+          svgWrap.setAttribute('stroke', '#ffffff');
+          svgWrap.setAttribute('stroke-width', '1.7');
           svgWrap.setAttribute('stroke-linecap', 'round');
           svgWrap.setAttribute('stroke-linejoin', 'round');
           svgWrap.setAttribute('pointer-events', 'none');
-          svgWrap.style.pointerEvents = 'none';
           svgWrap.innerHTML = iconDef.path;
           iconG.appendChild(svgWrap);
 
@@ -3355,15 +3403,20 @@ const MindMapView = {
             this.openIconPicker(node.id, e.clientX, e.clientY);
           });
           g.appendChild(iconG);
-        } else {
-          text.setAttribute('text-anchor', 'middle');
-          text.setAttribute('x', 0);
         }
-      } else {
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('x', 0);
       }
 
+      // ── Titre du concept central ─ cartouche sous l'icône ───────────────────
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const textYPos = node.icon ? (iconYOffset + 26) : 0;
+      text.setAttribute('y', textYPos);
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('x', 0);
+      text.setAttribute('class', 'mm-root-text');
+      text.setAttribute('fill', '#ffffff');
+      text.setAttribute('pointer-events', 'none');
+      text.textContent = node.text;
       g.appendChild(text);
 
       // Bouton contextuel + pour ajouter un BOI (en mode édition uniquement)
@@ -3821,9 +3874,86 @@ const MindMapView = {
 
     this.viewportG.appendChild(g);
 
-    if (node.children) {
+    // ── Indicateur de repli Fold/Unfold ──────────────────────────────────────
+    // Affiché sur tout nœud non-root ayant des enfants (mode Mémorisation)
+    if (!isRoot && node.children && node.children.length > 0) {
+      const isCollapsed = this.collapsedNodes && this.collapsedNodes.has(node.id);
+      const hasChildren = node.children.length > 0;
+      if (hasChildren) {
+        const foldG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        // Positionnement de l'indicateur : au bout de la branche (côté enfants)
+        const foldX = isTopDown ? 0 : (node.side === 'right' ? node.width / 2 + 2 : -node.width / 2 - 2);
+        const foldY = isTopDown ? (isBox ? node.height / 2 + 2 : 16) : (isBox ? 0 : 8);
+        const foldDir = isTopDown ? 1 : (node.side === 'right' ? 1 : -1);
+        foldG.setAttribute('transform', `translate(${foldX}, ${foldY})`);
+        foldG.setAttribute('class', `mm-fold-indicator ${isCollapsed ? 'is-folded' : ''}`);
+        foldG.setAttribute('title', isCollapsed ? `Déplier (${node.children.length} sous-branches) — [F]` : 'Replier les sous-branches — [F]');
+        foldG.setAttribute('style', 'cursor: pointer;');
+        foldG.setAttribute('data-node-id', node.id);
+
+        const foldCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        foldCircle.setAttribute('r', 7);
+        foldCircle.setAttribute('fill', node.color || 'var(--accent-blue, #2563eb)');
+        foldCircle.setAttribute('opacity', isCollapsed ? '1' : '0.6');
+        foldCircle.setAttribute('stroke', 'var(--bg-card, #fff)');
+        foldCircle.setAttribute('stroke-width', '1.5');
+        foldG.appendChild(foldCircle);
+
+        // Flèche SVG : ▶ si replié, ▼ si déplié
+        const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        if (isCollapsed) {
+          // Triangles pointant vers le bas (indique "peut déplier")
+          arrowPath.setAttribute('d', isTopDown
+            ? 'M -3 -1.5 L 3 -1.5 L 0 2.5 Z'
+            : `M ${-2 * foldDir} -3 L ${3 * foldDir} 0 L ${-2 * foldDir} 3 Z`);
+        } else {
+          // Tiret horizontal (indique "peut replier")
+          arrowPath.setAttribute('d', 'M -3 0 L 3 0');
+        }
+        arrowPath.setAttribute('fill', '#ffffff');
+        arrowPath.setAttribute('stroke', '#ffffff');
+        arrowPath.setAttribute('stroke-width', isCollapsed ? '0' : '1.8');
+        arrowPath.setAttribute('stroke-linecap', 'round');
+        arrowPath.setAttribute('pointer-events', 'none');
+        foldG.appendChild(arrowPath);
+
+        // Compteur d'enfants si replié
+        if (isCollapsed) {
+          const countText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          countText.setAttribute('text-anchor', 'middle');
+          countText.setAttribute('dominant-baseline', 'central');
+          countText.setAttribute('font-size', '7px');
+          countText.setAttribute('font-weight', '800');
+          countText.setAttribute('fill', '#ffffff');
+          countText.setAttribute('pointer-events', 'none');
+          countText.textContent = node.children.length;
+          foldG.appendChild(countText);
+        }
+
+        foldG.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.toggleNodeCollapse(node.id);
+        });
+        this.viewportG.appendChild(foldG);
+      }
+    }
+
+    // Récursion sur les enfants (bloquée si le nœud est replié)
+    if (node.children && !(this.collapsedNodes && this.collapsedNodes.has(node.id))) {
       node.children.forEach(child => this.drawNodes(child));
     }
+  },
+
+  // ── Mode Mémorisation : Fold / Unfold des branches ───────────────────────
+  toggleNodeCollapse(nodeId) {
+    if (!nodeId || nodeId === 'root') return;
+    if (!this.collapsedNodes) this.collapsedNodes = new Set();
+    if (this.collapsedNodes.has(nodeId)) {
+      this.collapsedNodes.delete(nodeId);
+    } else {
+      this.collapsedNodes.add(nodeId);
+    }
+    this.draw();
   },
 
   createActionButton(label, x, y, onClick, isDanger = false) {

@@ -34000,6 +34000,43 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-re
   fill: var(--bg-card, #1e293b);
 }
 
+/* ── Médaillon central Buzan — cercle polychrome ─────────────────────────── */
+.mm-root-medallion {
+  cursor: pointer;
+  transition: filter 0.25s ease, transform 0.2s ease;
+}
+
+.mm-node-g:hover .mm-root-medallion {
+  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.45)) !important;
+}
+
+.mm-root-aura {
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mm-node-g:hover .mm-root-aura {
+  opacity: 0.28 !important;
+}
+
+/* ── Indicateur Fold / Unfold (Mode Mémorisation Buzan) ─────────────────── */
+.mm-fold-indicator {
+  opacity: 0.28;
+  transition: opacity 0.18s ease;
+  cursor: pointer;
+  pointer-events: all;
+}
+
+/* Toujours visible quand replié */
+.mm-fold-indicator.is-folded {
+  opacity: 1 !important;
+}
+
+/* Apparaît au survol direct de l'indicateur */
+.mm-fold-indicator:hover {
+  opacity: 1;
+}
+
 .mm-branch-text {
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
   font-size: 11.5px;
