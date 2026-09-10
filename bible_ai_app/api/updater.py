@@ -25,11 +25,27 @@ logger = logging.getLogger("api_updater")
 class UpdaterMixin:
     """Mixin pour les fonctionnalités d'auto-mise à jour in-app."""
 
+    def is_store_package(self) -> bool:
+        """Indique si l'application s'exécute dans un conteneur Windows Store MSIX."""
+        from core.paths import is_running_as_package
+        return is_running_as_package()
+
     def check_for_updates(self, force: bool = False) -> Dict[str, Any]:
         """
         Vérifie la disponibilité d'une nouvelle version sur GitHub.
         Met à jour la date de dernière vérification dans la configuration.
         """
+        from core.paths import is_running_as_package
+        if is_running_as_package():
+            return {
+                "success": True,
+                "is_store": True,
+                "update_available": False,
+                "current_version": APP_VERSION,
+                "latest_version": APP_VERSION,
+                "message": "Version Microsoft Store. Vos mises à jour sont gérées automatiquement par Windows."
+            }
+
         cfg = load_config()
         freq = cfg.get("update_frequency", "startup")
         last_check = cfg.get("last_update_check", 0)

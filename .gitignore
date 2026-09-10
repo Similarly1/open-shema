@@ -37,12 +37,16 @@ venv.bak/
 *.db-wal
 *.sqlite
 *.sqlite3
+!bible_ai_app/data/upvr_corpus.sqlite
+!data/upvr_corpus/upvr_corpus.sqlite
 *.zip
 *.tar.gz
 *.rar
 **/commentaires/**/*.json
 **/commentaires/*.db
 **/data/stepbible_raw/
+**/html_cache/
+**/upvr_paired_raw.json
 scratch_*.py
 scratch_*.html
 

@@ -7,8 +7,12 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_NOTES_DIR = os.path.join(CURRENT_DIR, "data", "notes")
+from core.paths import get_user_data_path, resolve_data_path
+
+def get_default_notes_dir() -> str:
+    return get_user_data_path("notes")
+
+DEFAULT_NOTES_DIR = get_default_notes_dir()
 
 
 class NotesManager:
@@ -29,13 +33,14 @@ class NotesManager:
                 except Exception as e:
                     logger.warning(f"Impossible d'utiliser le dossier de notes personnalisé '{custom_dir}': {e}")
         
-        os.makedirs(DEFAULT_NOTES_DIR, exist_ok=True)
-        return DEFAULT_NOTES_DIR
+        default_dir = get_default_notes_dir()
+        os.makedirs(default_dir, exist_ok=True)
+        return default_dir
 
     @classmethod
     def migrate_legacy_json_if_needed(cls, target_dir: str):
         """Migre automatiquement les anciennes notes du fichier monolithique data/notes.json vers des fichiers .md."""
-        legacy_file = os.path.join(CURRENT_DIR, "data", "notes.json")
+        legacy_file = resolve_data_path("notes.json")
         if not os.path.exists(legacy_file):
             return
 

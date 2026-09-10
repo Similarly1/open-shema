@@ -7,9 +7,20 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_SERMONS_DIR = os.path.join(CURRENT_DIR, "data", "sermons")
-DEFAULT_ILLUSTRATIONS_DIR = os.path.join(CURRENT_DIR, "data", "illustrations")
+from core.paths import get_user_data_path, get_bundle_data_path, resolve_data_path
+
+def get_default_sermons_dir() -> str:
+    return get_user_data_path("sermons")
+
+def get_default_illustrations_dir() -> str:
+    # Si le pack est embarqué dans le bundle, le privilégier
+    bundle_ill = get_bundle_data_path("illustrations")
+    if os.path.exists(bundle_ill) and len(os.listdir(bundle_ill)) > 10:
+        return bundle_ill
+    return get_user_data_path("illustrations")
+
+DEFAULT_SERMONS_DIR = get_default_sermons_dir()
+DEFAULT_ILLUSTRATIONS_DIR = get_default_illustrations_dir()
 
 
 class SermonsManager:
@@ -30,8 +41,9 @@ class SermonsManager:
                 except Exception as e:
                     logger.warning(f"Impossible d'utiliser le dossier de sermons personnalisé '{custom_dir}': {e}")
         
-        os.makedirs(DEFAULT_SERMONS_DIR, exist_ok=True)
-        return DEFAULT_SERMONS_DIR
+        d = get_default_sermons_dir()
+        os.makedirs(d, exist_ok=True)
+        return d
 
     @classmethod
     def get_illustrations_directory(cls, config: Optional[Dict[str, Any]] = None) -> str:
@@ -45,8 +57,9 @@ class SermonsManager:
                 except Exception as e:
                     logger.warning(f"Impossible d'utiliser le dossier d'illustrations personnalisé '{custom_dir}': {e}")
         
-        os.makedirs(DEFAULT_ILLUSTRATIONS_DIR, exist_ok=True)
-        return DEFAULT_ILLUSTRATIONS_DIR
+        d = get_default_illustrations_dir()
+        os.makedirs(d, exist_ok=True)
+        return d
 
     @classmethod
     def _slugify_filename(cls, title: str, item_id: str, prefix: str = "sermon") -> str:
@@ -545,14 +558,7 @@ class SermonsManager:
 
         pack_installed = cls.is_illustrations_pack_installed(config)
         illustrations_map: Dict[str, Dict[str, Any]] = {}
-        import sys
-        cache_candidates = [
-            os.path.join(CURRENT_DIR, "data", "illustrations_processed_cache.json"),
-            os.path.join(os.path.dirname(sys.executable), "data", "illustrations_processed_cache.json"),
-            os.path.join(os.path.dirname(sys.executable), "_internal", "data", "illustrations_processed_cache.json"),
-            os.path.join(getattr(sys, "_MEIPASS", ""), "data", "illustrations_processed_cache.json")
-        ]
-        cache_json_file = next((p for p in cache_candidates if p and os.path.exists(p)), cache_candidates[0])
+        cache_json_file = resolve_data_path("illustrations_processed_cache.json")
 
         if pack_installed and os.path.exists(cache_json_file):
             try:
@@ -584,11 +590,12 @@ class SermonsManager:
             logger.error(f"Erreur lecture fichiers .md illustrations: {e}")
 
         # Sauvegarder automatiquement le cache JSON si créé ou enrichi pour des lectures sub-100ms
+        save_cache_file = get_user_data_path("illustrations_processed_cache.json")
         if (cache_needs_save or not os.path.exists(cache_json_file)) and illustrations_map:
             try:
                 import json
-                os.makedirs(os.path.dirname(cache_json_file), exist_ok=True)
-                with open(cache_json_file, "w", encoding="utf-8") as f:
+                os.makedirs(os.path.dirname(save_cache_file), exist_ok=True)
+                with open(save_cache_file, "w", encoding="utf-8") as f:
                     json.dump(illustrations_map, f, ensure_ascii=False)
             except Exception as e:
                 logger.warning(f"Impossible de sauvegarder le cache JSON illustrations : {e}")

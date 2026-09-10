@@ -137,6 +137,11 @@ const AppUpdater = {
       this.state.isChecking = false;
       this.setCheckButtonState(false);
 
+      if (res && res.is_store) {
+        this.renderStoreMode(res);
+        return;
+      }
+
       if (res && res.last_check) {
         this.renderLastCheckTime(res.last_check);
       } else {
@@ -159,6 +164,32 @@ const AppUpdater = {
       this.state.isChecking = false;
       this.setCheckButtonState(false);
       console.warn("Erreur vérification mise à jour:", err);
+    }
+  },
+
+  renderStoreMode(res) {
+    this.hideUpdateAvailable();
+    const badge = document.getElementById('lbl-update-status-badge');
+    if (badge) {
+      badge.textContent = `Version Store (${res?.current_version || '0.2.0'})`;
+      badge.style.background = 'rgba(16, 185, 129, 0.15)';
+      badge.style.color = '#34d399';
+    }
+    const desc = document.getElementById('lbl-update-status-desc');
+    if (desc) {
+      desc.textContent = "Cette version d'Open Shema est distribuée via le Microsoft Store. Vos mises à jour sont vérifiées, signées et déployées automatiquement par Windows.";
+    }
+    const btnCheckNow = document.getElementById('btn-check-updates-now');
+    if (btnCheckNow) {
+      btnCheckNow.style.display = 'none';
+    }
+    const lastCheck = document.getElementById('lbl-last-check-time');
+    if (lastCheck) {
+      lastCheck.textContent = "Gestion transparente par Windows Store";
+    }
+    const topbarBtn = document.getElementById('topbar-update-btn');
+    if (topbarBtn) {
+      topbarBtn.classList.add('hidden');
     }
   },
 

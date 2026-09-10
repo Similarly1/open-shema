@@ -46,6 +46,22 @@ class ContentMixin:
             logger.error(f"[API] Erreur ouverture URL externe : {e}")
         return False
 
+    def get_vigouroux_illustrations(self) -> Dict[str, Any]:
+        """Charge l'index des illustrations pour le dictionnaire Vigouroux."""
+        candidates = [
+            os.path.join(current_dir, "data", "dictionaries", "vigouroux_illustrations.json"),
+            os.path.join(os.path.dirname(sys.executable), "data", "dictionaries", "vigouroux_illustrations.json"),
+            os.path.join(os.path.dirname(sys.executable), "_internal", "data", "dictionaries", "vigouroux_illustrations.json"),
+        ]
+        for p in candidates:
+            if os.path.exists(p):
+                try:
+                    with open(p, "r", encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception as e:
+                    logger.warning(f"Erreur lecture {p}: {e}")
+        return {}
+
     def get_biblical_places(self, query: str = "", place_type: Optional[str] = None, limit: int = 150) -> List[Dict[str, Any]]:
         """Recherche des lieux bibliques avec filtre optionnel par type."""
         try:

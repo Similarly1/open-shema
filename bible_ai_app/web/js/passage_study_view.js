@@ -94,6 +94,8 @@ const PassageStudyView = {
     list: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
     pastoral: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>',
     apjLogo: '<svg viewBox="0 0 24 24" width="14" height="14" style="border-radius: 2.5px; vertical-align: middle; flex-shrink: 0;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg>',
+    upvrLogo: '<svg viewBox="0 0 24 24" width="14" height="14" style="border-radius: 2.5px; vertical-align: middle; flex-shrink: 0;"><rect width="24" height="24" rx="3.5" fill="#E63E09"/><g fill="#FFFFFF"><rect x="9.5" y="4.5" width="5" height="8.5" rx="2.5"/><path d="M7.5,10 C7.5,12.5 9.5,14.5 12,14.5 C14.5,14.5 16.5,12.5 16.5,10" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/><line x1="12" y1="14.5" x2="12" y2="18" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/><line x1="9" y1="18" x2="15" y2="18" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/><path d="M5,7.5 C4.2,8.8 4.2,11.2 5,12.5" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/><path d="M19,7.5 C19.8,8.8 19.8,11.2 19,12.5" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/></g></svg>',
+    audio: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
     externalLink: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
   },
 
@@ -2337,9 +2339,10 @@ const PassageStudyView = {
   },
 
   // =========================================================================
-  // 4b. QUESTIONS PASTORALES & ÉTHIQUE (ASK PASTOR JOHN — JOHN PIPER)
+  // 4b. QUESTIONS PASTORALES & ÉTHIQUE (ASK PASTOR JOHN & UN PASTEUR VOUS RÉPOND)
   // =========================================================================
   activePastoralEpIdx: 0,
+  activePastoralFilter: 'all',
 
   renderPastoralQa() {
     if (!this.pastoralContainerEl) return;
@@ -2357,17 +2360,17 @@ const PassageStudyView = {
               <span class="ps-card-icon" style="background: rgba(20, 184, 166, 0.12); color: #0d9488; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px;">${this.ICONS.pastoral}</span>
               <div>
                 <h3 class="ps-card-title">Questions Pastorales &amp; Éthique</h3>
-                <div class="ps-card-subtitle">Réponses pratiques et théologiques (Ask Pastor John, etc.)</div>
+                <div class="ps-card-subtitle">Réponses pratiques et théologiques (Florent Varak &amp; John Piper)</div>
               </div>
             </div>
           </div>
           
           <div class="ps-pastoral-empty-state" style="padding: 32px 20px; text-align: center;">
             <p style="font-size: 13.5px; color: var(--text-secondary); max-width: 580px; margin: 0 auto 18px auto; line-height: 1.55;">
-              Aucun épisode pastoral n'est directement rattaché aux versets de ce passage précis. Vous pouvez explorer les <strong>1 000 épisodes</strong> du corpus par mot-clé (souffrance, épreuve, anxiété, prière, justification...) :
+              Aucun épisode pastoral n'est directement rattaché aux versets de ce passage précis. Vous pouvez explorer les corpus de <strong>Florent Varak</strong> (<em>Un pasteur vous répond</em>) et <strong>John Piper</strong> (<em>Ask Pastor John</em>) par mot-clé :
             </p>
             <div class="ps-pastoral-search-row" style="display: flex; max-width: 480px; margin: 0 auto 20px auto; gap: 8px;">
-              <input type="text" id="ps-pastoral-global-search-input" class="search-field" placeholder="Rechercher une question pastoral..." style="flex: 1; font-size: 13px; padding: 7px 12px; border-radius: 6px;">
+              <input type="text" id="ps-pastoral-global-search-input" class="search-field" placeholder="Rechercher une question pastorale..." style="flex: 1; font-size: 13px; padding: 7px 12px; border-radius: 6px;">
               <button type="button" class="tool-btn primary" id="btn-ps-pastoral-global-search" style="padding: 7px 14px; font-size: 12.5px;">Rechercher</button>
             </div>
             <div id="ps-pastoral-search-results" class="ps-pastoral-results-box hidden" style="text-align: left; max-width: 800px; margin: 0 auto;"></div>
@@ -2377,6 +2380,26 @@ const PassageStudyView = {
       this.pastoralContainerEl.innerHTML = html;
       this.bindPastoralGlobalSearch();
       return;
+    }
+
+    const upvrCount = episodes.filter(e => e.is_upvr || e.author === 'Florent Varak').length;
+    const apjCount = episodes.filter(e => !e.is_upvr && e.author !== 'Florent Varak').length;
+
+    let filterBarHtml = '';
+    if (upvrCount > 0 && apjCount > 0) {
+      filterBarHtml = `
+        <div class="pastoral-filter-bar" style="margin-bottom: 12px;">
+          <button type="button" class="pastoral-filter-pill ${this.activePastoralFilter === 'all' ? 'active' : ''}" data-ps-filter="all">
+            Tous (${episodes.length})
+          </button>
+          <button type="button" class="pastoral-filter-pill ${this.activePastoralFilter === 'upvr' ? 'active' : ''}" data-ps-filter="upvr">
+            ${this.ICONS.upvrLogo} Florent Varak (${upvrCount})
+          </button>
+          <button type="button" class="pastoral-filter-pill ${this.activePastoralFilter === 'apj' ? 'active' : ''}" data-ps-filter="apj">
+            ${this.ICONS.apjLogo} John Piper (${apjCount})
+          </button>
+        </div>
+      `;
     }
 
     const activeEp = episodes[this.activePastoralEpIdx] || episodes[0];
@@ -2399,24 +2422,41 @@ const PassageStudyView = {
           </div>
         </div>
 
+        ${filterBarHtml}
+
         <div class="ps-pastoral-split-view" style="display: grid; grid-template-columns: 340px 1fr; gap: 16px; margin-top: 14px;">
           <!-- COLONNE GAUCHE : LISTE DES QUESTIONS -->
           <div class="ps-pastoral-episodes-list" id="ps-pastoral-episodes-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 720px; overflow-y: auto; padding-right: 4px;">
             ${episodes.map((ep, idx) => {
+              const isUpvr = ep.is_upvr || ep.author === 'Florent Varak';
               const epNum = ep.episode_number;
               const epBadge = (epNum != null && epNum !== '') ? `Ép. #${epNum}` : 'Hors-série';
-              const titleFr = ep.titre_fr || ep.original_title;
-              const typeQ = ep.type_question ? ep.type_question.toUpperCase() : 'PASTORAL';
+              const titleFr = ep.titre_fr || ep.titre || ep.original_title;
+              const typeQ = ep.type_question ? ep.type_question.toUpperCase() : (isUpvr ? 'PASTORAL' : 'APJ');
               const hasIllustr = ep.illustration?.has_illustration || !!ep.illustration?.titre;
-              const appCount = (ep.pistes_applications || []).length;
+              const appCount = (ep.pistes_applications || ep.applications_pastorales || []).length;
+              const ptsCount = (ep.points_cles || []).length;
               const primPassages = ep.passages_primaires || (ep.verse_ref ? [ep.verse_ref] : []);
               const secPassages = ep.passages_secondaires || [];
+              const hasAudio = !!ep.audio_url;
+
+              const shouldShow = (this.activePastoralFilter === 'all') ||
+                                 (this.activePastoralFilter === 'upvr' && isUpvr) ||
+                                 (this.activePastoralFilter === 'apj' && !isUpvr);
 
               return `
-                <div class="ps-pastoral-item ${idx === 0 ? 'active' : ''}" data-ep-idx="${idx}" style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-surface); cursor: pointer; transition: all 0.15s;">
+                <div class="ps-pastoral-item ${idx === this.activePastoralEpIdx ? 'active' : ''} ${isUpvr ? 'is-upvr-item' : 'is-apj-item'}" 
+                     data-ep-idx="${idx}" 
+                     data-author="${isUpvr ? 'upvr' : 'apj'}"
+                     style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-surface); cursor: pointer; transition: all 0.15s; display: ${shouldShow ? 'block' : 'none'};">
                   <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                    <span style="font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: rgba(20, 184, 166, 0.15); color: #0d9488; display: inline-flex; align-items: center; gap: 4px;">${this.ICONS.apjLogo} <span>${epBadge}</span></span>
+                    <span style="font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: ${isUpvr ? 'rgba(230, 62, 9, 0.12)' : 'rgba(20, 184, 166, 0.15)'}; color: ${isUpvr ? '#d9480f' : '#0d9488'}; display: inline-flex; align-items: center; gap: 4px;">
+                      ${isUpvr ? this.ICONS.upvrLogo : this.ICONS.apjLogo} 
+                      <span>${isUpvr ? 'UPVR' : 'APJ'} • ${epBadge}</span>
+                    </span>
                     <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">${this.escapeHtml(typeQ)}</span>
+                    ${hasAudio ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(255, 85, 0, 0.12); color: #ff5500;">Audio</span>` : ''}
+                    ${ptsCount > 0 ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(230, 62, 9, 0.1); color: #d9480f;">${ptsCount} pts</span>` : ''}
                     ${hasIllustr ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(245, 158, 11, 0.15); color: #d97706;">Analogie</span>` : ''}
                     ${appCount > 0 ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(59, 130, 246, 0.12); color: #2563eb;">${appCount} app.</span>` : ''}
                   </div>
@@ -2450,21 +2490,89 @@ const PassageStudyView = {
   renderPastoralEpisodePane(ep) {
     if (!ep) return '<p class="ps-empty-p">Sélectionnez une question pastorale à gauche pour afficher l\'analyse complète.</p>';
 
-    const titleFr = ep.titre_fr || ep.original_title;
+    const isUpvr = ep.is_upvr || ep.author === 'Florent Varak';
+    const sourceBrand = isUpvr ? 'ToutPourSaGloire' : 'Desiring God';
+    const titleFr = ep.titre_fr || ep.titre || ep.original_title;
     const origTitle = ep.original_title || '';
     const epNum = ep.episode_number;
     const epLabel = (epNum != null && epNum !== '') ? `Épisode #${epNum}` : 'Hors-série';
     const typeQ = ep.type_question || 'Pastorale';
     const datePub = ep.date_published || '';
     const sourceUrl = ep.source_url || '';
+    const audioUrl = ep.audio_url || '';
+    const mp3Url = ep.mp3_url || '';
+    const duration = ep.duration || '';
     const these = ep.these_centrale || '';
     const resume = ep.resume_analytique || '';
     const illustr = ep.illustration || {};
-    const apps = ep.pistes_applications || [];
+    const apps = ep.pistes_applications || ep.applications_pastorales || [];
+    const ptsCles = ep.points_cles || [];
     const themes = ep.themes || [];
     const verseRef = ep.verse_ref || '';
     const primPassages = ep.passages_primaires || (verseRef ? [verseRef] : []);
     const secPassages = ep.passages_secondaires || [];
+
+    const questionAuditeurHtml = ep.question_auditeur ? `
+      <div class="pastoral-question-callout">
+        <div class="pastoral-question-header">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Question de l'auditeur</span>
+        </div>
+        <div class="pastoral-question-body">« ${this.escapeHtml(ep.question_auditeur)} »</div>
+      </div>
+    ` : '';
+
+    const pointsClesHtml = ptsCles.length > 0 ? `
+      <div class="pastoral-points-box">
+        <div class="pastoral-points-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span>Points clés de l'argumentation</span>
+        </div>
+        <ul class="pastoral-points-list">
+          ${ptsCles.map((pt, i) => `
+            <li class="pastoral-points-item">
+              <span class="pastoral-point-badge">${i + 1}</span>
+              <span>${this.escapeHtml(pt)}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    let audioButtonHtml = '';
+    if (mp3Url) {
+      audioButtonHtml = `
+        <div class="pastoral-audio-native-player">
+          <div class="pastoral-audio-player-meta">
+            <span class="pastoral-audio-meta-left">
+              ${this.ICONS.audio}
+              <span>Enregistrement audio officiel</span>
+            </span>
+            ${duration ? `<span class="pastoral-audio-duration-badge">${this.escapeHtml(duration)}</span>` : ''}
+          </div>
+          <audio controls preload="none" src="${this.escapeHtml(mp3Url)}"></audio>
+          <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 6px;">
+            ${sourceUrl ? `
+              <a href="#" class="pastoral-audio-ext-link" data-ext-url="${this.escapeHtml(sourceUrl)}">
+                <span>Article &amp; podcast sur ${sourceBrand} ↗</span>
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    } else if (audioUrl) {
+      audioButtonHtml = `
+        <div style="margin-bottom: 12px;">
+          <button type="button" class="pastoral-audio-btn" id="btn-ps-audio-toggle">
+            ${this.ICONS.audio}
+            <span>Écouter le podcast officiel</span>
+          </button>
+          <div id="ps-audio-frame-wrap" class="pastoral-audio-frame-wrap" style="display: none; margin-top: 10px;">
+            <iframe width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay" src="${this.escapeHtml(audioUrl)}"></iframe>
+          </div>
+        </div>
+      `;
+    }
 
     const appsHtml = apps.length > 0 ? `
       <div style="margin-top: 18px;">
@@ -2475,7 +2583,7 @@ const PassageStudyView = {
         <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px;">
           ${apps.map(a => `
             <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.5; color: var(--text-secondary);">
-              <span style="color: #0d9488; font-weight: bold; font-size: 14px;">•</span>
+              <span style="color: ${isUpvr ? '#e63e09' : '#0d9488'}; font-weight: bold; font-size: 14px;">•</span>
               <span>${this.escapeHtml(a)}</span>
             </li>
           `).join('')}
@@ -2504,21 +2612,27 @@ const PassageStudyView = {
         <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
           <div>
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
-              <span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: rgba(20, 184, 166, 0.15); color: #0d9488; display: inline-flex; align-items: center; gap: 6px;">${this.ICONS.apjLogo} <span>Ask Pastor John • ${epLabel}</span></span>
+              <span class="${isUpvr ? 'upvr-ep-pill' : 'apj-ep-pill'}" style="display: inline-flex; align-items: center; gap: 6px;">
+                ${isUpvr ? this.ICONS.upvrLogo : this.ICONS.apjLogo} 
+                <span>${isUpvr ? 'Un pasteur vous répond' : 'Ask Pastor John'} • ${epLabel}</span>
+              </span>
               <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted);">${this.escapeHtml(typeQ)}</span>
               ${datePub ? `<span style="font-size: 11px; color: var(--text-muted);">${this.escapeHtml(this.formatFrenchDate(datePub))}</span>` : ''}
               ${verseRef ? `<span style="font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--bg-hover); color: var(--text-secondary);">${this.escapeHtml(verseRef)}</span>` : ''}
             </div>
             <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.35; margin: 0;">${this.escapeHtml(titleFr)}</h3>
-            ${origTitle && origTitle !== titleFr ? `<div style="font-size: 12px; font-style: italic; color: var(--text-muted); margin-top: 4px;">Titre original : « ${this.escapeHtml(origTitle)} »</div>` : ''}
+            ${origTitle && origTitle !== titleFr && !isUpvr ? `<div style="font-size: 12px; font-style: italic; color: var(--text-muted); margin-top: 4px;">Titre original : « ${this.escapeHtml(origTitle)} »</div>` : ''}
           </div>
           ${sourceUrl ? `
-            <button type="button" class="ps-btn-sm" id="btn-ps-open-apj-source" data-url="${this.escapeHtml(sourceUrl)}" title="Consulter l'article et écouter l'audio sur Desiring God" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; background: var(--bg-hover); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;">
-              ${this.ICONS.apjLogo}
-              <span>Desiring God ↗</span>
+            <button type="button" class="${isUpvr ? 'upvr-btn-source' : 'ps-btn-sm'}" id="btn-ps-open-apj-source" data-url="${this.escapeHtml(sourceUrl)}" title="Consulter l'article officiel sur ${sourceBrand}" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; white-space: nowrap;">
+              ${isUpvr ? this.ICONS.upvrLogo : this.ICONS.apjLogo}
+              <span>${sourceBrand} ↗</span>
             </button>
           ` : ''}
         </div>
+
+        ${audioButtonHtml}
+        ${questionAuditeurHtml}
 
         ${(primPassages.length > 0 || secPassages.length > 0) ? `
           <div class="apj-scriptures-box" style="margin-bottom: 14px;">
@@ -2557,11 +2671,13 @@ const PassageStudyView = {
         ` : ''}
 
         ${these ? `
-          <div style="padding: 14px 16px; border-radius: 8px; background: rgba(20, 184, 166, 0.08); border-left: 4px solid #0d9488; margin-bottom: 16px;">
-            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0d9488; margin-bottom: 6px;">Thèse centrale &amp; Réponse pastorale</div>
+          <div class="${isUpvr ? 'upvr-thesis-card' : 'apj-thesis-card'}" style="margin-bottom: 16px;">
+            <div class="${isUpvr ? 'upvr-thesis-label' : 'apj-thesis-label'}">Thèse centrale &amp; Réponse pastorale</div>
             <div style="font-size: 13.5px; line-height: 1.55; font-weight: 500; color: var(--text-primary);">${this.escapeHtml(these)}</div>
           </div>
         ` : ''}
+
+        ${pointsClesHtml}
 
         ${resume ? `
           <div style="margin-top: 16px;">
@@ -2590,9 +2706,10 @@ const PassageStudyView = {
     const updateReader = (idx) => {
       this.activePastoralEpIdx = idx;
       listContainer?.querySelectorAll('.ps-pastoral-item').forEach(el => {
-        el.classList.toggle('active', parseInt(el.dataset.epIdx, 10) === idx);
-        el.style.borderColor = parseInt(el.dataset.epIdx, 10) === idx ? '#0d9488' : 'var(--border-color)';
-        el.style.background = parseInt(el.dataset.epIdx, 10) === idx ? 'rgba(20, 184, 166, 0.06)' : 'var(--bg-surface)';
+        const isCurrent = parseInt(el.dataset.epIdx, 10) === idx;
+        el.classList.toggle('active', isCurrent);
+        el.style.borderColor = isCurrent ? '#0d9488' : 'var(--border-color)';
+        el.style.background = isCurrent ? 'rgba(20, 184, 166, 0.06)' : 'var(--bg-surface)';
       });
 
       if (readerPane && episodes[idx]) {
@@ -2604,17 +2721,69 @@ const PassageStudyView = {
             else window.open(u, '_blank');
           }
         });
+        readerPane.querySelector('#btn-ps-audio-toggle')?.addEventListener('click', () => {
+          const wrap = readerPane.querySelector('#ps-audio-frame-wrap');
+          if (wrap) {
+            const isHidden = wrap.style.display === 'none';
+            wrap.style.display = isHidden ? 'block' : 'none';
+          }
+        });
+        readerPane.querySelectorAll('.pastoral-audio-ext-link').forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const u = link.dataset.extUrl;
+            if (u && typeof API !== 'undefined' && API.openExternalUrl) {
+              API.openExternalUrl(u);
+            }
+          });
+        });
         readerPane.querySelectorAll('.drawer-pastoral-ref-btn').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const ref = btn.dataset.ref;
-            if (ref && typeof BibleReader !== 'undefined' && BibleReader.parseAndNavigate) {
-              BibleReader.parseAndNavigate(ref);
+            if (!ref) return;
+            if (typeof App !== 'undefined' && App.switchView) {
+              App.switchView('bible');
+            }
+            if (typeof BibleReader !== 'undefined') {
+              if (typeof BibleReader.parseAndNavigate === 'function') {
+                BibleReader.parseAndNavigate(ref);
+              } else if (typeof BibleReader.searchPassage === 'function') {
+                BibleReader.searchPassage(ref);
+              } else if (typeof BibleReader.navigateTo === 'function') {
+                BibleReader.navigateTo(ref);
+              }
             }
           });
         });
       }
     };
+
+    // Gestionnaire de filtrage par auteur (Tous / UPVR / APJ)
+    document.querySelectorAll('.pastoral-filter-pill[data-ps-filter]').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.activePastoralFilter = pill.dataset.psFilter || 'all';
+        document.querySelectorAll('.pastoral-filter-pill[data-ps-filter]').forEach(p => {
+          p.classList.toggle('active', p.dataset.psFilter === this.activePastoralFilter);
+        });
+
+        // Filtrer les cartes
+        let firstVisibleIdx = -1;
+        listContainer?.querySelectorAll('.ps-pastoral-item').forEach(item => {
+          const auth = item.dataset.author;
+          const show = (this.activePastoralFilter === 'all') || (this.activePastoralFilter === auth);
+          item.style.display = show ? 'block' : 'none';
+          if (show && firstVisibleIdx === -1) {
+            firstVisibleIdx = parseInt(item.dataset.epIdx, 10);
+          }
+        });
+
+        if (firstVisibleIdx !== -1) {
+          updateReader(firstVisibleIdx);
+        }
+      });
+    });
 
     listContainer?.querySelectorAll('.ps-pastoral-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -2631,14 +2800,25 @@ const PassageStudyView = {
       }
     });
 
+    readerPane?.querySelector('#btn-ps-audio-toggle')?.addEventListener('click', () => {
+      const wrap = readerPane.querySelector('#ps-audio-frame-wrap');
+      if (wrap) {
+        const isHidden = wrap.style.display === 'none';
+        wrap.style.display = isHidden ? 'block' : 'none';
+      }
+    });
+
     filterInput?.addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase().trim();
       listContainer?.querySelectorAll('.ps-pastoral-item').forEach(item => {
         const idx = parseInt(item.dataset.epIdx, 10);
         const ep = episodes[idx];
         if (!ep) return;
-        const text = `${ep.episode_number || ''} ${ep.titre_fr || ''} ${ep.original_title || ''} ${ep.these_centrale || ''} ${(ep.themes || []).join(' ')}`.toLowerCase();
-        item.style.display = (!q || text.includes(q)) ? 'block' : 'none';
+        const auth = item.dataset.author;
+        const matchesAuthor = (this.activePastoralFilter === 'all') || (this.activePastoralFilter === auth);
+        const text = `${ep.episode_number || ''} ${ep.titre_fr || ''} ${ep.titre || ''} ${ep.original_title || ''} ${ep.these_centrale || ''} ${(ep.themes || []).join(' ')}`.toLowerCase();
+        const matchesSearch = (!q || text.includes(q));
+        item.style.display = (matchesAuthor && matchesSearch) ? 'block' : 'none';
       });
     });
   },
@@ -2655,12 +2835,12 @@ const PassageStudyView = {
       resBox.classList.remove('hidden');
       resBox.innerHTML = `
         <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">
-          Recherche en cours dans les 1 000 épisodes pastoraux...
+          Recherche en cours dans les corpus pastoraux...
         </div>
       `;
 
       try {
-        const results = await API.searchApjEpisodes(q, 15);
+        const results = await API.searchPastoralEpisodes(q, 15);
         if (!results || results.length === 0) {
           resBox.innerHTML = `
             <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">
@@ -2675,17 +2855,26 @@ const PassageStudyView = {
             ${results.length} résultat(s) pour « ${this.escapeHtml(q)} »
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            ${results.map((r, i) => `
-              <div class="ps-pastoral-search-hit" data-hit-idx="${i}" style="padding: 12px; border-radius: 8px; background: var(--bg-subtle); border: 1px solid var(--border-color); cursor: pointer;">
-                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                  <span style="font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: rgba(20, 184, 166, 0.15); color: #0d9488; display: inline-flex; align-items: center; gap: 4px;">${this.ICONS.apjLogo} <span>${(r.episode_number != null && r.episode_number !== '') ? `Ép. #${r.episode_number}` : 'Hors-série'}</span></span>
-                  <span style="font-size: 10.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">${this.escapeHtml(r.type_question || 'Pastorale')}</span>
-                  ${r.scriptures_covered && r.scriptures_covered.length > 0 ? `<span style="font-size: 10.5px; color: var(--accent-blue);">${this.escapeHtml(r.scriptures_covered.join(', '))}</span>` : ''}
+            ${results.map((r, i) => {
+              const isUpvr = r.is_upvr || r.author === 'Florent Varak';
+              const epNum = r.episode_number;
+              const epBadge = (epNum != null && epNum !== '') ? `Ép. #${epNum}` : 'Hors-série';
+              const titleFr = r.titre_fr || r.titre || r.original_title;
+              return `
+                <div class="ps-pastoral-search-hit" data-hit-idx="${i}" style="padding: 12px; border-radius: 8px; background: var(--bg-subtle); border: 1px solid var(--border-color); cursor: pointer;">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                    <span style="font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: ${isUpvr ? 'rgba(230, 62, 9, 0.12)' : 'rgba(20, 184, 166, 0.15)'}; color: ${isUpvr ? '#d9480f' : '#0d9488'}; display: inline-flex; align-items: center; gap: 4px;">
+                      ${isUpvr ? this.ICONS.upvrLogo : this.ICONS.apjLogo} 
+                      <span>${isUpvr ? 'UPVR' : 'APJ'} • ${epBadge}</span>
+                    </span>
+                    <span style="font-size: 10.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">${this.escapeHtml(r.type_question || 'Pastorale')}</span>
+                    ${r.scriptures_covered && r.scriptures_covered.length > 0 ? `<span style="font-size: 10.5px; color: var(--accent-blue);">${this.escapeHtml(r.scriptures_covered.join(', '))}</span>` : ''}
+                  </div>
+                  <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">${this.escapeHtml(titleFr)}</div>
+                  ${r.these_centrale ? `<div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">${this.escapeHtml(r.these_centrale)}</div>` : ''}
                 </div>
-                <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">${this.escapeHtml(r.titre_fr)}</div>
-                ${r.these_centrale ? `<div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 3px; line-height: 1.4;">${this.escapeHtml(r.these_centrale)}</div>` : ''}
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         `;
 

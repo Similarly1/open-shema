@@ -3,8 +3,12 @@ import json
 import logging
 
 logger = logging.getLogger(__name__)
+from core.paths import get_user_data_path, resolve_data_path, ensure_data_directories
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "config.json")
+def get_config_path() -> str:
+    return get_user_data_path("config.json")
+
+CONFIG_PATH = get_config_path()
 
 DEFAULT_SYNTHESIS_SYSTEM_PROMPT = """Vous êtes un assistant de recherche biblique et exégétique universitaire.
 Votre mission est de produire une CARTOGRAPHIE COMPARATIVE DES SOURCES ET COMMENTAIRES fournis, pour faire gagner un temps précieux de dépouillement documentaire à l'étudiant ou au pasteur, sans penser ni conclure à sa place.
@@ -344,11 +348,16 @@ DEFAULTS = {
 }
 
 def load_config():
-    if not os.path.exists(CONFIG_PATH):
+    cfg_file = resolve_data_path("config.json")
+    if not os.path.exists(cfg_file):
+        ensure_data_directories()
+        cfg_file = resolve_data_path("config.json")
+
+    if not os.path.exists(cfg_file):
         config = dict(DEFAULTS)
     else:
         try:
-            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            with open(cfg_file, "r", encoding="utf-8") as f:
                 config = json.load(f)
         except (json.JSONDecodeError, OSError) as e:
             logger.warning(
@@ -371,13 +380,14 @@ def load_config():
     return config
 
 def save_config(config_dict):
+    target_path = get_config_path()
     try:
-        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        with open(target_path, "w", encoding="utf-8") as f:
             json.dump(config_dict, f, indent=4)
     except OSError as e:
         logger.error(
             "Impossible de sauvegarder la configuration (%s) : %s. "
-            "Vérifiez les droits d'écriture sur le dossier 'data/'.",
-            CONFIG_PATH, e
+            "Vérifiez les droits d'écriture sur le dossier utilisateur.",
+            target_path, e
         )

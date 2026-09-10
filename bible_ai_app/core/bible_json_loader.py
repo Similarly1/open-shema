@@ -61,71 +61,94 @@ class BibleJsonLoader:
         cls._metadata_cache.clear()
 
     @classmethod
+    def get_bibles_dirs(cls):
+        from core.paths import get_user_data_path, get_bundle_data_path
+        dirs = []
+        u_b = get_user_data_path("bibles")
+        if os.path.exists(u_b):
+            dirs.append(u_b)
+        b_b = get_bundle_data_path("bibles")
+        if os.path.exists(b_b) and b_b not in dirs:
+            dirs.append(b_b)
+        if not dirs:
+            dirs.append(u_b)
+        return dirs
+
+    @classmethod
     def get_bibles_dir(cls):
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        return os.path.join(base_dir, "data", "bibles")
+        from core.paths import get_user_data_path
+        d = get_user_data_path("bibles")
+        os.makedirs(d, exist_ok=True)
+        return d
 
     @classmethod
     def list_installed_bibles(cls):
-        """Retourne la liste des dossiers de Bibles installées dans data/bibles/"""
-        bibles_dir = cls.get_bibles_dir()
-        if not os.path.exists(bibles_dir):
-            return []
+        """Retourne la liste des dossiers de Bibles installées dans les répertoires bibles/"""
         bibles = []
-        for entry in os.listdir(bibles_dir):
-            entry_path = os.path.join(bibles_dir, entry)
-            if os.path.isdir(entry_path):
-                # Vérifier la présence de fichiers json
-                json_files = [f for f in os.listdir(entry_path) if f.endswith(".json")]
-                if json_files:
-                    bibles.append(entry)
+        seen = set()
+        for bibles_dir in cls.get_bibles_dirs():
+            if not os.path.exists(bibles_dir):
+                continue
+            for entry in os.listdir(bibles_dir):
+                if entry in seen:
+                    continue
+                entry_path = os.path.join(bibles_dir, entry)
+                if os.path.isdir(entry_path):
+                    json_files = [f for f in os.listdir(entry_path) if f.endswith(".json")]
+                    if json_files:
+                        bibles.append(entry)
+                        seen.add(entry)
         return bibles
 
     @classmethod
     def find_bible_dir_by_name(cls, bible_name):
-        """Trouve le dossier correspondant au nom ou identifiant de la Bible"""
-        bibles_dir = cls.get_bibles_dir()
-        if not os.path.exists(bibles_dir):
-            return None
-
+        """Trouve le dossier correspondant au nom ou identifiant de la Bible dans tous les dossiers disponibles"""
+        bibles_dirs = cls.get_bibles_dirs()
         if not bible_name or not isinstance(bible_name, str):
             installed = cls.list_installed_bibles()
             if installed:
-                return os.path.join(bibles_dir, installed[0])
+                for b_dir in bibles_dirs:
+                    cand = os.path.join(b_dir, installed[0])
+                    if os.path.exists(cand):
+                        return cand
             return None
-            
-        # 1. Vérifier si un dossier a exactement ce nom
-        direct_path = os.path.join(bibles_dir, bible_name)
-        if os.path.exists(direct_path) and os.path.isdir(direct_path):
-            return direct_path
 
-        # 2. Chercher dans library.json ou library_user_full_backup.json si un chemin ou un nom correspond
-        base_data = os.path.dirname(cls.get_bibles_dir())
+        # 1. Vérifier si un dossier a exactement ce nom
+        for bibles_dir in bibles_dirs:
+            direct_path = os.path.join(bibles_dir, bible_name)
+            if os.path.exists(direct_path) and os.path.isdir(direct_path):
+                return direct_path
+
+        # 2. Chercher dans library.json
+        from core.paths import resolve_data_path
         for lib_filename in ["library_user_full_backup.json", "library.json"]:
-            library_path = os.path.join(base_data, lib_filename)
+            library_path = resolve_data_path(lib_filename)
             if os.path.exists(library_path):
                 try:
                     with open(library_path, "r", encoding="utf-8") as f:
                         reg = json.load(f)
                     meta = reg.get(bible_name)
                     if meta and "folder_name" in meta:
-                        p = os.path.join(bibles_dir, meta["folder_name"])
-                        if os.path.exists(p):
-                            return p
+                        for bibles_dir in bibles_dirs:
+                            p = os.path.join(bibles_dir, meta["folder_name"])
+                            if os.path.exists(p):
+                                return p
                 except Exception as _silent_e:
                     logger.debug("Erreur ignoree : %s", _silent_e)
 
         # 3. Scanner les dossiers pour faire correspondre le nom ou la version
-        for d in os.listdir(bibles_dir):
-            d_path = os.path.join(bibles_dir, d)
-            if os.path.isdir(d_path):
-                if d.lower() == bible_name.lower().replace(" ", "_"):
-                    return d_path
-                # Vérifier les métadonnées du premier fichier
-                meta = cls.get_bible_metadata(d)
-                if meta:
-                    if meta.get("name") == bible_name or meta.get("version") == bible_name or meta.get("title") == bible_name:
+        for bibles_dir in bibles_dirs:
+            if not os.path.exists(bibles_dir):
+                continue
+            for d in os.listdir(bibles_dir):
+                d_path = os.path.join(bibles_dir, d)
+                if os.path.isdir(d_path):
+                    if d.lower() == bible_name.lower().replace(" ", "_"):
                         return d_path
+                    meta = cls.get_bible_metadata(d)
+                    if meta:
+                        if meta.get("name") == bible_name or meta.get("version") == bible_name or meta.get("title") == bible_name:
+                            return d_path
 
         return None
 

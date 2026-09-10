@@ -32270,6 +32270,26 @@ body[class*="palette-dark"] .clean-source-tag.is-pastoral {
   border-color: rgba(45, 212, 191, 0.4);
 }
 
+.clean-source-tag.is-upvr {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(230, 62, 9, 0.12);
+  color: #d9480f;
+  border: 1px solid rgba(230, 62, 9, 0.28);
+  font-weight: 700;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+body.theme-dark .clean-source-tag.is-upvr,
+body[class*="palette-dark"] .clean-source-tag.is-upvr {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fb923c;
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
 .clean-pastoral-type {
   font-size: 10.5px;
   text-transform: uppercase;
@@ -32416,6 +32436,324 @@ body[class*="palette-dark"] .apj-ep-pill {
   border-radius: 4px;
   background: var(--bg-hover);
   color: var(--text-secondary);
+}
+
+.upvr-ep-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(230, 62, 9, 0.15);
+  color: #d9480f;
+}
+
+body.theme-dark .upvr-ep-pill,
+body[class*="palette-dark"] .upvr-ep-pill {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+}
+
+.upvr-btn-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 6px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.upvr-btn-source:hover {
+  background: rgba(230, 62, 9, 0.12);
+  border-color: rgba(230, 62, 9, 0.35);
+  color: #d9480f;
+}
+
+body.theme-dark .upvr-btn-source:hover,
+body[class*="palette-dark"] .upvr-btn-source:hover {
+  color: #fb923c;
+}
+
+.upvr-thesis-card {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(230, 62, 9, 0.08);
+  border: 1px solid rgba(230, 62, 9, 0.25);
+  border-left: 4px solid #e63e09;
+  color: var(--text-primary);
+}
+
+body.theme-dark .upvr-thesis-card,
+body[class*="palette-dark"] .upvr-thesis-card {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.3);
+  border-left-color: #fb923c;
+}
+
+.upvr-thesis-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #d9480f;
+  margin-bottom: 6px;
+}
+
+body.theme-dark .upvr-thesis-label,
+body[class*="palette-dark"] .upvr-thesis-label {
+  color: #fb923c;
+}
+
+/* Question de l'auditeur Callout */
+.pastoral-question-callout {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  margin-bottom: 14px;
+}
+
+.pastoral-question-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.pastoral-question-body {
+  font-size: 13px;
+  line-height: 1.55;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* Points cles d'argumentation (Florent Varak) */
+.pastoral-points-box {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.pastoral-points-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.pastoral-points-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pastoral-points-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.pastoral-point-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(230, 62, 9, 0.12);
+  color: #e63e09;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+body.theme-dark .pastoral-point-badge,
+body[class*="palette-dark"] .pastoral-point-badge {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fb923c;
+}
+
+/* Bouton Lecteur Audio SoundCloud */
+.pastoral-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(255, 85, 0, 0.1);
+  border: 1px solid rgba(255, 85, 0, 0.28);
+  color: #ff5500;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pastoral-audio-btn:hover {
+  background: rgba(255, 85, 0, 0.2);
+  border-color: rgba(255, 85, 0, 0.45);
+}
+
+body.theme-dark .pastoral-audio-btn,
+body[class*="palette-dark"] .pastoral-audio-btn {
+  background: rgba(255, 85, 0, 0.15);
+  color: #ff7733;
+}
+
+.pastoral-audio-frame-wrap {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: #000;
+}
+
+.pastoral-audio-frame-wrap iframe {
+  display: block;
+  width: 100%;
+  height: 120px;
+  border: none;
+}
+
+/* Lecteur Audio Natif MP3 (Haute Fidélité AWS CDN / Spotify) */
+.pastoral-audio-native-player {
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid #e63e09;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+body.theme-dark .pastoral-audio-native-player,
+body[class*="palette-dark"] .pastoral-audio-native-player {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(249, 115, 22, 0.25);
+  border-left-color: #f97316;
+}
+
+.pastoral-audio-player-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pastoral-audio-meta-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e63e09;
+}
+
+body.theme-dark .pastoral-audio-meta-left,
+body[class*="palette-dark"] .pastoral-audio-meta-left {
+  color: #fb923c;
+}
+
+.pastoral-audio-duration-badge {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(230, 62, 9, 0.1);
+  color: #e63e09;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+body.theme-dark .pastoral-audio-duration-badge,
+body[class*="palette-dark"] .pastoral-audio-duration-badge {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+}
+
+.pastoral-audio-native-player audio {
+  width: 100%;
+  height: 38px;
+  outline: none;
+  border-radius: 6px;
+}
+
+.pastoral-audio-ext-link {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.pastoral-audio-ext-link:hover {
+  color: #e63e09;
+  text-decoration: underline;
+}
+
+/* Barre de filtres par corpus / auteur */
+.pastoral-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: var(--bg-subtle);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 10px;
+}
+
+.pastoral-filter-pill {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pastoral-filter-pill:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.pastoral-filter-pill.active {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-weight: 700;
 }
 
 .apj-modal-title {

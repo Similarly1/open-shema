@@ -7,11 +7,11 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(CURRENT_DIR, "data")
-CONVERSATIONS_DIR = os.path.join(DATA_DIR, "conversations")
-AI_MEMORY_FILE = os.path.join(DATA_DIR, "ai_memory.json")
-USER_PROFILE_FILE = os.path.join(DATA_DIR, "user_profile.json")
+from core.paths import get_user_data_path, resolve_data_path
+
+CONVERSATIONS_DIR = get_user_data_path("conversations")
+AI_MEMORY_FILE = resolve_data_path("ai_memory.json")
+USER_PROFILE_FILE = resolve_data_path("user_profile.json")
 
 class AISessionManager:
     """

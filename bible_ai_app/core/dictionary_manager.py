@@ -30,14 +30,15 @@ class DictionaryManager:
 
     @classmethod
     def get_dict_dir(cls):
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        d = os.path.join(base_dir, "data", "dictionaries")
+        from core.paths import get_user_data_path
+        d = get_user_data_path("dictionaries")
         os.makedirs(d, exist_ok=True)
         return d
 
     @classmethod
     def get_registry_path(cls):
-        return os.path.join(cls.get_dict_dir(), "registry.json")
+        from core.paths import resolve_data_path
+        return resolve_data_path("dictionaries", "registry.json")
 
     @classmethod
     def load_registry(cls):
@@ -158,9 +159,11 @@ class DictionaryManager:
 
     @classmethod
     def save_registry(cls, registry_data):
+        from core.paths import get_user_data_path
         cls._registry = registry_data
-        r_path = cls.get_registry_path()
+        r_path = get_user_data_path("dictionaries", "registry.json")
         try:
+            os.makedirs(os.path.dirname(r_path), exist_ok=True)
             with open(r_path, "w", encoding="utf-8") as f:
                 json.dump(registry_data, f, ensure_ascii=False, indent=2)
         except Exception as e:

@@ -87,7 +87,25 @@ def check_for_updates(repo: str = GITHUB_REPO, timeout: int = 6) -> Dict[str, An
     """
     Interroge l'API GitHub pour récupérer la dernière version stable publiée.
     Compare sémantiquement avec APP_VERSION.
+    Désactivé automatiquement sous Microsoft Store (MSIX).
     """
+    from core.paths import is_running_as_package
+    if is_running_as_package():
+        _set_update_state(
+            status="idle",
+            is_store=True,
+            current_version=APP_VERSION,
+            latest_version=APP_VERSION
+        )
+        return {
+            "success": True,
+            "is_store": True,
+            "update_available": False,
+            "current_version": APP_VERSION,
+            "latest_version": APP_VERSION,
+            "message": "Version Microsoft Store. Les mises à jour sont assurées automatiquement par Windows."
+        }
+
     _set_update_state(status="checking", error=None)
 
     url = f"https://api.github.com/repos/{repo}/releases"

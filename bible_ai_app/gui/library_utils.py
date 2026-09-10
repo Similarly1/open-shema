@@ -6,6 +6,15 @@ import shutil
 
 logger = logging.getLogger(__name__)
 
+from core.paths import (
+    get_user_data_dir,
+    get_bundle_data_dir,
+    get_user_data_path,
+    get_bundle_data_path,
+    resolve_data_path,
+    ensure_data_directories
+)
+
 # Chemin absolu calculé depuis l'emplacement du fichier — indépendant du CWD
 _APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -14,48 +23,45 @@ _APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _LIBRARY_CACHE: dict | None = None
 
 def get_library_path() -> str:
-    """Résout l'emplacement de library.json sur plusieurs chemins possibles (Dev, Portable, Dist, PyInstaller)."""
-    candidates = []
-    # 1. Emplacement relatif à l'exécutable (mode portable / build PyInstaller)
-    if getattr(sys, 'frozen', False):
-        exe_dir = os.path.dirname(sys.executable)
-        candidates.append(os.path.join(exe_dir, "data", "library.json"))
-        candidates.append(os.path.join(exe_dir, "_internal", "data", "library.json"))
-    # 2. _MEIPASS
-    if hasattr(sys, '_MEIPASS'):
-        candidates.append(os.path.join(sys._MEIPASS, "data", "library.json"))
-    # 3. Mode dev / local non-frozen : privilégier le registre utilisateur complet s'il existe
-    if not getattr(sys, 'frozen', False):
-        candidates.append(os.path.join(_APP_ROOT, "data", "library_user_full_backup.json"))
-        candidates.append(os.path.join(os.getcwd(), "data", "library_user_full_backup.json"))
-        candidates.append(os.path.join(os.getcwd(), "bible_ai_app", "data", "library_user_full_backup.json"))
-    # 4. Racine de l'application relative au fichier
-    candidates.append(os.path.join(_APP_ROOT, "data", "library.json"))
-    # 5. Dossier courant
-    candidates.append(os.path.join(os.getcwd(), "data", "library.json"))
-    candidates.append(os.path.join(os.getcwd(), "bible_ai_app", "data", "library.json"))
-
-    for c in candidates:
-        if c and os.path.exists(c):
-            return c
-    
-    # Par défaut
-    if getattr(sys, 'frozen', False):
-        return os.path.join(os.path.dirname(sys.executable), "data", "library.json")
-    return os.path.join(_APP_ROOT, "data", "library.json")
+    """Résout l'emplacement d'écriture de library.json dans l'espace utilisateur."""
+    return get_user_data_path("library.json")
 
 def load_books_metadata() -> dict:
     global _LIBRARY_CACHE
     if _LIBRARY_CACHE is not None:
         return _LIBRARY_CACHE
     registry = {}
-    path = get_library_path()
+    path = resolve_data_path("library.json")
+    if not os.path.exists(path):
+        ensure_data_directories()
+        path = resolve_data_path("library.json")
+
     if os.path.exists(path):
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 registry = json.load(f)
         except Exception as _silent_e:
             logger.debug("Erreur lecture library.json : %s", _silent_e)
+
+    # Filet de sécurité : vérifier si un backup complet existe et fusionner si besoin
+    backup_path = resolve_data_path("library_user_full_backup.json")
+    if not os.path.exists(backup_path):
+        # Chercher également dans la racine de l'app si non trouvé dans les chemins résolus
+        app_bkp = os.path.join(_APP_ROOT, "data", "library_user_full_backup.json")
+        if os.path.exists(app_bkp):
+            backup_path = app_bkp
+
+    if os.path.exists(backup_path):
+        try:
+            with open(backup_path, 'r', encoding='utf-8') as f:
+                backup_registry = json.load(f)
+            if isinstance(backup_registry, dict) and len(backup_registry) > len(registry):
+                for k, v in backup_registry.items():
+                    if k not in registry:
+                        registry[k] = v
+                save_books_metadata(registry)
+        except Exception as _bkp_e:
+            logger.debug("Erreur lecture backup library: %s", _bkp_e)
     
     # Si le registre est introuvable ou vide, lancer automatiquement la récupération
     if not registry:
@@ -80,13 +86,16 @@ def recover_books_metadata():
             registry = {}
     changed = False
 
-    # 1. Vérifier les Bibles JSON dans data/bibles/
-    data_dir = os.path.dirname(path)
-    bibles_dir = os.path.join(data_dir, 'bibles')
-    if not os.path.exists(bibles_dir):
-        bibles_dir = os.path.join(_APP_ROOT, 'data', 'bibles')
+    # 1. Vérifier les Bibles JSON dans bibles/ (espace utilisateur et bundle)
+    bibles_dirs = []
+    u_b = get_user_data_path('bibles')
+    if os.path.exists(u_b):
+        bibles_dirs.append(u_b)
+    b_b = get_bundle_data_path('bibles')
+    if os.path.exists(b_b) and b_b not in bibles_dirs:
+        bibles_dirs.append(b_b)
 
-    if os.path.exists(bibles_dir):
+    for bibles_dir in bibles_dirs:
         for entry in os.listdir(bibles_dir):
             entry_path = os.path.join(bibles_dir, entry)
             if os.path.isdir(entry_path):
@@ -125,7 +134,7 @@ def recover_books_metadata():
 
     # 2. Vérifier les collections ChromaDB si disponibles
     try:
-        chroma_path = os.path.join(data_dir, 'chroma_db')
+        chroma_path = resolve_data_path('chroma_db')
         if os.path.exists(chroma_path):
             import chromadb
             client = chromadb.PersistentClient(path=chroma_path)

@@ -445,15 +445,23 @@ class PassageStudyManager:
             book_code, start_ch, start_v, end_ch, end_v, bible_name=main_bible
         )
 
-        # 8. Questions Pastorales & Éthique (Ask Pastor John)
+        # 8. Questions Pastorales & Éthique (Ask Pastor John & Un pasteur vous répond)
         pastoral_qa = []
         try:
             from core.apj_manager import APJManager
             apj_mgr = APJManager.get_instance()
             if apj_mgr.is_installed():
-                pastoral_qa = apj_mgr.get_episodes_for_passage(book_code, start_ch, start_v, limit=20)
+                pastoral_qa.extend(apj_mgr.get_episodes_for_passage(book_code, start_ch, start_v, limit=15))
         except Exception as e:
             logger.debug(f"Erreur apj passage study: {e}")
+
+        try:
+            from core.upvr_manager import UPVRManager
+            upvr_mgr = UPVRManager.get_instance()
+            if upvr_mgr.is_installed():
+                pastoral_qa.extend(upvr_mgr.get_episodes_for_passage(book_code, start_ch, start_v, limit=15))
+        except Exception as e:
+            logger.debug(f"Erreur upvr passage study: {e}")
 
         return {
             "success": True,
@@ -1486,15 +1494,23 @@ CONSIGNES STRICTES :
         except Exception as e:
             logger.debug(f"Erreur bibleproject overview: {e}")
 
-        # 9. Questions Pastorales & Éthique — Ask Pastor John (John Piper)
+        # 9. Questions Pastorales & Éthique — Ask Pastor John & Un pasteur vous répond
         pastoral_qa = []
         try:
             from core.apj_manager import APJManager
             apj_mgr = APJManager.get_instance()
             if apj_mgr.is_installed():
-                pastoral_qa = apj_mgr.get_episodes_for_passage(norm_code, chapter, verse, limit=12)
+                pastoral_qa.extend(apj_mgr.get_episodes_for_passage(norm_code, chapter, verse, limit=10))
         except Exception as e:
             logger.debug(f"Erreur apj overview: {e}")
+
+        try:
+            from core.upvr_manager import UPVRManager
+            upvr_mgr = UPVRManager.get_instance()
+            if upvr_mgr.is_installed():
+                pastoral_qa.extend(upvr_mgr.get_episodes_for_passage(norm_code, chapter, verse, limit=10))
+        except Exception as e:
+            logger.debug(f"Erreur upvr overview: {e}")
 
         return {
             "success": True,

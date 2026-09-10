@@ -60,67 +60,95 @@ def build():
         "--hidden-import=webview",
         "--hidden-import=pymupdf",
         "--hidden-import=fitz",
+        "--hidden-import=core.paths",
         "webview_app.py"
     ]
 
-    print(f"-> Lancement de PyInstaller avec la commande :\n{' '.join(args)}\n")
-    result = subprocess.run(args)
+    # Mise à l'écart temporaire des gravures Vigouroux (193 Mo) pour ne pas gonfler le build de base
+    vigouroux_img_dir = os.path.join(current_dir, "web", "img", "vigouroux")
+    temp_vigouroux_dir = os.path.join(current_dir, "web", "img", "_vigouroux_staged_temp")
+    has_vigouroux_backup = False
+
+    if os.path.exists(vigouroux_img_dir):
+        print("-> Mise à l'écart temporaire des 2 437 gravures Vigouroux (téléchargeables via le Store)...")
+        try:
+            if os.path.exists(temp_vigouroux_dir):
+                shutil.rmtree(temp_vigouroux_dir)
+            os.rename(vigouroux_img_dir, temp_vigouroux_dir)
+            os.makedirs(vigouroux_img_dir, exist_ok=True)
+            has_vigouroux_backup = True
+        except Exception as e:
+            print(f"Avertissement mise à l'écart Vigouroux : {e}")
+
+    try:
+        print(f"-> Lancement de PyInstaller avec la commande :\n{' '.join(args)}\n")
+        result = subprocess.run(args)
+    finally:
+        # Restauration immédiate et garantie du dossier des gravures sources
+        if has_vigouroux_backup and os.path.exists(temp_vigouroux_dir):
+            if os.path.exists(vigouroux_img_dir):
+                try:
+                    shutil.rmtree(vigouroux_img_dir)
+                except Exception:
+                    pass
+            os.rename(temp_vigouroux_dir, vigouroux_img_dir)
+            print("-> Restauration locale du dossier web/img/vigouroux effectuée.")
 
     if result.returncode == 0:
         print("-> Copie des données applicatives embarquées (data/)...")
         dist_app_dir = os.path.join(current_dir, "dist", "OpenShema")
         src_data_dir = os.path.join(current_dir, "data")
+        internal_data_dir = os.path.join(dist_app_dir, "_internal", "data")
+        root_data_dir = os.path.join(dist_app_dir, "data")
 
-        for dest_data_dir in [
-            os.path.join(dist_app_dir, "data"),
-            os.path.join(dist_app_dir, "_internal", "data")
-        ]:
-            os.makedirs(dest_data_dir, exist_ok=True)
+        os.makedirs(internal_data_dir, exist_ok=True)
+        os.makedirs(root_data_dir, exist_ok=True)
 
-            # Fichiers permanents du socle d'étude (Cartes, Textes originaux, Lexiques, Outils linguistiques)
-            essential_files = [
-                "biblical_places.db",                # Cartes géospatiales
-                "original_languages.db",             # Textes originaux complets (Hébreu AT + Grec NT avec morpho & Strong)
-                "strong_lexicon.json",               # Lexique James Strong Hébreu & Grec
-                "bailly_lexicon.json",               # Dictionnaire Grec-Français Anatole Bailly
-                "illustrations_processed_cache.json", # Index rapide des illustrations
-                "catalog.json",                      # Catalogue officiel Open Shema Store & First Run Wizard
-                "bibles_registry.json",              # Métadonnées canoniques
-                "gospel_parallels.json",             # Harmonie des évangiles
-                "french_accent_map.json",            # Traitement linguistique
-                "french_words.json",
-                "config.example.json",
-                "bibleproject_fr.json"
-            ]
-            for fname in essential_files:
-                src_f = os.path.join(src_data_dir, fname)
-                if os.path.exists(src_f):
-                    shutil.copy2(src_f, os.path.join(dest_data_dir, fname))
+        # 1. Fichiers permanents lourds copiés UNIQUEMENT dans _internal/data/ (évite 93 Mo de doublon !)
+        essential_files = [
+            "biblical_places.db",                 # Cartes géospatiales
+            "original_languages.db",              # Textes originaux complets (Hébreu AT + Grec NT avec morpho & Strong)
+            "strong_lexicon.json",                # Lexique James Strong Hébreu & Grec
+            "bailly_lexicon.json",                # Dictionnaire Grec-Français Anatole Bailly
+            "illustrations_processed_cache.json", # Index rapide des illustrations
+            "catalog.json",                       # Catalogue officiel Open Shema Store & First Run Wizard
+            "bibles_registry.json",               # Métadonnées canoniques
+            "gospel_parallels.json",              # Harmonie des évangiles
+            "french_accent_map.json",             # Traitement linguistique
+            "french_words.json",
+            "config.example.json",
+            "bibleproject_fr.json"
+        ]
+        for fname in essential_files:
+            src_f = os.path.join(src_data_dir, fname)
+            if os.path.exists(src_f):
+                shutil.copy2(src_f, os.path.join(internal_data_dir, fname))
 
-            # Configuration vierge avec first_run=True (copie de config.example.json vers config.json)
+        # Dossier permanent des récits / illustrations (4 275 récits) dans _internal/data/
+        src_illus = os.path.join(src_data_dir, "illustrations")
+        dest_illus = os.path.join(internal_data_dir, "illustrations")
+        if os.path.exists(src_illus):
+            if os.path.exists(dest_illus):
+                shutil.rmtree(dest_illus)
+            shutil.copytree(src_illus, dest_illus)
+
+        # 2. Configuration et dossiers de travail initialisés dans les deux emplacements
+        for target_dir in [internal_data_dir, root_data_dir]:
             src_cfg_ex = os.path.join(src_data_dir, "config.example.json")
-            dest_cfg = os.path.join(dest_data_dir, "config.json")
-            if os.path.exists(src_cfg_ex):
+            dest_cfg = os.path.join(target_dir, "config.json")
+            if os.path.exists(src_cfg_ex) and not os.path.exists(dest_cfg):
                 shutil.copy2(src_cfg_ex, dest_cfg)
 
-            # Bibliothèque initiale 100% vide (aucun ouvrage pré-embarqué)
-            with open(os.path.join(dest_data_dir, "library.json"), "w", encoding="utf-8") as lf:
-                lf.write("{}\n")
+            lib_path = os.path.join(target_dir, "library.json")
+            if not os.path.exists(lib_path):
+                with open(lib_path, "w", encoding="utf-8") as lf:
+                    lf.write("{}\n")
 
-            # Dossier permanent des illustrations (4 275 récits & anecdotes pastorales)
-            src_illus = os.path.join(src_data_dir, "illustrations")
-            dest_illus = os.path.join(dest_data_dir, "illustrations")
-            if os.path.exists(src_illus):
-                if os.path.exists(dest_illus):
-                    shutil.rmtree(dest_illus)
-                shutil.copytree(src_illus, dest_illus)
-
-            # Création des dossiers de travail vierges (0 ouvrage ou document personnel pré-installé)
             for empty_sub in ["bibles", "commentaires", "theology", "dictionaries", "sermons", "notes", "conversations", "covers"]:
-                dest_sub = os.path.join(dest_data_dir, empty_sub)
-                if os.path.exists(dest_sub):
-                    shutil.rmtree(dest_sub)
-                os.makedirs(dest_sub, exist_ok=True)
+                os.makedirs(os.path.join(target_dir, empty_sub), exist_ok=True)
+
+        # Création du dossier cible pour les gravures Vigouroux dans _internal/web/img/vigouroux
+        os.makedirs(os.path.join(dist_app_dir, "_internal", "web", "img", "vigouroux"), exist_ok=True)
 
         # Copie de assets/ à la racine de dist/OpenShema pour les icônes de raccourcis
         src_assets = os.path.join(current_dir, "assets")

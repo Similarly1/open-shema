@@ -204,7 +204,9 @@ class ImportMixin:
             with urllib.request.urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 # Sauvegarder dans le cache local
-                cache_p = os.path.join(current_dir, "data", "catalog.json")
+                from core.paths import get_user_data_path, resolve_data_path
+                cache_p = get_user_data_path("catalog.json")
+                os.makedirs(os.path.dirname(cache_p), exist_ok=True)
                 with open(cache_p, "w", encoding="utf-8") as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
                 return data
@@ -212,7 +214,8 @@ class ImportMixin:
             logger.warning(f"Erreur chargement catalogue distant : {e}")
 
         # 2. Fallback sur le cache local
-        cache_p = os.path.join(current_dir, "data", "catalog.json")
+        from core.paths import resolve_data_path
+        cache_p = resolve_data_path("catalog.json")
         if os.path.exists(cache_p):
             try:
                 with open(cache_p, "r", encoding="utf-8") as f:
@@ -470,6 +473,90 @@ class ImportMixin:
                     cover_path = cover_dest
                 except Exception as cov_err:
                     logger.warning(f"Erreur téléchargement de la couverture pour {m_title}: {cov_err}")
+
+            # Téléchargement de l'index d'illustrations optionnel (ex: Dictionnaire Vigouroux)
+            illustrations_url = module_data.get("illustrations_url")
+            candidate_ill_urls = []
+            if illustrations_url:
+                candidate_ill_urls.append(illustrations_url)
+            if "vigouroux" in (m_id or "").lower():
+                for alt_url in [
+                    "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/vigouroux_illustrations.json",
+                    "https://raw.githubusercontent.com/Similarly1/open-shema-data/main/data/dictionaries/vigouroux_illustrations.json"
+                ]:
+                    if alt_url not in candidate_ill_urls:
+                        candidate_ill_urls.append(alt_url)
+
+            if candidate_ill_urls:
+                try:
+                    dict_dest_dirs = [os.path.join(current_dir, "data", "dictionaries")]
+                    if getattr(sys, 'frozen', False):
+                        exe_data_dict = os.path.join(os.path.dirname(sys.executable), "data", "dictionaries")
+                        if exe_data_dict not in dict_dest_dirs:
+                            dict_dest_dirs.append(exe_data_dict)
+                    for ddir in dict_dest_dirs:
+                        os.makedirs(ddir, exist_ok=True)
+                    target_json = os.path.join(dict_dest_dirs[0], "vigouroux_illustrations.json")
+
+                    downloaded = False
+                    for ill_url in candidate_ill_urls:
+                        try:
+                            req_ill = urllib.request.Request(ill_url, headers={"User-Agent": "OpenShemaApp/1.0"})
+                            with urllib.request.urlopen(req_ill, timeout=30, context=ctx) as ill_resp, open(target_json, "wb") as ill_out:
+                                shutil.copyfileobj(ill_resp, ill_out)
+                            downloaded = True
+                            logger.info(f"Index d'illustrations téléchargé avec succès depuis {ill_url}")
+                            break
+                        except Exception as try_err:
+                            logger.debug(f"Échec téléchargement index depuis {ill_url}: {try_err}")
+
+                    if downloaded:
+                        for extra_d in dict_dest_dirs[1:]:
+                            try: shutil.copy2(target_json, os.path.join(extra_d, "vigouroux_illustrations.json"))
+                            except Exception: pass
+                except Exception as ill_err:
+                    logger.warning(f"Erreur globale téléchargement index illustrations : {ill_err}")
+
+            # Téléchargement et extraction du pack d'images / gravures (ex: Dictionnaire Vigouroux 2 437 images)
+            images_zip_url = module_data.get("images_zip_url")
+            if not images_zip_url and "vigouroux" in (m_id or "").lower():
+                images_zip_url = "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/vigouroux_images.zip"
+            if images_zip_url:
+                try:
+                    import zipfile
+                    import tempfile
+                    img_dest_dirs = [os.path.join(current_dir, "web", "img", "vigouroux")]
+                    if getattr(sys, 'frozen', False):
+                        exe_img_dir = os.path.join(os.path.dirname(sys.executable), "_internal", "web", "img", "vigouroux")
+                        if exe_img_dir not in img_dest_dirs:
+                            img_dest_dirs.append(exe_img_dir)
+                    for idir in img_dest_dirs:
+                        os.makedirs(idir, exist_ok=True)
+
+                    logger.info(f"Téléchargement du pack d'images ({m_title}) depuis {images_zip_url}...")
+                    req_zip = urllib.request.Request(images_zip_url, headers={"User-Agent": "OpenShemaApp/1.0"})
+                    tmp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
+                    tmp_zip_path = tmp_zip.name
+                    tmp_zip.close()
+
+                    with urllib.request.urlopen(req_zip, timeout=180, context=ctx) as z_resp, open(tmp_zip_path, "wb") as z_out:
+                        shutil.copyfileobj(z_resp, z_out)
+
+                    # Extraction de l'archive dans les répertoires d'images
+                    with zipfile.ZipFile(tmp_zip_path, "r") as zf:
+                        zf.extractall(img_dest_dirs[0])
+                        for extra_idir in img_dest_dirs[1:]:
+                            try:
+                                zf.extractall(extra_idir)
+                            except Exception:
+                                pass
+                    try:
+                        os.remove(tmp_zip_path)
+                    except OSError:
+                        pass
+                    logger.info(f"Pack d'images extrait avec succès dans {img_dest_dirs[0]}")
+                except Exception as zip_err:
+                    logger.warning(f"Erreur lors du téléchargement/extraction du pack d'images : {zip_err}")
 
             registry = load_books_metadata()
             reg_key = m_abbr or m_id

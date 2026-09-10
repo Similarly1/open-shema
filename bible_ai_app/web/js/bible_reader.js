@@ -5291,7 +5291,9 @@ const BibleReader = {
     try {
       const parsed = await API.parseReference(refQuery.trim());
       if (parsed && parsed.book) {
-        App.switchView('bible');
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('bible');
+        }
         await this.navigateTo(parsed.book, parsed.chapter || 1, parsed.verse || null);
         return true;
       }
@@ -5299,6 +5301,14 @@ const BibleReader = {
       console.warn('[BibleReader] Erreur parsing passage:', e);
     }
     return false;
+  },
+
+  async parseAndNavigate(refQuery) {
+    if (!refQuery) return false;
+    if (typeof App !== 'undefined' && App.switchView) {
+      App.switchView('bible');
+    }
+    return await this.searchPassage(refQuery);
   },
 
   async loadPassage(bookCodeOrRef, chapterNum = 1, verseNum = null) {

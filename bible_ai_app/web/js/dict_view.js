@@ -63,8 +63,17 @@ const DictView = {
   },
 
   async loadVigourouxIllustrations() {
-    if (this.vigourouxIllustrationsMap) return this.vigourouxIllustrationsMap;
+    if (this.vigourouxIllustrationsMap && Object.keys(this.vigourouxIllustrationsMap).length > 0) {
+      return this.vigourouxIllustrationsMap;
+    }
     try {
+      if (window.pywebview?.api?.get_vigouroux_illustrations) {
+        const data = await window.pywebview.api.get_vigouroux_illustrations();
+        if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+          this.vigourouxIllustrationsMap = data;
+          return this.vigourouxIllustrationsMap;
+        }
+      }
       const res = await fetch('data/dictionaries/vigouroux_illustrations.json');
       if (res.ok) {
         this.vigourouxIllustrationsMap = await res.json();

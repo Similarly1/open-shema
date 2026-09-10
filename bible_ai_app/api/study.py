@@ -76,25 +76,79 @@ class StudyMixin:
         from core.passage_study_manager import PassageStudyManager
         return PassageStudyManager.get_synoptic_harmony(pericope_id=int(pericope_id), bible_name=bible_name, pivot_book=pivot_book)
 
-    def get_apj_episodes_for_passage(self, book_code: str, chapter: int = 1, verse: Optional[int] = None, limit: int = 20) -> List[Dict[str, Any]]:
-        """Récupère les synthèses pastorales Ask Pastor John associées à un livre et chapitre bibliques."""
+    def get_pastoral_episodes_for_passage(self, book_code: str, chapter: int = 1, verse: Optional[int] = None, limit: int = 25) -> List[Dict[str, Any]]:
+        """Récupère les synthèses pastorales (Ask Pastor John & Un pasteur vous répond) associées à un livre et chapitre bibliques."""
         from core.apj_manager import APJManager
+        from core.upvr_manager import UPVRManager
         try:
             ch_int = int(chapter) if chapter is not None else 1
         except (ValueError, TypeError):
             ch_int = 1
         v_int = int(verse) if (verse is not None and str(verse).isdigit()) else None
-        return APJManager.get_instance().get_episodes_for_passage(book_code or "ROM", ch_int, v_int, limit=int(limit))
+        
+        results = []
+        try:
+            if APJManager.get_instance().is_installed():
+                results.extend(APJManager.get_instance().get_episodes_for_passage(book_code or "ROM", ch_int, v_int, limit=int(limit)))
+        except Exception as e:
+            logger.debug(f"Erreur APJ dans API: {e}")
+
+        try:
+            if UPVRManager.get_instance().is_installed():
+                results.extend(UPVRManager.get_instance().get_episodes_for_passage(book_code or "ROM", ch_int, v_int, limit=int(limit)))
+        except Exception as e:
+            logger.debug(f"Erreur UPVR dans API: {e}")
+
+        if v_int is not None:
+            results.sort(key=lambda x: (not x.get("is_exact_verse", False), not x.get("is_primary", False)))
+        else:
+            results.sort(key=lambda x: not x.get("is_primary", False))
+
+        return results[:int(limit)]
+
+    def get_apj_episodes_for_passage(self, book_code: str, chapter: int = 1, verse: Optional[int] = None, limit: int = 20) -> List[Dict[str, Any]]:
+        return self.get_pastoral_episodes_for_passage(book_code, chapter, verse, limit)
+
+    def search_pastoral_episodes(self, query: str, limit: int = 25) -> List[Dict[str, Any]]:
+        """Recherche plein-texte FTS5 combinée dans Ask Pastor John et Un pasteur vous répond."""
+        from core.apj_manager import APJManager
+        from core.upvr_manager import UPVRManager
+        results = []
+        half = max(5, int(limit) // 2)
+        try:
+            if UPVRManager.get_instance().is_installed():
+                results.extend(UPVRManager.get_instance().search_episodes(query, limit=half))
+        except Exception as e:
+            logger.debug(f"Erreur search UPVR: {e}")
+            
+        try:
+            if APJManager.get_instance().is_installed():
+                results.extend(APJManager.get_instance().search_episodes(query, limit=half))
+        except Exception as e:
+            logger.debug(f"Erreur search APJ: {e}")
+
+        return results[:int(limit)]
 
     def search_apj_episodes(self, query: str, limit: int = 25) -> List[Dict[str, Any]]:
-        """Recherche plein-texte FTS5 instantanée dans les fiches Ask Pastor John."""
-        from core.apj_manager import APJManager
-        return APJManager.get_instance().search_episodes(query, limit=int(limit))
+        return self.search_pastoral_episodes(query, limit)
 
     def get_apj_episode_details(self, episode_number: int) -> Optional[Dict[str, Any]]:
-        """Récupère la fiche détaillée d'un épisode Ask Pastor John."""
+        """Récupère la fiche détaillée d'un épisode Ask Pastor John ou Un pasteur vous répond."""
         from core.apj_manager import APJManager
-        return APJManager.get_instance().get_episode_details(int(episode_number))
+        from core.upvr_manager import UPVRManager
+        try:
+            ep_num = int(episode_number)
+        except Exception:
+            return None
+        # Chercher d'abord dans UPVR si c'est dans sa tranche ou si trouvé
+        try:
+            if UPVRManager.get_instance().is_installed():
+                ep = UPVRManager.get_instance().get_episode_by_number(ep_num)
+                if ep:
+                    return ep
+        except Exception:
+            pass
+        return APJManager.get_instance().get_episode_details(ep_num)
 
     def generate_passage_ai_insight(self, passage_ref: str, insight_type: str, model: Optional[str] = None) -> Dict[str, Any]:
         """Génère une analyse exégétique, théologique ou homilétique ciblée par IA pour un passage sans émojis."""

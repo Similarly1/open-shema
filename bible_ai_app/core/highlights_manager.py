@@ -6,8 +6,12 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_HIGHLIGHTS_FILE = os.path.join(CURRENT_DIR, "data", "highlights.json")
+from core.paths import get_user_data_path, resolve_data_path
+
+def get_default_highlights_file() -> str:
+    return get_user_data_path("highlights.json")
+
+DEFAULT_HIGHLIGHTS_FILE = get_default_highlights_file()
 
 
 class HighlightsManager:
@@ -28,8 +32,9 @@ class HighlightsManager:
                 except Exception as e:
                     logger.warning(f"Impossible d'utiliser le fichier de surlignages personnalisé '{custom_file}': {e}")
         
-        os.makedirs(os.path.dirname(DEFAULT_HIGHLIGHTS_FILE), exist_ok=True)
-        return DEFAULT_HIGHLIGHTS_FILE
+        target = resolve_data_path("highlights.json")
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        return target
 
     @classmethod
     def _load_all(cls, filepath: str) -> List[Dict[str, Any]]:

@@ -18,8 +18,11 @@ class CommentaryLoader:
     @classmethod
     def get_db_path(cls) -> str:
         if cls._db_path is None:
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            cls._db_path = os.path.join(base_dir, "data", "commentaires", "commentaires_master.db")
+            from core.paths import resolve_data_path, get_user_data_path
+            p = resolve_data_path("commentaires", "commentaires_master.db")
+            if not os.path.exists(p):
+                p = get_user_data_path("commentaires", "commentaires_master.db")
+            cls._db_path = p
         return cls._db_path
 
     @classmethod

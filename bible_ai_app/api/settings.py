@@ -436,11 +436,10 @@ class SettingsMixin:
             return {"is_first_run": True, "config": cfg}
 
         # Sinon (clé absente d'une ancienne version), vérifier la présence physique de Bibles
-        bundle_root = getattr(sys, "_MEIPASS", None) or os.path.dirname(sys.executable)
+        from core.paths import get_user_data_path, get_bundle_data_path, get_user_data_dir
         candidates = [
-            os.path.join(current_dir, "data", "bibles"),
-            os.path.join(bundle_root, "data", "bibles"),
-            os.path.join(bundle_root, "_internal", "data", "bibles")
+            get_user_data_path("bibles"),
+            get_bundle_data_path("bibles")
         ]
         has_bibles = False
         for bdir in candidates:
@@ -461,6 +460,7 @@ class SettingsMixin:
         import urllib.request
         import ssl
         from core.task_manager import TaskManager
+        from core.paths import get_user_data_dir, get_user_data_path, get_bundle_data_dir
 
         task_id = "onboarding_download"
         total_modules = len(modules)
@@ -475,12 +475,12 @@ class SettingsMixin:
             detail="Initialisation du téléchargement..."
         )
 
-        data_dir = os.path.join(current_dir, "data")
+        data_dir = get_user_data_dir()
         os.makedirs(data_dir, exist_ok=True)
         installed_items = []
 
         try:
-            bundle_root = getattr(sys, "_MEIPASS", None) or os.path.dirname(sys.executable)
+            bundle_root = get_bundle_data_dir()
 
             for idx, mod in enumerate(modules):
                 mod_id = mod.get("id", "module")
@@ -494,15 +494,15 @@ class SettingsMixin:
                     rel_path = mod.get("file_path") or f"data/{mod_type}s/bible_{mod_abbr.lower()}.sqlite"
                     download_url = f"{cdn_base}/{rel_path}"
 
-                # Déterminer le dossier de destination
+                # Déterminer le dossier de destination dans l'espace utilisateur
                 if mod_type == "bible":
-                    target_dir = os.path.join(data_dir, "bibles")
+                    target_dir = get_user_data_path("bibles")
                 elif mod_type == "dictionary":
-                    target_dir = os.path.join(data_dir, "dictionaries")
+                    target_dir = get_user_data_path("dictionaries")
                 elif mod_type == "commentary":
-                    target_dir = os.path.join(data_dir, "commentaires")
+                    target_dir = get_user_data_path("commentaires")
                 elif mod_type == "theology":
-                    target_dir = os.path.join(data_dir, "theology")
+                    target_dir = get_user_data_path("theology")
                 else:
                     target_dir = data_dir
 

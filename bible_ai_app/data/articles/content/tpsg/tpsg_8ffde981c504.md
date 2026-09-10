@@ -10,7 +10,7 @@ Il faut ici bien définir ce à quoi Jean nous appelle. Le mot « monde », 
 
 > Nous savons […] que le monde entier est sous la puissance du malin.
 
-> — 1 Jn 5.19
+> — 1 Jean 5.19
 
 Satan est en effet appelé le prince de ce système-monde (Jn 12.31  ; 14.30  ; 16.11). Le monde considère l’Évangile comme une folie et hait ouvertement le Christ et ses disciples. Il s’est fermé pour ne pas recevoir le Christ, Parole et lumière de Dieu (Jn 1.5, 10  ; 3.19).
 
@@ -92,7 +92,7 @@ Nous ne rencontrons pas seulement le monde au travail, à l’université ou lor
 
 Des industries dépensent des millions et gagnent des milliards en exploitant les désirs de notre cœur corruptible. La culture devient le cheval de Troie du monde  : elle offre à notre cœur ce qu’il réclame pour mieux le vaincre.
 
-« Publiez sur Instagram, nous vous donnerons des likes. Regardez cette série, nous vous ferons oublier votre vie. Vous désirez du sexe  ? Le porno est là. Consommez encore et encore  : vous serez heureux. »
+*« Publiez sur Instagram, nous vous donnerons des likes. Regardez cette série, nous vous ferons oublier votre vie. Vous désirez du sexe ? Le porno est là. Consommez encore et encore : vous serez heureux. »*
 
 Le mensonge du monde, c’est de nous faire croire qu’il peut satisfaire nos désirs. Son véritable objectif est de nous apprendre à aimer autre chose que Dieu.
 
@@ -114,7 +114,7 @@ Quels désirs ces œuvres produiront-elles dans notre cœur  ? Nous pousseron
 
 Dieu veut notre cœur et notre maturité. Il veut que nous discernions ce qui peut nous éloigner de lui et que, par amour pour lui, nous sachions y renoncer.
 
-Si nous sentons qu’une série ou qu’un film nous éloigne de Dieu, notre réponse devrait être simple  : « Parce que mon amour pour Dieu est plus important, j’y renonce avec joie. Je n’aurai rien perdu lorsque le FOMO [^1] du monde sera passé. »
+Si nous sentons qu’une série ou qu’un film nous éloigne de Dieu, notre réponse devrait être simple : *« Parce que mon amour pour Dieu est plus important, j’y renonce avec joie. Je n’aurai rien perdu lorsque le FOMO[^1]du monde sera passé. »*
 
 Pourquoi notre cœur est-il si souvent sec lorsque nous ouvrons la Bible ou chantons des cantiques, après avoir passé des heures à faire défiler des contenus qui nourrissent notre amour du monde  ?
 
@@ -122,7 +122,7 @@ Parce que « tout ce qui est dans le monde ne vient point du Père ». Nous 
 
 ### Le monde nourrit « l’orgueil de la vie »
 
-Le monde gonfle notre ego par ce que nous possédons, accomplissons ou représentons  : « Regardez ce que j’ai. Regardez ce que j’ai fait. Regardez ce que je suis devenu. »
+Le monde gonfle notre ego par ce que nous possédons, accomplissons ou représentons : « *Regardez ce que j’ai. Regardez ce que j’ai fait. Regardez ce que je suis devenu. »*
 
 L’orgueil de la vie consiste à vivre en se croyant tellement supérieur aux autres que l’on pense n’avoir besoin de personne, pas même de l’amour du Père.
 

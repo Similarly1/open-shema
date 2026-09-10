@@ -679,7 +679,15 @@ const API = {
     return await this.call('show_system_notification', title, message);
   },
 
-  // --- QUESTIONS PASTORALES (ASK PASTOR JOHN) ---
+  // --- QUESTIONS PASTORALES (ASK PASTOR JOHN & UN PASTEUR VOUS RÉPOND) ---
+  async getPastoralEpisodesForPassage(bookCode, chapter, verse = null, limit = 25) {
+    return await this.call('get_pastoral_episodes_for_passage', bookCode, chapter, verse, limit);
+  },
+
+  async searchPastoralEpisodes(query, limit = 25) {
+    return await this.call('search_pastoral_episodes', query, limit);
+  },
+
   async getAPJEpisodesForPassage(bookCode, chapter, verse = null, limit = 20) {
     return await this.call('get_apj_episodes_for_passage', bookCode, chapter, verse, limit);
   },

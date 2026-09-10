@@ -152,7 +152,11 @@ class APJManager:
                         "themes": themes,
                         "verse_ref": f"{norm_code} {r['chapter']}:{v_start}" + (f"-{v_end}" if v_end != v_start else ""),
                         "is_primary": bool(r["is_primary"]),
-                        "is_exact_verse": is_exact_verse
+                        "is_exact_verse": is_exact_verse,
+                        "author": "John Piper",
+                        "show_name": "Ask Pastor John",
+                        "source_brand": "Desiring God",
+                        "is_upvr": False
                     })
                     if len(results) >= limit:
                         break
@@ -231,7 +235,11 @@ class APJManager:
                         "illustration_titre": r["illustration_titre"],
                         "illustration_resume": r["illustration_resume"],
                         "snippet": snippet,
-                        "themes": [t.strip() for t in (r["themes_csv"] or "").split(",") if t.strip()]
+                        "themes": [t.strip() for t in (r["themes_csv"] or "").split(",") if t.strip()],
+                        "author": "John Piper",
+                        "show_name": "Ask Pastor John",
+                        "source_brand": "Desiring God",
+                        "is_upvr": False
                     })
 
                 self._attach_scriptures(cur, results)
@@ -280,6 +288,10 @@ class APJManager:
                     return None
 
                 ep = dict(row)
+                ep["author"] = "John Piper"
+                ep["show_name"] = "Ask Pastor John"
+                ep["source_brand"] = "Desiring God"
+                ep["is_upvr"] = False
                 if ep.get("applications_json"):
                     try:
                         ep["pistes_applications"] = json.loads(ep["applications_json"])
