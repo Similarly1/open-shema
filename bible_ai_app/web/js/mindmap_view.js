@@ -3483,21 +3483,21 @@ const MindMapView = {
       sphereCircle.setAttribute('class', 'mm-root-sphere-layer');
       g.appendChild(sphereCircle);
 
-      // ── Icône SVG centrale agrandie (48px) ───────────────────────────────────
-      const iconYOffset = node.icon && typeof SvgIconsRegistry !== 'undefined' ? -Math.round(rootR * 0.22) : 0;
+      // ── Icône SVG centrale (positionnée dans la moitié supérieure du médaillon) ──
+      const iconSize = 42;
+      const iconCenterY = -Math.round(rootR * 0.35);
 
       if (node.icon && typeof SvgIconsRegistry !== 'undefined') {
         const iconDef = SvgIconsRegistry.get(node.icon);
         if (iconDef) {
-          const iconSize = 44;
           const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          iconG.setAttribute('transform', `translate(0, ${iconYOffset - iconSize / 2 + 6})`);
+          iconG.setAttribute('transform', `translate(0, ${iconCenterY})`);
           iconG.setAttribute('class', 'mm-node-icon-badge mm-root-icon-badge');
           iconG.setAttribute('style', 'cursor: pointer;');
           iconG.setAttribute('title', `Icône SVG : ${iconDef.label} (Cliquer pour changer ou [I])`);
 
           const iHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          iHit.setAttribute('r', iconSize / 2 + 4);
+          iHit.setAttribute('r', iconSize / 2 + 5);
           iHit.setAttribute('fill', 'transparent');
           iconG.appendChild(iHit);
 
@@ -3522,9 +3522,9 @@ const MindMapView = {
         }
       }
 
-      // ── Titre du concept central ─ cartouche sous l'icône ───────────────────
+      // ── Titre du concept central (positionné dans la moitié inférieure du médaillon) ──
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      const textBaseY = node.icon ? (iconYOffset + 24) : 0;
+      const textBaseY = node.icon ? Math.round(rootR * 0.34) : 0;
       text.setAttribute('dominant-baseline', 'central');
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('class', 'mm-root-text');
@@ -3542,7 +3542,7 @@ const MindMapView = {
 
         const tspan1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
         tspan1.setAttribute('x', '0');
-        tspan1.setAttribute('y', `${textBaseY - 6.5}`);
+        tspan1.setAttribute('y', `${textBaseY - 7.5}`);
         tspan1.setAttribute('font-size', '11.5px');
         tspan1.textContent = line1;
 
