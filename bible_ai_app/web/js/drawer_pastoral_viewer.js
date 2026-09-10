@@ -394,7 +394,16 @@ const DrawerPastoralViewer = {
     ` : '';
 
     let audioButtonHtml = '';
-    if (mp3Url) {
+    const isDirectMp3 = mp3Url && (
+      mp3Url.includes('.mp3') ||
+      mp3Url.includes('anchor.fm') ||
+      mp3Url.includes('cloudfront.net') ||
+      mp3Url.includes('.m4a') ||
+      mp3Url.includes('.wav') ||
+      (!mp3Url.includes('soundcloud.com') && !mp3Url.includes('/player'))
+    );
+
+    if (isDirectMp3) {
       audioButtonHtml = `
         <div class="pastoral-audio-native-player">
           <div class="pastoral-audio-player-meta">
@@ -414,7 +423,8 @@ const DrawerPastoralViewer = {
           </div>
         </div>
       `;
-    } else if (audioUrl) {
+    } else if (audioUrl || mp3Url) {
+      const frameUrl = audioUrl || mp3Url;
       audioButtonHtml = `
         <div style="margin-top: 6px; margin-bottom: 8px;">
           <button type="button" class="pastoral-audio-btn" id="btn-drawer-audio-toggle">
@@ -422,7 +432,7 @@ const DrawerPastoralViewer = {
             <span>Écouter le podcast officiel</span>
           </button>
           <div id="drawer-audio-frame-wrap" class="pastoral-audio-frame-wrap" style="display: none; margin-top: 10px;">
-            <iframe width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay" src="${this.escapeHtml(audioUrl)}"></iframe>
+            <iframe width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay" src="${this.escapeHtml(frameUrl)}"></iframe>
           </div>
         </div>
       `;
