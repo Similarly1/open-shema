@@ -1760,12 +1760,25 @@ const App = {
         }, 220);
       };
 
-      const stepTimer1 = setTimeout(() => updateStep("Exploration du corpus documentaire (Bibles, Commentaires, Dicos)..."), 1200);
-      const stepTimer2 = setTimeout(() => updateStep("Sélection et ordonnancement sémantique des extraits..."), 2800);
-      const stepTimer3 = setTimeout(() => updateStep(`Synthèse exégétique et rédaction théologique avec ${options.model || 'Gemini'}...`), 4800);
-      const stepTimer4 = setTimeout(() => updateStep("Recoupement des concordances textuelles et des sources doctrinales..."), 16000);
-      const stepTimer5 = setTimeout(() => updateStep("Harmonisation des références bibliques et formulation finale..."), 32000);
-      const activeStepTimeouts = [stepTimer1, stepTimer2, stepTimer3, stepTimer4, stepTimer5];
+      const isCuratorActive = !!options.enable_curator;
+      const curatorModelName = (typeof AIStudyView !== 'undefined' && AIStudyView.getCuratorModelName)
+        ? AIStudyView.getCuratorModelName()
+        : 'Ministral-3-14B';
+
+      const activeStepTimeouts = [];
+      activeStepTimeouts.push(setTimeout(() => updateStep("Exploration du corpus documentaire (Bibles, Commentaires, Dicos)..."), 1000));
+      activeStepTimeouts.push(setTimeout(() => updateStep("Sélection et ordonnancement sémantique des extraits..."), 2500));
+
+      if (isCuratorActive) {
+        activeStepTimeouts.push(setTimeout(() => updateStep(`Épuration et curation sémantique avec ${curatorModelName}...`), 4000));
+        activeStepTimeouts.push(setTimeout(() => updateStep(`Synthèse exégétique et rédaction théologique avec ${options.model || 'Gemini'}...`), 15000));
+        activeStepTimeouts.push(setTimeout(() => updateStep("Recoupement des concordances textuelles et des sources doctrinales..."), 30000));
+        activeStepTimeouts.push(setTimeout(() => updateStep("Harmonisation des références bibliques et formulation finale..."), 45000));
+      } else {
+        activeStepTimeouts.push(setTimeout(() => updateStep(`Synthèse exégétique et rédaction théologique avec ${options.model || 'Gemini'}...`), 4800));
+        activeStepTimeouts.push(setTimeout(() => updateStep("Recoupement des concordances textuelles et des sources doctrinales..."), 16000));
+        activeStepTimeouts.push(setTimeout(() => updateStep("Harmonisation des références bibliques et formulation finale..."), 32000));
+      }
 
       try {
         const response = await API.call('ask_study_ai', currentDrawerMessages, mode, passageRef, options);
@@ -1804,9 +1817,14 @@ const App = {
         const reasoningEl = document.getElementById(reasoningId);
         if (reasoningEl) {
           reasoningEl.classList.add('collapsed');
+          let curatorBadge = '';
+          if (response.curator_info?.enabled || isCuratorActive) {
+            const curM = response.curator_info?.model || curatorModelName;
+            curatorBadge = ` &bull; Curation : <strong>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(curM) : curM}</strong>`;
+          }
           reasoningEl.innerHTML = `
             <span class="ai-reasoning-check-icon">${typeof AIStudyView !== 'undefined' ? AIStudyView.ICONS.check : '✓'}</span>
-            <span style="font-weight: 600; color: var(--text-primary);">Raisonnement terminé (${totalDuration}s) &bull; <strong>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(detectedMode) : detectedMode}</strong></span>
+            <span style="font-weight: 600; color: var(--text-primary);">Raisonnement terminé (${totalDuration}s) &bull; <strong>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(detectedMode) : detectedMode}</strong>${curatorBadge}</span>
           `;
         }
 

@@ -754,6 +754,7 @@ class AiMixin:
                 logger.info(f"[ask_study_ai] Reranking bypass : {e}")
 
         # 5b. Curation sémantique intermédiaire du contexte si activée
+        curator_info = None
         if enable_curator and context_chunks:
             try:
                 from core.rag_pipeline import RAGPipeline
@@ -767,6 +768,11 @@ class AiMixin:
                     curation_model=curator_m,
                     fallback_model=curator_fb
                 )
+                curator_info = {
+                    "enabled": True,
+                    "model": (curator_m or "Curateur").split("/")[-1].replace("-Instruct", ""),
+                    "count": len(context_chunks)
+                }
             except Exception as e:
                 logger.info(f"[ask_study_ai] Curation bypass : {e}")
         # Dédoublonnage et structuration riche des sources mobilisées (avec couvertures et infobulles)
@@ -1062,7 +1068,8 @@ class AiMixin:
                     "sources_used": sources_used,
                     "sources_details": dedup_sources,
                     "detected_mode": detected_mode,
-                    "model_used": selected_model
+                    "model_used": selected_model,
+                    "curator_info": curator_info
                 }
 
             client = LLMClient(api_key=api_key, model=selected_model, provider=provider, product_id=product_id)
@@ -1074,7 +1081,8 @@ class AiMixin:
                 "sources_used": sources_used,
                 "sources_details": dedup_sources,
                 "detected_mode": detected_mode,
-                "model_used": selected_model
+                "model_used": selected_model,
+                "curator_info": curator_info
             }
         except Exception as e:
             logger.error(f"[ask_study_ai] Erreur LLM : {e}")
@@ -1082,7 +1090,8 @@ class AiMixin:
                 "answer": f"### Synthèse ({detected_mode}) pour {subject_label}\n\n**1. Fondements du sujet :**\nL'analyse de votre question met en lumière la richesse et la cohérence de la doctrine biblique.\n\n**2. Éléments d'étude approfondie :**\nLes sources disponibles permettent d'en dégager les articulations majeures et la portée théologique.\n\n**3. Application :**\nCette réflexion nourrit la compréhension des Écritures et la méditation chrétienne.",
                 "sources_used": sources_used or ["Corpus théologique général"],
                 "model_used": selected_model,
-                "detected_mode": detected_mode
+                "detected_mode": detected_mode,
+                "curator_info": curator_info
             }
 
     def save_ai_messages(self, session_id: str, messages: List[Dict[str, Any]], title: Optional[str] = None) -> bool:
