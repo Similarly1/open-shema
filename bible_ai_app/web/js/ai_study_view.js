@@ -1610,7 +1610,7 @@ const AIStudyView = {
         <div class="reasoning-step step-4 pending">
           <span class="step-bullet"></span>
           <div class="step-text-container">
-            <span class="step-label">Épuration &amp; curation sémantique avec ${this.escapeHtml(curatorModelName)}</span>
+            <span class="step-label">Épuration &amp; curation sémantique</span>
           </div>
         </div>
         <div class="reasoning-step step-5 pending">
@@ -1742,9 +1742,8 @@ const AIStudyView = {
         
         let curatorSummaryHtml = '';
         if (response.curator_info?.enabled || isCuratorActive) {
-          const curModel = response.curator_info?.model || curatorModelName;
           const countStr = response.curator_info?.count ? ` (${response.curator_info.count} extraits filtrés & condensés)` : '';
-          curatorSummaryHtml = `<div class="reasoning-summary-item"><span>Curation sémantique : <strong>${this.escapeHtml(curModel)}</strong>${countStr}</span></div>`;
+          curatorSummaryHtml = `<div class="reasoning-summary-item"><span>Curation sémantique : active${countStr}</span></div>`;
         }
 
         reasoningEl.innerHTML = `

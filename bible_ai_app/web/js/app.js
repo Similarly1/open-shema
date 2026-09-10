@@ -1770,7 +1770,7 @@ const App = {
       activeStepTimeouts.push(setTimeout(() => updateStep("Sélection et ordonnancement sémantique des extraits..."), 2500));
 
       if (isCuratorActive) {
-        activeStepTimeouts.push(setTimeout(() => updateStep(`Épuration et curation sémantique avec ${curatorModelName}...`), 4000));
+        activeStepTimeouts.push(setTimeout(() => updateStep("Épuration et curation sémantique..."), 4000));
         activeStepTimeouts.push(setTimeout(() => updateStep(`Synthèse exégétique et rédaction théologique avec ${options.model || 'Gemini'}...`), 15000));
         activeStepTimeouts.push(setTimeout(() => updateStep("Recoupement des concordances textuelles et des sources doctrinales..."), 30000));
         activeStepTimeouts.push(setTimeout(() => updateStep("Harmonisation des références bibliques et formulation finale..."), 45000));
@@ -1819,8 +1819,7 @@ const App = {
           reasoningEl.classList.add('collapsed');
           let curatorBadge = '';
           if (response.curator_info?.enabled || isCuratorActive) {
-            const curM = response.curator_info?.model || curatorModelName;
-            curatorBadge = ` &bull; Curation : <strong>${typeof AIStudyView !== 'undefined' ? AIStudyView.escapeHtml(curM) : curM}</strong>`;
+            curatorBadge = ` &bull; <span>Curation sémantique</span>`;
           }
           reasoningEl.innerHTML = `
             <span class="ai-reasoning-check-icon">${typeof AIStudyView !== 'undefined' ? AIStudyView.ICONS.check : '✓'}</span>
