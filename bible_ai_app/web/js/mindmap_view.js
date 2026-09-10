@@ -5114,21 +5114,21 @@ const MindMapView = {
     overlay.id = 'mm-note-view-modal';
     overlay.className = 'mm-prompt-overlay';
     overlay.innerHTML = `
-      <div class="mm-prompt-dialog" style="width: 540px; max-width: 92vw;">
+      <div class="mm-prompt-dialog mm-note-view-dialog" style="width: 560px; max-width: 92vw;">
         <div class="mm-prompt-header">
           <div class="mm-prompt-header-left">
-            <div class="mm-prompt-icon-badge" style="background: ${node.color || '#3b82f6'}18; color: ${node.color || 'var(--accent-blue)'};">
+            <div class="mm-prompt-icon-badge">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </div>
             <div class="mm-prompt-title">
               <span>Note de branche</span>
-              <span class="mm-prompt-target-tag" style="background: ${node.color || '#3b82f6'}22; color: ${node.color || 'var(--accent-blue)'}; border: 1px solid ${node.color || '#3b82f6'}44;">${this.escapeHtml(node.text || '')}</span>
+              <span class="mm-prompt-target-tag">${this.escapeHtml(node.text || '')}</span>
             </div>
           </div>
           <button type="button" class="mm-prompt-close-btn" id="mm-note-view-x-close" title="Fermer (Échap)">×</button>
         </div>
 
-        <div class="mm-prompt-readonly-body" style="margin: 16px 0 20px 0; padding: 14px 16px; background: var(--bg-hover, #f8fafc); border-radius: 8px; border: 1px solid var(--border-subtle, #e2e8f0); color: var(--text-main, #1e293b); font-size: 13.5px; line-height: 1.65; max-height: 55vh; overflow-y: auto; white-space: pre-wrap; word-break: break-word;">${this.escapeHtml(node.note || '')}</div>
+        <div class="mm-prompt-readonly-body">${this.escapeHtml(node.note || '')}</div>
 
         <div class="mm-prompt-actions-row" style="justify-content: flex-end;">
           <button type="button" class="btn-primary" id="mm-note-view-close">Fermer</button>
@@ -5179,7 +5179,7 @@ const MindMapView = {
             </div>
             <div class="mm-prompt-title">
               <span>Note de branche</span>
-              <span class="mm-prompt-target-tag" style="background: ${node.color || '#3b82f6'}22; color: ${node.color || 'var(--accent-blue)'}; border: 1px solid ${node.color || '#3b82f6'}44;">${this.escapeHtml(node.text)}</span>
+              <span class="mm-prompt-target-tag">${this.escapeHtml(node.text)}</span>
             </div>
           </div>
           <button type="button" class="mm-prompt-close-btn" id="mm-note-x-close" title="Fermer (Échap)">×</button>
@@ -5277,7 +5277,7 @@ const MindMapView = {
             </div>
             <div class="mm-prompt-title">
               <span>Couleur</span>
-              <span class="mm-prompt-target-tag" style="background: ${node.color || '#3b82f6'}22; color: ${node.color || 'var(--accent-blue)'}; border: 1px solid ${node.color || '#3b82f6'}44;">${this.escapeHtml(node.text)}</span>
+              <span class="mm-prompt-target-tag">${this.escapeHtml(node.text)}</span>
             </div>
           </div>
           <button type="button" class="mm-prompt-close-btn" id="mm-color-x-close" title="Fermer (Échap)">×</button>
