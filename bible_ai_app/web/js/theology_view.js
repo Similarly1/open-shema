@@ -2277,8 +2277,12 @@ const ScriptureTooltip = {
       this.hide();
     });
 
-    // Cacher lors du défilement
+    // Cacher lors du défilement ou redimensionnement
     window.addEventListener('scroll', () => this.hide(), { passive: true });
+    window.addEventListener('resize', () => this.hide(), { passive: true });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.hide();
+    });
     document.getElementById('theol-main-scroll')?.addEventListener('scroll', () => this.hide(), { passive: true });
   },
 
@@ -2416,7 +2420,7 @@ const ScriptureTooltip = {
     if (!this.tooltipEl || !targetEl) return;
     const rect = targetEl.getBoundingClientRect();
     const tooltipWidth = 350;
-    const tooltipHeight = 150;
+    const tooltipHeight = (this.tooltipEl && this.tooltipEl.offsetHeight > 0) ? this.tooltipEl.offsetHeight : 160;
 
     let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
     let top = rect.bottom + 8;

@@ -52,9 +52,18 @@ const DrawerPastoralViewer = {
         doSearch();
       }
     });
+    // Cacher l'infobulle biblique lors du défilement
+    document.getElementById('drawer-pastoral-list')?.addEventListener('scroll', () => {
+      if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) ScriptureTooltip.hide();
+    }, { passive: true });
+
+    document.getElementById('drawer-pastoral-reader-content')?.addEventListener('scroll', () => {
+      if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) ScriptureTooltip.hide();
+    }, { passive: true });
   },
 
   showListView() {
+    if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) ScriptureTooltip.hide();
     const listView = document.getElementById('drawer-pastoral-list-view');
     const readerView = document.getElementById('drawer-pastoral-reader-view');
     if (listView && readerView) {
@@ -64,6 +73,7 @@ const DrawerPastoralViewer = {
   },
 
   showReaderView() {
+    if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) ScriptureTooltip.hide();
     const listView = document.getElementById('drawer-pastoral-list-view');
     const readerView = document.getElementById('drawer-pastoral-reader-view');
     if (listView && readerView) {
@@ -233,8 +243,8 @@ const DrawerPastoralViewer = {
           ${(primPassages.length > 0 || secPassages.length > 0) ? `
             <div class="drawer-pastoral-item-refs">
               <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              ${primPassages.map(p => `<span class="drawer-pastoral-ref-pill primary">${this.escapeHtml(p)}</span>`).join('')}
-              ${secPassages.slice(0, 2).map(p => `<span class="drawer-pastoral-ref-pill secondary">${this.escapeHtml(p)}</span>`).join('')}
+              ${primPassages.map(p => `<span class="drawer-pastoral-ref-pill primary" data-ref="${this.escapeHtml(p)}">${this.escapeHtml(p)}</span>`).join('')}
+              ${secPassages.slice(0, 2).map(p => `<span class="drawer-pastoral-ref-pill secondary" data-ref="${this.escapeHtml(p)}">${this.escapeHtml(p)}</span>`).join('')}
               ${secPassages.length > 2 ? `<span class="drawer-pastoral-ref-pill more">+${secPassages.length - 2}</span>` : ''}
             </div>
           ` : ''}
@@ -244,6 +254,11 @@ const DrawerPastoralViewer = {
     });
 
     listEl.innerHTML = filterBarHtml + itemsHtml;
+
+    // Lier l'infobulle biblique sur les pastilles de référence de la liste
+    if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
+      ScriptureTooltip.bindToElements(listEl.querySelectorAll('.drawer-pastoral-ref-pill[data-ref]'));
+    }
 
     // Gestionnaires de clic filtres
     listEl.querySelectorAll('.pastoral-filter-pill').forEach(pill => {
@@ -445,7 +460,7 @@ const DrawerPastoralViewer = {
                   <span class="drawer-pastoral-ref-label">Texte(s) clé(s) :</span>
                   <div class="drawer-pastoral-ref-list">
                     ${primPassages.map(p => `
-                      <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur biblique">
+                      <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}">
                         <span>${this.escapeHtml(p)}</span>
                         <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                       </button>
@@ -458,7 +473,7 @@ const DrawerPastoralViewer = {
                   <span class="drawer-pastoral-ref-label">Passages d'appui :</span>
                   <div class="drawer-pastoral-ref-list">
                     ${secPassages.map(p => `
-                      <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur biblique">
+                      <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}">
                         <span>${this.escapeHtml(p)}</span>
                       </button>
                     `).join('')}
@@ -532,6 +547,9 @@ const DrawerPastoralViewer = {
     contentEl.querySelectorAll('.drawer-pastoral-ref-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) {
+          ScriptureTooltip.hide();
+        }
         const ref = btn.dataset.ref;
         if (!ref) return;
         if (typeof App !== 'undefined' && App.switchView) {
@@ -548,6 +566,11 @@ const DrawerPastoralViewer = {
         }
       });
     });
+
+    // Lier l'infobulle de prévisualisation biblique (ScriptureTooltip)
+    if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
+      ScriptureTooltip.bindToElements(contentEl.querySelectorAll('.drawer-pastoral-ref-btn'));
+    }
 
     contentEl.querySelector('#btn-drawer-pastoral-open-study')?.addEventListener('click', () => {
       const bestRef = (primPassages && primPassages[0]) || verseRef || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;

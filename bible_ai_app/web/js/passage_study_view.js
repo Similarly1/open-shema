@@ -2646,7 +2646,7 @@ const PassageStudyView = {
                   <span class="drawer-pastoral-ref-label">Texte(s) clé(s) :</span>
                   <div class="drawer-pastoral-ref-list">
                     ${primPassages.map(p => `
-                      <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur">
+                      <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}">
                         <span>${this.escapeHtml(p)}</span>
                         <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                       </button>
@@ -2659,7 +2659,7 @@ const PassageStudyView = {
                   <span class="drawer-pastoral-ref-label">Passages d'appui :</span>
                   <div class="drawer-pastoral-ref-list">
                     ${secPassages.map(p => `
-                      <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur">
+                      <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}">
                         <span>${this.escapeHtml(p)}</span>
                       </button>
                     `).join('')}
@@ -2703,6 +2703,66 @@ const PassageStudyView = {
     const readerPane = document.getElementById('ps-pastoral-reader-pane');
     const filterInput = document.getElementById('ps-pastoral-filter-input');
 
+    const bindReaderPaneEvents = () => {
+      if (!readerPane) return;
+
+      readerPane.querySelector('#btn-ps-open-apj-source')?.addEventListener('click', (e) => {
+        const u = e.currentTarget.dataset.url;
+        if (u) {
+          if (typeof API !== 'undefined' && API.openExternalUrl) API.openExternalUrl(u);
+          else window.open(u, '_blank');
+        }
+      });
+
+      readerPane.querySelector('#btn-ps-audio-toggle')?.addEventListener('click', () => {
+        const wrap = readerPane.querySelector('#ps-audio-frame-wrap');
+        if (wrap) {
+          const isHidden = wrap.style.display === 'none';
+          wrap.style.display = isHidden ? 'block' : 'none';
+        }
+      });
+
+      readerPane.querySelectorAll('.pastoral-audio-ext-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const u = link.dataset.extUrl;
+          if (u && typeof API !== 'undefined' && API.openExternalUrl) {
+            API.openExternalUrl(u);
+          } else if (u) {
+            window.open(u, '_blank');
+          }
+        });
+      });
+
+      readerPane.querySelectorAll('.drawer-pastoral-ref-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) {
+            ScriptureTooltip.hide();
+          }
+          const ref = btn.dataset.ref;
+          if (!ref) return;
+          if (typeof App !== 'undefined' && App.switchView) {
+            App.switchView('bible');
+          }
+          if (typeof BibleReader !== 'undefined') {
+            if (typeof BibleReader.parseAndNavigate === 'function') {
+              BibleReader.parseAndNavigate(ref);
+            } else if (typeof BibleReader.searchPassage === 'function') {
+              BibleReader.searchPassage(ref);
+            } else if (typeof BibleReader.navigateTo === 'function') {
+              BibleReader.navigateTo(ref);
+            }
+          }
+        });
+      });
+
+      // Lier l'infobulle de prévisualisation biblique (ScriptureTooltip)
+      if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
+        ScriptureTooltip.bindToElements(readerPane.querySelectorAll('.drawer-pastoral-ref-btn'));
+      }
+    };
+
     const updateReader = (idx) => {
       this.activePastoralEpIdx = idx;
       listContainer?.querySelectorAll('.ps-pastoral-item').forEach(el => {
@@ -2714,52 +2774,19 @@ const PassageStudyView = {
 
       if (readerPane && episodes[idx]) {
         readerPane.innerHTML = this.renderPastoralEpisodePane(episodes[idx]);
-        readerPane.querySelector('#btn-ps-open-apj-source')?.addEventListener('click', (e) => {
-          const u = e.currentTarget.dataset.url;
-          if (u) {
-            if (typeof API !== 'undefined' && API.openExternalUrl) API.openExternalUrl(u);
-            else window.open(u, '_blank');
-          }
-        });
-        readerPane.querySelector('#btn-ps-audio-toggle')?.addEventListener('click', () => {
-          const wrap = readerPane.querySelector('#ps-audio-frame-wrap');
-          if (wrap) {
-            const isHidden = wrap.style.display === 'none';
-            wrap.style.display = isHidden ? 'block' : 'none';
-          }
-        });
-        readerPane.querySelectorAll('.pastoral-audio-ext-link').forEach(link => {
-          link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const u = link.dataset.extUrl;
-            if (u && typeof API !== 'undefined' && API.openExternalUrl) {
-              API.openExternalUrl(u);
-            } else if (u) {
-              window.open(u, '_blank');
-            }
-          });
-        });
-        readerPane.querySelectorAll('.drawer-pastoral-ref-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const ref = btn.dataset.ref;
-            if (!ref) return;
-            if (typeof App !== 'undefined' && App.switchView) {
-              App.switchView('bible');
-            }
-            if (typeof BibleReader !== 'undefined') {
-              if (typeof BibleReader.parseAndNavigate === 'function') {
-                BibleReader.parseAndNavigate(ref);
-              } else if (typeof BibleReader.searchPassage === 'function') {
-                BibleReader.searchPassage(ref);
-              } else if (typeof BibleReader.navigateTo === 'function') {
-                BibleReader.navigateTo(ref);
-              }
-            }
-          });
-        });
+        bindReaderPaneEvents();
       }
     };
+
+    // Attacher les écouteurs du lecteur initial
+    bindReaderPaneEvents();
+
+    // Cacher l'infobulle lors du défilement du lecteur
+    readerPane?.addEventListener('scroll', () => {
+      if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) {
+        ScriptureTooltip.hide();
+      }
+    }, { passive: true });
 
     // Gestionnaire de filtrage par auteur (Tous / UPVR / APJ)
     document.querySelectorAll('.pastoral-filter-pill[data-ps-filter]').forEach(pill => {
@@ -2792,22 +2819,6 @@ const PassageStudyView = {
         const idx = parseInt(item.dataset.epIdx, 10);
         updateReader(idx);
       });
-    });
-
-    readerPane?.querySelector('#btn-ps-open-apj-source')?.addEventListener('click', (e) => {
-      const u = e.currentTarget.dataset.url;
-      if (u) {
-        if (typeof API !== 'undefined' && API.openExternalUrl) API.openExternalUrl(u);
-        else window.open(u, '_blank');
-      }
-    });
-
-    readerPane?.querySelector('#btn-ps-audio-toggle')?.addEventListener('click', () => {
-      const wrap = readerPane.querySelector('#ps-audio-frame-wrap');
-      if (wrap) {
-        const isHidden = wrap.style.display === 'none';
-        wrap.style.display = isHidden ? 'block' : 'none';
-      }
     });
 
     filterInput?.addEventListener('input', (e) => {

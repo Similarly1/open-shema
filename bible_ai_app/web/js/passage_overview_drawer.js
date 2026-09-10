@@ -1831,7 +1831,7 @@ const PassageOverviewDrawer = {
                     <span class="drawer-pastoral-ref-label">Texte(s) clé(s) :</span>
                     <div class="drawer-pastoral-ref-list">
                       ${primPassages.map(p => `
-                        <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur biblique">
+                        <button type="button" class="drawer-pastoral-ref-btn is-primary" data-ref="${this.escapeHtml(p)}">
                           <span>${this.escapeHtml(p)}</span>
                           <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
@@ -1844,7 +1844,7 @@ const PassageOverviewDrawer = {
                     <span class="drawer-pastoral-ref-label">Passages d'appui :</span>
                     <div class="drawer-pastoral-ref-list">
                       ${secPassages.map(p => `
-                        <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}" title="Ouvrir ${this.escapeHtml(p)} dans le lecteur biblique">
+                        <button type="button" class="drawer-pastoral-ref-btn is-secondary" data-ref="${this.escapeHtml(p)}">
                           <span>${this.escapeHtml(p)}</span>
                         </button>
                       `).join('')}
@@ -1905,6 +1905,9 @@ const PassageOverviewDrawer = {
 
     // Event listeners
     const closeModal = () => {
+      if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) {
+        ScriptureTooltip.hide();
+      }
       modal.classList.add('hidden');
       modal.style.display = 'none';
       document.body.classList.remove('apj-modal-open');
@@ -1940,6 +1943,9 @@ const PassageOverviewDrawer = {
     modal.querySelectorAll('.drawer-pastoral-ref-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) {
+          ScriptureTooltip.hide();
+        }
         closeModal();
         const ref = btn.dataset.ref;
         if (!ref) return;
@@ -1957,6 +1963,17 @@ const PassageOverviewDrawer = {
         }
       });
     });
+
+    // Lier l'infobulle de prévisualisation biblique (ScriptureTooltip)
+    if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
+      ScriptureTooltip.bindToElements(modal.querySelectorAll('.drawer-pastoral-ref-btn'));
+    }
+
+    modal.querySelector('.apj-modal-window')?.addEventListener('scroll', () => {
+      if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.hide) {
+        ScriptureTooltip.hide();
+      }
+    }, { passive: true });
 
     modal.querySelector('#btn-apj-open-source')?.addEventListener('click', (e) => {
       e.stopPropagation();

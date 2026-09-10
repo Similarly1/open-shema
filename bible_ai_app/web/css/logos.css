@@ -16292,7 +16292,7 @@ button .shine-text,
 
 .theol-scripture-tooltip {
   position: fixed;
-  z-index: 10000;
+  z-index: 99999;
   width: 350px;
   max-width: calc(100vw - 32px);
   background: var(--bg-card, #1e293b);
