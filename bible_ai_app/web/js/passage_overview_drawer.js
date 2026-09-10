@@ -329,7 +329,19 @@ const PassageOverviewDrawer = {
     } else if (cat === 'Note') {
       coverHtml = '';
     } else if (cat === 'Pastoral' || cat === 'Éthique') {
-      coverHtml = `<div class="popover-cover-wrap"><div class="popover-cover-fallback pastoral" style="background: transparent; border: none; padding: 0;"><svg viewBox="0 0 24 24" width="46" height="46" style="border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.3); vertical-align: middle;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg></div></div>`;
+      const isUpvr = itemEl.classList.contains('is-upvr') ||
+                     itemEl.dataset.isUpvr === '1' ||
+                     (author && author.includes('Florent Varak')) ||
+                     (badge && badge.includes('ToutPourSaGloire'));
+      if (isUpvr) {
+        coverHtml = `
+          <div class="popover-cover-wrap" style="background: #ffffff; border: 1px solid rgba(230, 62, 9, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 4px; box-sizing: border-box; box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+            <img src="assets/upvr_logo.svg" onerror="this.onerror=null; this.src='assets/upvr_logo.webp';" style="width: 100%; height: 100%; object-fit: contain;" alt="Un pasteur vous répond">
+          </div>
+        `;
+      } else {
+        coverHtml = `<div class="popover-cover-wrap"><div class="popover-cover-fallback pastoral" style="background: transparent; border: none; padding: 0;"><svg viewBox="0 0 24 24" width="46" height="46" style="border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.3); vertical-align: middle;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg></div></div>`;
+      }
     } else {
       coverHtml = imgUrl
         ? `<div class="popover-cover-wrap"><img src="${imgUrl}" class="popover-cover-img" alt=""></div>`
@@ -1145,7 +1157,7 @@ const PassageOverviewDrawer = {
           ? `Florent Varak · UPVR ${epBadge}`
           : `John Piper · APJ ${epBadge}`;
         const sourceBrand = isUpvr ? 'ToutPourSaGloire' : 'Desiring God';
-        const logoPath = isUpvr ? 'assets/upvr_logo.svg' : 'assets/apj_logo.svg';
+        const logoPath = isUpvr ? 'assets/upvr_badge.svg' : 'assets/apj_logo.svg';
         const typeBadge = ep.type_question ? ep.type_question.toUpperCase() : (isUpvr ? 'PASTORAL' : 'APJ');
         const hasIllustr = ep.illustration?.has_illustration || !!ep.illustration?.titre;
         const appCount = (ep.pistes_applications || ep.applications_pastorales || []).length;
@@ -1156,6 +1168,7 @@ const PassageOverviewDrawer = {
           <div class="overview-clean-item overview-pastoral-item ${isUpvr ? 'is-upvr' : 'is-apj'}"
                data-action="open-pastoral-episode"
                data-episode-idx="${idx}"
+               data-is-upvr="${isUpvr ? '1' : '0'}"
                data-tt-category="Pastoral"
                data-tt-author="${this.escapeHtml(authorLabel)}"
                data-tt-title="${this.escapeHtml(titleFr)}"
