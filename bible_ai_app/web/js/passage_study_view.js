@@ -2734,6 +2734,8 @@ const PassageStudyView = {
             const u = link.dataset.extUrl;
             if (u && typeof API !== 'undefined' && API.openExternalUrl) {
               API.openExternalUrl(u);
+            } else if (u) {
+              window.open(u, '_blank');
             }
           });
         });

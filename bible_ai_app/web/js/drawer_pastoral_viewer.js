@@ -304,6 +304,7 @@ const DrawerPastoralViewer = {
     const epBadge = (epNum != null && epNum !== '') ? `Épisode #${epNum}` : 'Hors-série';
     const typeQ = ep.type_question || 'Pastorale';
     const datePub = ep.date_published || '';
+    const sourceUrl = ep.source_url || '';
     const these = ep.these_centrale || '';
     const resume = ep.resume_analytique || '';
     const illustr = ep.illustration || {};
@@ -392,7 +393,7 @@ const DrawerPastoralViewer = {
           <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 6px;">
             ${sourceUrl ? `
               <a href="#" class="pastoral-audio-ext-link" data-ext-url="${this.escapeHtml(sourceUrl)}">
-                <span>Article &amp; podcast sur ToutPourSaGloire ↗</span>
+                <span>Article &amp; podcast sur ${sourceBrand} ↗</span>
               </a>
             ` : ''}
           </div>
@@ -521,6 +522,8 @@ const DrawerPastoralViewer = {
         const u = link.dataset.extUrl;
         if (u && typeof API !== 'undefined' && API.openExternalUrl) {
           API.openExternalUrl(u);
+        } else if (u) {
+          window.open(u, '_blank');
         }
       });
     });
