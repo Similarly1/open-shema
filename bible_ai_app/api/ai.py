@@ -1300,10 +1300,20 @@ class AiMixin:
                     "error": "Le jeton API Infomaniak n'est pas configuré. Veuillez le renseigner dans les Paramètres IA."
                 }
 
-            final_prompt = prompt.strip()
-            style_def = STYLE_PRESETS.get(style)
-            if style_def and not any(w in final_prompt.lower() for w in ["painting", "cinematic", "watercolor", "engraving"]):
-                final_prompt += f", {style_def['prompt_suffix']}"
+            final_prompt = (prompt or "").strip()
+            # Si le prompt est vide, générer un fallback minimal
+            if not final_prompt:
+                style_def = STYLE_PRESETS.get(style, STYLE_PRESETS["biblical_oil"])
+                final_prompt = f"Sacred historical art, {style_def['prompt_suffix']}"
+
+            # Garantir strictement <= 395 caractères pour respecter la limite Infomaniak
+            if len(final_prompt) > 395:
+                truncated = final_prompt[:395]
+                last_delim = max(truncated.rfind(' '), truncated.rfind(','))
+                if last_delim > 200:
+                    final_prompt = truncated[:last_delim].rstrip(', ')
+                else:
+                    final_prompt = truncated
 
             success, res = generate_image_with_infomaniak_flux(
                 prompt=final_prompt,

@@ -24,38 +24,38 @@ from ai.llm_client import LLMClient
 
 logger = logging.getLogger("mindmap_image_service")
 
-# Styles prédéfinis pour orienter le générateur d'images
+# Styles prédéfinis pour orienter le générateur d'images (suffixes courts < 85 caractères pour respecter la limite Infomaniak de 400 caractères)
 STYLE_PRESETS = {
     "biblical_oil": {
         "label": "Peinture d'Histoire & Maîtres Classiques",
-        "prompt_suffix": "classical fine art oil painting, dramatic chiaroscuro lighting, deep rich earthy colors, Renaissance and Baroque biblical art aesthetic, highly detailed canvas texture, Rembrandt and Caravaggio atmosphere, cinematic framing, masterpiece, no text, no letters, no watermark"
+        "prompt_suffix": "classical oil painting, chiaroscuro lighting, Rembrandt style, fine art, no text"
     },
     "cinematic": {
         "label": "Cinématique Biblique Dramatique",
-        "prompt_suffix": "dramatic cinematic historical movie scene, 35mm film photography, volumetric rays of divine light, golden hour, epic historical biblical environment, atmospheric dust, photorealistic details, high dynamic range, no text, no typography"
+        "prompt_suffix": "cinematic historical film still, volumetric divine rays, photorealistic, 35mm, no text"
     },
     "golden_engraving": {
         "label": "Gravure Ancienne & Dorures Dorées",
-        "prompt_suffix": "antique detailed copperplate etching, vintage botanical and biblical engraving style, delicate hatched line art with subtle warm gold accents, parchment paper background, refined historical illustration, no text"
+        "prompt_suffix": "antique detailed copperplate etching, parchment, warm gold accents, line art, no text"
     },
     "watercolor": {
         "label": "Aquarelle & Lumière Douce",
-        "prompt_suffix": "ethereal watercolor and gouache artwork, soft washes of warm sunlight, luminous sacred atmosphere, delicate brushwork, organic paper texture, poetic fine art, no text"
+        "prompt_suffix": "ethereal luminous watercolor, soft warm sacred lighting, fine art, no text"
     },
     "minimal_modern": {
         "label": "Symbole Moderne Épuré",
-        "prompt_suffix": "clean modern conceptual editorial illustration, minimalist composition, elegant geometric harmony, soft diffused lighting, sophisticated color palette, premium book cover aesthetics, no text"
+        "prompt_suffix": "clean modern minimalist conceptual illustration, geometric harmony, no text"
     }
 }
 
-PROMPT_CRAFT_SYSTEM_INSTRUCTION = """You are an elite art director and prompt engineer specializing in historical, biblical, and conceptual art for mind maps.
-Your job is to generate a concise, highly evocative English text prompt for a text-to-image AI model (Flux Schnell).
+PROMPT_CRAFT_SYSTEM_INSTRUCTION = """You are an elite art director specializing in evocative, symbolic sacred and historical art.
+Your task: generate a concise, highly evocative English visual prompt for the Flux Schnell image model.
 
-RULES:
-1. Output ONLY the English prompt, without any explanations, conversational filler, markdown formatting, or quotes.
-2. Focus on a clear central subject, mood, composition, materials, and lighting appropriate to the theme.
-3. STRICT NEGATIVE CONSTRAINT: Absolutely NEVER include words like "diagram", "chart", "infographic", "text", "letters", "label", "writing", "alphabet", "symbols". The image must be purely pictorial and artistic.
-4. Keep the final prompt between 25 and 55 words long. It should describe a concrete visual scene representing the concept."""
+CRITICAL RULES:
+1. STRICT CHARACTER LIMIT: The output MUST NOT exceed 280 characters in total (around 30-40 words). Infomaniak strictly rejects prompts longer than 400 characters!
+2. Output ONLY the English prompt string, without any commentary, quotes, explanations, or prefixes.
+3. NEVER include words like "diagram", "chart", "infographic", "text", "letters", "label", "writing", "alphabet", "watermark".
+4. Describe concrete visual elements: lighting, mood, materials, composition, colors."""
 
 
 def ensure_mindmap_images_dir() -> str:
@@ -155,11 +155,21 @@ def suggest_image_prompt(
 
     if not generated_prompt:
         # Fallback élégant en cas d'absence de LLM
-        generated_prompt = f"Evocative sacred scene of {clean_text}, dramatic atmospheric lighting, high quality fine art"
+        generated_prompt = f"Evocative sacred scene of {clean_text}, dramatic lighting, fine art"
 
     # Concaténation avec le style d'arrière-plan si nécessaire
-    if style_suffix and not any(k in generated_prompt.lower() for k in ["painting", "cinematic", "watercolor", "engraving"]):
-        generated_prompt = f"{generated_prompt}, {style_suffix}"
+    if style_suffix and not any(k in generated_prompt.lower() for k in ["painting", "cinematic", "watercolor", "engraving", "minimalist"]):
+        if len(generated_prompt) + len(style_suffix) + 2 <= 370:
+            generated_prompt = f"{generated_prompt}, {style_suffix}"
+
+    # Garantie absolue <= 370 caractères pour laisser de la marge à l'utilisateur
+    if len(generated_prompt) > 370:
+        truncated = generated_prompt[:370]
+        last_delim = max(truncated.rfind(' '), truncated.rfind(','))
+        if last_delim > 180:
+            generated_prompt = truncated[:last_delim].rstrip(', ')
+        else:
+            generated_prompt = truncated
 
     return generated_prompt
 
@@ -181,6 +191,17 @@ def generate_image_with_infomaniak_flux(
     if not token:
         return False, "Jeton API Infomaniak non configuré dans les paramètres."
 
+    # Règle absolue Infomaniak API : le prompt ne doit JAMAIS dépasser 400 caractères
+    clean_prompt = (prompt or "").strip()
+    if len(clean_prompt) > 395:
+        truncated = clean_prompt[:395]
+        last_delim = max(truncated.rfind(' '), truncated.rfind(','))
+        if last_delim > 200:
+            clean_prompt = truncated[:last_delim].rstrip(', ')
+        else:
+            clean_prompt = truncated
+        logger.warning("Prompt tronqué pour respecter la limite Infomaniak (max 400 car.) : %s", clean_prompt)
+
     url = f"https://api.infomaniak.com/1/ai/{product_id}/openai/images/generations"
     headers = {
         "Authorization": f"Bearer {token}",
@@ -188,7 +209,7 @@ def generate_image_with_infomaniak_flux(
     }
     payload = {
         "model": "flux",
-        "prompt": prompt,
+        "prompt": clean_prompt,
         "size": size,
         "n": 1,
         "response_format": "b64_json"

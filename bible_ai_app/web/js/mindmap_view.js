@@ -6684,11 +6684,14 @@ const MindMapView = {
         </div>
 
         <!-- Prompt artistique -->
-        <div style="position: relative; margin-bottom: 10px;">
-          <textarea class="mm-prompt-textarea" id="mm-img-prompt-input" rows="3" placeholder="Génération du prompt artistique contextuel en cours..." style="font-size: 12px; padding: 10px 38px 10px 10px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+        <div style="position: relative; margin-bottom: 4px;">
+          <textarea class="mm-prompt-textarea" id="mm-img-prompt-input" rows="3" maxlength="390" placeholder="Génération du prompt artistique contextuel en cours..." style="font-size: 12px; padding: 10px 38px 10px 10px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
           <button type="button" id="mm-img-btn-regen-prompt" title="Régénérer le prompt avec l'IA" style="position: absolute; right: 8px; top: 8px; background: transparent; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; border-radius: 4px;">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
           </button>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+          <span id="mm-img-char-count" style="font-size: 10px; color: var(--text-secondary); transition: color 0.15s ease;">0 / 390 car. (max Infomaniak)</span>
         </div>
 
         <!-- Bouton d'action Génération -->
@@ -6747,6 +6750,16 @@ const MindMapView = {
     const btnApply = overlay.querySelector('#mm-img-btn-apply');
     const statusSpan = overlay.querySelector('#mm-img-status');
     const previewContainer = overlay.querySelector('#mm-img-preview-container');
+    const charCountEl = overlay.querySelector('#mm-img-char-count');
+
+    const updateCharCount = () => {
+      const len = (promptTextarea.value || '').length;
+      if (charCountEl) {
+        charCountEl.textContent = `${len} / 390 car. (max Infomaniak)`;
+        charCountEl.style.color = len > 360 ? '#f59e0b' : (len >= 390 ? '#ef4444' : 'var(--text-secondary)');
+      }
+    };
+    promptTextarea.addEventListener('input', updateCharCount);
 
     const closeDialog = () => overlay.remove();
     overlay.querySelector('#mm-img-x-close')?.addEventListener('click', closeDialog);
@@ -6785,18 +6798,24 @@ const MindMapView = {
             selectedStyle
           );
           if (res && res.success && res.prompt) {
-            promptTextarea.value = res.prompt;
+            let p = res.prompt.trim();
+            if (p.length > 390) p = p.slice(0, 390);
+            promptTextarea.value = p;
+            updateCharCount();
             statusSpan.textContent = 'Prêt pour génération Flux';
           } else {
-            promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
+            promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art`;
+            updateCharCount();
             statusSpan.textContent = 'Prêt pour génération';
           }
         } catch (e) {
-          promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
+          promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art`;
+          updateCharCount();
           statusSpan.textContent = 'Prêt pour génération';
         }
       } else {
-        promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
+        promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art`;
+        updateCharCount();
         statusSpan.textContent = 'Prêt pour génération';
       }
       promptTextarea.disabled = false;
@@ -6806,8 +6825,13 @@ const MindMapView = {
 
     // Génération avec Infomaniak Flux
     btnGen?.addEventListener('click', async () => {
-      const prompt = promptTextarea.value.trim();
+      let prompt = promptTextarea.value.trim();
       if (!prompt) return;
+      if (prompt.length > 390) {
+        prompt = prompt.slice(0, 390);
+        promptTextarea.value = prompt;
+        updateCharCount();
+      }
 
       btnGen.disabled = true;
       btnGen.style.opacity = '0.6';
