@@ -34022,7 +34022,7 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-re
 /* ── Indicateur Fold / Unfold (Mode Mémorisation Buzan) ─────────────────── */
 .mm-fold-indicator {
   opacity: 0.35;
-  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s ease;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   pointer-events: all;
 }
@@ -34033,8 +34033,10 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-re
   opacity: 1 !important;
 }
 
-.mm-fold-indicator:hover {
-  transform: scale(1.22);
+/* Illumination et surbrillance nette sans AUCUN déplacement spatial */
+.mm-fold-indicator:hover circle {
+  filter: drop-shadow(0 0 5px var(--node-color, #3b82f6));
+  stroke-width: 2px !important;
 }
 
 /* Toujours 100% visible quand la branche est repliée avec badge relief */

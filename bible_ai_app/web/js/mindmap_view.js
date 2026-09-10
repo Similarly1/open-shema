@@ -2113,7 +2113,7 @@ const MindMapView = {
     if (!parent.children || parent.children.length === 0) return;
 
     const dir = side === 'right' ? 1 : -1;
-    const clearHorizGap = 55; // Espace horizontal net garanti entre bord parent et bord enfant
+    const clearHorizGap = 76; // Espace horizontal net garanti entre bord parent et bord enfant (dégage les boutons d'action)
     const childrenTotalHeight = parent.children.reduce((acc, c) => acc + c.totalHeight, 0);
     let currentY = parent.y - childrenTotalHeight / 2;
 
@@ -3947,13 +3947,13 @@ const MindMapView = {
         actionsG.setAttribute('class', 'mm-node-actions');
 
         const hasKids = node.children && node.children.length > 0;
-        const foldOffset = hasKids ? 16 : 0;
+        const foldOffset = hasKids ? 14 : 0;
         const actionY = isBox ? 0 : 3;
-        const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 14 + foldOffset : -node.width / 2 - 14 - foldOffset;
+        const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 13 + foldOffset : -node.width / 2 - 13 - foldOffset;
         const addSubBtn = this.createActionButton('+', endX, actionY, () => this.addChildToNode(node));
         addSubBtn.setAttribute('title', 'Ajouter une sous-branche');
 
-        const delX = (isTopDown || node.side === 'right') ? node.width / 2 + 34 + foldOffset : -node.width / 2 - 34 - foldOffset;
+        const delX = (isTopDown || node.side === 'right') ? node.width / 2 + 33 + foldOffset : -node.width / 2 - 33 - foldOffset;
         const delBtn = this.createActionButton('×', delX, actionY, () => this.deleteNode(node.id), true);
         delBtn.setAttribute('title', 'Supprimer la branche');
 
@@ -3971,8 +3971,8 @@ const MindMapView = {
 
       // Coordonnées exactes à l'extrémité de la branche dans le repère local de g
       const foldDir = (isTopDown || (node.side || 'right') === 'right') ? 1 : -1;
-      const foldX = isTopDown ? 0 : foldDir * (node.width / 2 + 8);
-      const foldY = isTopDown ? (isBox ? (node.height || 28) / 2 + 8 : 18) : (isBox ? 0 : 10);
+      const foldX = isTopDown ? 0 : foldDir * (node.width / 2 + 6);
+      const foldY = isTopDown ? (isBox ? (node.height || 28) / 2 + 7 : 17) : (isBox ? 0 : 10);
 
       foldG.setAttribute('transform', `translate(${foldX}, ${foldY})`);
       foldG.setAttribute('class', `mm-fold-indicator ${isCollapsed ? 'is-folded' : ''}`);
