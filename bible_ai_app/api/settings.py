@@ -48,6 +48,64 @@ class SettingsMixin:
         TaskManager.dismiss_task(task_id)
         return {"success": True}
 
+    def get_upvr_rag_status(self, embedding_model: Optional[str] = None) -> Dict[str, Any]:
+        """Retourne l'état de vectorisation du corpus UPVR pour le modèle actif."""
+        from core.upvr_manager import UPVRManager
+        model = embedding_model or self.config.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)")
+        try:
+            from core.database import VectorDB
+            db = VectorDB(api_keys=self.config)
+        except Exception:
+            db = None
+        mgr = UPVRManager.get_instance()
+        return mgr.get_rag_status(vector_db=db, embedding_model=model)
+
+    def start_upvr_vectorization(self, embedding_model: Optional[str] = None, force: bool = False) -> Dict[str, Any]:
+        """Déclenche la vectorisation en arrière-plan du corpus UPVR dans ChromaDB."""
+        from core.upvr_manager import UPVRManager
+        from core.task_manager import TaskManager
+        from core.database import VectorDB
+        
+        mgr = UPVRManager.get_instance()
+        if not mgr.is_installed():
+            return {"success": False, "error": "Corpus UPVR non installé"}
+            
+        chunks = mgr.get_all_rag_chunks()
+        if not chunks:
+            return {"success": False, "error": "Aucun chunk RAG trouvé dans le corpus UPVR"}
+            
+        model = embedding_model or self.config.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)")
+        task_id = "upvr_vectorization"
+        total = len(chunks)
+        
+        TaskManager.start_task(
+            task_id=task_id,
+            title="Indexation Deep RAG : Un pasteur vous répond",
+            task_type="rag_indexing",
+            total=total,
+            detail=f"Préparation de la vectorisation de {total} fragments avec {model}..."
+        )
+
+        def _worker():
+            try:
+                db = VectorDB(api_keys=self.config)
+                def _prog(pct, cur=0, tot=0):
+                    TaskManager.update_progress(
+                        task_id,
+                        progress=pct,
+                        current=cur,
+                        total=tot or total,
+                        detail=f"Vectorisation UPVR : {pct}% ({cur}/{tot or total} fragments)"
+                    )
+                mgr.vectorize_all_chunks(vector_db=db, embedding_model=model, progress_callback=_prog)
+                TaskManager.complete_task(task_id, message=f"Vectorisation UPVR terminée avec succès ({total} fragments)")
+            except Exception as e:
+                logger.error(f"Erreur vectorisation UPVR : {e}", exc_info=True)
+                TaskManager.fail_task(task_id, str(e))
+
+        threading.Thread(target=_worker, daemon=True).start()
+        return {"success": True, "task_id": task_id, "total_chunks": total, "embedding_model": model}
+
     def get_settings(self) -> Dict[str, Any]:
         return load_secrets_into_config(load_config())
 

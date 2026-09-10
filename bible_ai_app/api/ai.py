@@ -660,6 +660,85 @@ class AiMixin:
                         logger.debug(f"[ask_study_ai] Recherche vectorielle articles : {ve}")
             except Exception as e:
                 logger.error(f"[ask_study_ai] Erreur extraction articles : {e}")
+
+        # 5b. Extraction Pastorale (Un pasteur vous répond - Florent Varak)
+        if sources_cfg.get("pastoral", True) or sources_cfg.get("upvr", True):
+            try:
+                from core.upvr_manager import UPVRManager
+                from core.database import VectorDB
+                upvr_mgr = UPVRManager.get_instance()
+                if upvr_mgr.is_installed():
+                    upvr_seen = set()
+                    
+                    # A. Si un passage est spécifié, rechercher les épisodes pastoraux liés au passage
+                    if passage_ref and passage_ref.strip():
+                        parsed = self.parse_reference(passage_ref)
+                        if parsed and parsed.get("book"):
+                            b_code = parsed["book"]
+                            ch_num = parsed.get("chapter") or 1
+                            v_num = parsed.get("verse")
+                            pastoral_eps = upvr_mgr.get_episodes_for_passage(b_code, ch_num, verse=v_num, limit=2)
+                            for pep in pastoral_eps:
+                                ep_num = pep.get("episode_number")
+                                if ep_num and ep_num not in upvr_seen:
+                                    upvr_seen.add(ep_num)
+                                    resume = pep.get("resume_analytique") or pep.get("these_centrale") or ""
+                                    ep_title = pep.get("titre") or f"Épisode #{ep_num}"
+                                    context_chunks.append({
+                                        "id": f"upvr_passage_{ep_num}",
+                                        "text": f"### Réflexion Pastorale [Un pasteur vous répond #{ep_num} : {ep_title}] :\n{resume[:900]}",
+                                        "metadata": {
+                                            "type": "Pastorale",
+                                            "name": f"UPVR #{ep_num} ({ep_title})",
+                                            "author": "Florent Varak",
+                                            "title": ep_title,
+                                            "episode_number": ep_num,
+                                            "url": pep.get("source_url", ""),
+                                            "mp3_url": pep.get("mp3_url", "")
+                                        }
+                                    })
+
+                    # B. Recherche vectorielle si ChromaDB est disponible et vectorisé
+                    vdb = VectorDB.get_instance()
+                    if vdb:
+                        query_text = f"{passage_ref} {question}".strip()
+                        embed_model = self.config.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)")
+                        try:
+                            search_res = vdb.search_semantic(
+                                query=query_text,
+                                n_results=3,
+                                where_clause={"source_type": "pastoral_upvr"},
+                                embedding_model=embed_model
+                            )
+                            docs = search_res.get("documents", [[]])[0] if search_res else []
+                            metas = search_res.get("metadatas", [[]])[0] if search_res else []
+                            for idx, doc in enumerate(docs):
+                                meta = metas[idx] if idx < len(metas) else {}
+                                ep_num = meta.get("episode_number")
+                                sec_title = meta.get("section_title") or ""
+                                ep_title = meta.get("title") or f"Épisode #{ep_num}"
+                                t_key = f"upvr:{ep_num}:{sec_title}".lower()
+                                if t_key not in upvr_seen:
+                                    upvr_seen.add(t_key)
+                                    context_chunks.append({
+                                        "id": f"upvr_vdb_{ep_num}_{idx}",
+                                        "text": f"### Réflexion Pastorale [UPVR #{ep_num} : {ep_title} - {sec_title}] :\n{doc[:900]}",
+                                        "metadata": {
+                                            "type": "Pastorale",
+                                            "name": f"UPVR #{ep_num} ({ep_title})",
+                                            "author": "Florent Varak",
+                                            "title": ep_title,
+                                            "section_title": sec_title,
+                                            "episode_number": ep_num,
+                                            "url": meta.get("url", ""),
+                                            "mp3_url": meta.get("mp3_url", "")
+                                        }
+                                    })
+                        except Exception as ve:
+                            logger.debug(f"[ask_study_ai] Recherche vectorielle UPVR : {ve}")
+            except Exception as e:
+                logger.error(f"[ask_study_ai] Erreur extraction pastorale UPVR : {e}")
+
         # 5. Pipeline RAG : Reranking sémantique & Curation
         if enable_rerank and len(context_chunks) > 1:
             try:
@@ -714,6 +793,11 @@ class AiMixin:
                     author = "John MacArthur"
                 elif "spurgeon" in s_lower:
                     author = "C.H. Spurgeon"
+                elif "upvr" in s_lower or "pasteur vous répond" in s_lower:
+                    author = "Florent Varak"
+
+            if s_type == "Pastorale":
+                author = "Florent Varak"
 
             key = f"{s_type}:{s_name}".lower()
             if key not in seen_source_keys:
@@ -724,14 +808,17 @@ class AiMixin:
                 
                 # Chercher une image de couverture correspondante
                 cover_data_url = None
+                if s_type == "Pastorale":
+                    cover_data_url = "assets/upvr_logo.svg"
                 
                 # 1. Par correspondance dans le registre des livres
-                for reg_k, reg_v in books_registry.items():
-                    if reg_k.lower() in s_name.lower() or s_name.lower() in reg_k.lower() or (reg_v.get("title") and reg_v.get("title").lower() in s_name.lower()):
-                        cov_p = reg_v.get("cover_path") or reg_v.get("cover_url")
-                        if cov_p:
-                            cover_data_url = get_cover_data_url(cov_p)
-                            break
+                if not cover_data_url:
+                    for reg_k, reg_v in books_registry.items():
+                        if reg_k.lower() in s_name.lower() or s_name.lower() in reg_k.lower() or (reg_v.get("title") and reg_v.get("title").lower() in s_name.lower()):
+                            cov_p = reg_v.get("cover_path") or reg_v.get("cover_url")
+                            if cov_p:
+                                cover_data_url = get_cover_data_url(cov_p)
+                                break
                             
                 # 2. Si non trouvé, chercher dans le dossier covers
                 if not cover_data_url and os.path.exists(covers_dir):

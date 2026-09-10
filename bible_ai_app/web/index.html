@@ -3834,6 +3834,65 @@
               </div>
             </div>
 
+            <!-- CARTE CORPUS PASTORAL : UN PASTEUR VOUS RÉPOND (FLORENT VARAK) -->
+            <div class="settings-card" id="sec-upvr-rag-settings" style="margin-top: 16px; border: 1px solid rgba(185, 82, 50, 0.25); background: var(--bg-card);">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 44px; height: 44px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(185, 82, 50, 0.3); display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); flex-shrink: 0;">
+                    <img src="assets/upvr_logo.svg" onerror="this.src='assets/upvr_logo.webp'" alt="UPVR Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                  </div>
+                  <div>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                      <span>Un pasteur vous répond</span>
+                      <span style="font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(185, 82, 50, 0.12); color: #B95232; border: 1px solid rgba(185, 82, 50, 0.25);">Florent Varak</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                      201 épisodes audio &amp; transcriptions réconciliés • <span id="upvr-chunks-count-label">~800</span> fragments d'enseignement RAG
+                    </div>
+                  </div>
+                </div>
+                <div id="upvr-status-badge" style="font-size: 0.76rem; font-weight: 600; padding: 4px 10px; border-radius: 16px; background: var(--bg-secondary, rgba(0,0,0,0.05)); color: var(--text-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
+                  <span>Chargement du statut...</span>
+                </div>
+              </div>
+
+              <p class="card-desc" style="font-size: 0.82rem; line-height: 1.45; color: var(--text-secondary); margin-bottom: 14px;">
+                Le corpus pastoral de Florent Varak est stocké localement en texte intégral et découpé en fragments thématiques d'enseignement.
+                La vectorisation calcule les représentations sémantiques dans votre base ChromaDB pour que l'IA puisse citer et mobiliser précisément les enseignements de Florent Varak lors de vos études de passages ou questions d'exégèse.
+              </p>
+
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(0,0,0,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="flex: 1; min-width: 220px;">
+                  <label for="upvr-embed-model-select" style="font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Modèle d'embedding :</label>
+                  <select id="upvr-embed-model-select" class="select-field full-w" style="height: 36px; font-size: 0.82rem;">
+                    <option value="bge_multilingual_gemma2 (Infomaniak)">bge_multilingual_gemma2 (Infomaniak - Recommandé)</option>
+                    <option value="mini_lm_l12_v2 (Infomaniak)">mini_lm_l12_v2 (Infomaniak - Léger)</option>
+                    <option value="gemini-embedding-2">gemini-embedding-2 (Google)</option>
+                    <option value="gemini-embedding-1">gemini-embedding-1 (Google)</option>
+                    <option value="mistral-embed">mistral-embed (Mistral AI)</option>
+                  </select>
+                </div>
+                <div style="align-self: flex-end;">
+                  <button type="button" id="btn-vectorize-upvr" class="btn-primary" style="height: 36px; padding: 0 16px; font-size: 0.82rem; background: #b95232; border-color: #b95232; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span id="btn-vectorize-upvr-text">Vectoriser dans ChromaDB</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Barre de progression en temps réel -->
+              <div id="upvr-progress-container" style="display: none; margin-top: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 4px;">
+                  <span id="upvr-progress-label">Vectorisation en cours...</span>
+                  <span id="upvr-progress-pct" style="font-weight: 600; color: #b95232;">0%</span>
+                </div>
+                <div style="height: 6px; width: 100%; background: var(--border-color); border-radius: 3px; overflow: hidden;">
+                  <div id="upvr-progress-bar" style="height: 100%; width: 0%; background: #b95232; transition: width 0.3s ease;"></div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <!-- Section 6 : Sauvegarde ZIP -->

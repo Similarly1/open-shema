@@ -176,6 +176,14 @@ const SettingsView = {
       }
     });
 
+    // Bouton de vectorisation RAG UPVR (Florent Varak)
+    document.getElementById('btn-vectorize-upvr')?.addEventListener('click', () => {
+      this.triggerUpvrVectorization();
+    });
+    document.getElementById('upvr-embed-model-select')?.addEventListener('change', () => {
+      this.loadUpvrRagStatus();
+    });
+
     setTimeout(() => this.updateTabsScrollButtons(), 200);
   },
 
@@ -234,6 +242,7 @@ const SettingsView = {
     if (secId === 'articles') {
       this.updateArticlesLastSyncLabel();
       this.loadArticleSources();
+      this.loadUpvrRagStatus();
     }
     if (secId === 'dict') {
       this.loadDictionaries();
@@ -1377,6 +1386,7 @@ Règles impératives :
       this.loadStepBibleStatus();
       this.loadDictionaries();
       this.loadArticleSources();
+      this.loadUpvrRagStatus();
     } catch (e) {
       console.error('Erreur chargement paramètres:', e);
     }
@@ -2309,6 +2319,117 @@ Règles impératives :
     } catch (e) {
       console.error('Erreur chargement sources articles:', e);
     }
+  },
+
+  async loadUpvrRagStatus() {
+    const badge = document.getElementById('upvr-status-badge');
+    const chunksLabel = document.getElementById('upvr-chunks-count-label');
+    const btn = document.getElementById('btn-vectorize-upvr');
+    const btnText = document.getElementById('btn-vectorize-upvr-text');
+    const modelSelect = document.getElementById('upvr-embed-model-select');
+    if (!badge || !btn) return;
+
+    try {
+      const selectedModel = modelSelect ? modelSelect.value : null;
+      const status = await API.call('get_upvr_rag_status', selectedModel);
+      if (!status || !status.installed) {
+        badge.innerHTML = '<span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span><span>Non installé</span>';
+        badge.style.background = 'rgba(239, 68, 68, 0.1)';
+        badge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+        badge.style.color = '#ef4444';
+        btn.disabled = true;
+        return;
+      }
+
+      if (chunksLabel && status.total_chunks) {
+        chunksLabel.textContent = `${status.total_chunks}`;
+      }
+
+      if (status.is_vectorized) {
+        badge.innerHTML = `<span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span><span>Vectorisé dans ChromaDB (${status.indexed_chunks}/${status.total_chunks})</span>`;
+        badge.style.background = 'rgba(16, 185, 129, 0.1)';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        badge.style.color = '#10b981';
+        if (btnText) btnText.textContent = 'Re-vectoriser le corpus';
+      } else if (status.indexed_chunks > 0) {
+        badge.innerHTML = `<span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span><span>Partiellement vectorisé (${status.percentage}% • ${status.indexed_chunks}/${status.total_chunks})</span>`;
+        badge.style.background = 'rgba(245, 158, 11, 0.1)';
+        badge.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+        badge.style.color = '#f59e0b';
+        if (btnText) btnText.textContent = 'Continuer la vectorisation';
+      } else {
+        badge.innerHTML = '<span style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span><span>Non vectorisé (Recherche FTS active)</span>';
+        badge.style.background = 'var(--bg-secondary, rgba(0,0,0,0.05))';
+        badge.style.borderColor = 'var(--border-color)';
+        badge.style.color = 'var(--text-secondary)';
+        if (btnText) btnText.textContent = 'Vectoriser dans ChromaDB';
+      }
+      btn.disabled = false;
+    } catch (e) {
+      console.error('Erreur statut RAG UPVR:', e);
+    }
+  },
+
+  async triggerUpvrVectorization() {
+    const btn = document.getElementById('btn-vectorize-upvr');
+    const modelSelect = document.getElementById('upvr-embed-model-select');
+    const selectedModel = modelSelect ? modelSelect.value : null;
+
+    if (btn) btn.disabled = true;
+    try {
+      const res = await API.call('start_upvr_vectorization', selectedModel, false);
+      if (res && res.success) {
+        App.showToast(`Vectorisation UPVR lancée (${res.total_chunks} fragments)`);
+        this.pollUpvrProgress();
+      } else {
+        App.showToast(`Erreur : ${res?.error || 'Impossible de lancer'}`, 'error');
+        if (btn) btn.disabled = false;
+      }
+    } catch (e) {
+      console.error('Erreur lancement vectorisation UPVR:', e);
+      if (btn) btn.disabled = false;
+    }
+  },
+
+  pollUpvrProgress() {
+    const progContainer = document.getElementById('upvr-progress-container');
+    const progBar = document.getElementById('upvr-progress-bar');
+    const progPct = document.getElementById('upvr-progress-pct');
+    const progLabel = document.getElementById('upvr-progress-label');
+    if (progContainer) progContainer.style.display = 'block';
+
+    const interval = setInterval(async () => {
+      try {
+        const tasks = await API.call('get_background_tasks') || [];
+        const task = tasks.find(t => t.id === 'upvr_vectorization');
+        if (task) {
+          const pct = task.progress || 0;
+          if (progBar) progBar.style.width = `${pct}%`;
+          if (progPct) progPct.textContent = `${pct}%`;
+          if (progLabel) progLabel.textContent = task.detail || `Vectorisation en cours (${pct}%)...`;
+
+          if (task.status === 'completed') {
+            clearInterval(interval);
+            if (progLabel) progLabel.textContent = 'Vectorisation terminée avec succès !';
+            setTimeout(() => {
+              if (progContainer) progContainer.style.display = 'none';
+              this.loadUpvrRagStatus();
+            }, 3000);
+          } else if (task.status === 'error') {
+            clearInterval(interval);
+            if (progLabel) progLabel.textContent = `Erreur : ${task.error || 'Échec'}`;
+            const btn = document.getElementById('btn-vectorize-upvr');
+            if (btn) btn.disabled = false;
+          }
+        } else {
+          clearInterval(interval);
+          if (progContainer) progContainer.style.display = 'none';
+          this.loadUpvrRagStatus();
+        }
+      } catch (e) {
+        clearInterval(interval);
+      }
+    }, 800);
   },
 
   async save() {

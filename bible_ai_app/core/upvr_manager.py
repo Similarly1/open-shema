@@ -3,7 +3,7 @@ import sqlite3
 import json
 import re
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -388,14 +388,210 @@ class UPVRManager:
                 cur.execute("SELECT count(*) FROM upvr_scriptures WHERE is_primary = 1")
                 primary_count = cur.fetchone()[0]
 
+                # Vérifier si la table upvr_rag_chunks existe
+                cur.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='upvr_rag_chunks'")
+                has_chunks_table = bool(cur.fetchone()[0])
+                total_chunks = 0
+                if has_chunks_table:
+                    cur.execute("SELECT count(*) FROM upvr_rag_chunks")
+                    total_chunks = cur.fetchone()[0]
+
                 return {
                     "installed": True,
                     "db_path": self.get_db_path(),
                     "total_episodes": ep_count,
                     "total_scriptures": sc_count,
                     "primary_scriptures": primary_count,
+                    "total_rag_chunks": total_chunks,
                     "author": "Florent Varak",
                     "show": "Un pasteur vous répond"
                 }
         except Exception as e:
             return {"installed": False, "error": str(e)}
+
+    def get_all_rag_chunks(self) -> List[Dict[str, Any]]:
+        """
+        Récupère tous les fragments RAG formatés pour l'indexation ChromaDB.
+        Chaque chunk contient le contexte complet de l'enseignement pastoral.
+        """
+        if not self.is_installed():
+            return []
+
+        try:
+            with sqlite3.connect(self.get_db_path()) as conn:
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+
+                # Vérifier présence table
+                cur.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='upvr_rag_chunks'")
+                if not cur.fetchone()[0]:
+                    return []
+
+                sql = """
+                    SELECT 
+                        c.id,
+                        c.episode_number,
+                        c.chunk_index,
+                        c.section_title,
+                        c.content,
+                        c.verse_refs,
+                        c.themes,
+                        c.source_url,
+                        c.mp3_url,
+                        e.titre
+                    FROM upvr_rag_chunks c
+                    JOIN upvr_episodes e ON e.episode_number = c.episode_number
+                    ORDER BY c.episode_number ASC, c.chunk_index ASC
+                """
+                cur.execute(sql)
+                rows = cur.fetchall()
+
+                chunks = []
+                for r in rows:
+                    ep_num = r["episode_number"]
+                    title = r["titre"] or f"Épisode #{ep_num}"
+                    sec_title = r["section_title"] or ""
+                    
+                    # Contexte textuel riche pour l'embedding
+                    header = f"### [Un pasteur vous répond #{ep_num} : {title}] - {sec_title}"
+                    full_text = f"{header}\n\n{r['content']}".strip()
+
+                    # Nettoyage des listes JSON
+                    refs_str = ""
+                    if r["verse_refs"]:
+                        try:
+                            parsed_refs = json.loads(r["verse_refs"])
+                            refs_str = ", ".join(parsed_refs) if isinstance(parsed_refs, list) else str(parsed_refs)
+                        except Exception:
+                            refs_str = str(r["verse_refs"])
+
+                    themes_str = ""
+                    if r["themes"]:
+                        try:
+                            parsed_themes = json.loads(r["themes"])
+                            themes_str = ", ".join(parsed_themes) if isinstance(parsed_themes, list) else str(parsed_themes)
+                        except Exception:
+                            themes_str = str(r["themes"])
+
+                    chunks.append({
+                        "id": r["id"],
+                        "text": full_text,
+                        "metadata": {
+                            "source_type": "pastoral_upvr",
+                            "source_id": f"upvr_{ep_num}",
+                            "source_name": "Un pasteur vous répond",
+                            "name": "Un pasteur vous répond",
+                            "title": title,
+                            "author": "Florent Varak",
+                            "url": r["source_url"] or "",
+                            "mp3_url": r["mp3_url"] or "",
+                            "episode_number": ep_num,
+                            "section_title": sec_title,
+                            "verse_refs": refs_str,
+                            "themes": themes_str,
+                            "chunk_index": r["chunk_index"]
+                        }
+                    })
+
+                return chunks
+        except Exception as e:
+            logger.error(f"[UPVRManager] Erreur get_all_rag_chunks : {e}")
+            return []
+
+    def get_rag_chunks_for_episode(self, episode_number: int) -> List[Dict[str, Any]]:
+        """Récupère les chunks RAG pour un épisode donné."""
+        if not self.is_installed():
+            return []
+
+        try:
+            with sqlite3.connect(self.get_db_path()) as conn:
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT c.*, e.titre
+                    FROM upvr_rag_chunks c
+                    JOIN upvr_episodes e ON e.episode_number = c.episode_number
+                    WHERE c.episode_number = ?
+                    ORDER BY c.chunk_index ASC
+                """, (int(episode_number),))
+                rows = cur.fetchall()
+                results = []
+                for r in rows:
+                    results.append({
+                        "id": r["id"],
+                        "episode_number": r["episode_number"],
+                        "chunk_index": r["chunk_index"],
+                        "section_title": r["section_title"],
+                        "content": r["content"],
+                        "verse_refs": json.loads(r["verse_refs"]) if r["verse_refs"] else [],
+                        "themes": json.loads(r["themes"]) if r["themes"] else [],
+                        "source_url": r["source_url"],
+                        "mp3_url": r["mp3_url"],
+                        "title": r["titre"]
+                    })
+                return results
+        except Exception as e:
+            logger.error(f"[UPVRManager] Erreur get_rag_chunks_for_episode : {e}")
+            return []
+
+    def get_rag_status(self, vector_db: Any = None, embedding_model: str = "bge_multilingual_gemma2 (Infomaniak)") -> Dict[str, Any]:
+        """Retourne l'état précis de vectorisation du corpus UPVR pour le modèle d'embedding donné."""
+        stats = self.get_stats()
+        total_chunks = stats.get("total_rag_chunks", 0)
+        indexed_count = 0
+        is_vectorized = False
+
+        if vector_db and total_chunks > 0:
+            try:
+                collection = vector_db.get_collection(embedding_model)
+                if collection:
+                    res = collection.get(where={"source_type": "pastoral_upvr"}, include=[])
+                    if res and res.get("ids"):
+                        indexed_count = len(res["ids"])
+                        is_vectorized = (indexed_count >= total_chunks)
+            except Exception as e:
+                logger.debug(f"[UPVRManager] get_rag_status collection check: {e}")
+
+        pct = int((indexed_count / total_chunks * 100)) if total_chunks > 0 else 0
+
+        return {
+            "installed": stats.get("installed", False),
+            "total_episodes": stats.get("total_episodes", 0),
+            "total_chunks": total_chunks,
+            "indexed_chunks": indexed_count,
+            "is_vectorized": is_vectorized,
+            "percentage": pct,
+            "embedding_model": embedding_model
+        }
+
+    def vectorize_all_chunks(
+        self,
+        vector_db: Any,
+        embedding_model: str = "bge_multilingual_gemma2 (Infomaniak)",
+        progress_callback: Optional[Callable[[int, int, int], None]] = None
+    ) -> int:
+        """
+        Vectorise l'intégralité des chunks RAG d'UPVR dans ChromaDB
+        avec notification de progression en temps réel.
+        """
+        if not vector_db:
+            raise ValueError("VectorDB non initialisé")
+
+        chunks = self.get_all_rag_chunks()
+        if not chunks:
+            logger.warning("[UPVRManager] Aucun chunk UPVR à vectoriser.")
+            if progress_callback:
+                progress_callback(100, 0, 0)
+            return 0
+
+        total = len(chunks)
+        logger.info(f"[UPVRManager] Début de vectorisation de {total} chunks UPVR avec {embedding_model}...")
+
+        vector_db.add_chunks(
+            chunks=chunks,
+            embedding_model=embedding_model,
+            progress_callback=progress_callback
+        )
+
+        logger.info(f"[UPVRManager] Vectorisation terminée ({total} chunks).")
+        return total
