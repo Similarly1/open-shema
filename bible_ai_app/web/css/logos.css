@@ -34984,6 +34984,45 @@ body[class*="palette-dark"] .mm-img-mode-pill.active {
   pointer-events: none;
 }
 
+/* Pilules de sélection chromatique (Couleur, Noir & Blanc, Teinte) */
+.mm-img-color-pill:hover {
+  filter: brightness(0.95);
+}
+
+body.theme-dark .mm-img-color-pill,
+body[class*="palette-dark"] .mm-img-color-pill {
+  background: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+body.theme-dark .mm-img-color-pill.active,
+body[class*="palette-dark"] .mm-img-color-pill.active {
+  background: #2563eb !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* Contrôles de recadrage interactif & zoom */
+.mm-crop-container {
+  user-select: none;
+  touch-action: none;
+}
+
+.mm-crop-viewport {
+  cursor: grab;
+}
+
+.mm-crop-viewport.panning,
+.mm-crop-viewport:active {
+  cursor: grabbing;
+}
+
+.mm-crop-zoom-slider {
+  accent-color: var(--accent-blue, #2563eb);
+  cursor: pointer;
+}
+
 @keyframes mmSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

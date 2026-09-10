@@ -136,6 +136,14 @@ const MindMapView = {
             <marker id="mm-rel-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
             </marker>
+            <filter id="mm-filter-bw">
+              <feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"/>
+              <feComponentTransfer>
+                <feFuncR type="linear" slope="1.15" intercept="-0.05"/>
+                <feFuncG type="linear" slope="1.15" intercept="-0.05"/>
+                <feFuncB type="linear" slope="1.15" intercept="-0.05"/>
+              </feComponentTransfer>
+            </filter>
           </defs>
           <g id="mindmap-viewport"></g>
         </svg>
@@ -1065,6 +1073,58 @@ const MindMapView = {
   // PARSING & SÉRIALISATION MARKDOWN ↔ TREE
   // =========================================================================
 
+  parseImageDirective(raw) {
+    let image = raw;
+    let mode = 'background';
+    let zoom = 1.0;
+    let panX = 0;
+    let panY = 0;
+    let color = 'natural';
+
+    if (raw && raw.includes('|')) {
+      const parts = raw.split('|');
+      image = parts[0].trim();
+      const modeMatch = raw.match(/mode:\s*([a-zA-Z\-]+)/i);
+      if (modeMatch) mode = modeMatch[1].trim().toLowerCase();
+
+      const zoomMatch = raw.match(/zoom:\s*([0-9.]+)/i);
+      if (zoomMatch) {
+        const z = parseFloat(zoomMatch[1]);
+        if (!isNaN(z) && z >= 0.5 && z <= 4.0) zoom = Math.round(z * 100) / 100;
+      }
+
+      const panMatch = raw.match(/pan:\s*(-?[0-9.]+)\s*,\s*(-?[0-9.]+)/i);
+      if (panMatch) {
+        const px = parseFloat(panMatch[1]);
+        const py = parseFloat(panMatch[2]);
+        if (!isNaN(px)) panX = Math.round(px * 10) / 10;
+        if (!isNaN(py)) panY = Math.round(py * 10) / 10;
+      }
+
+      const colorMatch = raw.match(/color:\s*([a-zA-Z\-]+)/i);
+      if (colorMatch) color = colorMatch[1].trim().toLowerCase();
+    }
+    return { image, mode, zoom, panX, panY, color };
+  },
+
+  serializeImageDirective(node) {
+    if (!node || !node.image) return '';
+    const parts = [node.image];
+    if (node.imageMode && node.imageMode !== 'background') {
+      parts.push(`mode: ${node.imageMode}`);
+    }
+    if (typeof node.imageZoom === 'number' && node.imageZoom !== 1.0) {
+      parts.push(`zoom: ${node.imageZoom}`);
+    }
+    if ((typeof node.imagePanX === 'number' && node.imagePanX !== 0) || (typeof node.imagePanY === 'number' && node.imagePanY !== 0)) {
+      parts.push(`pan: ${node.imagePanX || 0},${node.imagePanY || 0}`);
+    }
+    if (node.imageColor && node.imageColor !== 'natural') {
+      parts.push(`color: ${node.imageColor}`);
+    }
+    return parts.join(' | ');
+  },
+
   parseMarkdownToTree(title, markdownContent) {
     // Détection de la directive de structure <!-- mindmap-layout: radiant|right-tree|top-down -->
     let structure = 'radiant';
@@ -1094,6 +1154,10 @@ const MindMapView = {
     let rootIcon = null;
     let rootImage = null;
     let rootImageMode = 'background';
+    let rootImageZoom = 1.0;
+    let rootImagePanX = 0;
+    let rootImagePanY = 0;
+    let rootImageColor = 'natural';
     let rootTitle = (title || 'CONCEPT CENTRAL').toUpperCase();
     if (markdownContent) {
       const rootIconMatch = markdownContent.match(/<!--\s*mindmap-root-icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
@@ -1102,15 +1166,13 @@ const MindMapView = {
       }
       const rootImageMatch = markdownContent.match(/<!--\s*mindmap-root-image:\s*([\s\S]*?)\s*-->/i);
       if (rootImageMatch) {
-        const raw = rootImageMatch[1].trim();
-        if (raw.includes('|')) {
-          const parts = raw.split('|');
-          rootImage = parts[0].trim();
-          const modeMatch = raw.match(/mode:\s*([a-zA-Z\-]+)/i);
-          if (modeMatch) rootImageMode = modeMatch[1].trim().toLowerCase();
-        } else {
-          rootImage = raw;
-        }
+        const parsed = this.parseImageDirective(rootImageMatch[1].trim());
+        rootImage = parsed.image;
+        rootImageMode = parsed.mode;
+        rootImageZoom = parsed.zoom;
+        rootImagePanX = parsed.panX;
+        rootImagePanY = parsed.panY;
+        rootImageColor = parsed.color;
       }
     }
     const titleIconMatch = rootTitle.match(/::([a-zA-Z0-9_-]+):?/i);
@@ -1127,6 +1189,10 @@ const MindMapView = {
     if (!rootImage && this.currentNote && this.currentNote.rootImage) {
       rootImage = this.currentNote.rootImage;
       rootImageMode = this.currentNote.rootImageMode || 'background';
+      rootImageZoom = this.currentNote.rootImageZoom || 1.0;
+      rootImagePanX = this.currentNote.rootImagePanX || 0;
+      rootImagePanY = this.currentNote.rootImagePanY || 0;
+      rootImageColor = this.currentNote.rootImageColor || 'natural';
     }
 
     const root = {
@@ -1135,6 +1201,10 @@ const MindMapView = {
       icon: rootIcon,
       image: rootImage,
       imageMode: rootImageMode,
+      imageZoom: rootImageZoom,
+      imagePanX: rootImagePanX,
+      imagePanY: rootImagePanY,
+      imageColor: rootImageColor,
       ref: '',
       children: [],
       side: 'center',
@@ -1217,20 +1287,22 @@ const MindMapView = {
           }
         }
 
-        // Extraction d'une image <!-- image: path | mode: image-only -->
+        // Extraction d'une image <!-- image: path | mode: ... | zoom: ... | pan: ... | color: ... -->
         let image = null;
         let imageMode = 'background';
+        let imageZoom = 1.0;
+        let imagePanX = 0;
+        let imagePanY = 0;
+        let imageColor = 'natural';
         const imageMatch = text.match(/<!--\s*image:\s*([\s\S]*?)\s*-->/i);
         if (imageMatch) {
-          const raw = imageMatch[1].trim();
-          if (raw.includes('|')) {
-            const parts = raw.split('|');
-            image = parts[0].trim();
-            const modeMatch = raw.match(/mode:\s*([a-zA-Z\-]+)/i);
-            if (modeMatch) imageMode = modeMatch[1].trim().toLowerCase();
-          } else {
-            image = raw;
-          }
+          const parsed = this.parseImageDirective(imageMatch[1].trim());
+          image = parsed.image;
+          imageMode = parsed.mode;
+          imageZoom = parsed.zoom;
+          imagePanX = parsed.panX;
+          imagePanY = parsed.panY;
+          imageColor = parsed.color;
           text = text.replace(imageMatch[0], '').trim();
         }
 
@@ -1254,6 +1326,10 @@ const MindMapView = {
           icon: icon,
           image: image,
           imageMode: imageMode,
+          imageZoom: imageZoom,
+          imagePanX: imagePanX,
+          imagePanY: imagePanY,
+          imageColor: imageColor,
           ref: ref,
           note: noteText,
           children: [],
@@ -1523,8 +1599,7 @@ const MindMapView = {
       md += `<!-- mindmap-root-icon: ${tree.icon} -->\n`;
     }
     if (tree && tree.image) {
-      const rootModePart = (tree.imageMode && tree.imageMode !== 'background') ? ` | mode: ${tree.imageMode}` : '';
-      md += `<!-- mindmap-root-image: ${tree.image}${rootModePart} -->\n`;
+      md += `<!-- mindmap-root-image: ${this.serializeImageDirective(tree)} -->\n`;
     }
     const serializeChildren = (node, indentLevel) => {
       if (!node || !node.children) return;
@@ -1532,8 +1607,7 @@ const MindMapView = {
         const indent = '  '.repeat(indentLevel);
         const markerPart = child.marker ? ` <!-- marker: ${child.marker} -->` : '';
         const iconPart = child.icon ? ` <!-- icon: ${child.icon} -->` : '';
-        const childModePart = (child.imageMode && child.imageMode !== 'background') ? ` | mode: ${child.imageMode}` : '';
-        const imagePart = child.image ? ` <!-- image: ${child.image}${childModePart} -->` : '';
+        const imagePart = child.image ? ` <!-- image: ${this.serializeImageDirective(child)} -->` : '';
         const refPart = child.ref ? ` [${child.ref}]` : '';
         const notePart = child.note ? ` <!-- note: ${child.note.replace(/\r?\n/g, ' ')} -->` : '';
         md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}${iconPart}${imagePart}\n`;
@@ -3627,6 +3701,12 @@ const MindMapView = {
         const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         imgG.setAttribute('clip-path', `url(#${rootClipId})`);
 
+        const rootZoom = (typeof node.imageZoom === 'number' && node.imageZoom >= 0.5) ? node.imageZoom : 1.0;
+        const rootPanX = typeof node.imagePanX === 'number' ? node.imagePanX : 0;
+        const rootPanY = typeof node.imagePanY === 'number' ? node.imagePanY : 0;
+        const rootOffX = (rootPanX / 100) * (rootR * 2);
+        const rootOffY = (rootPanY / 100) * (rootR * 2);
+
         const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         imgEl.setAttribute('href', rootImgSrc);
         imgEl.setAttribute('x', -rootR);
@@ -3634,7 +3714,29 @@ const MindMapView = {
         imgEl.setAttribute('width', rootR * 2);
         imgEl.setAttribute('height', rootR * 2);
         imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-        imgG.appendChild(imgEl);
+
+        if (node.imageColor === 'bw' || node.imageColor === 'tint') {
+          imgEl.setAttribute('filter', 'url(#mm-filter-bw)');
+        }
+
+        if (rootZoom !== 1.0 || rootPanX !== 0 || rootPanY !== 0) {
+          const imgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          imgWrap.setAttribute('transform', `translate(${rootOffX}, ${rootOffY}) scale(${rootZoom})`);
+          imgWrap.appendChild(imgEl);
+          imgG.appendChild(imgWrap);
+        } else {
+          imgG.appendChild(imgEl);
+        }
+
+        // Teinte polychrome harmonisée pour le médaillon central (mix des branches)
+        if (node.imageColor === 'tint') {
+          const tintCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          tintCircle.setAttribute('r', rootR);
+          tintCircle.setAttribute('fill', `url(#${gradId})`);
+          tintCircle.setAttribute('style', 'mix-blend-mode: multiply; opacity: 0.72;');
+          tintCircle.setAttribute('pointer-events', 'none');
+          imgG.appendChild(tintCircle);
+        }
 
         const isRootImgOnly = !!rootImgSrc && (node.imageMode === 'image-only');
 
@@ -3805,14 +3907,49 @@ const MindMapView = {
           const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
           imgG.setAttribute('clip-path', `url(#${nodeClipId})`);
 
+          const vW = boxW;
+          const vH = isTopImage ? topImgH : boxH;
+          const vCx = 0;
+          const vCy = isTopImage ? (-boxH / 2 + topImgH / 2) : 0;
+          const bZoom = (typeof node.imageZoom === 'number' && node.imageZoom >= 0.5) ? node.imageZoom : 1.0;
+          const bPanX = typeof node.imagePanX === 'number' ? node.imagePanX : 0;
+          const bPanY = typeof node.imagePanY === 'number' ? node.imagePanY : 0;
+          const bOffX = (bPanX / 100) * vW;
+          const bOffY = (bPanY / 100) * vH;
+
           const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
           imgEl.setAttribute('href', branchImgSrc);
-          imgEl.setAttribute('x', -boxW / 2);
-          imgEl.setAttribute('y', -boxH / 2);
-          imgEl.setAttribute('width', boxW);
-          imgEl.setAttribute('height', isTopImage ? topImgH : boxH);
+          imgEl.setAttribute('x', -vW / 2);
+          imgEl.setAttribute('y', isTopImage ? -boxH / 2 : -boxH / 2);
+          imgEl.setAttribute('width', vW);
+          imgEl.setAttribute('height', vH);
           imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-          imgG.appendChild(imgEl);
+
+          if (node.imageColor === 'bw' || node.imageColor === 'tint') {
+            imgEl.setAttribute('filter', 'url(#mm-filter-bw)');
+          }
+
+          if (bZoom !== 1.0 || bPanX !== 0 || bPanY !== 0) {
+            const imgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            imgWrap.setAttribute('transform', `translate(${vCx + bOffX}, ${vCy + bOffY}) scale(${bZoom}) translate(${-vCx}, ${-vCy})`);
+            imgWrap.appendChild(imgEl);
+            imgG.appendChild(imgWrap);
+          } else {
+            imgG.appendChild(imgEl);
+          }
+
+          // Teinte harmonisée de branche
+          if (node.imageColor === 'tint') {
+            const tintRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            tintRect.setAttribute('x', -vW / 2);
+            tintRect.setAttribute('y', isTopImage ? -boxH / 2 : -boxH / 2);
+            tintRect.setAttribute('width', vW);
+            tintRect.setAttribute('height', vH);
+            tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
+            tintRect.setAttribute('style', 'mix-blend-mode: multiply; opacity: 0.72;');
+            tintRect.setAttribute('pointer-events', 'none');
+            imgG.appendChild(tintRect);
+          }
 
           if (isTopImage) {
             const sepLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -6000,6 +6137,12 @@ const MindMapView = {
           <span class="mm-ctx-label">${node?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
         </div>
         ${node?.image ? `
+          <div class="mm-ctx-item" data-action="image-crop">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+            </span>
+            <span class="mm-ctx-label">Recadrer & Zoomer...</span>
+          </div>
           <div class="mm-ctx-item" data-action="image-mode-background">
             <span class="mm-ctx-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
@@ -6021,6 +6164,29 @@ const MindMapView = {
             <span class="mm-ctx-label">Affichage : Vignette + Mot</span>
             ${node?.imageMode === 'top-image' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
           </div>
+          <div class="mm-ctx-divider"></div>
+          <div class="mm-ctx-item" data-action="image-color-natural">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+            </span>
+            <span class="mm-ctx-label">Couleur : Naturelle</span>
+            ${(!node?.imageColor || node?.imageColor === 'natural') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>
+          <div class="mm-ctx-item" data-action="image-color-bw">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
+            </span>
+            <span class="mm-ctx-label">Couleur : Noir & Blanc</span>
+            ${node?.imageColor === 'bw' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>
+          <div class="mm-ctx-item" data-action="image-color-tint">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><circle cx="19" cy="19" r="3" fill="currentColor"/></svg>
+            </span>
+            <span class="mm-ctx-label">Couleur : Teinte de la pastille</span>
+            ${node?.imageColor === 'tint' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>
+          <div class="mm-ctx-divider"></div>
           <div class="mm-ctx-item danger" data-action="remove-image">
             <span class="mm-ctx-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -6116,6 +6282,12 @@ const MindMapView = {
           <span class="mm-ctx-label">${this.tree?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
         </div>
         ${this.tree?.image ? `
+          <div class="mm-ctx-item" data-action="image-crop">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+            </span>
+            <span class="mm-ctx-label">Recadrer & Zoomer...</span>
+          </div>
           <div class="mm-ctx-item" data-action="image-mode-background">
             <span class="mm-ctx-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
@@ -6130,6 +6302,29 @@ const MindMapView = {
             <span class="mm-ctx-label">Affichage : Image seule (Buzan)</span>
             ${this.tree?.imageMode === 'image-only' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
           </div>
+          <div class="mm-ctx-divider"></div>
+          <div class="mm-ctx-item" data-action="image-color-natural">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+            </span>
+            <span class="mm-ctx-label">Couleur : Naturelle</span>
+            ${(!this.tree?.imageColor || this.tree?.imageColor === 'natural') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>
+          <div class="mm-ctx-item" data-action="image-color-bw">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
+            </span>
+            <span class="mm-ctx-label">Couleur : Noir & Blanc</span>
+            ${this.tree?.imageColor === 'bw' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>
+          <div class="mm-ctx-item" data-action="image-color-tint">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><circle cx="19" cy="19" r="3" fill="currentColor"/></svg>
+            </span>
+            <span class="mm-ctx-label">Couleur : Dégradé central</span>
+            ${this.tree?.imageColor === 'tint' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>
+          <div class="mm-ctx-divider"></div>
           <div class="mm-ctx-item danger" data-action="remove-image">
             <span class="mm-ctx-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -6410,6 +6605,11 @@ const MindMapView = {
               this.openImageGenModal(targetNodeId);
             }
             break;
+          case 'image-crop':
+            if (targetNodeId) {
+              this.openImageGenModal(targetNodeId);
+            }
+            break;
           case 'image-mode-background':
             if (targetNodeId) {
               this.setNodeImageMode(targetNodeId, 'background');
@@ -6423,6 +6623,21 @@ const MindMapView = {
           case 'image-mode-top-image':
             if (targetNodeId) {
               this.setNodeImageMode(targetNodeId, 'top-image');
+            }
+            break;
+          case 'image-color-natural':
+            if (targetNodeId) {
+              this.setNodeImageColor(targetNodeId, 'natural');
+            }
+            break;
+          case 'image-color-bw':
+            if (targetNodeId) {
+              this.setNodeImageColor(targetNodeId, 'bw');
+            }
+            break;
+          case 'image-color-tint':
+            if (targetNodeId) {
+              this.setNodeImageColor(targetNodeId, 'tint');
             }
             break;
           case 'remove-image':
@@ -6833,6 +7048,44 @@ const MindMapView = {
     }
   },
 
+  setNodeImageColor(nodeId, color) {
+    if (this.isReadOnly || !nodeId) return;
+    const isRoot = (nodeId === 'root');
+    const node = this.findNode(nodeId);
+    if (!node) return;
+    node.imageColor = color;
+    if (isRoot && this.currentNote) {
+      this.currentNote.rootImageColor = color;
+    }
+    this.draw();
+    this.syncAndAutoSave();
+    const colorLabels = {
+      'natural': 'Couleur naturelle',
+      'bw': 'Noir & Blanc artistique',
+      'tint': isRoot ? 'Dégradé central' : 'Teinte de la pastille'
+    };
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Harmonie visuelle : ${colorLabels[color] || color}`);
+    }
+  },
+
+  setNodeImageCrop(nodeId, zoom, panX, panY) {
+    if (this.isReadOnly || !nodeId) return;
+    const isRoot = (nodeId === 'root');
+    const node = this.findNode(nodeId);
+    if (!node) return;
+    node.imageZoom = typeof zoom === 'number' ? zoom : 1.0;
+    node.imagePanX = typeof panX === 'number' ? panX : 0;
+    node.imagePanY = typeof panY === 'number' ? panY : 0;
+    if (isRoot && this.currentNote) {
+      this.currentNote.rootImageZoom = node.imageZoom;
+      this.currentNote.rootImagePanX = node.imagePanX;
+      this.currentNote.rootImagePanY = node.imagePanY;
+    }
+    this.draw();
+    this.syncAndAutoSave();
+  },
+
   removeNodeImage(nodeId) {
     if (this.isReadOnly || !nodeId) return;
     const node = this.findNode(nodeId);
@@ -6840,9 +7093,17 @@ const MindMapView = {
     delete node.image;
     delete node.imageDataUrl;
     delete node.imageMode;
+    delete node.imageZoom;
+    delete node.imagePanX;
+    delete node.imagePanY;
+    delete node.imageColor;
     if (nodeId === 'root' && this.currentNote) {
       delete this.currentNote.rootImage;
       delete this.currentNote.rootImageMode;
+      delete this.currentNote.rootImageZoom;
+      delete this.currentNote.rootImagePanX;
+      delete this.currentNote.rootImagePanY;
+      delete this.currentNote.rootImageColor;
     }
     this.layoutTree();
     this.draw();
@@ -6873,13 +7134,22 @@ const MindMapView = {
     ];
     let selectedStyle = 'biblical_oil';
     let selectedMode = node.imageMode || 'background';
+    let selectedColor = node.imageColor || 'natural';
+    let selectedZoom = (typeof node.imageZoom === 'number' && node.imageZoom >= 0.5) ? node.imageZoom : 1.0;
+    let selectedPanX = typeof node.imagePanX === 'number' ? node.imagePanX : 0;
+    let selectedPanY = typeof node.imagePanY === 'number' ? node.imagePanY : 0;
     let generatedImageResult = null;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let startPanX = 0;
+    let startPanY = 0;
 
     const overlay = document.createElement('div');
     overlay.id = 'mm-image-gen-overlay';
     overlay.className = 'mm-prompt-overlay';
     overlay.innerHTML = `
-      <div class="mm-prompt-dialog mm-image-modal" style="width: 530px; max-width: 95vw;">
+      <div class="mm-prompt-dialog mm-image-modal" style="width: 540px; max-width: 95vw;">
         <div class="mm-prompt-header">
           <div class="mm-prompt-header-left">
             <div class="mm-prompt-icon-badge" style="background: rgba(234, 88, 12, 0.15); color: #ea580c;">
@@ -6894,7 +7164,7 @@ const MindMapView = {
         </div>
 
         <p class="mm-prompt-desc" style="margin-bottom: 8px; font-size: 12px; line-height: 1.5;">
-          Générez une illustration avec <strong>Infomaniak Flux (Flux Schnell)</strong> et choisissez sa disposition selon les lois de Buzan.
+          Générez une illustration avec <strong>Infomaniak Flux (Flux Schnell)</strong> et ajustez son cadrage selon les lois de Buzan.
         </p>
 
         <!-- Sélecteur de style artistique -->
@@ -6907,8 +7177,8 @@ const MindMapView = {
         </div>
 
         <!-- Sélecteur de mode d'affichage visuel (Lois de Buzan) -->
-        <div style="margin-bottom: 10px;">
-          <label style="font-size: 10.5px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px;">
+        <div style="margin-bottom: 8px;">
+          <label style="font-size: 10.5px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
             Disposition visuelle (Lois de Buzan)
           </label>
           <div class="mm-img-modes-row" style="display: flex; gap: 6px;">
@@ -6926,6 +7196,27 @@ const MindMapView = {
               <span>Vignette + Mot</span>
             </button>
             ` : ''}
+          </div>
+        </div>
+
+        <!-- Sélecteur d'harmonisation chromatique -->
+        <div style="margin-bottom: 10px;">
+          <label style="font-size: 10.5px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
+            Harmonisation chromatique
+          </label>
+          <div class="mm-img-colors-row" style="display: flex; gap: 6px;">
+            <button type="button" class="mm-img-color-pill ${selectedColor === 'natural' ? 'active' : ''}" data-color="natural" style="flex: 1; padding: 6px 8px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid ${selectedColor === 'natural' ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${selectedColor === 'natural' ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${selectedColor === 'natural' ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+              <span>Couleur naturelle</span>
+            </button>
+            <button type="button" class="mm-img-color-pill ${selectedColor === 'bw' ? 'active' : ''}" data-color="bw" style="flex: 1; padding: 6px 8px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid ${selectedColor === 'bw' ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${selectedColor === 'bw' ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${selectedColor === 'bw' ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
+              <span>Noir & Blanc</span>
+            </button>
+            <button type="button" class="mm-img-color-pill ${selectedColor === 'tint' ? 'active' : ''}" data-color="tint" style="flex: 1; padding: 6px 8px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid ${selectedColor === 'tint' ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${selectedColor === 'tint' ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${selectedColor === 'tint' ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><circle cx="19" cy="19" r="3" fill="currentColor"/></svg>
+              <span>${isRoot ? 'Dégradé central' : 'Teinte pastille'}</span>
+            </button>
           </div>
         </div>
 
@@ -6955,9 +7246,34 @@ const MindMapView = {
         </div>
 
         <!-- Zone d'aperçu / résultat -->
-        <div id="mm-img-preview-container" style="background: var(--bg-secondary, #0f172a); border-radius: 10px; padding: 10px; margin-bottom: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; position: relative; overflow: hidden; border: 1px solid var(--border-color, rgba(255,255,255,0.1));">
+        <div id="mm-img-preview-container" class="mm-crop-container" style="background: var(--bg-secondary, #0f172a); border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; position: relative; overflow: hidden; border: 1px solid var(--border-color, rgba(255,255,255,0.1));">
           <div id="mm-img-preview-placeholder" style="color: var(--text-secondary); font-size: 12px; text-align: center;">
             ${currentImg ? '' : 'Aucune illustration générée pour le moment'}
+          </div>
+        </div>
+
+        <!-- Barre de contrôles Recadrage interactif & Zoom (visible si une image est présente) -->
+        <div id="mm-img-crop-controls" style="display: ${currentImg ? 'flex' : 'none'}; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; padding: 6px 10px; background: rgba(0,0,0,0.18); border-radius: 8px; border: 1px solid var(--border-color, rgba(255,255,255,0.08));">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              <span>Zoom</span>
+            </span>
+            <button type="button" id="mm-crop-zoom-out" title="Dézoomer" style="background: var(--bg-secondary, #334155); border: 1px solid var(--border-color, #475569); color: var(--text-primary); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <input type="range" id="mm-crop-zoom-range" class="mm-crop-zoom-slider" min="100" max="250" step="5" value="${Math.round(selectedZoom * 100)}" style="width: 85px;" />
+            <button type="button" id="mm-crop-zoom-in" title="Zoomer" style="background: var(--bg-secondary, #334155); border: 1px solid var(--border-color, #475569); color: var(--text-primary); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <span id="mm-crop-zoom-val" style="font-size: 11px; font-weight: 600; min-width: 32px; color: var(--text-primary);">${Math.round(selectedZoom * 100)}%</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 10px; color: var(--text-secondary);">(Glisser l'image pour cadrer)</span>
+            <button type="button" id="mm-crop-reset" title="Réinitialiser zoom et cadrage" style="background: transparent; border: 1px solid var(--border-color, #475569); color: var(--text-secondary); font-size: 10px; padding: 2px 7px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <span>Centrer</span>
+            </button>
           </div>
         </div>
 
@@ -6987,20 +7303,90 @@ const MindMapView = {
     const promptTextarea = overlay.querySelector('#mm-img-prompt-input');
     const stylePills = overlay.querySelectorAll('.mm-img-style-pill');
     const modePills = overlay.querySelectorAll('.mm-img-mode-pill');
+    const colorPills = overlay.querySelectorAll('.mm-img-color-pill');
     const btnRegen = overlay.querySelector('#mm-img-btn-regen-prompt');
     const btnGen = overlay.querySelector('#mm-img-btn-generate');
     const btnApply = overlay.querySelector('#mm-img-btn-apply');
     const statusSpan = overlay.querySelector('#mm-img-status');
     const previewContainer = overlay.querySelector('#mm-img-preview-container');
+    const cropControls = overlay.querySelector('#mm-img-crop-controls');
+    const zoomRange = overlay.querySelector('#mm-crop-zoom-range');
+    const zoomVal = overlay.querySelector('#mm-crop-zoom-val');
     const charCountEl = overlay.querySelector('#mm-img-char-count');
+
+    const updatePreviewTransform = () => {
+      const previewImg = previewContainer.querySelector('.mm-crop-preview-img');
+      if (previewImg) {
+        previewImg.style.transform = `translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom})`;
+      }
+    };
+
+    const setZoom = (val) => {
+      selectedZoom = Math.max(1.0, Math.min(2.5, Math.round(val * 100) / 100));
+      if (zoomRange) zoomRange.value = Math.round(selectedZoom * 100);
+      if (zoomVal) zoomVal.textContent = `${Math.round(selectedZoom * 100)}%`;
+      updatePreviewTransform();
+    };
+
+    const attachCropListeners = () => {
+      const viewportEl = previewContainer.querySelector('.mm-crop-viewport');
+      if (!viewportEl) return;
+
+      viewportEl.onmousedown = (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        startPanX = selectedPanX;
+        startPanY = selectedPanY;
+        viewportEl.classList.add('panning');
+      };
+
+      viewportEl.onwheel = (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.05 : -0.05;
+        setZoom(selectedZoom + delta);
+      };
+    };
+
+    const onGlobalMouseMove = (e) => {
+      if (!isDragging) return;
+      const viewportEl = previewContainer.querySelector('.mm-crop-viewport');
+      const vW = viewportEl ? (viewportEl.clientWidth || 100) : 100;
+      const vH = viewportEl ? (viewportEl.clientHeight || 100) : 100;
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      selectedPanX = Math.max(-100, Math.min(100, Math.round(startPanX + (dx / vW) * 100)));
+      selectedPanY = Math.max(-100, Math.min(100, Math.round(startPanY + (dy / vH) * 100)));
+      updatePreviewTransform();
+    };
+
+    const onGlobalMouseUp = () => {
+      if (isDragging) {
+        isDragging = false;
+        const viewportEl = previewContainer.querySelector('.mm-crop-viewport');
+        if (viewportEl) viewportEl.classList.remove('panning');
+      }
+    };
+
+    window.addEventListener('mousemove', onGlobalMouseMove);
+    window.addEventListener('mouseup', onGlobalMouseUp);
 
     const renderPreview = (dataUrl) => {
       if (!dataUrl) return;
+      if (cropControls) cropControls.style.display = 'flex';
+
+      const filterStyle = (selectedColor === 'bw' || selectedColor === 'tint') ? 'filter: grayscale(100%) contrast(1.15) brightness(0.95);' : '';
+      const tintBg = isRoot ? 'linear-gradient(135deg, #3b82f6, #ec4899, #10b981)' : (node.color || '#3b82f6');
+      const tintOverlayHtml = selectedColor === 'tint' ? `<div class="mm-crop-preview-tint" style="position: absolute; inset: 0; pointer-events: none; background: ${tintBg}; mix-blend-mode: multiply; opacity: 0.72;"></div>` : '';
+
       if (selectedMode === 'image-only') {
         previewContainer.innerHTML = `
           <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0;">
-            <div style="width: ${isRoot ? '80px' : '64px'}; height: ${isRoot ? '80px' : '64px'}; border-radius: ${isRoot ? '50%' : '14px'}; overflow: hidden; border: 2.5px solid ${node.color || '#3b82f6'}; box-shadow: 0 4px 14px rgba(0,0,0,0.35); position: relative;">
-              <img src="${dataUrl}" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div class="mm-crop-viewport" style="width: ${isRoot ? '88px' : '72px'}; height: ${isRoot ? '88px' : '72px'}; border-radius: ${isRoot ? '50%' : '14px'}; overflow: hidden; border: 2.5px solid ${node.color || '#3b82f6'}; box-shadow: 0 4px 14px rgba(0,0,0,0.35); position: relative; user-select: none;">
+              <img src="${dataUrl}" class="mm-crop-preview-img" style="width: 100%; height: 100%; object-fit: cover; transform: translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom}); transform-origin: center center; ${filterStyle} user-select: none; pointer-events: none;" />
+              ${tintOverlayHtml}
             </div>
             <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'image remplace le mot-clé (Loi de Buzan)</span>
             <span style="font-size: 10px; opacity: 0.75; color: var(--text-secondary);">« ${this.escapeHtml(nodeText)} » reste visible au survol</span>
@@ -7009,9 +7395,10 @@ const MindMapView = {
       } else if (selectedMode === 'top-image') {
         previewContainer.innerHTML = `
           <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 4px 0;">
-            <div style="width: 140px; border-radius: 12px; overflow: hidden; border: 2px solid ${node.color || '#3b82f6'}; background: var(--bg-card, #ffffff); box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
-              <div style="height: 64px; overflow: hidden; position: relative;">
-                <img src="${dataUrl}" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div style="width: 150px; border-radius: 12px; overflow: hidden; border: 2px solid ${node.color || '#3b82f6'}; background: var(--bg-card, #ffffff); box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
+              <div class="mm-crop-viewport" style="height: 72px; overflow: hidden; position: relative; user-select: none;">
+                <img src="${dataUrl}" class="mm-crop-preview-img" style="width: 100%; height: 100%; object-fit: cover; transform: translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom}); transform-origin: center center; ${filterStyle} user-select: none; pointer-events: none;" />
+                ${tintOverlayHtml}
               </div>
               <div style="padding: 6px 8px; text-align: center; border-top: 1px solid rgba(148,163,184,0.25); color: var(--text-primary); font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px;">
                 ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 12)}</span>` : ''}
@@ -7024,15 +7411,21 @@ const MindMapView = {
         // background (défaut)
         previewContainer.innerHTML = `
           <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center;">
-            <img src="${dataUrl}" style="max-height: 160px; width: 100%; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" />
-            <div style="position: absolute; bottom: 12px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); border: 1.5px solid ${node.color || '#3b82f6'}; border-radius: 20px; padding: 4px 14px; display: flex; align-items: center; gap: 8px; color: #ffffff; font-weight: 800; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">
-              ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 14)}</span>` : ''}
-              <span style="text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${this.escapeHtml(nodeText)}</span>
-              ${node.ref ? `<span style="font-size: 9px; padding: 1px 6px; border-radius: 4px; background: rgba(255,255,255,0.2);">${this.escapeHtml(this.formatScripturePillRef(node.ref))}</span>` : ''}
+            <div class="mm-crop-viewport" style="width: 100%; max-width: 380px; height: 140px; border-radius: 8px; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1.5px solid ${node.color || '#3b82f6'}; user-select: none;">
+              <img src="${dataUrl}" class="mm-crop-preview-img" style="width: 100%; height: 100%; object-fit: cover; transform: translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom}); transform-origin: center center; ${filterStyle} user-select: none; pointer-events: none;" />
+              ${tintOverlayHtml}
+              <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.4); pointer-events: none;"></div>
+              <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(4px); border: 1.5px solid ${node.color || '#3b82f6'}; border-radius: 20px; padding: 4px 14px; display: flex; align-items: center; gap: 8px; color: #ffffff; font-weight: 800; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.5); white-space: nowrap; pointer-events: none;">
+                ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 14)}</span>` : ''}
+                <span style="text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${this.escapeHtml(nodeText)}</span>
+                ${node.ref ? `<span style="font-size: 9px; padding: 1px 6px; border-radius: 4px; background: rgba(255,255,255,0.2);">${this.escapeHtml(this.formatScripturePillRef(node.ref))}</span>` : ''}
+              </div>
             </div>
           </div>
         `;
       }
+
+      attachCropListeners();
     };
 
     if (currentImg) {
@@ -7048,10 +7441,33 @@ const MindMapView = {
     };
     promptTextarea.addEventListener('input', updateCharCount);
 
-    const closeDialog = () => overlay.remove();
+    const closeDialog = () => {
+      window.removeEventListener('mousemove', onGlobalMouseMove);
+      window.removeEventListener('mouseup', onGlobalMouseUp);
+      overlay.remove();
+    };
     overlay.querySelector('#mm-img-x-close')?.addEventListener('click', closeDialog);
     overlay.querySelector('#mm-img-btn-cancel')?.addEventListener('click', closeDialog);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeDialog(); });
+
+    // Contrôles de zoom
+    zoomRange?.addEventListener('input', () => {
+      setZoom(parseFloat(zoomRange.value) / 100);
+    });
+
+    overlay.querySelector('#mm-crop-zoom-out')?.addEventListener('click', () => {
+      setZoom(selectedZoom - 0.1);
+    });
+
+    overlay.querySelector('#mm-crop-zoom-in')?.addEventListener('click', () => {
+      setZoom(selectedZoom + 0.1);
+    });
+
+    overlay.querySelector('#mm-crop-reset')?.addEventListener('click', () => {
+      selectedPanX = 0;
+      selectedPanY = 0;
+      setZoom(1.0);
+    });
 
     // Clic sur les styles
     stylePills.forEach(pill => {
@@ -7085,6 +7501,25 @@ const MindMapView = {
         pill.style.borderColor = 'var(--accent-blue, #2563eb)';
         pill.style.color = '#ffffff';
         selectedMode = pill.getAttribute('data-mode') || 'background';
+        const activeUrl = generatedImageResult?.dataUrl || currentImg;
+        if (activeUrl) renderPreview(activeUrl);
+      });
+    });
+
+    // Clic sur les modes chromatiques
+    colorPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        colorPills.forEach(p => {
+          p.classList.remove('active');
+          p.style.background = 'var(--bg-secondary, #f1f5f9)';
+          p.style.borderColor = 'var(--border-color, #cbd5e1)';
+          p.style.color = 'var(--text-primary)';
+        });
+        pill.classList.add('active');
+        pill.style.background = 'var(--accent-blue, #2563eb)';
+        pill.style.borderColor = 'var(--accent-blue, #2563eb)';
+        pill.style.color = '#ffffff';
+        selectedColor = pill.getAttribute('data-color') || 'natural';
         const activeUrl = generatedImageResult?.dataUrl || currentImg;
         if (activeUrl) renderPreview(activeUrl);
       });
@@ -7190,18 +7625,27 @@ const MindMapView = {
         node.imageDataUrl = generatedImageResult.dataUrl;
       }
       node.imageMode = selectedMode;
+      node.imageColor = selectedColor;
+      node.imageZoom = selectedZoom;
+      node.imagePanX = selectedPanX;
+      node.imagePanY = selectedPanY;
+
       if (isRoot && this.currentNote) {
         if (generatedImageResult) {
           this.currentNote.rootImage = generatedImageResult.relativePath;
         }
         this.currentNote.rootImageMode = selectedMode;
+        this.currentNote.rootImageColor = selectedColor;
+        this.currentNote.rootImageZoom = selectedZoom;
+        this.currentNote.rootImagePanX = selectedPanX;
+        this.currentNote.rootImagePanY = selectedPanY;
       }
       this.layoutTree();
       this.draw();
       this.syncAndAutoSave();
       closeDialog();
       if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast('Illustration et disposition enregistrées');
+        App.showToast('Illustration, recadrage et harmonie enregistrés');
       }
     });
 
