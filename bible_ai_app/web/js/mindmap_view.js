@@ -230,7 +230,7 @@ const MindMapView = {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
               </div>
               <div class="mm-struct-info">
-                <div class="mm-struct-name">Pensée radiante <span class="mm-struct-check" data-for="radiant">✓</span></div>
+                <div class="mm-struct-name">Pensée radiante <span class="mm-struct-check" data-for="radiant"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
                 <div class="mm-struct-desc">Équilibrée gauche / droite (Buzan). Idéale pour le remue-méninges et les synthèses.</div>
               </div>
             </div>
@@ -239,7 +239,7 @@ const MindMapView = {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="5" height="6" rx="1.5" fill="currentColor"/><path d="M8 12h5m0-6h6m-6 6h6m-6 6h6"/><path d="M13 6v12"/></svg>
               </div>
               <div class="mm-struct-info">
-                <div class="mm-struct-name">Arbre logique à droite <span class="mm-struct-check hidden" data-for="right-tree">✓</span></div>
+                <div class="mm-struct-name">Arbre logique à droite <span class="mm-struct-check hidden" data-for="right-tree"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
                 <div class="mm-struct-desc">Racine à gauche, branches à droite. Parfait pour plans d'homélie et exégèse linéaire.</div>
               </div>
             </div>
@@ -248,7 +248,7 @@ const MindMapView = {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="5" rx="1.5" fill="currentColor"/><path d="M12 8v5m-6 0h12m-12 0v6m6-6v6m6-6v6"/></svg>
               </div>
               <div class="mm-struct-info">
-                <div class="mm-struct-name">Organigramme descendant <span class="mm-struct-check hidden" data-for="top-down">✓</span></div>
+                <div class="mm-struct-name">Organigramme descendant <span class="mm-struct-check hidden" data-for="top-down"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
                 <div class="mm-struct-desc">Hiérarchie verticale descendante. Idéal pour généalogies et divisions structurelles.</div>
               </div>
             </div>
@@ -272,7 +272,7 @@ const MindMapView = {
                 </svg>
               </div>
               <span class="mm-style-card-name">Courbe</span>
-              <span class="mm-style-check" data-connector-for="curve">✓</span>
+              <span class="mm-style-check" data-connector-for="curve"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             </div>
 
             <div class="mm-style-card" data-style-type="connector" data-value="orthogonal" title="Ligne à angle droit avec coudes arrondis">
@@ -282,7 +282,7 @@ const MindMapView = {
                 </svg>
               </div>
               <span class="mm-style-card-name">Équerre</span>
-              <span class="mm-style-check hidden" data-connector-for="orthogonal">✓</span>
+              <span class="mm-style-check hidden" data-connector-for="orthogonal"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             </div>
 
             <div class="mm-style-card" data-style-type="connector" data-value="straight" title="Ligne droite directe">
@@ -292,7 +292,7 @@ const MindMapView = {
                 </svg>
               </div>
               <span class="mm-style-card-name">Droite</span>
-              <span class="mm-style-check hidden" data-connector-for="straight">✓</span>
+              <span class="mm-style-check hidden" data-connector-for="straight"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             </div>
           </div>
 
@@ -307,7 +307,7 @@ const MindMapView = {
                 </svg>
               </div>
               <span class="mm-style-card-name">Souligné</span>
-              <span class="mm-style-check" data-shape-for="underline">✓</span>
+              <span class="mm-style-check" data-shape-for="underline"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             </div>
 
             <div class="mm-style-card" data-style-type="shape" data-value="rounded-rect" title="Rectangle arrondi moderne">
@@ -318,7 +318,7 @@ const MindMapView = {
                 </svg>
               </div>
               <span class="mm-style-card-name">Rectangle</span>
-              <span class="mm-style-check hidden" data-shape-for="rounded-rect">✓</span>
+              <span class="mm-style-check hidden" data-shape-for="rounded-rect"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             </div>
 
             <div class="mm-style-card" data-style-type="shape" data-value="pill" title="Capsule / Pilule">
@@ -329,7 +329,7 @@ const MindMapView = {
                 </svg>
               </div>
               <span class="mm-style-card-name">Pilule</span>
-              <span class="mm-style-check hidden" data-shape-for="pill">✓</span>
+              <span class="mm-style-check hidden" data-shape-for="pill"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             </div>
           </div>
         </div>
@@ -364,9 +364,9 @@ const MindMapView = {
 
           <div class="mm-marker-section-label" style="margin-top: 10px;">Statuts & Symboles</div>
           <div class="mm-marker-grid symbols">
-            <div class="mm-marker-choice" data-marker="done" style="--m-bg: #10b981;" title="Terminé / Validé"><span>✓</span></div>
-            <div class="mm-marker-choice" data-marker="progress" style="--m-bg: #f59e0b;" title="En cours"><span>◐</span></div>
-            <div class="mm-marker-choice" data-marker="star" style="--m-bg: #f59e0b;" title="Étoile clé"><span>★</span></div>
+            <div class="mm-marker-choice" data-marker="done" style="--m-bg: #10b981;" title="Terminé / Validé"><span style="display:inline-flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+            <div class="mm-marker-choice" data-marker="progress" style="--m-bg: #f59e0b;" title="En cours"><span style="display:inline-flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#ffffff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="#ffffff"/></svg></span></div>
+            <div class="mm-marker-choice" data-marker="star" style="--m-bg: #f59e0b;" title="Étoile clé"><span style="display:inline-flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" width="11" height="11" fill="#ffffff"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span></div>
             <div class="mm-marker-choice" data-marker="alert" style="--m-bg: #ef4444;" title="Attention / Important"><span>!</span></div>
           </div>
 
@@ -5136,7 +5136,7 @@ const MindMapView = {
     this.syncAndAutoSave();
 
     if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast('✨ Carte réorganisée harmonieusement');
+      App.showToast('Carte réorganisée harmonieusement');
     }
   },
 
@@ -5834,7 +5834,7 @@ const MindMapView = {
         ${(topSuggestion && topSuggestion.id !== node?.icon) ? `
           <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
             <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
-            <span class="mm-ctx-label">✨ Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+            <span class="mm-ctx-label">Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
             <span class="mm-ctx-shortcut">1-clic</span>
           </div>
         ` : ''}
@@ -5849,7 +5849,7 @@ const MindMapView = {
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           </span>
-          <span class="mm-ctx-label">${node?.image ? 'Modifier l\'illustration IA...' : '🎨 Illustration IA (Flux)...'}</span>
+          <span class="mm-ctx-label">${node?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
         </div>
         ${node?.image ? `
           <div class="mm-ctx-item danger" data-action="remove-image">
@@ -5929,7 +5929,7 @@ const MindMapView = {
         ${(topSuggestion && topSuggestion.id !== this.tree?.icon) ? `
           <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
             <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
-            <span class="mm-ctx-label">✨ Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+            <span class="mm-ctx-label">Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
             <span class="mm-ctx-shortcut">1-clic</span>
           </div>
         ` : ''}
@@ -5944,7 +5944,7 @@ const MindMapView = {
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           </span>
-          <span class="mm-ctx-label">${this.tree?.image ? 'Modifier l\'illustration IA...' : '🎨 Illustration IA (Flux)...'}</span>
+          <span class="mm-ctx-label">${this.tree?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
         </div>
         ${this.tree?.image ? `
           <div class="mm-ctx-item danger" data-action="remove-image">
@@ -5975,17 +5975,17 @@ const MindMapView = {
         <div class="mm-ctx-item" data-action="structure-radiant">
           <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
           <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
-          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
         </div>
         <div class="mm-ctx-item" data-action="structure-right-tree">
           <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
           <span class="mm-ctx-label">Arbre logique à droite</span>
-          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
         </div>
         <div class="mm-ctx-item" data-action="structure-top-down">
           <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
           <span class="mm-ctx-label">Organigramme descendant</span>
-          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
         </div>
         <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="palette">
@@ -6048,17 +6048,17 @@ const MindMapView = {
         <div class="mm-ctx-item" data-action="structure-radiant">
           <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
           <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
-          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
         </div>
         <div class="mm-ctx-item" data-action="structure-right-tree">
           <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
           <span class="mm-ctx-label">Arbre logique à droite</span>
-          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
         </div>
         <div class="mm-ctx-item" data-action="structure-top-down">
           <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
           <span class="mm-ctx-label">Organigramme descendant</span>
-          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut">✓</span>' : ''}
+          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
         </div>
         <div class="mm-ctx-item" data-action="open-styles">
           <span class="mm-ctx-icon">
@@ -6693,9 +6693,14 @@ const MindMapView = {
 
         <!-- Bouton d'action Génération -->
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <span id="mm-img-status" style="font-size: 11px; color: var(--text-secondary);">⚡ Moteur : Infomaniak Flux (< 3s)</span>
+          <span id="mm-img-status" style="font-size: 11px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Moteur : Infomaniak Flux (&lt; 3s)</span>
+          </span>
           <button type="button" class="btn-primary" id="mm-img-btn-generate" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700;">
-            <span id="mm-img-gen-icon">🎨</span>
+            <span id="mm-img-gen-icon" style="display: inline-flex; align-items: center;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/></svg>
+            </span>
             <span id="mm-img-gen-label">Générer avec Flux</span>
           </button>
         </div>
@@ -6724,8 +6729,9 @@ const MindMapView = {
           </div>
           <div class="mm-prompt-actions-right" style="display: flex; gap: 8px;">
             <button type="button" class="btn-secondary" id="mm-img-btn-cancel">Annuler</button>
-            <button type="button" class="btn-primary" id="mm-img-btn-apply" disabled style="opacity: 0.5;">
-              ✨ Appliquer à la pastille
+            <button type="button" class="btn-primary" id="mm-img-btn-apply" disabled style="opacity: 0.5; display: inline-flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Appliquer à la pastille</span>
             </button>
           </div>
         </div>
@@ -6768,7 +6774,7 @@ const MindMapView = {
     // Chargement automatique du prompt artistique
     const loadSuggestedPrompt = async () => {
       promptTextarea.disabled = true;
-      statusSpan.textContent = '✨ Synthèse du prompt artistique contextuel...';
+      statusSpan.textContent = 'Synthèse du prompt artistique contextuel...';
       if (window.pywebview && window.pywebview.api && window.pywebview.api.get_suggested_image_prompt) {
         try {
           const res = await window.pywebview.api.get_suggested_image_prompt(
@@ -6780,18 +6786,18 @@ const MindMapView = {
           );
           if (res && res.success && res.prompt) {
             promptTextarea.value = res.prompt;
-            statusSpan.textContent = '⚡ Prêt pour génération Flux';
+            statusSpan.textContent = 'Prêt pour génération Flux';
           } else {
             promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
-            statusSpan.textContent = '⚡ Prêt pour génération';
+            statusSpan.textContent = 'Prêt pour génération';
           }
         } catch (e) {
           promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
-          statusSpan.textContent = '⚡ Prêt pour génération';
+          statusSpan.textContent = 'Prêt pour génération';
         }
       } else {
         promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
-        statusSpan.textContent = '⚡ Prêt pour génération';
+        statusSpan.textContent = 'Prêt pour génération';
       }
       promptTextarea.disabled = false;
     };
@@ -6805,14 +6811,14 @@ const MindMapView = {
 
       btnGen.disabled = true;
       btnGen.style.opacity = '0.6';
-      overlay.querySelector('#mm-img-gen-icon').textContent = '⏳';
+      overlay.querySelector('#mm-img-gen-icon').innerHTML = '<span style="display:inline-block; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:mmSpin 0.7s linear infinite;"></span>';
       overlay.querySelector('#mm-img-gen-label').textContent = 'Génération en cours...';
-      statusSpan.textContent = '🎨 Infomaniak Flux génère votre illustration...';
+      statusSpan.textContent = 'Infomaniak Flux génère votre illustration...';
 
       previewContainer.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-secondary); padding: 20px 0;">
           <div style="width: 24px; height: 24px; border: 2.5px solid rgba(255,255,255,0.2); border-top-color: #3b82f6; border-radius: 50%; animation: mmSpin 0.7s linear infinite;"></div>
-          <span style="font-size: 11px;">Création du chef-d'œuvre par Flux Schnell (< 3s)...</span>
+          <span style="font-size: 11px;">Création par Flux Schnell (< 3s)...</span>
         </div>
       `;
 
@@ -6826,7 +6832,7 @@ const MindMapView = {
           );
           if (res && res.success && res.dataUrl) {
             generatedImageResult = res;
-            statusSpan.textContent = '✅ Illustration générée avec succès !';
+            statusSpan.textContent = 'Illustration générée avec succès !';
             previewContainer.innerHTML = `
               <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <img src="${res.dataUrl}" style="max-height: 180px; width: 100%; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" />
@@ -6842,17 +6848,17 @@ const MindMapView = {
             btnApply.style.opacity = '1';
           } else {
             const err = res?.error || 'Erreur inconnue';
-            statusSpan.textContent = `❌ ${err}`;
+            statusSpan.textContent = `Erreur : ${err}`;
             previewContainer.innerHTML = `<div style="color: #ef4444; font-size: 12px; text-align: center; padding: 10px;">${this.escapeHtml(err)}</div>`;
           }
         }
       } catch (ex) {
-        statusSpan.textContent = `❌ Erreur : ${ex.message || ex}`;
+        statusSpan.textContent = `Erreur : ${ex.message || ex}`;
         previewContainer.innerHTML = `<div style="color: #ef4444; font-size: 12px; text-align: center; padding: 10px;">${this.escapeHtml(String(ex))}</div>`;
       } finally {
         btnGen.disabled = false;
         btnGen.style.opacity = '1';
-        overlay.querySelector('#mm-img-gen-icon').textContent = '🎨';
+        overlay.querySelector('#mm-img-gen-icon').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/></svg>';
         overlay.querySelector('#mm-img-gen-label').textContent = 'Régénérer avec Flux';
       }
     });
@@ -6870,7 +6876,7 @@ const MindMapView = {
       this.syncAndAutoSave();
       closeDialog();
       if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast('🎨 Illustration appliquée en fond de pastille !');
+        App.showToast('Illustration appliquée en fond de pastille');
       }
     });
 
@@ -7419,7 +7425,7 @@ const MindMapView = {
     this.syncAndAutoSave();
 
     if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast(`Liaison créée : « ${fromNode?.text} » ➔ « ${toNode?.text} »`);
+      App.showToast(`Liaison créée : « ${fromNode?.text} » → « ${toNode?.text} »`);
     }
 
     this.promptEditRelationshipLabel(createdId);
