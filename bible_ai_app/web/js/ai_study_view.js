@@ -1500,6 +1500,18 @@ const AIStudyView = {
     };
   },
 
+  getCuratorModelName() {
+    let cur = (typeof SettingsView !== 'undefined' && SettingsView.config)
+      ? (SettingsView.config.curator_model || SettingsView.config.rag_curation_model)
+      : null;
+    if (!cur) {
+      const el = document.getElementById('cfg-curator-model');
+      if (el && el.value) cur = el.value;
+    }
+    if (!cur) cur = 'mistralai/Ministral-3-14B-Instruct-2512';
+    return cur.split('/').pop().replace(/-instruct/i, '');
+  },
+
   // =========================================================================
   // ENVOI DE QUESTION & AFFICHAGE DU REASONING / LOADER (Sobre & Sans émojis)
   // =========================================================================
@@ -1576,6 +1588,8 @@ const AIStudyView = {
     const isFreeChat = mode === 'free_chat';
     const isThinkingDisabled = options.thinking_level === 'off';
     const thinkingLabel = isThinkingDisabled ? "Réflexion désactivée" : (options.thinking_level === 'low' ? "Raisonnement rapide" : (options.thinking_level === 'high' ? "Raisonnement approfondi" : "Raisonnement équilibré"));
+    const isCuratorActive = !isFreeChat && !!options.enable_curator;
+    const curatorModelName = this.getCuratorModelName();
 
     let stepsHtml = '';
     if (isFreeChat) {
@@ -1585,6 +1599,24 @@ const AIStudyView = {
           <span class="step-bullet"></span>
           <div class="step-text-container">
             <span class="step-label">Échange et réflexion avec ${this.escapeHtml(options.model)}${isThinkingDisabled ? ' (direct)' : ''}</span>
+          </div>
+        </div>
+      `;
+    } else if (isCuratorActive) {
+      stepsHtml = `
+        <div class="reasoning-step step-1 active"><span class="step-bullet"></span><span>Analyse de l'intention et du contexte</span></div>
+        <div class="reasoning-step step-2 pending"><span class="step-bullet"></span><span>Exploration du corpus documentaire</span></div>
+        <div class="reasoning-step step-3 pending"><span class="step-bullet"></span><span>Sélection et ordonnancement sémantique</span></div>
+        <div class="reasoning-step step-4 pending">
+          <span class="step-bullet"></span>
+          <div class="step-text-container">
+            <span class="step-label">Épuration &amp; curation sémantique avec ${this.escapeHtml(curatorModelName)}</span>
+          </div>
+        </div>
+        <div class="reasoning-step step-5 pending">
+          <span class="step-bullet"></span>
+          <div class="step-text-container">
+            <span class="step-label">Synthèse IA avec ${this.escapeHtml(options.model)} (${thinkingLabel})</span>
           </div>
         </div>
       `;
@@ -1646,6 +1678,24 @@ const AIStudyView = {
         reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
       }, 350);
       this.activeTimeouts.push(t1);
+    } else if (isCuratorActive) {
+      const t1 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-2')?.classList.replace('pending', 'active');
+      }, 500);
+      const t2 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-2')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-3')?.classList.replace('pending', 'active');
+      }, 1200);
+      const t3 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-3')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-4')?.classList.replace('pending', 'active');
+      }, 2000);
+      const t4 = setTimeout(() => {
+        reasoningEl?.querySelector('.step-4')?.classList.replace('active', 'done');
+        reasoningEl?.querySelector('.step-5')?.classList.replace('pending', 'active');
+      }, 14000);
+      this.activeTimeouts.push(t1, t2, t3, t4);
     } else {
       const t1 = setTimeout(() => {
         reasoningEl?.querySelector('.step-1')?.classList.replace('active', 'done');
@@ -1690,6 +1740,13 @@ const AIStudyView = {
         reasoningEl.classList.remove('active');
         reasoningEl.classList.add('collapsed');
         
+        let curatorSummaryHtml = '';
+        if (response.curator_info?.enabled || isCuratorActive) {
+          const curModel = response.curator_info?.model || curatorModelName;
+          const countStr = response.curator_info?.count ? ` (${response.curator_info.count} extraits filtrés & condensés)` : '';
+          curatorSummaryHtml = `<div class="reasoning-summary-item"><span>Curation sémantique : <strong>${this.escapeHtml(curModel)}</strong>${countStr}</span></div>`;
+        }
+
         reasoningEl.innerHTML = `
           <div class="ai-reasoning-header clickable" title="Afficher ou masquer les détails du raisonnement">
             <div class="ai-reasoning-title">
@@ -1701,6 +1758,8 @@ const AIStudyView = {
           <div class="ai-reasoning-details hidden">
             <div class="reasoning-summary-item"><span>Intention détectée : ${this.escapeHtml(detectedMode)}</span></div>
             <div class="reasoning-summary-item"><span>Corpus mobilisé : ${sourcesUsed.length} source(s) analysée(s)</span></div>
+            ${curatorSummaryHtml}
+            <div class="reasoning-summary-item"><span>Modèle de synthèse : ${this.escapeHtml(modelUsed)}</span></div>
           </div>
         `;
 
@@ -1832,6 +1891,7 @@ const AIStudyView = {
     if (t.includes('dict')) return 'dict';
     if (t.includes('comm')) return 'comm';
     if (t.includes('note')) return 'notes';
+    if (t.includes('pastor') || t.includes('upvr') || t.includes('varak') || t.includes('apj') || t.includes('piper')) return 'pastoral';
     return 'theology';
   },
 
@@ -1841,6 +1901,8 @@ const AIStudyView = {
     if (t.includes('dict')) return 'Dictionnaire';
     if (t.includes('comm')) return 'Commentaire';
     if (t.includes('note')) return 'Notes';
+    if (t.includes('pastor') || t.includes('upvr') || t.includes('varak')) return 'Pastorale • UPVR';
+    if (t.includes('apj') || t.includes('piper')) return 'Pastorale • APJ';
     return 'Théologie';
   },
 
@@ -1850,6 +1912,7 @@ const AIStudyView = {
     if (t.includes('dict')) return this.ICONS.dict;
     if (t.includes('comm')) return this.ICONS.book;
     if (t.includes('note')) return this.ICONS.notes;
+    if (t.includes('pastor') || t.includes('upvr') || t.includes('varak') || t.includes('apj') || t.includes('piper')) return this.ICONS.mic;
     return this.ICONS.book;
   },
 
@@ -2210,6 +2273,8 @@ const AIStudyView = {
 
   guessAuthor(name) {
     const n = (name || '').toLowerCase();
+    if (n.includes('varak') || n.includes('upvr')) return 'Florent Varak';
+    if (n.includes('piper') || n.includes('apj')) return 'John Piper';
     if (n.includes('clarke')) return 'Adam Clarke';
     if (n.includes('gaebelein')) return 'A.C. Gaebelein';
     if (n.includes('godet')) return 'Frédéric Godet';
@@ -2284,21 +2349,37 @@ const AIStudyView = {
 
       const matched = sourcesDetails.find(s => {
         const t = (s.title || '').toLowerCase();
+        const a = (s.author || '').toLowerCase();
         const b = mappedBookName.toLowerCase();
         const r = cleanContent.toLowerCase();
-        return t === b || t.includes(b) || b.includes(t) || t.includes(r) || r.includes(t) || (entryTerm && t.includes(entryTerm.toLowerCase()));
+        return t === b || t.includes(b) || b.includes(t) || t.includes(r) || r.includes(t) ||
+               (a && (a === r || a.includes(r) || r.includes(a))) ||
+               (entryTerm && t.includes(entryTerm.toLowerCase()));
       });
 
-      const typeClass = matched ? this.getSourceTypeClass(matched.type) : this.getSourceTypeClass(mappedBookName);
-      const typeLabel = matched ? this.getSourceTypeLabel(matched.type) : this.getSourceTypeLabel(mappedBookName);
-      const author = (matched?.author || this.guessAuthor(mappedBookName) || '').slice(0, 60);
-      const coverUrl = matched?.cover_url || null;
+      const isPastoral = (matched?.type && matched.type.toLowerCase().includes('pastor')) ||
+                         mappedBookName.toLowerCase().includes('varak') ||
+                         mappedBookName.toLowerCase().includes('upvr') ||
+                         mappedBookName.toLowerCase().includes('piper') ||
+                         mappedBookName.toLowerCase().includes('apj');
 
-      const displayTitle = (entryTerm ? `${mappedBookName} : ${entryTerm}` : mappedBookName).slice(0, 80);
+      const typeClass = matched ? this.getSourceTypeClass(matched.type) : (isPastoral ? 'pastoral' : this.getSourceTypeClass(mappedBookName));
+      const typeLabel = matched ? this.getSourceTypeLabel(matched.type) : (isPastoral ? (mappedBookName.toLowerCase().includes('piper') || mappedBookName.toLowerCase().includes('apj') ? 'Pastorale • APJ' : 'Pastorale • UPVR') : this.getSourceTypeLabel(mappedBookName));
+      const author = (matched?.author || this.guessAuthor(mappedBookName) || '').slice(0, 60);
+      const coverUrl = matched?.cover_url || (isPastoral ? 'assets/upvr_logo.svg' : null);
+
+      let displayTitle = (matched?.title || (entryTerm ? `${mappedBookName} : ${entryTerm}` : mappedBookName)).slice(0, 80);
+      if (displayTitle.toLowerCase() === author.toLowerCase() && matched?.name) {
+        displayTitle = matched.name;
+      }
+      if (displayTitle.toLowerCase() === author.toLowerCase() && isPastoral) {
+        displayTitle = 'Un pasteur vous répond';
+      }
       const preview = (matched?.preview ? String(matched.preview).replace(/[\r\n]+/g, ' ').slice(0, 200) : '');
       const coverData = coverUrl ? `data-cover="${this.escapeHtml(coverUrl)}"` : '';
+      const pillIcon = isPastoral ? this.ICONS.mic : this.ICONS.book;
 
-      return `<span class="intext-source-pill" tabindex="0" data-type="${this.escapeHtml(typeClass)}" data-title="${this.escapeHtml(displayTitle)}" data-author="${this.escapeHtml(author)}" data-label="${this.escapeHtml(typeLabel)}" data-preview="${this.escapeHtml(preview)}" ${coverData}>${this.ICONS.book}</span>`;
+      return `<span class="intext-source-pill ${typeClass}" tabindex="0" data-type="${this.escapeHtml(typeClass)}" data-title="${this.escapeHtml(displayTitle)}" data-author="${this.escapeHtml(author)}" data-label="${this.escapeHtml(typeLabel)}" data-preview="${this.escapeHtml(preview)}" ${coverData}>${pillIcon}</span>`;
     };
 
     res = res.replace(universalDocSourceRegex, (match, fullBracketContent) => {

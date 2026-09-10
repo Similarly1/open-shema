@@ -9090,6 +9090,11 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 .intext-tooltip-fallback.dict { color: var(--accent-purple); background: rgba(124, 58, 237, 0.1); }
 .intext-tooltip-fallback.theology { color: #2DD4BF; background: rgba(15, 118, 110, 0.1); }
 .intext-tooltip-fallback.notes { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+.intext-tooltip-fallback.pastoral { color: #e63e09; background: rgba(230, 62, 9, 0.12); }
+
+.intext-source-pill.pastoral { color: #e63e09; }
+.intext-source-pill.pastoral:hover { border-color: #e63e09; }
+.tooltip-badge.pastoral { color: #ea580c; background: rgba(234, 88, 12, 0.12); border: 1px solid rgba(234, 88, 12, 0.25); border-radius: 3px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
 
 .intext-tooltip-content {
   flex: 1;
