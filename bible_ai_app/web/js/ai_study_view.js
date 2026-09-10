@@ -200,6 +200,18 @@ const AIStudyView = {
       }
     });
 
+    // Synchroniser l'inclusion d'UPVR en RAG depuis le popover du chat vers les paramètres
+    const chkOptUpvr = document.getElementById('ai-opt-src-upvr');
+    chkOptUpvr?.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      if (typeof SettingsView !== 'undefined' && SettingsView.config) {
+        SettingsView.config.include_upvr_in_ai = isChecked;
+        const cfgUpvr = document.getElementById('cfg-include-upvr-ai');
+        if (cfgUpvr) cfgUpvr.checked = isChecked;
+        SettingsView.save();
+      }
+    });
+
     document.addEventListener('click', (e) => {
       if (modePopover && !modePopover.contains(e.target) && e.target !== btnModeSelector) {
         modePopover.classList.add('hidden');
@@ -390,6 +402,13 @@ const AIStudyView = {
         const chkNotes = document.getElementById('ai-opt-src-notes');
         if (chkNotes && this.currentMode !== 'free_chat') {
           chkNotes.checked = isNotesIncluded;
+        }
+
+        // Synchroniser l'état du corpus UPVR avec la configuration
+        const isUpvrIncluded = typeof cfg.include_upvr_in_ai !== 'undefined' ? (cfg.include_upvr_in_ai !== false) : true;
+        const chkUpvr = document.getElementById('ai-opt-src-upvr');
+        if (chkUpvr && this.currentMode !== 'free_chat') {
+          chkUpvr.checked = isUpvrIncluded;
         }
       }
     } catch (e) {
@@ -1055,6 +1074,7 @@ const AIStudyView = {
     const chkDict = document.getElementById('ai-opt-src-dict');
     const chkArticles = document.getElementById('ai-opt-src-articles');
     const chkNotes = document.getElementById('ai-opt-src-notes');
+    const chkUpvr = document.getElementById('ai-opt-src-upvr');
     const chkRerank = document.getElementById('ai-opt-reranking');
     const chkCurator = document.getElementById('ai-opt-curator');
     const thinkingSelect = document.getElementById('ai-opt-thinking-level');
@@ -1068,6 +1088,7 @@ const AIStudyView = {
       if (chkDict) chkDict.checked = false;
       if (chkArticles) chkArticles.checked = false;
       if (chkNotes) chkNotes.checked = false;
+      if (chkUpvr) chkUpvr.checked = false;
       if (chkRerank) chkRerank.checked = false;
       if (chkCurator) chkCurator.checked = false;
       if (thinkingSelect) thinkingSelect.value = 'off';
@@ -1087,6 +1108,12 @@ const AIStudyView = {
           ? SettingsView.config.include_notes_in_ai !== false
           : true;
         chkNotes.checked = isNotesIncluded;
+      }
+      if (chkUpvr) {
+        const isUpvrIncluded = (typeof SettingsView !== 'undefined' && SettingsView.config && typeof SettingsView.config.include_upvr_in_ai !== 'undefined')
+          ? SettingsView.config.include_upvr_in_ai !== false
+          : true;
+        chkUpvr.checked = isUpvrIncluded;
       }
       if (chkRerank) chkRerank.checked = true;
       if (thinkingSelect && thinkingSelect.value === 'off') {
@@ -1456,7 +1483,9 @@ const AIStudyView = {
       commentaries: document.getElementById('ai-opt-src-comms')?.checked ?? false,
       dictionaries: document.getElementById('ai-opt-src-dict')?.checked ?? false,
       articles: document.getElementById('ai-opt-src-articles')?.checked ?? false,
-      notes: document.getElementById('ai-opt-src-notes')?.checked ?? false
+      notes: document.getElementById('ai-opt-src-notes')?.checked ?? false,
+      upvr: document.getElementById('ai-opt-src-upvr')?.checked ?? false,
+      pastoral: document.getElementById('ai-opt-src-upvr')?.checked ?? false
     };
 
     return {

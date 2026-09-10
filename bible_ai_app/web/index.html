@@ -2362,6 +2362,13 @@
                 <p style="font-size: 11px; color: var(--text-muted); margin-left: 24px; margin-top: 4px;">
                   Si activé, l'IA consultera vos notes associées au passage ou au sujet étudié pour enrichir ses réponses. Vous pouvez aussi désactiver des notes individuellement.
                 </p>
+                <label class="custom-checkbox" style="margin-top: 10px;">
+                  <input type="checkbox" id="cfg-include-upvr-ai" checked>
+                  <span>Inclure les textes d'« Un pasteur vous répond » (UPVR) dans le contexte de l'assistant IA</span>
+                </label>
+                <p style="font-size: 11px; color: var(--text-muted); margin-left: 24px; margin-top: 4px;">
+                  Si activé, l'IA consultera les synthèses pastorales et transcriptions d'UPVR (Florent Varak) associées aux passages et questions étudiés.
+                </p>
               </div>
             </div>
 
@@ -4482,8 +4489,11 @@
                     <label style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--text-primary);">
                       <input type="checkbox" id="ai-opt-src-articles" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Articles</span>
                     </label>
-                    <label style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--text-primary); grid-column: span 2;">
+                    <label style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--text-primary);">
                       <input type="checkbox" id="ai-opt-src-notes" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Notes (.md)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--text-primary);" title="Corpus pastoral Un pasteur vous répond (Florent Varak)">
+                      <input type="checkbox" id="ai-opt-src-upvr" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Textes UPVR</span>
                     </label>
                   </div>
                 </div>

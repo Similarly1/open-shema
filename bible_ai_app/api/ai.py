@@ -317,7 +317,9 @@ class AiMixin:
             "commentaries": True,
             "dictionaries": True,
             "articles": True,
-            "notes": True
+            "notes": True,
+            "upvr": True,
+            "pastoral": True
         })
         
         sources_used = []
@@ -662,7 +664,8 @@ class AiMixin:
                 logger.error(f"[ask_study_ai] Erreur extraction articles : {e}")
 
         # 5b. Extraction Pastorale (Un pasteur vous répond - Florent Varak)
-        if sources_cfg.get("pastoral", True) or sources_cfg.get("upvr", True):
+        is_upvr_active = sources_cfg.get("upvr") if "upvr" in sources_cfg else sources_cfg.get("pastoral", True)
+        if is_upvr_active and self.config.get("include_upvr_in_ai", True):
             try:
                 from core.upvr_manager import UPVRManager
                 from core.database import VectorDB

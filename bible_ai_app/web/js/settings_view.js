@@ -924,6 +924,15 @@ Règles impératives :
       this.save();
     });
 
+    document.getElementById('cfg-include-upvr-ai')?.addEventListener('change', (e) => {
+      this.config.include_upvr_in_ai = e.target.checked;
+      const chkStudyUpvr = document.getElementById('ai-opt-src-upvr');
+      if (chkStudyUpvr && typeof AIStudyView !== 'undefined' && AIStudyView.currentMode !== 'free_chat') {
+        chkStudyUpvr.checked = e.target.checked;
+      }
+      this.save();
+    });
+
     // Boutons des cartes de prompts système
     const promptBtnBindings = [
       { type: 'mode_exegesis', open: 'btn-open-modal-mode-exegesis-prompt', reset: 'btn-reset-mode-exegesis-prompt' },
@@ -1492,6 +1501,10 @@ Règles impératives :
       document.getElementById('cfg-ebooks-dir').value = c.ebooks_dir || '';
     }
     document.getElementById('cfg-include-notes-ai').checked = c.include_notes_in_ai !== false;
+    const chkCfgUpvr = document.getElementById('cfg-include-upvr-ai');
+    if (chkCfgUpvr) {
+      chkCfgUpvr.checked = c.include_upvr_in_ai !== false;
+    }
 
     if (typeof NotesView !== 'undefined') {
       NotesView.updateAiToggleVisibility();
@@ -2480,6 +2493,10 @@ Règles impératives :
       newCfg.ebooks_dir = document.getElementById('cfg-ebooks-dir').value.trim();
     }
     newCfg.include_notes_in_ai = document.getElementById('cfg-include-notes-ai').checked;
+    const chkSaveUpvr = document.getElementById('cfg-include-upvr-ai');
+    if (chkSaveUpvr) {
+      newCfg.include_upvr_in_ai = chkSaveUpvr.checked;
+    }
 
     newCfg.chat_model = document.getElementById('cfg-chat-model').value;
     const aiOptModel = document.getElementById('ai-opt-model');

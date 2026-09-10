@@ -291,6 +291,7 @@ DEFAULTS = {
     "notes_directory": "",
     "highlights_file": "",
     "include_notes_in_ai": True,
+    "include_upvr_in_ai": True,
     "enable_ai": True,
     "synthesis_model": "gemini-3.7-flash",
     "synthesis_fallback_model": "gemini-3.5-flash-lite",
