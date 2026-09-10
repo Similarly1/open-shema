@@ -1240,4 +1240,104 @@ class AiMixin:
             "model_used": used_model
         }
 
+    def get_image_style_presets(self) -> Dict[str, Any]:
+        """Retourne la liste des styles prédéfinis pour la génération d'images."""
+        from core.mindmap_image_service import STYLE_PRESETS
+        return {
+            "success": True,
+            "styles": [
+                {"id": k, "label": v["label"]}
+                for k, v in STYLE_PRESETS.items()
+            ]
+        }
+
+    def get_suggested_image_prompt(
+        self,
+        node_text: str,
+        mindmap_title: str = "",
+        parent_context: str = "",
+        scripture_ref: str = "",
+        style: str = "biblical_oil"
+    ) -> Dict[str, Any]:
+        """Génère une proposition de prompt artistique en anglais via LLM."""
+        try:
+            from core.mindmap_image_service import suggest_image_prompt
+            prompt = suggest_image_prompt(
+                node_text=node_text,
+                mindmap_title=mindmap_title,
+                parent_context=parent_context,
+                scripture_ref=scripture_ref,
+                style_key=style,
+                config=self.config or load_config()
+            )
+            return {"success": True, "prompt": prompt}
+        except Exception as e:
+            logger.error("Erreur get_suggested_image_prompt: %s", e)
+            return {"success": False, "error": str(e), "prompt": f"Biblical scene representing {node_text}"}
+
+    def generate_mindmap_node_image(
+        self,
+        prompt: str,
+        note_id: str = "",
+        node_id: str = "",
+        style: str = "biblical_oil"
+    ) -> Dict[str, Any]:
+        """Génère une illustration via Infomaniak Flux et la sauvegarde localement."""
+        try:
+            from core.mindmap_image_service import (
+                generate_image_with_infomaniak_flux,
+                save_mindmap_image,
+                STYLE_PRESETS
+            )
+            from core.secrets_manager import get_secret
+            cfg = self.config or load_config()
+            token = get_secret("infomaniak_token", cfg) or cfg.get("infomaniak_token", "")
+            product_id = get_secret("infomaniak_product_id", cfg) or cfg.get("infomaniak_product_id", "251")
+
+            if not token:
+                return {
+                    "success": False,
+                    "error": "Le jeton API Infomaniak n'est pas configuré. Veuillez le renseigner dans les Paramètres IA."
+                }
+
+            final_prompt = prompt.strip()
+            style_def = STYLE_PRESETS.get(style)
+            if style_def and not any(w in final_prompt.lower() for w in ["painting", "cinematic", "watercolor", "engraving"]):
+                final_prompt += f", {style_def['prompt_suffix']}"
+
+            success, res = generate_image_with_infomaniak_flux(
+                prompt=final_prompt,
+                token=token,
+                product_id=product_id
+            )
+            if not success:
+                return {"success": False, "error": res}
+
+            save_res = save_mindmap_image(
+                b64_jpeg=res,
+                node_id=node_id,
+                note_id=note_id
+            )
+            return {
+                "success": True,
+                "relativePath": save_res["relativePath"],
+                "dataUrl": save_res["dataUrl"],
+                "prompt": final_prompt
+            }
+        except Exception as e:
+            logger.error("Erreur generate_mindmap_node_image: %s", e)
+            return {"success": False, "error": str(e)}
+
+    def load_mindmap_image_data_url(self, image_path: str) -> Dict[str, Any]:
+        """Charge une image locale mindmap et renvoie son Data URL."""
+        try:
+            from core.mindmap_image_service import get_mindmap_image_data_url
+            data_url = get_mindmap_image_data_url(image_path)
+            if data_url:
+                return {"success": True, "dataUrl": data_url}
+            return {"success": False, "error": "Fichier introuvable"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+
 

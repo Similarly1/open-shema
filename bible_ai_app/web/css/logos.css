@@ -34931,6 +34931,46 @@ body[class*="palette-dark"] .mm-prompt-hint kbd {
   color: #f8fafc;
 }
 
+/* =========================================================================
+   Illustrations IA en fond de pastille (Infomaniak Flux) & Overlays
+   ========================================================================= */
+
+.mm-image-modal {
+  width: 530px;
+  max-width: 95vw;
+}
+
+.mm-img-style-pill:hover {
+  filter: brightness(0.95);
+}
+
+body.theme-dark .mm-img-style-pill,
+body[class*="palette-dark"] .mm-img-style-pill {
+  background: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+body.theme-dark .mm-img-style-pill.active,
+body[class*="palette-dark"] .mm-img-style-pill.active {
+  background: #2563eb !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.mm-node-image-overlay {
+  pointer-events: none;
+}
+
+.mm-root-image-overlay {
+  pointer-events: none;
+}
+
+@keyframes mmSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Pastille de note de sujet / Topic Note */
 .mm-note-pill {
   cursor: pointer;

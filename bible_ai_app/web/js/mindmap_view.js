@@ -1092,11 +1092,16 @@ const MindMapView = {
     this.nodeShape = shape;
 
     let rootIcon = null;
+    let rootImage = null;
     let rootTitle = (title || 'CONCEPT CENTRAL').toUpperCase();
     if (markdownContent) {
       const rootIconMatch = markdownContent.match(/<!--\s*mindmap-root-icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
       if (rootIconMatch) {
         rootIcon = rootIconMatch[1].trim().toLowerCase();
+      }
+      const rootImageMatch = markdownContent.match(/<!--\s*mindmap-root-image:\s*([\s\S]*?)\s*-->/i);
+      if (rootImageMatch) {
+        rootImage = rootImageMatch[1].trim();
       }
     }
     const titleIconMatch = rootTitle.match(/::([a-zA-Z0-9_-]+):?/i);
@@ -1110,11 +1115,15 @@ const MindMapView = {
     if (!rootIcon && this.currentNote && this.currentNote.rootIcon) {
       rootIcon = this.currentNote.rootIcon;
     }
+    if (!rootImage && this.currentNote && this.currentNote.rootImage) {
+      rootImage = this.currentNote.rootImage;
+    }
 
     const root = {
       id: 'root',
       text: rootTitle,
       icon: rootIcon,
+      image: rootImage,
       ref: '',
       children: [],
       side: 'center',
@@ -1197,6 +1206,14 @@ const MindMapView = {
           }
         }
 
+        // Extraction d'une image en fond de pastille <!-- image: ... -->
+        let image = null;
+        const imageMatch = text.match(/<!--\s*image:\s*([\s\S]*?)\s*-->/i);
+        if (imageMatch) {
+          image = imageMatch[1].trim();
+          text = text.replace(imageMatch[0], '').trim();
+        }
+
         // Extraction d'une référence biblique entre crochets [Jean 3:16] ou [Romains 3:21-31]
         let refMatch = text.match(/\[([A-Za-z0-9À-ÿ\s:.,\-–—]+)\]\s*$/);
         if (refMatch) {
@@ -1215,6 +1232,7 @@ const MindMapView = {
           text: text.toUpperCase(), // Loi 4 de Buzan : MAJUSCULES
           marker: marker,
           icon: icon,
+          image: image,
           ref: ref,
           note: noteText,
           children: [],
@@ -1483,15 +1501,19 @@ const MindMapView = {
     if (tree && tree.icon) {
       md += `<!-- mindmap-root-icon: ${tree.icon} -->\n`;
     }
+    if (tree && tree.image) {
+      md += `<!-- mindmap-root-image: ${tree.image} -->\n`;
+    }
     const serializeChildren = (node, indentLevel) => {
       if (!node || !node.children) return;
       for (const child of node.children) {
         const indent = '  '.repeat(indentLevel);
         const markerPart = child.marker ? ` <!-- marker: ${child.marker} -->` : '';
         const iconPart = child.icon ? ` <!-- icon: ${child.icon} -->` : '';
+        const imagePart = child.image ? ` <!-- image: ${child.image} -->` : '';
         const refPart = child.ref ? ` [${child.ref}]` : '';
         const notePart = child.note ? ` <!-- note: ${child.note.replace(/\r?\n/g, ' ')} -->` : '';
-        md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}${iconPart}\n`;
+        md += `${indent}- ${child.text}${refPart}${notePart}${markerPart}${iconPart}${imagePart}\n`;
         serializeChildren(child, indentLevel + 1);
       }
     };
@@ -1766,7 +1788,7 @@ const MindMapView = {
       const words = (node.text || '').trim().split(/\s+/);
       const isMultiWord = words.length >= 3 && node.text.length > 15;
       const effectiveTextW = isMultiWord ? textW * 0.58 : textW;
-      const rootR = Math.max(48, Math.min(82, Math.max(effectiveTextW * 0.52 + 16, node.icon ? 56 : 46)));
+      const rootR = Math.max(node.image ? 58 : 48, Math.min(88, Math.max(effectiveTextW * 0.52 + 16, node.icon ? 56 : 46)));
       node.rootRadius = rootR;
       node.width = rootR * 2;
       node.height = rootR * 2;
@@ -1802,9 +1824,10 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(96, node.contentWidth + 36);
-      node.height = 36; // Plus imposant que les niveaux inférieurs (36px vs 28px/24px)
+      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
+      const minW = node.image ? 116 : 96;
+      node.width = Math.max(minW, node.contentWidth + 36);
+      node.height = node.image ? 40 : 36; // Plus imposant que les niveaux inférieurs (36px vs 28px/24px)
     } else if (node.level === 2) {
       // NIVEAU 2 (Sous-branches subordonnées)
       const textW = this.getTextWidth(node.text, 11.5, '700');
@@ -1837,9 +1860,10 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(82, node.contentWidth + 30);
-      node.height = 28;
+      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
+      const minW = node.image ? 104 : 82;
+      node.width = Math.max(minW, node.contentWidth + 30);
+      node.height = node.image ? 32 : 28;
     } else {
       // NIVEAU 3+ (Détails fins légers)
       const textW = this.getTextWidth(node.text, 10, '600');
@@ -1872,9 +1896,10 @@ const MindMapView = {
         node.notePillWidth = 0;
       }
 
-      node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(68, node.contentWidth + 26);
-      node.height = 24;
+      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
+      const minW = node.image ? 96 : 68;
+      node.width = Math.max(minW, node.contentWidth + 26);
+      node.height = node.image ? 28 : 24;
     }
 
     if (!node.children || node.children.length === 0) {
@@ -3475,6 +3500,44 @@ const MindMapView = {
       mainCircle.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'none');
       g.appendChild(mainCircle);
 
+      // Si une illustration IA est associée au médaillon central
+      const rootImgSrc = node.imageDataUrl || (node.image && (node.image.startsWith('data:') || node.image.startsWith('http')) ? node.image : null);
+      if (node.image && !rootImgSrc) {
+        this.resolveNodeImageDataUrl(node);
+      }
+      if (rootImgSrc && defs) {
+        const rootClipId = `mm-root-clip-${node.id || 'r'}`;
+        let rClip = defs.querySelector(`#${rootClipId}`);
+        if (!rClip) {
+          rClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+          rClip.setAttribute('id', rootClipId);
+          const cCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          cCircle.setAttribute('r', rootR);
+          rClip.appendChild(cCircle);
+          defs.appendChild(rClip);
+        }
+
+        const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        imgG.setAttribute('clip-path', `url(#${rootClipId})`);
+
+        const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        imgEl.setAttribute('href', rootImgSrc);
+        imgEl.setAttribute('x', -rootR);
+        imgEl.setAttribute('y', -rootR);
+        imgEl.setAttribute('width', rootR * 2);
+        imgEl.setAttribute('height', rootR * 2);
+        imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+        imgG.appendChild(imgEl);
+
+        const darkOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        darkOverlay.setAttribute('r', rootR);
+        darkOverlay.setAttribute('fill', 'rgba(15, 23, 42, 0.55)');
+        darkOverlay.setAttribute('class', 'mm-root-image-overlay');
+        imgG.appendChild(darkOverlay);
+
+        g.appendChild(imgG);
+      }
+
       // Superposition sphérique 3D (volume et reflet de brillance)
       const sphereCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       sphereCircle.setAttribute('r', rootR);
@@ -3574,13 +3637,15 @@ const MindMapView = {
 
     } else {
       // isBox déjà déclaré en tête de fonction
-      const isPill = node.isFloating || this.nodeShape === 'pill';
+      const hasImage = !!node.image;
+      const effectiveIsBox = isBox || hasImage;
+      const isPill = node.isFloating || hasImage || this.nodeShape === 'pill';
       const rx = isPill ? (isLvl1 ? 18 : (isLvl2 ? 14 : 12)) : (isLvl1 ? 9 : (isLvl2 ? 6 : 4));
       const boxW = node.width;
       const boxH = node.height || (isLvl1 ? 36 : (isLvl2 ? 28 : 24));
       const strokeW = node.isFloating ? '2' : (isLvl1 ? '2.4' : (isLvl2 ? '1.5' : '1.1'));
 
-      if (isBox) {
+      if (effectiveIsBox) {
         // Boîte d'arrière-plan avec bordure colorée (Style XMind & Buzan : Niveau 1 plus imposant)
         const boxRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         boxRect.setAttribute('x', -boxW / 2);
@@ -3595,16 +3660,76 @@ const MindMapView = {
         boxRect.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'url(#mm-glow)');
         g.appendChild(boxRect);
 
-        // Fond teinté translucide assorti à la couleur de la branche
-        const tintRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        tintRect.setAttribute('x', -boxW / 2);
-        tintRect.setAttribute('y', -boxH / 2);
-        tintRect.setAttribute('width', boxW);
-        tintRect.setAttribute('height', boxH);
-        tintRect.setAttribute('rx', rx);
-        tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
-        tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.14' : (isLvl2 ? '0.07' : '0.05')));
-        g.appendChild(tintRect);
+        // Si une illustration IA est attachée à la branche
+        const branchImgSrc = node.imageDataUrl || (node.image && (node.image.startsWith('data:') || node.image.startsWith('http')) ? node.image : null);
+        if (node.image && !branchImgSrc) {
+          this.resolveNodeImageDataUrl(node);
+        }
+        const defs = this.svg?.querySelector('defs');
+        if (branchImgSrc && defs) {
+          const nodeClipId = `mm-node-clip-${node.id}`;
+          let nClip = defs.querySelector(`#${nodeClipId}`);
+          if (!nClip) {
+            nClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+            nClip.setAttribute('id', nodeClipId);
+            const cRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            cRect.setAttribute('x', -boxW / 2);
+            cRect.setAttribute('y', -boxH / 2);
+            cRect.setAttribute('width', boxW);
+            cRect.setAttribute('height', boxH);
+            cRect.setAttribute('rx', rx);
+            nClip.appendChild(cRect);
+            defs.appendChild(nClip);
+          }
+
+          const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          imgG.setAttribute('clip-path', `url(#${nodeClipId})`);
+
+          const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+          imgEl.setAttribute('href', branchImgSrc);
+          imgEl.setAttribute('x', -boxW / 2);
+          imgEl.setAttribute('y', -boxH / 2);
+          imgEl.setAttribute('width', boxW);
+          imgEl.setAttribute('height', boxH);
+          imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+          imgG.appendChild(imgEl);
+
+          const darkOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          darkOverlay.setAttribute('x', -boxW / 2);
+          darkOverlay.setAttribute('y', -boxH / 2);
+          darkOverlay.setAttribute('width', boxW);
+          darkOverlay.setAttribute('height', boxH);
+          darkOverlay.setAttribute('rx', rx);
+          darkOverlay.setAttribute('fill', 'rgba(15, 23, 42, 0.62)');
+          darkOverlay.setAttribute('class', 'mm-node-image-overlay');
+          imgG.appendChild(darkOverlay);
+
+          g.appendChild(imgG);
+
+          // Réappliquer le contour coloré par-dessus l'image
+          const borderRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          borderRect.setAttribute('x', -boxW / 2);
+          borderRect.setAttribute('y', -boxH / 2);
+          borderRect.setAttribute('width', boxW);
+          borderRect.setAttribute('height', boxH);
+          borderRect.setAttribute('rx', rx);
+          borderRect.setAttribute('fill', 'none');
+          borderRect.setAttribute('stroke', node.color || 'var(--accent-blue)');
+          borderRect.setAttribute('stroke-width', strokeW);
+          borderRect.setAttribute('pointer-events', 'none');
+          g.appendChild(borderRect);
+        } else if (!hasImage) {
+          // Fond teinté translucide assorti à la couleur de la branche (quand pas d'image)
+          const tintRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          tintRect.setAttribute('x', -boxW / 2);
+          tintRect.setAttribute('y', -boxH / 2);
+          tintRect.setAttribute('width', boxW);
+          tintRect.setAttribute('height', boxH);
+          tintRect.setAttribute('rx', rx);
+          tintRect.setAttribute('fill', node.color || 'var(--accent-blue)');
+          tintRect.setAttribute('opacity', node.isFloating ? '0.12' : (isLvl1 ? '0.14' : (isLvl2 ? '0.07' : '0.05')));
+          g.appendChild(tintRect);
+        }
       } else {
         // Mode souligné (underline) : halo d'illumination discret visible uniquement à la sélection
         const haloRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -3624,19 +3749,24 @@ const MindMapView = {
       const hitW = node.width + 65;
       const hitX = isTopDown ? -node.width / 2 - 5 : (node.side === 'right' ? -node.width / 2 - 5 : -node.width / 2 - 55);
       hitRect.setAttribute('x', hitX);
-      hitRect.setAttribute('y', isBox ? -boxH / 2 - 4 : -18);
+      hitRect.setAttribute('y', effectiveIsBox ? -boxH / 2 - 4 : -18);
       hitRect.setAttribute('width', hitW);
-      hitRect.setAttribute('height', isBox ? boxH + 8 : 36);
+      hitRect.setAttribute('height', effectiveIsBox ? boxH + 8 : 36);
       hitRect.setAttribute('fill', 'transparent');
       hitRect.setAttribute('style', 'cursor: pointer;');
       g.appendChild(hitRect);
 
       // Nœud de branche : Mot-clé (Buzan : plus gros pour niveau 1, majuscules)
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('dominant-baseline', isBox ? 'central' : 'bottom');
-      text.setAttribute('y', isBox ? 0 : 5);
+      text.setAttribute('dominant-baseline', effectiveIsBox ? 'central' : 'bottom');
+      text.setAttribute('y', effectiveIsBox ? 0 : 5);
       text.setAttribute('class', 'mm-branch-text');
-      text.setAttribute('fill', 'var(--text-primary)');
+      if (hasImage) {
+        text.setAttribute('fill', '#ffffff');
+        text.setAttribute('style', 'text-shadow: 0 1px 4px rgba(0,0,0,0.85); font-weight: 800;');
+      } else {
+        text.setAttribute('fill', 'var(--text-primary)');
+      }
       if (isLvl1) {
         text.setAttribute('font-size', '14px');
         text.setAttribute('font-weight', '800');
@@ -3777,7 +3907,7 @@ const MindMapView = {
         const def = this.MARKER_DEFS[node.marker];
         if (def) {
           const markerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          markerG.setAttribute('transform', `translate(${markerX}, ${isBox ? 0 : 3})`);
+          markerG.setAttribute('transform', `translate(${markerX}, ${effectiveIsBox ? 0 : 3})`);
           markerG.setAttribute('class', 'mm-node-marker-badge');
           markerG.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
           markerG.setAttribute('title', this.isReadOnly ? `Marqueur : ${def.label}` : `Marqueur : ${def.label} (Cliquer pour faire défiler)`);
@@ -3829,7 +3959,7 @@ const MindMapView = {
         const iconDef = SvgIconsRegistry.get(node.icon);
         if (iconDef) {
           const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          iconG.setAttribute('transform', `translate(${iconX}, ${isBox ? 0 : 2})`);
+          iconG.setAttribute('transform', `translate(${iconX}, ${effectiveIsBox ? 0 : 2})`);
           iconG.setAttribute('class', 'mm-node-icon-badge');
           iconG.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
           iconG.setAttribute('title', this.isReadOnly ? `Icône SVG : ${iconDef.label}` : `Icône SVG : ${iconDef.label} (Cliquer pour modifier ou [I])`);
@@ -3843,7 +3973,7 @@ const MindMapView = {
           const svgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
           svgWrap.setAttribute('transform', 'translate(-7.5, -7.5) scale(0.64)');
           svgWrap.setAttribute('fill', 'none');
-          svgWrap.setAttribute('stroke', isBox ? (node.color || 'var(--text-main)') : (node.color || 'var(--accent-blue)'));
+          svgWrap.setAttribute('stroke', hasImage ? '#ffffff' : (isBox ? (node.color || 'var(--text-main)') : (node.color || 'var(--accent-blue)')));
           svgWrap.setAttribute('stroke-width', '2.2');
           svgWrap.setAttribute('stroke-linecap', 'round');
           svgWrap.setAttribute('stroke-linejoin', 'round');
@@ -3866,7 +3996,7 @@ const MindMapView = {
       if (node.ref && refX !== null) {
         const pillW = refPillW;
         const refG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        refG.setAttribute('transform', `translate(${refX}, ${isBox ? 0 : 3})`);
+        refG.setAttribute('transform', `translate(${refX}, ${effectiveIsBox ? 0 : 3})`);
         refG.setAttribute('class', 'mm-scripture-pill');
 
         const refRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -3876,9 +4006,9 @@ const MindMapView = {
         refRect.setAttribute('height', 16);
         refRect.setAttribute('rx', 4);
         const isDarkTheme = typeof document !== 'undefined' && !document.body.classList.contains('theme-light');
-        if (isBox) {
-          refRect.setAttribute('fill', 'rgba(255, 255, 255, 0.14)');
-          refRect.setAttribute('stroke', 'rgba(255, 255, 255, 0.28)');
+        if (hasImage || isBox) {
+          refRect.setAttribute('fill', 'rgba(255, 255, 255, 0.18)');
+          refRect.setAttribute('stroke', 'rgba(255, 255, 255, 0.35)');
           refRect.setAttribute('stroke-width', '1');
           refRect.setAttribute('opacity', '1');
         } else {
@@ -3893,7 +4023,7 @@ const MindMapView = {
         refText.setAttribute('font-size', '9px');
         refText.setAttribute('font-weight', '800');
         refText.setAttribute('letter-spacing', '0.3px');
-        refText.setAttribute('fill', isDarkTheme ? '#f8fafc' : (isBox ? '#0f172a' : (node.color || '#2563eb')));
+        refText.setAttribute('fill', hasImage ? '#ffffff' : (isDarkTheme ? '#f8fafc' : (isBox ? '#0f172a' : (node.color || '#2563eb'))));
         refText.textContent = displayRef;
         refG.appendChild(refText);
 
@@ -3912,7 +4042,7 @@ const MindMapView = {
       // Pastille d'annotation / Note textuelle si présente (Topic Note XMind)
       if (node.note && noteX !== null) {
         const noteG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        noteG.setAttribute('transform', `translate(${noteX}, ${isBox ? 0 : 3})`);
+        noteG.setAttribute('transform', `translate(${noteX}, ${effectiveIsBox ? 0 : 3})`);
         noteG.setAttribute('class', 'mm-note-pill');
         noteG.setAttribute('style', 'cursor: pointer;');
         noteG.setAttribute('title', this.isReadOnly ? 'Note de branche (Cliquer pour agrandir)' : 'Note de branche (Cliquer pour modifier)');
@@ -3950,14 +4080,13 @@ const MindMapView = {
       }
 
       // Actions au survol ou à la sélection (Loi ergonomie 100% Souris - désactivé en lecture seule)
-      // Actions au survol ou à la sélection (Loi ergonomie 100% Souris - désactivé en lecture seule)
       if (!this.isReadOnly) {
         const actionsG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         actionsG.setAttribute('class', 'mm-node-actions');
 
         const hasKids = node.children && node.children.length > 0;
         const foldOffset = hasKids ? 14 : 0;
-        const actionY = isBox ? 0 : 3;
+        const actionY = effectiveIsBox ? 0 : 3;
         const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 13 + foldOffset : -node.width / 2 - 13 - foldOffset;
         const addSubBtn = this.createActionButton('+', endX, actionY, () => this.addChildToNode(node));
         addSubBtn.setAttribute('title', 'Ajouter une sous-branche');
@@ -3981,7 +4110,7 @@ const MindMapView = {
       // Coordonnées exactes à l'extrémité de la branche dans le repère local de g
       const foldDir = (isTopDown || (node.side || 'right') === 'right') ? 1 : -1;
       const foldX = isTopDown ? 0 : foldDir * (node.width / 2 + 6);
-      const foldY = isTopDown ? (isBox ? (node.height || 28) / 2 + 7 : 17) : (isBox ? 0 : 10);
+      const foldY = isTopDown ? (effectiveIsBox ? (node.height || 28) / 2 + 7 : 17) : (effectiveIsBox ? 0 : 10);
 
       foldG.setAttribute('transform', `translate(${foldX}, ${foldY})`);
       foldG.setAttribute('class', `mm-fold-indicator ${isCollapsed ? 'is-folded' : ''}`);
@@ -5717,6 +5846,20 @@ const MindMapView = {
           <span class="mm-ctx-label">${node?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
           <span class="mm-ctx-shortcut">I</span>
         </div>
+        <div class="mm-ctx-item" data-action="ai-image">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          </span>
+          <span class="mm-ctx-label">${node?.image ? 'Modifier l\'illustration IA...' : '🎨 Illustration IA (Flux)...'}</span>
+        </div>
+        ${node?.image ? `
+          <div class="mm-ctx-item danger" data-action="remove-image">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </span>
+            <span class="mm-ctx-label">Supprimer l'illustration</span>
+          </div>
+        ` : ''}
         ${(node?.offsetX || node?.offsetY) ? `
           <div class="mm-ctx-item" data-action="reset-position">
             <span class="mm-ctx-icon">
@@ -5798,6 +5941,20 @@ const MindMapView = {
           <span class="mm-ctx-label">${this.tree?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
           <span class="mm-ctx-shortcut">I</span>
         </div>
+        <div class="mm-ctx-item" data-action="ai-image">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          </span>
+          <span class="mm-ctx-label">${this.tree?.image ? 'Modifier l\'illustration IA...' : '🎨 Illustration IA (Flux)...'}</span>
+        </div>
+        ${this.tree?.image ? `
+          <div class="mm-ctx-item danger" data-action="remove-image">
+            <span class="mm-ctx-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </span>
+            <span class="mm-ctx-label">Supprimer l'illustration</span>
+          </div>
+        ` : ''}
         ${this.clipboardNode ? `
           <div class="mm-ctx-item" data-action="paste">
             <span class="mm-ctx-icon">
@@ -6064,6 +6221,16 @@ const MindMapView = {
           case 'svg-icon':
             if (targetNodeId) {
               this.openIconPicker(targetNodeId, clientX, clientY);
+            }
+            break;
+          case 'ai-image':
+            if (targetNodeId) {
+              this.openImageGenModal(targetNodeId);
+            }
+            break;
+          case 'remove-image':
+            if (targetNodeId) {
+              this.removeNodeImage(targetNodeId);
             }
             break;
           case 'auto-suggest-icon': {
@@ -6420,6 +6587,302 @@ const MindMapView = {
         App.showToast('Icône SVG retirée');
       }
     }
+  },
+
+  // =========================================================================
+  // ILLUSTRATIONS IA EN FOND DE PASTILLE (INFOMANIAK FLUX)
+  // =========================================================================
+
+  resolveNodeImageDataUrl(node) {
+    if (!node || !node.image || node._loadingImage || node.imageDataUrl) return;
+    if (node.image.startsWith('data:') || node.image.startsWith('http')) {
+      node.imageDataUrl = node.image;
+      return;
+    }
+    node._loadingImage = true;
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.load_mindmap_image_data_url) {
+      window.pywebview.api.load_mindmap_image_data_url(node.image).then(res => {
+        node._loadingImage = false;
+        if (res && res.success && res.dataUrl) {
+          node.imageDataUrl = res.dataUrl;
+          this.draw();
+        }
+      }).catch(err => {
+        node._loadingImage = false;
+        console.warn('Erreur chargement image mindmap:', err);
+      });
+    }
+  },
+
+  removeNodeImage(nodeId) {
+    if (this.isReadOnly || !nodeId) return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+    delete node.image;
+    delete node.imageDataUrl;
+    if (nodeId === 'root' && this.currentNote) {
+      delete this.currentNote.rootImage;
+    }
+    this.layoutTree();
+    this.draw();
+    this.syncAndAutoSave();
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast('Illustration retirée de la pastille');
+    }
+  },
+
+  async openImageGenModal(nodeId) {
+    if (this.isReadOnly || !nodeId) return;
+    const node = this.findNode(nodeId);
+    if (!node) return;
+
+    // Supprimer une modale existante
+    document.getElementById('mm-image-gen-overlay')?.remove();
+
+    const isRoot = (nodeId === 'root');
+    const nodeText = isRoot ? (this.tree?.text || 'Concept Central') : (node.text || 'Branche');
+    const currentImg = node.imageDataUrl || (node.image && (node.image.startsWith('data:') || node.image.startsWith('http')) ? node.image : null);
+
+    const styles = [
+      { id: 'biblical_oil', label: 'Peinture d\'Histoire' },
+      { id: 'cinematic', label: 'Cinématique Dramatique' },
+      { id: 'golden_engraving', label: 'Gravure & Dorures' },
+      { id: 'watercolor', label: 'Aquarelle & Lumière' },
+      { id: 'minimal_modern', label: 'Symbole Épuré' }
+    ];
+    let selectedStyle = 'biblical_oil';
+    let generatedImageResult = null;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'mm-image-gen-overlay';
+    overlay.className = 'mm-prompt-overlay';
+    overlay.innerHTML = `
+      <div class="mm-prompt-dialog mm-image-modal" style="width: 530px; max-width: 95vw;">
+        <div class="mm-prompt-header">
+          <div class="mm-prompt-header-left">
+            <div class="mm-prompt-icon-badge" style="background: rgba(234, 88, 12, 0.15); color: #ea580c;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            </div>
+            <div class="mm-prompt-title">
+              <span>Illustration IA en fond de pastille</span>
+              <span class="mm-prompt-target-tag" style="background: rgba(234, 88, 12, 0.12); color: #ea580c; border-color: rgba(234, 88, 12, 0.3);">${this.escapeHtml(nodeText)}</span>
+            </div>
+          </div>
+          <button type="button" class="mm-prompt-close-btn" id="mm-img-x-close" title="Fermer (Échap)">×</button>
+        </div>
+
+        <p class="mm-prompt-desc" style="margin-bottom: 10px; font-size: 12px; line-height: 1.5;">
+          Générez une illustration sur mesure avec <strong>Infomaniak Flux (Flux Schnell)</strong>. L'image s'intègre harmonieusement en arrière-plan avec un voile assurant la lisibilité totale du texte.
+        </p>
+
+        <!-- Sélecteur de style artistique -->
+        <div class="mm-img-styles-row" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;">
+          ${styles.map((s, idx) => `
+            <button type="button" class="mm-img-style-pill ${idx === 0 ? 'active' : ''}" data-style="${s.id}" style="padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 20px; border: 1px solid ${idx === 0 ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${idx === 0 ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${idx === 0 ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; transition: all 0.15s ease;">
+              ${this.escapeHtml(s.label)}
+            </button>
+          `).join('')}
+        </div>
+
+        <!-- Prompt artistique -->
+        <div style="position: relative; margin-bottom: 10px;">
+          <textarea class="mm-prompt-textarea" id="mm-img-prompt-input" rows="3" placeholder="Génération du prompt artistique contextuel en cours..." style="font-size: 12px; padding: 10px 38px 10px 10px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+          <button type="button" id="mm-img-btn-regen-prompt" title="Régénérer le prompt avec l'IA" style="position: absolute; right: 8px; top: 8px; background: transparent; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; border-radius: 4px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </button>
+        </div>
+
+        <!-- Bouton d'action Génération -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span id="mm-img-status" style="font-size: 11px; color: var(--text-secondary);">⚡ Moteur : Infomaniak Flux (< 3s)</span>
+          <button type="button" class="btn-primary" id="mm-img-btn-generate" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700;">
+            <span id="mm-img-gen-icon">🎨</span>
+            <span id="mm-img-gen-label">Générer avec Flux</span>
+          </button>
+        </div>
+
+        <!-- Zone d'aperçu / résultat -->
+        <div id="mm-img-preview-container" style="background: var(--bg-secondary, #0f172a); border-radius: 10px; padding: 10px; margin-bottom: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; position: relative; overflow: hidden; border: 1px solid var(--border-color, rgba(255,255,255,0.1));">
+          <div id="mm-img-preview-placeholder" style="color: var(--text-secondary); font-size: 12px; text-align: center;">
+            ${currentImg ? `
+              <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <img id="mm-img-preview-img" src="${currentImg}" style="max-height: 140px; border-radius: 8px; object-fit: cover; width: 100%;" />
+                <span style="font-size: 11px; margin-top: 6px; opacity: 0.8;">Illustration actuelle</span>
+              </div>
+            ` : 'Aucune illustration générée pour le moment'}
+          </div>
+        </div>
+
+        <!-- Boutons d'actions -->
+        <div class="mm-prompt-actions-row">
+          <div>
+            ${node.image ? `
+              <button type="button" class="btn-danger-subtle" id="mm-img-btn-delete" title="Supprimer l'illustration actuelle">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Retirer l'image</span>
+              </button>
+            ` : ''}
+          </div>
+          <div class="mm-prompt-actions-right" style="display: flex; gap: 8px;">
+            <button type="button" class="btn-secondary" id="mm-img-btn-cancel">Annuler</button>
+            <button type="button" class="btn-primary" id="mm-img-btn-apply" disabled style="opacity: 0.5;">
+              ✨ Appliquer à la pastille
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const promptTextarea = overlay.querySelector('#mm-img-prompt-input');
+    const stylePills = overlay.querySelectorAll('.mm-img-style-pill');
+    const btnRegen = overlay.querySelector('#mm-img-btn-regen-prompt');
+    const btnGen = overlay.querySelector('#mm-img-btn-generate');
+    const btnApply = overlay.querySelector('#mm-img-btn-apply');
+    const statusSpan = overlay.querySelector('#mm-img-status');
+    const previewContainer = overlay.querySelector('#mm-img-preview-container');
+
+    const closeDialog = () => overlay.remove();
+    overlay.querySelector('#mm-img-x-close')?.addEventListener('click', closeDialog);
+    overlay.querySelector('#mm-img-btn-cancel')?.addEventListener('click', closeDialog);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeDialog(); });
+
+    // Clic sur les styles
+    stylePills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        stylePills.forEach(p => {
+          p.classList.remove('active');
+          p.style.background = 'var(--bg-secondary, #f1f5f9)';
+          p.style.borderColor = 'var(--border-color, #cbd5e1)';
+          p.style.color = 'var(--text-primary)';
+        });
+        pill.classList.add('active');
+        pill.style.background = 'var(--accent-blue, #2563eb)';
+        pill.style.borderColor = 'var(--accent-blue, #2563eb)';
+        pill.style.color = '#ffffff';
+        selectedStyle = pill.getAttribute('data-style');
+        loadSuggestedPrompt();
+      });
+    });
+
+    // Chargement automatique du prompt artistique
+    const loadSuggestedPrompt = async () => {
+      promptTextarea.disabled = true;
+      statusSpan.textContent = '✨ Synthèse du prompt artistique contextuel...';
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.get_suggested_image_prompt) {
+        try {
+          const res = await window.pywebview.api.get_suggested_image_prompt(
+            nodeText,
+            this.tree?.text || '',
+            node.parent?.text || '',
+            node.ref || '',
+            selectedStyle
+          );
+          if (res && res.success && res.prompt) {
+            promptTextarea.value = res.prompt;
+            statusSpan.textContent = '⚡ Prêt pour génération Flux';
+          } else {
+            promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
+            statusSpan.textContent = '⚡ Prêt pour génération';
+          }
+        } catch (e) {
+          promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
+          statusSpan.textContent = '⚡ Prêt pour génération';
+        }
+      } else {
+        promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art masterpiece`;
+        statusSpan.textContent = '⚡ Prêt pour génération';
+      }
+      promptTextarea.disabled = false;
+    };
+
+    btnRegen?.addEventListener('click', () => loadSuggestedPrompt());
+
+    // Génération avec Infomaniak Flux
+    btnGen?.addEventListener('click', async () => {
+      const prompt = promptTextarea.value.trim();
+      if (!prompt) return;
+
+      btnGen.disabled = true;
+      btnGen.style.opacity = '0.6';
+      overlay.querySelector('#mm-img-gen-icon').textContent = '⏳';
+      overlay.querySelector('#mm-img-gen-label').textContent = 'Génération en cours...';
+      statusSpan.textContent = '🎨 Infomaniak Flux génère votre illustration...';
+
+      previewContainer.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-secondary); padding: 20px 0;">
+          <div style="width: 24px; height: 24px; border: 2.5px solid rgba(255,255,255,0.2); border-top-color: #3b82f6; border-radius: 50%; animation: mmSpin 0.7s linear infinite;"></div>
+          <span style="font-size: 11px;">Création du chef-d'œuvre par Flux Schnell (< 3s)...</span>
+        </div>
+      `;
+
+      try {
+        if (window.pywebview && window.pywebview.api && window.pywebview.api.generate_mindmap_node_image) {
+          const res = await window.pywebview.api.generate_mindmap_node_image(
+            prompt,
+            this.currentNote?.id || 'note',
+            node.id,
+            selectedStyle
+          );
+          if (res && res.success && res.dataUrl) {
+            generatedImageResult = res;
+            statusSpan.textContent = '✅ Illustration générée avec succès !';
+            previewContainer.innerHTML = `
+              <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <img src="${res.dataUrl}" style="max-height: 180px; width: 100%; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" />
+                <!-- Simulation visuelle du nœud sur l'image -->
+                <div style="position: absolute; bottom: 12px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); border: 1.5px solid ${node.color || '#3b82f6'}; border-radius: 20px; padding: 4px 14px; display: flex; align-items: center; gap: 8px; color: #ffffff; font-weight: 800; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">
+                  ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 14)}</span>` : ''}
+                  <span style="text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${this.escapeHtml(nodeText)}</span>
+                  ${node.ref ? `<span style="font-size: 9px; padding: 1px 6px; border-radius: 4px; background: rgba(255,255,255,0.2);">${this.escapeHtml(this.formatScripturePillRef(node.ref))}</span>` : ''}
+                </div>
+              </div>
+            `;
+            btnApply.disabled = false;
+            btnApply.style.opacity = '1';
+          } else {
+            const err = res?.error || 'Erreur inconnue';
+            statusSpan.textContent = `❌ ${err}`;
+            previewContainer.innerHTML = `<div style="color: #ef4444; font-size: 12px; text-align: center; padding: 10px;">${this.escapeHtml(err)}</div>`;
+          }
+        }
+      } catch (ex) {
+        statusSpan.textContent = `❌ Erreur : ${ex.message || ex}`;
+        previewContainer.innerHTML = `<div style="color: #ef4444; font-size: 12px; text-align: center; padding: 10px;">${this.escapeHtml(String(ex))}</div>`;
+      } finally {
+        btnGen.disabled = false;
+        btnGen.style.opacity = '1';
+        overlay.querySelector('#mm-img-gen-icon').textContent = '🎨';
+        overlay.querySelector('#mm-img-gen-label').textContent = 'Régénérer avec Flux';
+      }
+    });
+
+    // Appliquer à la pastille
+    btnApply?.addEventListener('click', () => {
+      if (!generatedImageResult) return;
+      node.image = generatedImageResult.relativePath;
+      node.imageDataUrl = generatedImageResult.dataUrl;
+      if (isRoot && this.currentNote) {
+        this.currentNote.rootImage = generatedImageResult.relativePath;
+      }
+      this.layoutTree();
+      this.draw();
+      this.syncAndAutoSave();
+      closeDialog();
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('🎨 Illustration appliquée en fond de pastille !');
+      }
+    });
+
+    // Supprimer l'image
+    overlay.querySelector('#mm-img-btn-delete')?.addEventListener('click', () => {
+      this.removeNodeImage(nodeId);
+      closeDialog();
+    });
+
+    // Lancer automatiquement la première suggestion de prompt
+    loadSuggestedPrompt();
   },
 
   // =========================================================================

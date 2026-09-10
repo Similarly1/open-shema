@@ -210,6 +210,7 @@ def ensure_data_directories() -> None:
         "covers",
         "conversations",
         "illustrations",
+        "mindmap_images",
         "articles"
     ]:
         os.makedirs(os.path.join(u_dir, sub), exist_ok=True)
