@@ -4483,16 +4483,26 @@ const MindMapView = {
     input.value = node.text;
     input.placeholder = 'MOT-CLÉ';
     const isPaperMode = !!(this.container && this.container.classList.contains('paper-mode'));
+    const isDarkMode = document.body.classList.contains('theme-dark') ||
+      Array.from(document.body.classList).some(c => c.includes('palette-dark'));
     input.className = isPaperMode ? 'mm-inline-editor paper-mode' : 'mm-inline-editor';
     input.style.position = 'fixed';
-    input.style.background = 'transparent';
+    // Fond légèrement opaque pour garantir la lisibilité en tout contexte
     if (isPaperMode) {
+      input.style.background = 'rgba(255,255,255,0.92)';
+      input.style.color = '#0f172a';
+    } else if (isDarkMode) {
+      input.style.background = 'rgba(15,23,42,0.88)';
+      input.style.color = '#f8fafc';
+    } else {
+      input.style.background = 'rgba(255,255,255,0.92)';
       input.style.color = '#0f172a';
     }
+    input.style.borderRadius = '4px';
     input.style.border = 'none';
     input.style.outline = 'none';
     input.style.boxShadow = 'none';
-    input.style.padding = '0';
+    input.style.padding = '0 3px';
     input.style.margin = '0';
     input.style.top = `${Math.round(targetRect.top)}px`;
     input.style.height = `${Math.max(16, Math.round(targetRect.height / scale))}px`;
