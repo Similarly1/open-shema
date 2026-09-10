@@ -218,13 +218,20 @@ const DrawerPastoralViewer = {
       const epNum = ep.episode_number;
       const epBadge = (epNum != null && epNum !== '') ? `Ép. #${epNum}` : 'Hors-série';
       const titleFr = ep.titre_fr || ep.titre || ep.original_title || 'Question pastorale';
-      const typeQ = ep.type_question ? ep.type_question.toUpperCase() : (isUpvr ? 'PASTORAL' : 'APJ');
-      const hasIllustr = ep.illustration?.has_illustration || !!ep.illustration?.titre;
-      const appCount = (ep.pistes_applications || ep.applications_pastorales || []).length;
       const primPassages = ep.passages_primaires || (ep.verse_ref ? [ep.verse_ref] : []);
       const secPassages = ep.passages_secondaires || [];
-      const hasAudio = !!ep.audio_url;
-      const ptsCount = (ep.points_cles || []).length;
+      const mainRef = primPassages.length > 0 ? primPassages[0] : (secPassages.length > 0 ? secPassages[0] : '');
+      const totalRefsCount = primPassages.length + secPassages.length;
+      const extraCount = totalRefsCount > 1 ? totalRefsCount - 1 : 0;
+      const hasAudio = !!(ep.audio_url || ep.mp3_url);
+      const durStr = this.formatDuration(ep.duration);
+
+      const audioBadgeHtml = hasAudio ? `
+        <span class="pastoral-card-audio-pill" title="${durStr ? 'Durée audio : ' + durStr : 'Enregistrement audio officiel disponible'}">
+          <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+          <span>${durStr || 'Audio'}</span>
+        </span>
+      ` : '';
 
       itemsHtml += `
         <div class="drawer-pastoral-item ${isUpvr ? 'is-upvr-card' : 'is-apj-card'}" data-item-idx="${realIdx}">
@@ -233,21 +240,14 @@ const DrawerPastoralViewer = {
               ${isUpvr ? this.upvrLogoSvg(12) : this.apjLogoSvg(12)}
               <span>${isUpvr ? 'UPVR' : 'APJ'} • ${epBadge}</span>
             </span>
-            <span class="clean-pastoral-type">${this.escapeHtml(typeQ)}</span>
-            ${hasAudio ? `<span class="clean-pastoral-feat" style="background: rgba(255, 85, 0, 0.12); color: #ff5500;">Audio</span>` : ''}
-            ${ptsCount > 0 ? `<span class="clean-pastoral-feat" style="background: rgba(230, 62, 9, 0.1); color: #d9480f;">${ptsCount} pts</span>` : ''}
-            ${hasIllustr ? `<span class="clean-pastoral-feat has-analogy" title="Contient une analogie">Analogie</span>` : ''}
-            ${appCount > 0 ? `<span class="clean-pastoral-feat has-apps" title="${appCount} applications">${appCount} app.</span>` : ''}
+            ${mainRef ? `
+              <span class="drawer-pastoral-ref-pill primary" data-ref="${this.escapeHtml(mainRef)}" title="Référence principale (survolez pour lire)">
+                ${this.escapeHtml(mainRef)}${extraCount > 0 ? ` <span class="ref-pill-more">+${extraCount}</span>` : ''}
+              </span>
+            ` : ''}
+            ${audioBadgeHtml}
           </div>
           <div class="drawer-pastoral-item-title">${this.escapeHtml(titleFr)}</div>
-          ${(primPassages.length > 0 || secPassages.length > 0) ? `
-            <div class="drawer-pastoral-item-refs">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              ${primPassages.map(p => `<span class="drawer-pastoral-ref-pill primary" data-ref="${this.escapeHtml(p)}">${this.escapeHtml(p)}</span>`).join('')}
-              ${secPassages.slice(0, 2).map(p => `<span class="drawer-pastoral-ref-pill secondary" data-ref="${this.escapeHtml(p)}">${this.escapeHtml(p)}</span>`).join('')}
-              ${secPassages.length > 2 ? `<span class="drawer-pastoral-ref-pill more">+${secPassages.length - 2}</span>` : ''}
-            </div>
-          ` : ''}
           ${ep.these_centrale ? `<div class="drawer-pastoral-item-thesis">${this.escapeHtml(ep.these_centrale)}</div>` : ''}
         </div>
       `;
@@ -598,6 +598,24 @@ const DrawerPastoralViewer = {
         }, 120);
       }
     });
+  },
+
+  formatDuration(dur) {
+    if (!dur) return '';
+    if (typeof dur === 'string') {
+      const parts = dur.split(':').map(p => parseInt(p, 10));
+      if (parts.length === 2 && !isNaN(parts[0])) {
+        return `${parts[0]} min`;
+      }
+      if (parts.length === 3 && !isNaN(parts[0])) {
+        return `${parts[0] * 60 + parts[1]} min`;
+      }
+      return dur;
+    }
+    if (typeof dur === 'number' && dur > 0) {
+      return `${Math.round(dur / 60)} min`;
+    }
+    return '';
   },
 
   formatFrenchDate(dateStr) {

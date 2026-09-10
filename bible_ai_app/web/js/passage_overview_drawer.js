@@ -1158,11 +1158,20 @@ const PassageOverviewDrawer = {
           : `John Piper · APJ ${epBadge}`;
         const sourceBrand = isUpvr ? 'ToutPourSaGloire' : 'Desiring God';
         const logoPath = isUpvr ? 'assets/upvr_badge.svg' : 'assets/apj_logo.svg';
-        const typeBadge = ep.type_question ? ep.type_question.toUpperCase() : (isUpvr ? 'PASTORAL' : 'APJ');
-        const hasIllustr = ep.illustration?.has_illustration || !!ep.illustration?.titre;
-        const appCount = (ep.pistes_applications || ep.applications_pastorales || []).length;
-        const ptsCount = (ep.points_cles || []).length;
-        const hasAudio = !!ep.audio_url;
+        const primPassages = ep.passages_primaires || (ep.verse_ref ? [ep.verse_ref] : []);
+        const secPassages = ep.passages_secondaires || [];
+        const mainRef = primPassages.length > 0 ? primPassages[0] : (secPassages.length > 0 ? secPassages[0] : '');
+        const totalRefsCount = primPassages.length + secPassages.length;
+        const extraCount = totalRefsCount > 1 ? totalRefsCount - 1 : 0;
+        const hasAudio = !!(ep.audio_url || ep.mp3_url);
+        const durStr = this.formatPastoralDuration(ep.duration);
+
+        const audioBadgeHtml = hasAudio ? `
+          <span class="pastoral-card-audio-pill" title="${durStr ? 'Durée audio : ' + durStr : 'Enregistrement audio officiel disponible'}">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+            <span>${durStr || 'Audio'}</span>
+          </span>
+        ` : '';
 
         bodyHtml += `
           <div class="overview-clean-item overview-pastoral-item ${isUpvr ? 'is-upvr' : 'is-apj'}"
@@ -1177,16 +1186,17 @@ const PassageOverviewDrawer = {
                data-tt-excerpt="${this.escapeHtml(theseHtml)}">
             <div class="clean-article-row">
               <div class="clean-article-content">
-                <div class="clean-article-top">
+                <div class="clean-article-top" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                   <span class="clean-source-tag ${isUpvr ? 'is-upvr' : 'is-pastoral'}" style="display: inline-flex; align-items: center; gap: 4px;">
                     ${isUpvr ? this.icons.upvrLogo : this.icons.apjLogo}
                     <span class="source-tag-text">${isUpvr ? 'UPVR' : 'APJ'} • ${epBadge}</span>
                   </span>
-                  <span class="clean-pastoral-type">${this.escapeHtml(typeBadge)}</span>
-                  ${hasAudio ? `<span class="clean-pastoral-feat" style="background: rgba(255, 85, 0, 0.12); color: #ff5500;">Audio</span>` : ''}
-                  ${ptsCount > 0 ? `<span class="clean-pastoral-feat" style="background: rgba(230, 62, 9, 0.1); color: #d9480f;">${ptsCount} pts</span>` : ''}
-                  ${hasIllustr ? `<span class="clean-pastoral-feat has-analogy" title="Contient une analogie ou illustration">Analogie</span>` : ''}
-                  ${appCount > 0 ? `<span class="clean-pastoral-feat has-apps" title="${appCount} pistes d'application pratique">${appCount} app.</span>` : ''}
+                  ${mainRef ? `
+                    <span class="drawer-pastoral-ref-pill primary" data-ref="${this.escapeHtml(mainRef)}" title="Référence principale">
+                      ${this.escapeHtml(mainRef)}${extraCount > 0 ? ` <span class="ref-pill-more">+${extraCount}</span>` : ''}
+                    </span>
+                  ` : ''}
+                  ${audioBadgeHtml}
                 </div>
                 <div class="clean-article-title">${this.escapeHtml(titleFr)}</div>
                 ${ep.these_centrale ? `<div class="clean-pastoral-thesis">${this.escapeHtml(ep.these_centrale)}</div>` : ''}
@@ -2291,6 +2301,24 @@ const PassageOverviewDrawer = {
     if (lbl) {
       lbl.textContent = `${Math.round(this.panzoom.scale * 100)}%`;
     }
+  },
+
+  formatPastoralDuration(dur) {
+    if (!dur) return '';
+    if (typeof dur === 'string') {
+      const parts = dur.split(':').map(p => parseInt(p, 10));
+      if (parts.length === 2 && !isNaN(parts[0])) {
+        return `${parts[0]} min`;
+      }
+      if (parts.length === 3 && !isNaN(parts[0])) {
+        return `${parts[0] * 60 + parts[1]} min`;
+      }
+      return dur;
+    }
+    if (typeof dur === 'number' && dur > 0) {
+      return `${Math.round(dur / 60)} min`;
+    }
+    return '';
   },
 
   formatFrenchDate(dateStr) {

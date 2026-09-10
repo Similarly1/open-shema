@@ -2432,44 +2432,44 @@ const PassageStudyView = {
               const epNum = ep.episode_number;
               const epBadge = (epNum != null && epNum !== '') ? `Ép. #${epNum}` : 'Hors-série';
               const titleFr = ep.titre_fr || ep.titre || ep.original_title;
-              const typeQ = ep.type_question ? ep.type_question.toUpperCase() : (isUpvr ? 'PASTORAL' : 'APJ');
-              const hasIllustr = ep.illustration?.has_illustration || !!ep.illustration?.titre;
-              const appCount = (ep.pistes_applications || ep.applications_pastorales || []).length;
-              const ptsCount = (ep.points_cles || []).length;
               const primPassages = ep.passages_primaires || (ep.verse_ref ? [ep.verse_ref] : []);
               const secPassages = ep.passages_secondaires || [];
-              const hasAudio = !!ep.audio_url;
+              const mainRef = primPassages.length > 0 ? primPassages[0] : (secPassages.length > 0 ? secPassages[0] : '');
+              const totalRefsCount = primPassages.length + secPassages.length;
+              const extraCount = totalRefsCount > 1 ? totalRefsCount - 1 : 0;
+              const hasAudio = !!(ep.audio_url || ep.mp3_url);
+              const durStr = this.formatPastoralDuration(ep.duration);
 
               const shouldShow = (this.activePastoralFilter === 'all') ||
                                  (this.activePastoralFilter === 'upvr' && isUpvr) ||
                                  (this.activePastoralFilter === 'apj' && !isUpvr);
 
+              const audioBadgeHtml = hasAudio ? `
+                <span class="pastoral-card-audio-pill" title="${durStr ? 'Durée audio : ' + durStr : 'Enregistrement audio officiel disponible'}">
+                  <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+                  <span>${durStr || 'Audio'}</span>
+                </span>
+              ` : '';
+
               return `
                 <div class="ps-pastoral-item ${idx === this.activePastoralEpIdx ? 'active' : ''} ${isUpvr ? 'is-upvr-item' : 'is-apj-item'}" 
                      data-ep-idx="${idx}" 
                      data-author="${isUpvr ? 'upvr' : 'apj'}"
-                     style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-surface); cursor: pointer; transition: all 0.15s; display: ${shouldShow ? 'block' : 'none'};">
-                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                     style="padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-surface); cursor: pointer; transition: all 0.15s; display: ${shouldShow ? 'flex' : 'none'}; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                     <span style="font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: ${isUpvr ? 'rgba(230, 62, 9, 0.12)' : 'rgba(20, 184, 166, 0.15)'}; color: ${isUpvr ? '#d9480f' : '#0d9488'}; display: inline-flex; align-items: center; gap: 4px;">
                       ${isUpvr ? this.ICONS.upvrLogo : this.ICONS.apjLogo} 
                       <span>${isUpvr ? 'UPVR' : 'APJ'} • ${epBadge}</span>
                     </span>
-                    <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">${this.escapeHtml(typeQ)}</span>
-                    ${hasAudio ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(255, 85, 0, 0.12); color: #ff5500;">Audio</span>` : ''}
-                    ${ptsCount > 0 ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(230, 62, 9, 0.1); color: #d9480f;">${ptsCount} pts</span>` : ''}
-                    ${hasIllustr ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(245, 158, 11, 0.15); color: #d97706;">Analogie</span>` : ''}
-                    ${appCount > 0 ? `<span style="font-size: 9.5px; padding: 1px 4px; border-radius: 3px; background: rgba(59, 130, 246, 0.12); color: #2563eb;">${appCount} app.</span>` : ''}
+                    ${mainRef ? `
+                      <span class="drawer-pastoral-ref-pill primary" data-ref="${this.escapeHtml(mainRef)}" title="Référence principale (survolez pour lire)">
+                        ${this.escapeHtml(mainRef)}${extraCount > 0 ? ` <span class="ref-pill-more">+${extraCount}</span>` : ''}
+                      </span>
+                    ` : ''}
+                    ${audioBadgeHtml}
                   </div>
                   <div style="font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--text-primary);">${this.escapeHtml(titleFr)}</div>
-                  ${(primPassages.length > 0 || secPassages.length > 0) ? `
-                    <div class="drawer-pastoral-item-refs" style="margin-top: 4px;">
-                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                      ${primPassages.map(p => `<span class="drawer-pastoral-ref-pill primary">${this.escapeHtml(p)}</span>`).join('')}
-                      ${secPassages.slice(0, 2).map(p => `<span class="drawer-pastoral-ref-pill secondary">${this.escapeHtml(p)}</span>`).join('')}
-                      ${secPassages.length > 2 ? `<span class="drawer-pastoral-ref-pill more">+${secPassages.length - 2}</span>` : ''}
-                    </div>
-                  ` : ''}
-                  ${ep.these_centrale ? `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${this.escapeHtml(ep.these_centrale)}</div>` : ''}
+                  ${ep.these_centrale ? `<div style="font-size: 11px; color: var(--text-secondary); opacity: 0.85; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(ep.these_centrale)}</div>` : ''}
                 </div>
               `;
             }).join('')}
@@ -2770,6 +2770,7 @@ const PassageStudyView = {
       // Lier l'infobulle de prévisualisation biblique (ScriptureTooltip)
       if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
         ScriptureTooltip.bindToElements(readerPane.querySelectorAll('.drawer-pastoral-ref-btn'));
+        ScriptureTooltip.bindToElements(listContainer?.querySelectorAll('.drawer-pastoral-ref-pill[data-ref]'));
       }
     };
 
@@ -2790,6 +2791,11 @@ const PassageStudyView = {
 
     // Attacher les écouteurs du lecteur initial
     bindReaderPaneEvents();
+
+    // Lier les infobulles sur la liste initiale
+    if (typeof ScriptureTooltip !== 'undefined' && ScriptureTooltip.bindToElements) {
+      ScriptureTooltip.bindToElements(listContainer?.querySelectorAll('.drawer-pastoral-ref-pill[data-ref]'));
+    }
 
     // Cacher l'infobulle lors du défilement du lecteur
     readerPane?.addEventListener('scroll', () => {
@@ -2812,7 +2818,7 @@ const PassageStudyView = {
         listContainer?.querySelectorAll('.ps-pastoral-item').forEach(item => {
           const auth = item.dataset.author;
           const show = (this.activePastoralFilter === 'all') || (this.activePastoralFilter === auth);
-          item.style.display = show ? 'block' : 'none';
+          item.style.display = show ? 'flex' : 'none';
           if (show && firstVisibleIdx === -1) {
             firstVisibleIdx = parseInt(item.dataset.epIdx, 10);
           }
@@ -2841,7 +2847,7 @@ const PassageStudyView = {
         const matchesAuthor = (this.activePastoralFilter === 'all') || (this.activePastoralFilter === auth);
         const text = `${ep.episode_number || ''} ${ep.titre_fr || ''} ${ep.titre || ''} ${ep.original_title || ''} ${ep.these_centrale || ''} ${(ep.themes || []).join(' ')}`.toLowerCase();
         const matchesSearch = (!q || text.includes(q));
-        item.style.display = (matchesAuthor && matchesSearch) ? 'block' : 'none';
+        item.style.display = (matchesAuthor && matchesSearch) ? 'flex' : 'none';
       });
     });
   },
@@ -3469,9 +3475,24 @@ const PassageStudyView = {
     }
   },
 
-  // =========================================================================
-  // UTILITAIRES & FORMATEURS
-  // =========================================================================
+  formatPastoralDuration(dur) {
+    if (!dur) return '';
+    if (typeof dur === 'string') {
+      const parts = dur.split(':').map(p => parseInt(p, 10));
+      if (parts.length === 2 && !isNaN(parts[0])) {
+        return `${parts[0]} min`;
+      }
+      if (parts.length === 3 && !isNaN(parts[0])) {
+        return `${parts[0] * 60 + parts[1]} min`;
+      }
+      return dur;
+    }
+    if (typeof dur === 'number' && dur > 0) {
+      return `${Math.round(dur / 60)} min`;
+    }
+    return '';
+  },
+
   formatFrenchDate(dateStr) {
     if (!dateStr || typeof dateStr !== 'string') return '';
     const cleanStr = dateStr.trim();
