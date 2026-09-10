@@ -9237,24 +9237,33 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   gap: 6px;
 }
 
-/* SmoothUI Button Copy */
-.smooth-btn-copy {
+/* SmoothUI Button Copy & Footer Action Buttons */
+.smooth-btn-copy,
+.ai-footer-action-btn,
+.ai-footer-left button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: 3px 8px;
+  height: 24px;
+  padding: 0 8px;
   border-radius: 5px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
   font-size: 11px;
   font-weight: 500;
+  line-height: 1;
   cursor: pointer;
+  box-sizing: border-box;
   transition: var(--transition-fast);
   user-select: none;
+  white-space: nowrap;
 }
 
-.smooth-btn-copy:hover {
+.smooth-btn-copy:hover,
+.ai-footer-action-btn:hover,
+.ai-footer-left button:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
 }
@@ -9264,6 +9273,7 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   position: relative;
   width: 13px;
   height: 13px;
+  flex-shrink: 0;
 }
 
 .icon-copy, .icon-check {
@@ -9294,24 +9304,13 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
   transform: scale(1);
 }
 
-.ai-footer-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 5px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.ai-footer-action-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+.ai-footer-left .btn-export-mindmap,
+.ai-footer-action-btn.btn-export-mindmap {
+  height: 24px !important;
+  padding: 0 8px !important;
+  font-size: 11px !important;
+  border-radius: 5px !important;
+  font-weight: 500 !important;
 }
 
 .ai-footer-right {
@@ -37130,7 +37129,7 @@ body[class*="palette-dark"] .mm-marker-clear-btn:hover {
   display: none !important;
 }
 
-.btn-export-mindmap {
+.mm-export-dropdown-wrap .btn-export-mindmap {
   display: inline-flex;
   align-items: center;
   gap: 5px;

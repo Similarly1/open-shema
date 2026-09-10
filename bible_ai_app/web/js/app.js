@@ -1835,18 +1835,18 @@ const App = {
         const footerHtml = `
           <div class="ai-msg-footer" style="margin-top: 8px;">
             <div class="ai-footer-left">
-              <button class="smooth-btn-copy" title="Copier l'analyse">
+              <button class="ai-footer-action-btn smooth-btn-copy" title="Copier l'analyse">
                 <span class="copy-icon-wrap">
                   <svg class="icon-copy" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                   <svg class="icon-check" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
-                <span class="copy-label" style="font-size: 10.5px;">Copier</span>
+                <span class="copy-label">Copier</span>
               </button>
-              <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans les notes (.md)" style="font-size: 10.5px;">
+              <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans les notes (.md)">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
                 <span>Note</span>
               </button>
-              <button class="ai-footer-action-btn btn-export-mindmap" title="Convertir cette étude en Mind Map radiante (Buzan)" style="font-size: 10.5px;">
+              <button class="ai-footer-action-btn btn-export-mindmap" title="Convertir cette étude en Mind Map radiante (Buzan)">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
                 <span>Mind Map</span>
               </button>
