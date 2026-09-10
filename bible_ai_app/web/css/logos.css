@@ -37914,32 +37914,55 @@ body[class*="palette-dark"] .note-svg-icon:hover {
    BADGES D'ICÔNES SVG DANS LA MIND MAP
    ========================================================================= */
 
-.mm-node-icon-badge {
+.mm-node-icon-badge,
+.mm-root-icon-badge {
   cursor: pointer;
-  transition: opacity 0.15s ease, filter 0.15s ease;
+  transform-box: fill-box;
+  transform-origin: center center;
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .mm-node-icon-badge * {
   pointer-events: none;
 }
 
-.mm-node-icon-badge circle:first-child {
+.mm-node-icon-badge circle:first-child,
+.mm-root-icon-badge circle:first-child {
   pointer-events: all;
+  transition: fill 0.22s ease, stroke 0.22s ease, filter 0.22s ease;
 }
 
-.mm-node-icon-badge:hover {
-  filter: brightness(1.25);
-  opacity: 0.9;
-}
-
-.mm-root-icon-badge {
-  cursor: pointer;
-  transition: opacity 0.15s ease, filter 0.15s ease;
-}
-
+/* ── 1. Pulsation élastique au survol (+15%) ── */
+.mm-node-icon-badge:hover,
 .mm-root-icon-badge:hover {
-  filter: brightness(1.2);
-  opacity: 0.95;
+  transform: scale(1.15);
+}
+
+/* ── 2. Fond de verre dépoli interactif sur le médaillon central ── */
+.mm-root-icon-badge:hover circle:first-child {
+  fill: rgba(255, 255, 255, 0.24) !important;
+  stroke: rgba(255, 255, 255, 0.65) !important;
+  stroke-width: 1.5px !important;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+}
+
+/* ── 3. Aura lumineuse irisée autour de l'icône racine au survol ── */
+.mm-root-icon-badge:hover g path {
+  stroke: #ffffff !important;
+  stroke-width: 2.1 !important;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.8)) !important;
+}
+
+/* ── 4. Fond interactif & aura sur les icônes de branches ── */
+.mm-node-icon-badge:hover circle:first-child {
+  fill: var(--node-color, rgba(59, 130, 246, 0.2)) !important;
+  stroke: var(--node-color, #3b82f6) !important;
+  stroke-width: 1.4px !important;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+.mm-node-icon-badge:hover g path {
+  filter: drop-shadow(0 0 6px var(--node-color, rgba(59, 130, 246, 0.85))) !important;
 }
 
 .mm-outline-icon-badge {
