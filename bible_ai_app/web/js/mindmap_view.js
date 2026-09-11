@@ -457,10 +457,13 @@ const MindMapView = {
       if (e.button !== 0) return; // Clic gauche uniquement
 
       // Autoriser le panoramique si clic sur le fond, le canevas, les branches, ou n'importe où en lecture seule (sauf badges interactifs)
+      // Autoriser le panoramique si clic sur le fond, le canevas, les branches, ou n'importe où en lecture seule (sauf badges interactifs et liaisons/enclos)
       const isInteractiveBadge = e.target.closest('.mm-node-icon-badge') || e.target.closest('.mm-scripture-pill') || e.target.closest('.mm-note-pill') || e.target.closest('.mm-action-btn') || e.target.closest('button');
       const isNode = !!e.target.closest('.mm-node-g');
+      const isRel = !!e.target.closest('.mm-relationship-g, .mm-rel-label-wrap, .mm-rel-label-g, .mm-rel-handle, .mm-rel-handle-line');
+      const isBoundary = !!e.target.closest('.mm-boundary-g');
 
-      if (!isInteractiveBadge && (!isNode || this.isReadOnly)) {
+      if (!isInteractiveBadge && !isRel && !isBoundary && (!isNode || this.isReadOnly)) {
         this.isPanning = true;
         this.panStart = { x: e.clientX - this.viewBox.x, y: e.clientY - this.viewBox.y };
         this.selectedNodeId = null;
@@ -483,15 +486,34 @@ const MindMapView = {
         return;
       }
 
-      // 2. Glisser-déplacer de la courbure d'une liaison (Bézier handle)
-      if (this.dragState.active && this.dragState.type === 'rel-curve') {
+      // 2. Glisser-déplacer de la courbure d'une liaison (poignée Bézier) ou de son titre
+      if (this.dragState.active && (this.dragState.type === 'rel-curve' || this.dragState.type === 'rel-label')) {
         this.hideTooltip();
         const rel = this.relationships.find(r => r.id === this.dragState.relId);
         if (rel && this.svg) {
           const rect = this.svg.getBoundingClientRect();
           const mouseSvgX = (e.clientX - rect.left - this.viewBox.x) / this.viewBox.scale;
           const mouseSvgY = (e.clientY - rect.top - this.viewBox.y) / this.viewBox.scale;
-          rel.customControl = { x: mouseSvgX, y: mouseSvgY };
+
+          if (this.dragState.type === 'rel-label') {
+            // L'utilisateur déplace directement le titre de la liaison :
+            // Inverser la formule quadratique Bézier pour que le milieu L(t=0.5) suive la souris au pixel près
+            const fromNode = this.findNode(rel.fromId);
+            const toNode = this.findNode(rel.toId);
+            if (fromNode && toNode) {
+              const p1 = this.getNodeConnectionPoint(fromNode, { x: toNode.x, y: toNode.y });
+              const p2 = this.getNodeConnectionPoint(toNode, { x: fromNode.x, y: fromNode.y });
+              rel.customControl = {
+                x: 2 * mouseSvgX - 0.5 * (p1.x + p2.x),
+                y: 2 * mouseSvgY - 0.5 * (p1.y + p2.y)
+              };
+            } else {
+              rel.customControl = { x: mouseSvgX, y: mouseSvgY };
+            }
+          } else {
+            // L'utilisateur déplace la poignée de courbure ou la courbe
+            rel.customControl = { x: mouseSvgX, y: mouseSvgY };
+          }
           this.dragState.hasMoved = true;
           this.drawRelationships();
         }
@@ -542,8 +564,8 @@ const MindMapView = {
         this.isPanning = false;
       }
 
-      // Fin de drag de liaison
-      if (this.dragState.active && this.dragState.type === 'rel-curve') {
+      // Fin de drag de liaison (courbe ou titre)
+      if (this.dragState.active && (this.dragState.type === 'rel-curve' || this.dragState.type === 'rel-label')) {
         if (this.dragState.hasMoved) {
           this.syncAndAutoSave();
         }
@@ -4570,9 +4592,15 @@ const MindMapView = {
     });
     this.viewportG?.querySelectorAll('.mm-rel-handle').forEach(handle => {
       const wrap = handle.closest('[data-rel-id]');
-      const relId = wrap ? wrap.getAttribute('data-rel-id') : null;
+      const relId = wrap ? wrap.getAttribute('data-rel-id') : handle.getAttribute('data-rel-id');
       const isRelSel = relId === this.selectedRelId;
       handle.style.display = (isRelSel && !this.isReadOnly) ? 'inline' : 'none';
+    });
+    this.viewportG?.querySelectorAll('.mm-rel-handle-line').forEach(line => {
+      const wrap = line.closest('[data-rel-id]');
+      const relId = wrap ? wrap.getAttribute('data-rel-id') : line.getAttribute('data-rel-id');
+      const isRelSel = relId === this.selectedRelId;
+      line.style.display = (isRelSel && !this.isReadOnly) ? 'inline' : 'none';
     });
     this.viewportG?.querySelectorAll('.mm-boundary-g').forEach(el => {
       const isBndSel = el.getAttribute('data-boundary-id') === this.selectedBoundaryId;
@@ -7809,11 +7837,22 @@ const MindMapView = {
       relG.setAttribute('class', `mm-relationship-g ${isSelected ? 'selected' : ''}`);
       relG.setAttribute('data-rel-id', rel.id);
 
-      // Trait transparent pour zone de clic et glisser-déplacer aérée
+      // Courbe tiretée noble avec flèche terminale
+      const visiblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      visiblePath.setAttribute('d', pathData);
+      visiblePath.setAttribute('stroke', relColor);
+      visiblePath.setAttribute('stroke-width', isSelected ? '2.8' : '2');
+      visiblePath.setAttribute('stroke-dasharray', '6,4');
+      visiblePath.setAttribute('fill', 'none');
+      visiblePath.setAttribute('marker-end', 'url(#mm-rel-arrow)');
+      visiblePath.setAttribute('class', 'mm-rel-visible-path');
+      relG.appendChild(visiblePath);
+
+      // Trait transparent pour zone de clic et glisser-déplacer aérée (au premier plan du groupe de courbe)
       const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       hitPath.setAttribute('d', pathData);
       hitPath.setAttribute('stroke', 'transparent');
-      hitPath.setAttribute('stroke-width', '18');
+      hitPath.setAttribute('stroke-width', '20');
       hitPath.setAttribute('fill', 'none');
       hitPath.setAttribute('class', 'mm-rel-hit-path');
       hitPath.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
@@ -7823,7 +7862,6 @@ const MindMapView = {
         if (this.isReadOnly) return;
         if (e.button !== 0) return;
         e.stopPropagation();
-        e.preventDefault();
         this.selectRelationship(rel.id);
         this.dragState = {
           active: true,
@@ -7838,18 +7876,6 @@ const MindMapView = {
       });
 
       relG.appendChild(hitPath);
-
-      // Courbe tiretée noble avec flèche terminale
-      const visiblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      visiblePath.setAttribute('d', pathData);
-      visiblePath.setAttribute('stroke', relColor);
-      visiblePath.setAttribute('stroke-width', isSelected ? '2.8' : '2');
-      visiblePath.setAttribute('stroke-dasharray', '6,4');
-      visiblePath.setAttribute('fill', 'none');
-      visiblePath.setAttribute('marker-end', 'url(#mm-rel-arrow)');
-      visiblePath.setAttribute('class', 'mm-rel-visible-path');
-      relG.appendChild(visiblePath);
-
       relsLayer.appendChild(relG);
 
       // Conteneur au premier plan pour l'étiquette et la poignée de manipulation (au-dessus des nœuds)
@@ -7859,22 +7885,35 @@ const MindMapView = {
 
       // Poignée de contrôle interactive de la courbure Bézier (style XMind - masquée en lecture seule)
       if (!this.isReadOnly) {
+        // Ligne directrice en pointillés reliant le titre (sommet) à la poignée de contrôle
+        const handleLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        handleLine.setAttribute('x1', lx);
+        handleLine.setAttribute('y1', ly);
+        handleLine.setAttribute('x2', cx);
+        handleLine.setAttribute('y2', cy);
+        handleLine.setAttribute('stroke', relColor);
+        handleLine.setAttribute('stroke-width', '1.4');
+        handleLine.setAttribute('stroke-dasharray', '3,3');
+        handleLine.setAttribute('class', 'mm-rel-handle-line');
+        handleLine.setAttribute('data-rel-id', rel.id);
+        handleLine.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
+        labelWrapG.appendChild(handleLine);
+
         const handleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         handleCircle.setAttribute('cx', cx);
         handleCircle.setAttribute('cy', cy);
-        handleCircle.setAttribute('r', '6.5');
+        handleCircle.setAttribute('r', '7');
         handleCircle.setAttribute('class', 'mm-rel-handle');
+        handleCircle.setAttribute('data-rel-id', rel.id);
         handleCircle.setAttribute('fill', relColor);
         handleCircle.setAttribute('stroke', '#ffffff');
-        handleCircle.setAttribute('stroke-width', '2');
-        handleCircle.style.display = isSelected ? 'inline' : 'none';
+        handleCircle.setAttribute('stroke-width', '2.5');
         handleCircle.setAttribute('style', isSelected ? 'display: inline;' : 'display: none;');
         handleCircle.setAttribute('title', 'Glisser pour ajuster la courbure (Double-clic pour réinitialiser)');
 
         handleCircle.addEventListener('mousedown', (e) => {
           if (e.button !== 0) return;
           e.stopPropagation();
-          e.preventDefault();
           this.selectRelationship(rel.id);
           this.dragState = {
             active: true,
@@ -7949,12 +7988,35 @@ const MindMapView = {
         delXText.textContent = '×';
         delBtnG.appendChild(delXText);
 
+        delBtnG.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+        });
+
         delBtnG.addEventListener('click', (e) => {
           e.stopPropagation();
           this.deleteRelationship(rel.id);
         });
         labelG.appendChild(delBtnG);
       }
+
+      // Glisser-déplacer direct du titre de la liaison pour déplacer son emplacement et sa courbe
+      labelG.addEventListener('mousedown', (e) => {
+        if (this.isReadOnly) return;
+        if (e.button !== 0) return;
+        if (e.target.closest('.mm-rel-del-btn')) return;
+        e.stopPropagation();
+        this.selectRelationship(rel.id);
+        this.dragState = {
+          active: true,
+          type: 'rel-label',
+          nodeId: null,
+          relId: rel.id,
+          startX: e.clientX,
+          startY: e.clientY,
+          hasMoved: false,
+          targetNodeId: null
+        };
+      });
 
       // Synchronisation survol entre la ligne et l'étiquette
       labelG.addEventListener('mouseenter', () => {
@@ -7990,6 +8052,7 @@ const MindMapView = {
       labelG.addEventListener('dblclick', (e) => {
         e.stopPropagation();
         if (this.isReadOnly) return;
+        if (this.dragState && this.dragState.hasMoved) return;
         this.promptEditRelationshipLabel(rel.id);
       });
 

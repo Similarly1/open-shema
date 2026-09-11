@@ -35872,8 +35872,12 @@ body[class*="palette-dark"] .mm-connecting-text kbd {
 
 /* Étiquette flottante de liaison */
 .mm-rel-label-g {
-  cursor: pointer;
+  cursor: grab;
   user-select: none;
+}
+
+.mm-rel-label-g:active {
+  cursor: grabbing;
 }
 
 .mm-rel-label-rect {
@@ -35925,8 +35929,10 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-rel-lab
   cursor: pointer;
 }
 
-/* Apparaît UNIQUEMENT au survol de l'étiquette */
-.mm-rel-label-g:hover .mm-rel-del-btn {
+/* Apparaît au survol de l'étiquette ou quand la liaison est sélectionnée */
+.mm-rel-label-g:hover .mm-rel-del-btn,
+.mm-rel-label-wrap.selected .mm-rel-del-btn,
+.mm-rel-label-g.selected .mm-rel-del-btn {
   opacity: 1;
   pointer-events: all;
 }
@@ -36526,21 +36532,34 @@ body[class*="palette-dark"] .mm-node-drag-ghost {
 
 /* Poignée de contrôle interactive de la courbure des liaisons */
 .mm-rel-handle {
-  display: none !important;
+  display: none;
   cursor: grab;
   transition: r 0.15s ease, stroke-width 0.15s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
 }
 
+.mm-rel-label-wrap.selected .mm-rel-handle,
 .mm-relationship-g.selected .mm-rel-handle {
   display: inline !important;
 }
 
 .mm-rel-handle:hover,
+.mm-rel-label-wrap.selected .mm-rel-handle:hover,
 .mm-relationship-g.selected .mm-rel-handle:hover {
-  r: 7.5;
+  r: 8.5;
   cursor: grabbing;
   stroke-width: 2.5;
+}
+
+.mm-rel-handle-line {
+  display: none;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.mm-rel-label-wrap.selected .mm-rel-handle-line,
+.mm-relationship-g.selected .mm-rel-handle-line {
+  display: inline !important;
 }
 
 /* ==========================================================================
