@@ -2010,13 +2010,23 @@ const MindMapView = {
     };
   },
 
+  getNodeDefaultImageSize(node) {
+    if (!node) return 72;
+    if (node.isFloating) return 72;  // Sujet flottant : Standard (72 px)
+    if (node.id === 'root' || node.level === 0) return 104;
+    if (node.level === 1) return 96;  // Grand (96 px) pour niveau 1
+    if (node.level === 2) return 72;  // Standard (72 px) pour niveau 2
+    if (node.level >= 3) return 48;   // Compact (48 px) pour niveau 3+
+    return 72;
+  },
+
   measureNode(node) {
     const hasImg = !!node.image;
     const imgMode = node.imageMode || 'background';
 
     if (node.isFloating) {
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 56;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : this.getNodeDefaultImageSize(node);
         const imgShape = node.imageShape || 'rounded';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.45) : s;
@@ -2072,7 +2082,7 @@ const MindMapView = {
     } else if (node.level === 0) {
       // NIVEAU 0 (Thème général / Noyau central dominant Buzan - médaillon circulaire polychrome)
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 104;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : this.getNodeDefaultImageSize(node);
         const imgShape = node.imageShape || 'circle';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.4) : s;
@@ -2100,9 +2110,9 @@ const MindMapView = {
         node.height = rootR * 2;
       }
     } else if (node.level === 1) {
-      // NIVEAU 1 (BOIs - Règles de Buzan : mots-clés forces, affirmé et contrasté)
+      // NIVEAU 1 (BOIs - Règles de Buzan : Grand par défaut 96px)
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 68;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 96;
         const imgShape = node.imageShape || 'rounded';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.45) : s;
@@ -2157,9 +2167,9 @@ const MindMapView = {
         }
       }
     } else if (node.level === 2) {
-      // NIVEAU 2 (Sous-branches subordonnées)
+      // NIVEAU 2 (Sous-branches : Standard par défaut 72px)
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 52;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 72;
         const imgShape = node.imageShape || 'rounded';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.45) : s;
@@ -2214,9 +2224,9 @@ const MindMapView = {
         }
       }
     } else {
-      // NIVEAU 3+ (Détails fins légers)
+      // NIVEAU 3+ (Détails fins légers : Compact par défaut 48px)
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 44;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 48;
         const imgShape = node.imageShape || 'rounded';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.45) : s;
@@ -2328,7 +2338,7 @@ const MindMapView = {
       }
     } else if (node.level === 1) {
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 68;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : this.getNodeDefaultImageSize(node);
         const imgShape = node.imageShape || 'rounded';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.45) : s;
@@ -2383,7 +2393,7 @@ const MindMapView = {
       }
     } else if (node.level === 2) {
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 52;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : this.getNodeDefaultImageSize(node);
         const imgShape = node.imageShape || 'rounded';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.45) : s;
@@ -2438,7 +2448,7 @@ const MindMapView = {
       }
     } else {
       if (hasImg && imgMode === 'image-only') {
-        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 44;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : this.getNodeDefaultImageSize(node);
         const imgShape = node.imageShape || 'rounded';
         const isPill = imgShape === 'pill';
         const w = isPill ? Math.round(s * 1.45) : s;
@@ -6840,6 +6850,9 @@ const MindMapView = {
     menu.id = 'mm-dynamic-context-menu';
     menu.className = 'mm-context-menu';
 
+    const checkSvg = '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
+    const arrowSvg = '<span class="mm-ctx-arrow"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>';
+
     let itemsHtml = '';
 
     const nodeText = isRoot ? (this.tree?.text || 'Sujet Central') : (node?.text || '');
@@ -6850,6 +6863,13 @@ const MindMapView = {
 
     if (isBranch) {
       // 1. Clic droit sur une BRANCHE / SOUS-BRANCHE
+      const activeBranchSize = (typeof node?.imageSize === 'number' && node?.imageSize >= 36)
+        ? node.imageSize
+        : this.getNodeDefaultImageSize(node);
+      const activeBranchShape = node?.imageShape || 'rounded';
+      const activeBranchMode = node?.imageMode || 'background';
+      const activeBranchColor = node?.imageColor || 'natural';
+
       itemsHtml = `
         <div class="mm-ctx-item" data-action="add-child">
           <span class="mm-ctx-icon">
@@ -6872,6 +6892,7 @@ const MindMapView = {
           <span class="mm-ctx-label">Modifier le mot-clé</span>
           <span class="mm-ctx-shortcut">Espace</span>
         </div>
+        <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="scripture">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -6899,149 +6920,199 @@ const MindMapView = {
           <span class="mm-ctx-label">${this.boundaries?.some(b => b.rootId === targetNodeId) ? 'Modifier l\'enclos' : 'Créer un enclos'}</span>
           <span class="mm-ctx-shortcut">Ctrl+B</span>
         </div>
-        <div class="mm-ctx-item" data-action="color">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-          </span>
-          <span class="mm-ctx-label">Changer la couleur</span>
-        </div>
-        <div class="mm-ctx-item" data-action="marker">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="15.5" font-size="10" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
-          </span>
-          <span class="mm-ctx-label">Marqueur / Priorité...</span>
-          <span class="mm-ctx-shortcut">1-9</span>
-        </div>
-        ${(topSuggestion && topSuggestion.id !== node?.icon) ? `
-          <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
-            <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
-            <span class="mm-ctx-label">Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
-            <span class="mm-ctx-shortcut">1-clic</span>
-          </div>
-        ` : ''}
-        <div class="mm-ctx-item" data-action="svg-icon">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
-          </span>
-          <span class="mm-ctx-label">${node?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
-          <span class="mm-ctx-shortcut">I</span>
-        </div>
-        <div class="mm-ctx-item" data-action="ai-image">
+        <div class="mm-ctx-divider"></div>
+
+        <!-- SOUS-MENU ILLUSTRATION & MÉDAILLON -->
+        <div class="mm-ctx-item has-submenu">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           </span>
-          <span class="mm-ctx-label">${node?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
+          <span class="mm-ctx-label">Illustration & Médaillon</span>
+          ${arrowSvg}
+          <div class="mm-ctx-submenu">
+            <div class="mm-ctx-item" data-action="ai-image">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              </span>
+              <span class="mm-ctx-label">${node?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
+            </div>
+            ${node?.image ? `
+              <div class="mm-ctx-item" data-action="image-crop">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+                </span>
+                <span class="mm-ctx-label">Recadrer & Zoomer...</span>
+              </div>
+              <div class="mm-ctx-divider"></div>
+
+              <!-- SOUS-MENU MODE D'AFFICHAGE -->
+              <div class="mm-ctx-item has-submenu">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
+                </span>
+                <span class="mm-ctx-label">Mode d'affichage</span>
+                ${arrowSvg}
+                <div class="mm-ctx-submenu">
+                  <div class="mm-ctx-item" data-action="image-mode-background">
+                    <span class="mm-ctx-label">Fond avec texte</span>
+                    ${activeBranchMode === 'background' ? checkSvg : ''}
+                  </div>
+                  <div class="mm-ctx-item" data-action="image-mode-image-only">
+                    <span class="mm-ctx-label">Image seule (Buzan)</span>
+                    ${activeBranchMode === 'image-only' ? checkSvg : ''}
+                  </div>
+                  <div class="mm-ctx-item" data-action="image-mode-top-image">
+                    <span class="mm-ctx-label">Vignette + Mot</span>
+                    ${activeBranchMode === 'top-image' ? checkSvg : ''}
+                  </div>
+                </div>
+              </div>
+
+              <!-- SOUS-MENU HARMONIE DES COULEURS -->
+              <div class="mm-ctx-item has-submenu">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
+                </span>
+                <span class="mm-ctx-label">Harmonie des couleurs</span>
+                ${arrowSvg}
+                <div class="mm-ctx-submenu">
+                  <div class="mm-ctx-item" data-action="image-color-natural">
+                    <span class="mm-ctx-label">Couleur naturelle</span>
+                    ${activeBranchColor === 'natural' ? checkSvg : ''}
+                  </div>
+                  <div class="mm-ctx-item" data-action="image-color-bw">
+                    <span class="mm-ctx-label">Noir & Blanc artistique</span>
+                    ${activeBranchColor === 'bw' ? checkSvg : ''}
+                  </div>
+                  <div class="mm-ctx-item" data-action="image-color-tint">
+                    <span class="mm-ctx-label">Teinte de la pastille</span>
+                    ${activeBranchColor === 'tint' ? checkSvg : ''}
+                  </div>
+                </div>
+              </div>
+
+              ${activeBranchMode === 'image-only' ? `
+                <!-- SOUS-MENU FORME -->
+                <div class="mm-ctx-item has-submenu">
+                  <span class="mm-ctx-icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/></svg>
+                  </span>
+                  <span class="mm-ctx-label">Forme du médaillon</span>
+                  ${arrowSvg}
+                  <div class="mm-ctx-submenu">
+                    <div class="mm-ctx-item" data-action="image-shape-rounded">
+                      <span class="mm-ctx-label">Carré arrondi</span>
+                      ${activeBranchShape === 'rounded' ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-shape-circle">
+                      <span class="mm-ctx-label">Cercle</span>
+                      ${activeBranchShape === 'circle' ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-shape-pill">
+                      <span class="mm-ctx-label">Capsule</span>
+                      ${activeBranchShape === 'pill' ? checkSvg : ''}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SOUS-MENU TAILLE -->
+                <div class="mm-ctx-item has-submenu">
+                  <span class="mm-ctx-icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
+                  </span>
+                  <span class="mm-ctx-label">Taille du médaillon</span>
+                  ${arrowSvg}
+                  <div class="mm-ctx-submenu">
+                    <div class="mm-ctx-item" data-action="image-size-48">
+                      <span class="mm-ctx-label">Compact (48 px)</span>
+                      ${activeBranchSize === 48 ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-size-72">
+                      <span class="mm-ctx-label">Standard (72 px)</span>
+                      ${activeBranchSize === 72 ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-size-96">
+                      <span class="mm-ctx-label">Grand (96 px)</span>
+                      ${activeBranchSize === 96 ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-size-128">
+                      <span class="mm-ctx-label">Héroïque (128 px)</span>
+                      ${activeBranchSize === 128 ? checkSvg : ''}
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="mm-ctx-divider"></div>
+              <div class="mm-ctx-item danger" data-action="remove-image">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </span>
+                <span class="mm-ctx-label">Supprimer l'illustration</span>
+              </div>
+            ` : ''}
+          </div>
         </div>
-        ${node?.image ? `
-          <div class="mm-ctx-item" data-action="image-crop">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
-            </span>
-            <span class="mm-ctx-label">Recadrer & Zoomer...</span>
-          </div>
-          <div class="mm-ctx-item" data-action="image-mode-background">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
-            </span>
-            <span class="mm-ctx-label">Affichage : Fond avec texte</span>
-            ${(node?.imageMode || 'background') === 'background' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-item" data-action="image-mode-image-only">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-            </span>
-            <span class="mm-ctx-label">Affichage : Image seule (Buzan)</span>
-            ${node?.imageMode === 'image-only' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-item" data-action="image-mode-top-image">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="7" y1="18" x2="17" y2="18"/></svg>
-            </span>
-            <span class="mm-ctx-label">Affichage : Vignette + Mot</span>
-            ${node?.imageMode === 'top-image' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-divider"></div>
-          <div class="mm-ctx-item" data-action="image-color-natural">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
-            </span>
-            <span class="mm-ctx-label">Couleur : Naturelle</span>
-            ${(!node?.imageColor || node?.imageColor === 'natural') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-item" data-action="image-color-bw">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
-            </span>
-            <span class="mm-ctx-label">Couleur : Noir & Blanc</span>
-            ${node?.imageColor === 'bw' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-item" data-action="image-color-tint">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><circle cx="19" cy="19" r="3" fill="currentColor"/></svg>
-            </span>
-            <span class="mm-ctx-label">Couleur : Teinte de la pastille</span>
-            ${node?.imageColor === 'tint' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          ${node?.imageMode === 'image-only' ? `
+
+        <!-- SOUS-MENU ICÔNE & MARQUEUR -->
+        <div class="mm-ctx-item has-submenu">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="15.5" font-size="10" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
+          </span>
+          <span class="mm-ctx-label">Icône & Marqueur</span>
+          ${arrowSvg}
+          <div class="mm-ctx-submenu">
+            ${(topSuggestion && topSuggestion.id !== node?.icon) ? `
+              <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
+                <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
+                <span class="mm-ctx-label">Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+                <span class="mm-ctx-shortcut">1-clic</span>
+              </div>
+            ` : ''}
+            <div class="mm-ctx-item" data-action="svg-icon">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
+              </span>
+              <span class="mm-ctx-label">${node?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
+              <span class="mm-ctx-shortcut">I</span>
+            </div>
+            <div class="mm-ctx-item" data-action="marker">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="15.5" font-size="10" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
+              </span>
+              <span class="mm-ctx-label">Marqueur / Priorité...</span>
+              <span class="mm-ctx-shortcut">1-9</span>
+            </div>
             <div class="mm-ctx-divider"></div>
-            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Forme du médaillon</div>
-            <div class="mm-ctx-item" data-action="image-shape-rounded">
-              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/></svg></span>
-              <span class="mm-ctx-label">Carré arrondi</span>
-              ${(!node?.imageShape || node?.imageShape === 'rounded') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            <div class="mm-ctx-item" data-action="color">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+              </span>
+              <span class="mm-ctx-label">Changer la couleur de branche</span>
             </div>
-            <div class="mm-ctx-item" data-action="image-shape-circle">
-              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></span>
-              <span class="mm-ctx-label">Cercle</span>
-              ${node?.imageShape === 'circle' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div class="mm-ctx-item" data-action="image-shape-pill">
-              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="6"/></svg></span>
-              <span class="mm-ctx-label">Capsule</span>
-              ${node?.imageShape === 'pill' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Taille du médaillon</div>
-            <div class="mm-ctx-item" data-action="image-size-48">
-              <span class="mm-ctx-label">Compact (48 px)</span>
-              ${node?.imageSize === 48 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div class="mm-ctx-item" data-action="image-size-72">
-              <span class="mm-ctx-label">Standard (72 px)</span>
-              ${(!node?.imageSize || node?.imageSize === 72 || node?.imageSize === 68 || node?.imageSize === 56 || node?.imageSize === 52) ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div class="mm-ctx-item" data-action="image-size-96">
-              <span class="mm-ctx-label">Grand (96 px)</span>
-              ${node?.imageSize === 96 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div class="mm-ctx-item" data-action="image-size-128">
-              <span class="mm-ctx-label">Héroïque (128 px)</span>
-              ${node?.imageSize === 128 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>
+        </div>
+
+        ${((node?.offsetX || node?.offsetY) || !node?.isFloating) ? `
+          <div class="mm-ctx-divider"></div>
+          ${(node?.offsetX || node?.offsetY) ? `
+            <div class="mm-ctx-item" data-action="reset-position">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+              </span>
+              <span class="mm-ctx-label">Réinitialiser la position</span>
             </div>
           ` : ''}
-          <div class="mm-ctx-divider"></div>
-          <div class="mm-ctx-item danger" data-action="remove-image">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            </span>
-            <span class="mm-ctx-label">Supprimer l'illustration</span>
-          </div>
+          ${!node?.isFloating ? `
+            <div class="mm-ctx-item" data-action="detach-floating">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              </span>
+              <span class="mm-ctx-label">Détacher en sujet flottant</span>
+            </div>
+          ` : ''}
         ` : ''}
-        ${(node?.offsetX || node?.offsetY) ? `
-          <div class="mm-ctx-item" data-action="reset-position">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-            </span>
-            <span class="mm-ctx-label">Réinitialiser la position</span>
-          </div>
-        ` : ''}
-        ${!node?.isFloating ? `
-          <div class="mm-ctx-item" data-action="detach-floating">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            </span>
-            <span class="mm-ctx-label">Détacher en sujet flottant</span>
-          </div>
-        ` : ''}
+
         <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="copy">
           <span class="mm-ctx-icon">
@@ -7078,6 +7149,13 @@ const MindMapView = {
       `;
     } else if (isRoot) {
       // 2. Clic droit sur le CONCEPT CENTRAL (Noyau)
+      const activeRootSize = (typeof this.tree?.imageSize === 'number' && this.tree?.imageSize >= 36)
+        ? this.tree.imageSize
+        : 104;
+      const activeRootShape = this.tree?.imageShape || 'circle';
+      const activeRootMode = this.tree?.imageMode || 'background';
+      const activeRootColor = this.tree?.imageColor || 'natural';
+
       itemsHtml = `
         <div class="mm-ctx-item" data-action="add-child">
           <span class="mm-ctx-icon">
@@ -7093,113 +7171,209 @@ const MindMapView = {
           <span class="mm-ctx-label">Renommer le concept central</span>
           <span class="mm-ctx-shortcut">Double-clic</span>
         </div>
-        ${(topSuggestion && topSuggestion.id !== this.tree?.icon) ? `
-          <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
-            <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
-            <span class="mm-ctx-label">Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
-            <span class="mm-ctx-shortcut">1-clic</span>
-          </div>
-        ` : ''}
-        <div class="mm-ctx-item" data-action="svg-icon">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
-          </span>
-          <span class="mm-ctx-label">${this.tree?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
-          <span class="mm-ctx-shortcut">I</span>
-        </div>
-        <div class="mm-ctx-item" data-action="ai-image">
+        <div class="mm-ctx-divider"></div>
+
+        <!-- SOUS-MENU ILLUSTRATION CENTRALE -->
+        <div class="mm-ctx-item has-submenu">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           </span>
-          <span class="mm-ctx-label">${this.tree?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
+          <span class="mm-ctx-label">Illustration centrale</span>
+          ${arrowSvg}
+          <div class="mm-ctx-submenu">
+            <div class="mm-ctx-item" data-action="ai-image">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              </span>
+              <span class="mm-ctx-label">${this.tree?.image ? 'Modifier l\'illustration IA...' : 'Illustration IA (Flux)...'}</span>
+            </div>
+            ${this.tree?.image ? `
+              <div class="mm-ctx-item" data-action="image-crop">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+                </span>
+                <span class="mm-ctx-label">Recadrer & Zoomer...</span>
+              </div>
+              <div class="mm-ctx-divider"></div>
+
+              <!-- SOUS-MENU MODE -->
+              <div class="mm-ctx-item has-submenu">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
+                </span>
+                <span class="mm-ctx-label">Mode d'affichage</span>
+                ${arrowSvg}
+                <div class="mm-ctx-submenu">
+                  <div class="mm-ctx-item" data-action="image-mode-background">
+                    <span class="mm-ctx-label">Fond avec texte</span>
+                    ${activeRootMode === 'background' ? checkSvg : ''}
+                  </div>
+                  <div class="mm-ctx-item" data-action="image-mode-image-only">
+                    <span class="mm-ctx-label">Image seule (Buzan)</span>
+                    ${activeRootMode === 'image-only' ? checkSvg : ''}
+                  </div>
+                </div>
+              </div>
+
+              <!-- SOUS-MENU COULEUR -->
+              <div class="mm-ctx-item has-submenu">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
+                </span>
+                <span class="mm-ctx-label">Harmonie des couleurs</span>
+                ${arrowSvg}
+                <div class="mm-ctx-submenu">
+                  <div class="mm-ctx-item" data-action="image-color-natural">
+                    <span class="mm-ctx-label">Couleur naturelle</span>
+                    ${activeRootColor === 'natural' ? checkSvg : ''}
+                  </div>
+                  <div class="mm-ctx-item" data-action="image-color-bw">
+                    <span class="mm-ctx-label">Noir & Blanc artistique</span>
+                    ${activeRootColor === 'bw' ? checkSvg : ''}
+                  </div>
+                  <div class="mm-ctx-item" data-action="image-color-tint">
+                    <span class="mm-ctx-label">Dégradé central</span>
+                    ${activeRootColor === 'tint' ? checkSvg : ''}
+                  </div>
+                </div>
+              </div>
+
+              ${activeRootMode === 'image-only' ? `
+                <!-- SOUS-MENU FORME -->
+                <div class="mm-ctx-item has-submenu">
+                  <span class="mm-ctx-icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+                  </span>
+                  <span class="mm-ctx-label">Forme du médaillon</span>
+                  ${arrowSvg}
+                  <div class="mm-ctx-submenu">
+                    <div class="mm-ctx-item" data-action="image-shape-circle">
+                      <span class="mm-ctx-label">Cercle classique</span>
+                      ${activeRootShape === 'circle' ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-shape-rounded">
+                      <span class="mm-ctx-label">Carré arrondi</span>
+                      ${activeRootShape === 'rounded' ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-shape-pill">
+                      <span class="mm-ctx-label">Capsule</span>
+                      ${activeRootShape === 'pill' ? checkSvg : ''}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SOUS-MENU TAILLE -->
+                <div class="mm-ctx-item has-submenu">
+                  <span class="mm-ctx-icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
+                  </span>
+                  <span class="mm-ctx-label">Taille du médaillon</span>
+                  ${arrowSvg}
+                  <div class="mm-ctx-submenu">
+                    <div class="mm-ctx-item" data-action="image-size-80">
+                      <span class="mm-ctx-label">Compact (80 px)</span>
+                      ${activeRootSize === 80 ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-size-104">
+                      <span class="mm-ctx-label">Standard (104 px)</span>
+                      ${activeRootSize === 104 ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-size-130">
+                      <span class="mm-ctx-label">Grand (130 px)</span>
+                      ${activeRootSize === 130 ? checkSvg : ''}
+                    </div>
+                    <div class="mm-ctx-item" data-action="image-size-160">
+                      <span class="mm-ctx-label">Héroïque (160 px)</span>
+                      ${activeRootSize === 160 ? checkSvg : ''}
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="mm-ctx-divider"></div>
+              <div class="mm-ctx-item danger" data-action="remove-image">
+                <span class="mm-ctx-icon">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </span>
+                <span class="mm-ctx-label">Supprimer l'illustration</span>
+              </div>
+            ` : ''}
+          </div>
         </div>
-        ${this.tree?.image ? `
-          <div class="mm-ctx-item" data-action="image-crop">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
-            </span>
-            <span class="mm-ctx-label">Recadrer & Zoomer...</span>
+
+        <!-- SOUS-MENU ICÔNE CENTRALE -->
+        <div class="mm-ctx-item has-submenu">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
+          </span>
+          <span class="mm-ctx-label">Icône centrale</span>
+          ${arrowSvg}
+          <div class="mm-ctx-submenu">
+            ${(topSuggestion && topSuggestion.id !== this.tree?.icon) ? `
+              <div class="mm-ctx-item mm-ctx-item-suggest" data-action="auto-suggest-icon" data-icon-id="${topSuggestion.id}" title="Appliquer instantanément l'icône suggérée pour « ${SvgIconsRegistry.escapeHtml(nodeText)} »">
+                <span class="mm-ctx-icon">${SvgIconsRegistry.getSvg(topSuggestion.id, 15)}</span>
+                <span class="mm-ctx-label">Suggéré : <strong>${SvgIconsRegistry.escapeHtml(topSuggestion.label)}</strong></span>
+                <span class="mm-ctx-shortcut">1-clic</span>
+              </div>
+            ` : ''}
+            <div class="mm-ctx-item" data-action="svg-icon">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 8h10"/></svg>
+              </span>
+              <span class="mm-ctx-label">${this.tree?.icon ? 'Modifier l\'icône SVG' : 'Associer une icône SVG'}</span>
+              <span class="mm-ctx-shortcut">I</span>
+            </div>
           </div>
-          <div class="mm-ctx-item" data-action="image-mode-background">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
-            </span>
-            <span class="mm-ctx-label">Affichage : Fond avec texte</span>
-            ${(this.tree?.imageMode || 'background') === 'background' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-item" data-action="image-mode-image-only">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-            </span>
-            <span class="mm-ctx-label">Affichage : Image seule (Buzan)</span>
-            ${this.tree?.imageMode === 'image-only' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-divider"></div>
-          <div class="mm-ctx-item" data-action="image-color-natural">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
-            </span>
-            <span class="mm-ctx-label">Couleur : Naturelle</span>
-            ${(!this.tree?.imageColor || this.tree?.imageColor === 'natural') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-item" data-action="image-color-bw">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"/></svg>
-            </span>
-            <span class="mm-ctx-label">Couleur : Noir & Blanc</span>
-            ${this.tree?.imageColor === 'bw' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <div class="mm-ctx-item" data-action="image-color-tint">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><circle cx="19" cy="19" r="3" fill="currentColor"/></svg>
-            </span>
-            <span class="mm-ctx-label">Couleur : Dégradé central</span>
-            ${this.tree?.imageColor === 'tint' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          ${this.tree?.imageMode === 'image-only' ? `
+        </div>
+
+        <!-- SOUS-MENU STRUCTURE & DISPOSITION -->
+        <div class="mm-ctx-item has-submenu">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="21"/></svg>
+          </span>
+          <span class="mm-ctx-label">Structure & Disposition</span>
+          ${arrowSvg}
+          <div class="mm-ctx-submenu">
+            <div class="mm-ctx-item" data-action="structure-radiant">
+              <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
+              <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
+              ${this.treeStructure === 'radiant' ? checkSvg : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="structure-right-tree">
+              <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
+              <span class="mm-ctx-label">Arbre logique à droite</span>
+              ${this.treeStructure === 'right-tree' ? checkSvg : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="structure-top-down">
+              <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
+              <span class="mm-ctx-label">Organigramme descendant</span>
+              ${this.treeStructure === 'top-down' ? checkSvg : ''}
+            </div>
             <div class="mm-ctx-divider"></div>
-            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Forme du médaillon central</div>
-            <div class="mm-ctx-item" data-action="image-shape-circle">
-              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></span>
-              <span class="mm-ctx-label">Cercle classique</span>
-              ${(!this.tree?.imageShape || this.tree?.imageShape === 'circle') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            <div class="mm-ctx-item" data-action="reorganize">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+              </span>
+              <span class="mm-ctx-label">Réorganiser harmonieusement</span>
+              <span class="mm-ctx-shortcut">Alt+R</span>
             </div>
-            <div class="mm-ctx-item" data-action="image-shape-rounded">
-              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/></svg></span>
-              <span class="mm-ctx-label">Carré arrondi</span>
-              ${this.tree?.imageShape === 'rounded' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            <div class="mm-ctx-item" data-action="fit">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+              </span>
+              <span class="mm-ctx-label">Recentrer la carte</span>
+              <span class="mm-ctx-shortcut">R</span>
             </div>
-            <div class="mm-ctx-item" data-action="image-shape-pill">
-              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="6"/></svg></span>
-              <span class="mm-ctx-label">Capsule</span>
-              ${this.tree?.imageShape === 'pill' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Taille du médaillon central</div>
-            <div class="mm-ctx-item" data-action="image-size-80">
-              <span class="mm-ctx-label">Compact (80 px)</span>
-              ${this.tree?.imageSize === 80 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div class="mm-ctx-item" data-action="image-size-104">
-              <span class="mm-ctx-label">Standard (104 px)</span>
-              ${(!this.tree?.imageSize || this.tree?.imageSize === 104) ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div class="mm-ctx-item" data-action="image-size-130">
-              <span class="mm-ctx-label">Grand (130 px)</span>
-              ${this.tree?.imageSize === 130 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-            <div class="mm-ctx-item" data-action="image-size-160">
-              <span class="mm-ctx-label">Héroïque (160 px)</span>
-              ${this.tree?.imageSize === 160 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-            </div>
-          ` : ''}
-          <div class="mm-ctx-divider"></div>
-          <div class="mm-ctx-item danger" data-action="remove-image">
-            <span class="mm-ctx-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            </span>
-            <span class="mm-ctx-label">Supprimer l'illustration</span>
           </div>
-        ` : ''}
+        </div>
+
+        <div class="mm-ctx-divider"></div>
+        <div class="mm-ctx-item" data-action="palette">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          </span>
+          <span class="mm-ctx-label">Changer la palette de couleurs</span>
+        </div>
         ${this.clipboardNode ? `
           <div class="mm-ctx-item" data-action="paste">
             <span class="mm-ctx-icon">
@@ -7216,44 +7390,6 @@ const MindMapView = {
           </span>
           <span class="mm-ctx-label">${this.viewMode === 'outline' ? 'Basculer en Vue Carte' : 'Basculer en Vue Plan'}</span>
           <span class="mm-ctx-shortcut">Alt+P</span>
-        </div>
-        <div class="mm-ctx-divider"></div>
-        <div class="mm-ctx-item" data-action="structure-radiant">
-          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
-          <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
-          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-        </div>
-        <div class="mm-ctx-item" data-action="structure-right-tree">
-          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
-          <span class="mm-ctx-label">Arbre logique à droite</span>
-          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-        </div>
-        <div class="mm-ctx-item" data-action="structure-top-down">
-          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
-          <span class="mm-ctx-label">Organigramme descendant</span>
-          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-        </div>
-        <div class="mm-ctx-divider"></div>
-        <div class="mm-ctx-item" data-action="palette">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-          </span>
-          <span class="mm-ctx-label">Changer la palette de couleurs</span>
-        </div>
-        <div class="mm-ctx-divider"></div>
-        <div class="mm-ctx-item" data-action="reorganize">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-          </span>
-          <span class="mm-ctx-label">Réorganiser harmonieusement</span>
-          <span class="mm-ctx-shortcut">Alt+R</span>
-        </div>
-        <div class="mm-ctx-item" data-action="fit">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-          </span>
-          <span class="mm-ctx-label">Recentrer la carte</span>
-          <span class="mm-ctx-shortcut">R</span>
         </div>
       `;
     } else {
@@ -7283,6 +7419,79 @@ const MindMapView = {
           </div>
         ` : ''}
         <div class="mm-ctx-divider"></div>
+
+        <!-- SOUS-MENU STRUCTURE & DISPOSITION -->
+        <div class="mm-ctx-item has-submenu">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="21"/></svg>
+          </span>
+          <span class="mm-ctx-label">Structure & Disposition</span>
+          ${arrowSvg}
+          <div class="mm-ctx-submenu">
+            <div class="mm-ctx-item" data-action="structure-radiant">
+              <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
+              <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
+              ${this.treeStructure === 'radiant' ? checkSvg : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="structure-right-tree">
+              <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
+              <span class="mm-ctx-label">Arbre logique à droite</span>
+              ${this.treeStructure === 'right-tree' ? checkSvg : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="structure-top-down">
+              <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
+              <span class="mm-ctx-label">Organigramme descendant</span>
+              ${this.treeStructure === 'top-down' ? checkSvg : ''}
+            </div>
+            <div class="mm-ctx-divider"></div>
+            <div class="mm-ctx-item" data-action="reorganize">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+              </span>
+              <span class="mm-ctx-label">Réorganiser harmonieusement</span>
+              <span class="mm-ctx-shortcut">Alt+R</span>
+            </div>
+            <div class="mm-ctx-item" data-action="fit">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+              </span>
+              <span class="mm-ctx-label">Recentrer la vue</span>
+              <span class="mm-ctx-shortcut">R</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOUS-MENU STYLES & THÈMES -->
+        <div class="mm-ctx-item has-submenu">
+          <span class="mm-ctx-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          </span>
+          <span class="mm-ctx-label">Styles & Thème</span>
+          ${arrowSvg}
+          <div class="mm-ctx-submenu">
+            <div class="mm-ctx-item" data-action="open-styles">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><circle cx="7" cy="12" r="3"/><path d="M10 12h5"/><rect x="15" y="9" width="6" height="6" rx="1.5"/></svg>
+              </span>
+              <span class="mm-ctx-label">Styles & Connecteurs...</span>
+              <span class="mm-ctx-shortcut">Alt+T</span>
+            </div>
+            <div class="mm-ctx-item" data-action="palette">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+              </span>
+              <span class="mm-ctx-label">Changer de palette chromatique</span>
+            </div>
+            <div class="mm-ctx-item" data-action="theme">
+              <span class="mm-ctx-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
+              </span>
+              <span class="mm-ctx-label">Basculer Feuille Blanche / Thème</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="toggle-mode">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -7290,57 +7499,6 @@ const MindMapView = {
           <span class="mm-ctx-label">${this.viewMode === 'outline' ? 'Basculer en Vue Carte' : 'Basculer en Vue Plan'}</span>
           <span class="mm-ctx-shortcut">Alt+P</span>
         </div>
-        <div class="mm-ctx-divider"></div>
-        <div class="mm-ctx-item" data-action="structure-radiant">
-          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS.radiant}</span>
-          <span class="mm-ctx-label">Pensée radiante (Buzan)</span>
-          ${this.treeStructure === 'radiant' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-        </div>
-        <div class="mm-ctx-item" data-action="structure-right-tree">
-          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['right-tree']}</span>
-          <span class="mm-ctx-label">Arbre logique à droite</span>
-          ${this.treeStructure === 'right-tree' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-        </div>
-        <div class="mm-ctx-item" data-action="structure-top-down">
-          <span class="mm-ctx-icon">${this.STRUCTURE_ICONS['top-down']}</span>
-          <span class="mm-ctx-label">Organigramme descendant</span>
-          ${this.treeStructure === 'top-down' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-        </div>
-        <div class="mm-ctx-item" data-action="open-styles">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><circle cx="7" cy="12" r="3"/><path d="M10 12h5"/><rect x="15" y="9" width="6" height="6" rx="1.5"/></svg>
-          </span>
-          <span class="mm-ctx-label">Styles & Connecteurs...</span>
-          <span class="mm-ctx-shortcut">Alt+T</span>
-        </div>
-        <div class="mm-ctx-divider"></div>
-        <div class="mm-ctx-item" data-action="reorganize">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-          </span>
-          <span class="mm-ctx-label">Réorganiser harmonieusement</span>
-          <span class="mm-ctx-shortcut">Alt+R</span>
-        </div>
-        <div class="mm-ctx-item" data-action="fit">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-          </span>
-          <span class="mm-ctx-label">Recentrer la vue</span>
-          <span class="mm-ctx-shortcut">R</span>
-        </div>
-        <div class="mm-ctx-item" data-action="palette">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-          </span>
-          <span class="mm-ctx-label">Changer de palette chromatique</span>
-        </div>
-        <div class="mm-ctx-item" data-action="theme">
-          <span class="mm-ctx-icon">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
-          </span>
-          <span class="mm-ctx-label">Basculer Feuille Blanche / Thème</span>
-        </div>
-        <div class="mm-ctx-divider"></div>
         <div class="mm-ctx-item" data-action="export-text">
           <span class="mm-ctx-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -7372,8 +7530,8 @@ const MindMapView = {
     const x = Math.min(clientX, window.innerWidth - menuWidth - 10);
     const y = Math.min(clientY, window.innerHeight - menuHeight - 10);
 
-    menu.style.left = `${x}px`;
-    menu.style.top = `${y}px`;
+    menu.style.left = `${Math.max(10, x)}px`;
+    menu.style.top = `${Math.max(10, y)}px`;
 
     const closeMenu = () => {
       menu.remove();
@@ -7390,8 +7548,38 @@ const MindMapView = {
       document.addEventListener('keydown', handleKey);
     }, 10);
 
+    // Gestion du positionnement adaptatif des sous-menus au survol
+    menu.querySelectorAll('.mm-ctx-item.has-submenu').forEach(parentItem => {
+      parentItem.addEventListener('mouseenter', () => {
+        const submenu = parentItem.querySelector(':scope > .mm-ctx-submenu');
+        if (!submenu) return;
+        const parentRect = parentItem.getBoundingClientRect();
+        const subWidth = 215;
+        if (parentRect.right + subWidth > window.innerWidth - 10) {
+          submenu.classList.add('open-left');
+        } else {
+          submenu.classList.remove('open-left');
+        }
+        const subHeight = submenu.offsetHeight || 190;
+        if (parentRect.top + subHeight > window.innerHeight - 10) {
+          submenu.style.top = 'auto';
+          submenu.style.bottom = '-4px';
+        } else {
+          submenu.style.top = '-4px';
+          submenu.style.bottom = 'auto';
+        }
+      });
+    });
+
     // Écouteurs d'actions du menu contextuel
     menu.querySelectorAll('.mm-ctx-item').forEach(item => {
+      if (item.classList.contains('has-submenu')) {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+        return;
+      }
+
       item.addEventListener('click', (e) => {
         e.stopPropagation();
         closeMenu();
@@ -7580,6 +7768,11 @@ const MindMapView = {
             break;
           case 'help':
             this.toggleHelpDrawer(true);
+            break;
+          case 'markdown-guide':
+            if (typeof SettingsView !== 'undefined' && SettingsView.openMarkdownGuideModal) {
+              SettingsView.openMarkdownGuideModal('mindmap');
+            }
             break;
         }
       });
@@ -7895,6 +8088,12 @@ const MindMapView = {
     const node = this.findNode(nodeId);
     if (!node) return;
     node.imageMode = mode;
+    if (mode === 'image-only' && (!node.imageSize || node.imageSize < 36)) {
+      node.imageSize = this.getNodeDefaultImageSize(node);
+      if (isRoot && this.currentNote) {
+        this.currentNote.rootImageSize = node.imageSize;
+      }
+    }
     if (isRoot && this.currentNote) {
       this.currentNote.rootImageMode = mode;
     }

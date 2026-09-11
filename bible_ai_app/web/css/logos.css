@@ -34977,6 +34977,88 @@ body[class*="palette-dark"] .mm-ctx-divider {
   background: #334155;
 }
 
+/* Sous-menus latéraux & catégories du menu contextuel Mind Map */
+.mm-ctx-item.has-submenu {
+  position: relative;
+}
+
+.mm-ctx-arrow {
+  margin-left: auto;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted, #94a3b8);
+  font-size: 11px;
+}
+
+.mm-ctx-item:hover > .mm-ctx-arrow {
+  color: inherit;
+}
+
+.mm-ctx-submenu {
+  display: none;
+  position: absolute;
+  top: -4px;
+  left: calc(100% + 2px);
+  min-width: 205px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 9px;
+  padding: 5px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+  z-index: 100005;
+}
+
+/* Pont invisible pour transition fluide du curseur vers le sous-menu */
+.mm-ctx-submenu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -8px;
+  width: 8px;
+}
+
+body.theme-dark .mm-ctx-submenu,
+body[class*="palette-dark"] .mm-ctx-submenu {
+  background: rgba(30, 41, 59, 0.96);
+  border-color: #334155;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+
+.mm-ctx-item.has-submenu:hover > .mm-ctx-submenu {
+  display: flex;
+  flex-direction: column;
+  animation: mmFadeIn 0.12s ease-out;
+}
+
+.mm-ctx-submenu.open-left {
+  left: auto;
+  right: calc(100% + 2px);
+}
+
+.mm-ctx-submenu.open-left::before {
+  left: auto;
+  right: -8px;
+  width: 8px;
+}
+
+.mm-ctx-header {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #94a3b8);
+  padding: 5px 10px 3px 10px;
+  user-select: none;
+}
+
+body.theme-dark .mm-ctx-header,
+body[class*="palette-dark"] .mm-ctx-header {
+  color: #64748b;
+}
+
 /* Mini dialogue d'association de verset biblique */
 .mm-prompt-overlay {
   position: fixed;
