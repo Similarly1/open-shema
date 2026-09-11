@@ -63,6 +63,7 @@ scratch_*.html
 *.swo
 *~
 *.log
+*.bak
 .DS_Store
 Thumbs.db
 **/data/covers/cache/

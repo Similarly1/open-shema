@@ -116,6 +116,8 @@ class LibraryMixin:
         
         for d in dict_registry:
             d_id = d.get("id")
+            if d_id == "strong" or d.get("type") == "strong":
+                continue
             d_name = d.get("name")
             dict_desc = d.get("description") or f"Dictionnaire biblique comprenant {d.get('count', 0):,} articles et définitions.".replace(",", " ")
             

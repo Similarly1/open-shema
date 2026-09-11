@@ -20,7 +20,7 @@ PACKAGE_NAME = "OpenShema.OpenShema"
 PUBLISHER_ID = "CN=EE79AB15-04CF-49DC-868E-EEEB85DD3708"
 PUBLISHER_DISPLAY_NAME = "Open Shema"
 DISPLAY_NAME = "Open Shema"
-PACKAGE_VERSION = "0.2.0.0"  # Format Quad: Major.Minor.Build.Revision
+PACKAGE_VERSION = "0.3.0.0"  # Format Quad: Major.Minor.Build.Revision
 STORE_ID = "9NXC16S8DHT3"
 BG_COLOR = "#0F172A"
 

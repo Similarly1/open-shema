@@ -57,8 +57,12 @@ class EbookFinderManager:
     ]
 
     def __init__(self):
-        self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.curated_catalog_path = os.path.join(self.current_dir, "data", "french_bible_ebooks.json")
+        try:
+            from core.paths import resolve_data_path
+            self.curated_catalog_path = resolve_data_path("french_bible_ebooks.json")
+        except Exception:
+            self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            self.curated_catalog_path = os.path.join(self.current_dir, "data", "french_bible_ebooks.json")
         self._curated_books: List[Dict[str, Any]] = []
         self._cache: Dict[str, Any] = {}
         self._cache_ttl = 300  # 5 minutes de mise en cache

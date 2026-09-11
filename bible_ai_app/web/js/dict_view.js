@@ -465,9 +465,42 @@ const DictView = {
         // Sélectionner par défaut le Nouveau Dictionnaire Biblique s'il existe, sinon le premier
         const defaultDict = dicts.find(d => d.id === 'nouveau_dictionnaire') || dicts[0];
         this.selectDictionary(defaultDict.id);
+      } else if (dicts.length === 0) {
+        this.renderEmptyDictionaryState();
       }
     } catch (e) {
       console.error('Erreur chargement dictionnaires:', e);
+    }
+  },
+
+  renderEmptyDictionaryState() {
+    const listEl = document.getElementById('dict-toc-list');
+    if (listEl) {
+      listEl.innerHTML = `
+        <div style="padding: 32px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+          Aucun dictionnaire installé.
+        </div>
+      `;
+    }
+    const nameEl = document.getElementById('dict-active-name');
+    if (nameEl) nameEl.textContent = 'Aucun dictionnaire';
+    const badgeEl = document.getElementById('dict-active-badge');
+    if (badgeEl) badgeEl.textContent = '0 dictionnaire';
+    const bodyEl = document.getElementById('dict-article-body');
+    if (bodyEl) {
+      bodyEl.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; text-align: center; padding: 40px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">📖</div>
+          <h3 style="margin-bottom: 8px; font-size: 18px; font-weight: 600;">Aucun dictionnaire installé</h3>
+          <p style="max-width: 460px; color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 24px;">
+            Votre bibliothèque de dictionnaires est vide. Téléchargez le <strong>Dictionnaire de la Bible F. Vigouroux (8 312 articles)</strong> ou d'autres ressources bibliques depuis le Store officiel Open Shema.
+          </p>
+          <button class="btn btn-primary" onclick="OpenShemaStoreModal.open('dictionaries')" style="padding: 10px 22px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Explorer le Store Open Shema
+          </button>
+        </div>
+      `;
     }
   },
 

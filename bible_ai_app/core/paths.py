@@ -137,14 +137,14 @@ def get_user_data_dir() -> str:
         _USER_DATA_DIR_CACHED = dev_data
         return dev_data
 
-    # 2. Mode portable explicite
+    # 2. Mode portable : présence du marqueur .portable OU présence d'un dossier data/ local à côté de l'exécutable (hors conteneur MSIX)
     b_dir = get_bundle_dir()
     portable_marker = os.path.join(b_dir, ".portable")
-    if os.path.exists(portable_marker) and not is_running_as_package():
-        portable_data = os.path.join(b_dir, "data")
-        os.makedirs(portable_data, exist_ok=True)
-        _USER_DATA_DIR_CACHED = portable_data
-        return portable_data
+    local_data = os.path.join(b_dir, "data")
+    if (os.path.exists(portable_marker) or os.path.exists(local_data)) and not is_running_as_package():
+        os.makedirs(local_data, exist_ok=True)
+        _USER_DATA_DIR_CACHED = local_data
+        return local_data
 
     # 3. Mode Standard ou Store MSIX -> %LOCALAPPDATA%\OpenShema\data
     local_appdata = os.environ.get("LOCALAPPDATA")

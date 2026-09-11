@@ -53,36 +53,9 @@ class DictionaryManager:
                     return cls._registry
             except Exception as e:
                 logger.error(f"Erreur lecture registry.json : {e}")
-        # Registre par défaut
-        base_registry = [
-            {
-                "id": "strong",
-                "name": "Lexique Hébreu & Grec Strong",
-                "type": "strong",
-                "enabled": True,
-                "priority": 1,
-                "count": 14024,
-                "file": "data/strong_lexicon.json"
-            },
-            {
-                "id": "calmet",
-                "name": "Dictionnaire Historique et Critique Dom Calmet (1728)",
-                "type": "custom",
-                "enabled": True,
-                "priority": 2,
-                "count": 5369,
-                "file": "data/calmet_dict.json"
-            },
-            {
-                "id": "bailly",
-                "name": "Dictionnaire Grec-Français Anatole Bailly (1901)",
-                "type": "greek",
-                "enabled": True,
-                "priority": 3,
-                "count": 14642,
-                "file": "data/bailly_lexicon.json"
-            }
-        ]
+        # Registre par défaut vierge : aucun dictionnaire pré-installé d'office
+        # Les dictionnaires (Vigouroux 8 312 articles, etc.) se téléchargent à la demande depuis le Store / open-shema-data
+        base_registry = []
 
         if not os.path.exists(r_path):
             cls._registry = base_registry
@@ -94,25 +67,11 @@ class DictionaryManager:
                 logger.error(f"Erreur lecture registry.json : {e}")
                 cls._registry = base_registry
 
-        # Auto-découverte dynamique de Vigouroux et des dictionnaires ajoutés dans data/ ou data/dictionaries/
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        data_dir = os.path.join(base_dir, "data")
-        dicts_dir = os.path.join(data_dir, "dictionaries")
-
-        vigo_p = os.path.join(data_dir, "vigouroux_dict.json")
-        if os.path.exists(vigo_p) and not any(d.get("id") == "vigouroux" for d in cls._registry):
-            cls._registry.append({
-                "id": "vigouroux",
-                "name": "Dictionnaire de la Bible Fulcran Vigouroux (1912)",
-                "type": "custom",
-                "enabled": True,
-                "priority": 4,
-                "count": 7585,
-                "file": "data/vigouroux_dict.json"
-            })
-
-        if os.path.exists(dicts_dir):
-            for fn in os.listdir(dicts_dir):
+        # Auto-découverte dynamique uniquement des dictionnaires explicitement importés par l'utilisateur dans user_data_dir/dictionaries/
+        from core.paths import get_user_data_path
+        user_dicts_dir = get_user_data_path("dictionaries")
+        if os.path.exists(user_dicts_dir):
+            for fn in os.listdir(user_dicts_dir):
                 if fn.endswith((".sqlite", ".json")) and fn != "registry.json":
                     d_slug = os.path.splitext(fn)[0].replace("dict_", "").lower()
                     if not any(d.get("id") == d_slug for d in cls._registry):
@@ -123,7 +82,7 @@ class DictionaryManager:
                             "type": "custom",
                             "enabled": True,
                             "priority": len(cls._registry) + 1,
-                            "file": os.path.join("data", "dictionaries", fn)
+                            "file": os.path.join(user_dicts_dir, fn)
                         })
 
         cls.save_registry(cls._registry)
@@ -293,7 +252,7 @@ class DictionaryManager:
         meta_info = {
             "nouveau_dictionnaire": {"author": "Collectif / Éditions Emmaüs", "year": "1992", "badge": "7 016 art.", "count": 7016},
             "calmet": {"author": "Dom Augustin Calmet", "year": "1728", "badge": "5 369 art.", "count": 5369},
-            "vigouroux": {"author": "Fulcran Vigouroux", "year": "1912", "badge": "7 585 art.", "count": 7585},
+            "vigouroux": {"author": "Fulgrence Vigouroux & Collaborateurs", "year": "1895–1912", "badge": "8 312 art.", "count": 8312},
             "strong": {"author": "James Strong", "year": "1890", "badge": "14 024 ent.", "count": 14024},
             "bailly": {"author": "Anatole Bailly", "year": "1901", "badge": "14 642 ent.", "count": 14642},
             "theologie_systematiq": {"author": "Études Doctrinales", "year": "", "badge": "99 art.", "count": 99},

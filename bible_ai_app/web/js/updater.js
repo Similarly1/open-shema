@@ -171,7 +171,7 @@ const AppUpdater = {
     this.hideUpdateAvailable();
     const badge = document.getElementById('lbl-update-status-badge');
     if (badge) {
-      badge.textContent = `Version Store (${res?.current_version || '0.2.0'})`;
+      badge.textContent = `Version Store (${res?.current_version || '0.3.0'})`;
       badge.style.background = 'rgba(16, 185, 129, 0.15)';
       badge.style.color = '#34d399';
     }

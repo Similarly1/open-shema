@@ -360,34 +360,36 @@ class ImportMixin:
             if not download_url:
                 return {"success": False, "error": "URL de téléchargement manquante."}
 
+            from core.paths import get_user_data_path
+
             if m_type == "bible":
-                target_dir = os.path.join(current_dir, "data", "bibles")
+                target_dir = get_user_data_path("bibles")
                 os.makedirs(target_dir, exist_ok=True)
                 file_name = f"bible_{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
                 target_path = os.path.join(target_dir, file_name)
             elif m_type == "dictionary":
-                target_dir = os.path.join(current_dir, "data", "dictionaries")
+                target_dir = get_user_data_path("dictionaries")
                 os.makedirs(target_dir, exist_ok=True)
                 file_name = f"dict_{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
                 target_path = os.path.join(target_dir, file_name)
             elif m_type == "commentary":
-                target_dir = os.path.join(current_dir, "data", "commentaires")
+                target_dir = get_user_data_path("commentaires")
                 os.makedirs(target_dir, exist_ok=True)
                 file_name = f"comm_{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
                 target_path = os.path.join(target_dir, file_name)
             elif m_type == "theology":
-                target_dir = os.path.join(current_dir, "data", "theology")
+                target_dir = get_user_data_path("theology")
                 os.makedirs(target_dir, exist_ok=True)
                 file_name = f"{m_id.replace('-', '_')}.sqlite" if m_format == "sqlite" else f"{m_id}.json"
                 target_path = os.path.join(target_dir, file_name)
             elif m_type in ["logos_pb", "personal_book", "docx"]:
-                target_dir = os.path.join(current_dir, "data", "personal_books")
+                target_dir = get_user_data_path("personal_books")
                 os.makedirs(target_dir, exist_ok=True)
                 ext = ".zip" if download_url.endswith(".zip") else ".docx"
                 file_name = f"{m_id}{ext}"
                 target_path = os.path.join(target_dir, file_name)
             else:
-                target_dir = os.path.join(current_dir, "data")
+                target_dir = get_user_data_path()
                 file_name = os.path.basename(download_url.split("?")[0])
                 target_path = os.path.join(target_dir, file_name)
 

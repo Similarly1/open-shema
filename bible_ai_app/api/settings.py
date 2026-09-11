@@ -502,16 +502,8 @@ class SettingsMixin:
         cfg = load_secrets_into_config(load_config())
         first_run_flag = cfg.get("first_run")
 
-        # Si l'onboarding a déjà été validé par l'utilisateur
-        if first_run_flag is False:
-            return {"is_first_run": False, "config": cfg}
-
-        # Si first_run est explicitement True
-        if first_run_flag is True:
-            return {"is_first_run": True, "config": cfg}
-
-        # Sinon (clé absente d'une ancienne version), vérifier la présence physique de Bibles
-        from core.paths import get_user_data_path, get_bundle_data_path, get_user_data_dir
+        # Vérifier la présence physique de Bibles dans l'espace utilisateur ou bundle
+        from core.paths import get_user_data_path, get_bundle_data_path
         candidates = [
             get_user_data_path("bibles"),
             get_bundle_data_path("bibles")
@@ -526,6 +518,22 @@ class SettingsMixin:
                         break
             if has_bibles:
                 break
+
+        # Si l'onboarding a été explicitement validé en mode 'empty' (démarrer vierge confirmé)
+        if cfg.get("empty_confirmed") is True or cfg.get("onboarding_empty_confirmed") is True:
+            return {"is_first_run": False, "config": cfg}
+
+        # Si aucune Bible n'est encore installée, afficher l'assistant pour composer la bibliothèque
+        if not has_bibles:
+            return {"is_first_run": True, "config": cfg}
+
+        # Si first_run est explicitement True
+        if first_run_flag is True:
+            return {"is_first_run": True, "config": cfg}
+
+        # Si l'onboarding a déjà été validé par l'utilisateur
+        if first_run_flag is False:
+            return {"is_first_run": False, "config": cfg}
 
         return {"is_first_run": not has_bibles, "config": cfg}
 

@@ -43,29 +43,9 @@ def load_books_metadata() -> dict:
         except Exception as _silent_e:
             logger.debug("Erreur lecture library.json : %s", _silent_e)
 
-    # Filet de sécurité : vérifier si un backup complet existe et fusionner si besoin
-    backup_path = resolve_data_path("library_user_full_backup.json")
-    if not os.path.exists(backup_path):
-        # Chercher également dans la racine de l'app si non trouvé dans les chemins résolus
-        app_bkp = os.path.join(_APP_ROOT, "data", "library_user_full_backup.json")
-        if os.path.exists(app_bkp):
-            backup_path = app_bkp
-
-    if os.path.exists(backup_path):
-        try:
-            with open(backup_path, 'r', encoding='utf-8') as f:
-                backup_registry = json.load(f)
-            if isinstance(backup_registry, dict) and len(backup_registry) > len(registry):
-                for k, v in backup_registry.items():
-                    if k not in registry:
-                        registry[k] = v
-                save_books_metadata(registry)
-        except Exception as _bkp_e:
-            logger.debug("Erreur lecture backup library: %s", _bkp_e)
-    
-    # Si le registre est introuvable ou vide, lancer automatiquement la récupération
-    if not registry:
-        registry = recover_books_metadata()
+    # Si le fichier n'existait pas du tout, initialiser vide
+    if registry is None:
+        registry = {}
 
     _LIBRARY_CACHE = registry
     return registry

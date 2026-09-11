@@ -104,12 +104,13 @@ def build():
         os.makedirs(internal_data_dir, exist_ok=True)
         os.makedirs(root_data_dir, exist_ok=True)
 
-        # 1. Fichiers permanents lourds copiés UNIQUEMENT dans _internal/data/ (évite 93 Mo de doublon !)
+        # 1. Fichiers permanents légers et index copiés UNIQUEMENT dans _internal/data/
+        # Aucun dictionnaire encyclopédique (Vigouroux, Calmet, Bailly) ni Bible n'est pré-embarqué :
+        # Tout est téléchargeable à la demande depuis open-shema-data via le Store
         essential_files = [
             "biblical_places.db",                 # Cartes géospatiales
             "original_languages.db",              # Textes originaux complets (Hébreu AT + Grec NT avec morpho & Strong)
             "strong_lexicon.json",                # Lexique James Strong Hébreu & Grec
-            "bailly_lexicon.json",                # Dictionnaire Grec-Français Anatole Bailly
             "illustrations_processed_cache.json", # Index rapide des illustrations
             "catalog.json",                       # Catalogue officiel Open Shema Store & First Run Wizard
             "bibles_registry.json",               # Métadonnées canoniques
@@ -117,7 +118,11 @@ def build():
             "french_accent_map.json",             # Traitement linguistique
             "french_words.json",
             "config.example.json",
-            "bibleproject_fr.json"
+            "bibleproject_fr.json",
+            "french_bible_ebooks.json",
+            "gutenberg_theology_books.json",
+            "ccel_theology_books.json",
+            "logos_community_books.json"
         ]
         for fname in essential_files:
             src_f = os.path.join(src_data_dir, fname)
@@ -136,16 +141,24 @@ def build():
         for target_dir in [internal_data_dir, root_data_dir]:
             src_cfg_ex = os.path.join(src_data_dir, "config.example.json")
             dest_cfg = os.path.join(target_dir, "config.json")
-            if os.path.exists(src_cfg_ex) and not os.path.exists(dest_cfg):
+            if os.path.exists(src_cfg_ex):
                 shutil.copy2(src_cfg_ex, dest_cfg)
 
             lib_path = os.path.join(target_dir, "library.json")
-            if not os.path.exists(lib_path):
-                with open(lib_path, "w", encoding="utf-8") as lf:
-                    lf.write("{}\n")
+            with open(lib_path, "w", encoding="utf-8") as lf:
+                lf.write("{}\n")
 
             for empty_sub in ["bibles", "commentaires", "theology", "dictionaries", "sermons", "notes", "conversations", "covers"]:
                 os.makedirs(os.path.join(target_dir, empty_sub), exist_ok=True)
+
+            dict_reg_path = os.path.join(target_dir, "dictionaries", "registry.json")
+            with open(dict_reg_path, "w", encoding="utf-8") as rf:
+                rf.write("[]\n")
+
+        # 3. Création du marqueur .portable pour garantir l'autonomie totale (données dans dist/OpenShema/data/)
+        portable_marker = os.path.join(dist_app_dir, ".portable")
+        with open(portable_marker, "w", encoding="utf-8") as pf:
+            pf.write("portable\n")
 
         # Création du dossier cible pour les gravures Vigouroux dans _internal/web/img/vigouroux
         os.makedirs(os.path.join(dist_app_dir, "_internal", "web", "img", "vigouroux"), exist_ok=True)

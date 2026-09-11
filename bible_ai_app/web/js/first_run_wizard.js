@@ -14,7 +14,7 @@ const FirstRunWizard = {
   activeFilter: 'all',
   
   // Choix utilisateur
-  libraryMode: 'essential', // 'essential' | 'custom'
+  libraryMode: 'essential', // 'essential' | 'custom' | 'empty'
   selectedModules: new Set(['bible-lsg-1910']),
   aiProvider: 'gemini',     // 'gemini' | 'mistral' | 'infomaniak' | 'disabled'
   geminiKey: '',
@@ -602,6 +602,8 @@ const FirstRunWizard = {
       const configPayload = {
         theme: this.selectedTheme,
         theme_palette: this.selectedPalette,
+        library_mode: this.libraryMode,
+        empty_confirmed: this.libraryMode === 'empty',
         enable_ai: this.aiProvider !== 'disabled',
         gemini_api_key: this.geminiKey,
         mistral_api_key: this.mistralKey,
