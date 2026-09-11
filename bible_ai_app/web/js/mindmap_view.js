@@ -1861,6 +1861,49 @@ const MindMapView = {
     return Math.ceil(baseW + tracking + safetyBuffer);
   },
 
+  calcImageCover(vW, vH, imgAspect, zoom, panX, panY) {
+    const w = Math.max(1, vW || 100);
+    const h = Math.max(1, vH || 100);
+    const R = (typeof imgAspect === 'number' && imgAspect > 0) ? imgAspect : 1.0;
+    const Z = (typeof zoom === 'number' && zoom >= 0.95) ? zoom : 1.0;
+    const Px = typeof panX === 'number' ? panX : 0;
+    const Py = typeof panY === 'number' ? panY : 0;
+
+    const boxAspect = w / h;
+    let baseW, baseH;
+    if (R >= boxAspect) {
+      baseH = h;
+      baseW = h * R;
+    } else {
+      baseW = w;
+      baseH = w / R;
+    }
+
+    const renderW = baseW * Z;
+    const renderH = baseH * Z;
+    const maxPanX = Math.max(0, (renderW - w) / 2);
+    const maxPanY = Math.max(0, (renderH - h) / 2);
+
+    const clampedPx = Math.max(-100, Math.min(100, Px));
+    const clampedPy = Math.max(-100, Math.min(100, Py));
+
+    const offsetX = (clampedPx / 100) * maxPanX;
+    const offsetY = (clampedPy / 100) * maxPanY;
+
+    return {
+      vW: w,
+      vH: h,
+      renderW,
+      renderH,
+      maxPanX,
+      maxPanY,
+      offsetX,
+      offsetY,
+      clampedPx,
+      clampedPy
+    };
+  },
+
   measureNode(node) {
     const hasImg = !!node.image;
     const imgMode = node.imageMode || 'background';
@@ -3723,31 +3766,38 @@ const MindMapView = {
         const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         imgG.setAttribute('clip-path', `url(#${rootClipId})`);
 
-        const rootZoom = (typeof node.imageZoom === 'number' && node.imageZoom >= 0.5) ? node.imageZoom : 1.0;
-        const rootPanX = typeof node.imagePanX === 'number' ? node.imagePanX : 0;
-        const rootPanY = typeof node.imagePanY === 'number' ? node.imagePanY : 0;
-        const rootOffX = (rootPanX / 100) * (rootR * 2);
-        const rootOffY = (rootPanY / 100) * (rootR * 2);
+        const vW = rootR * 2;
+        const vH = rootR * 2;
+        const imgAspect = node.imageAspect || 1.0;
+        const cover = this.calcImageCover(vW, vH, imgAspect, node.imageZoom, node.imagePanX, node.imagePanY);
 
         const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         imgEl.setAttribute('href', rootImgSrc);
-        imgEl.setAttribute('x', -rootR);
-        imgEl.setAttribute('y', -rootR);
-        imgEl.setAttribute('width', rootR * 2);
-        imgEl.setAttribute('height', rootR * 2);
-        imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+        imgEl.setAttribute('x', -cover.renderW / 2 + cover.offsetX);
+        imgEl.setAttribute('y', -cover.renderH / 2 + cover.offsetY);
+        imgEl.setAttribute('width', cover.renderW);
+        imgEl.setAttribute('height', cover.renderH);
+        imgEl.setAttribute('preserveAspectRatio', 'none');
 
         if (node.imageColor === 'bw' || node.imageColor === 'tint') {
           imgEl.setAttribute('filter', 'url(#mm-filter-bw)');
         }
 
-        if (rootZoom !== 1.0 || rootPanX !== 0 || rootPanY !== 0) {
-          const imgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          imgWrap.setAttribute('transform', `translate(${rootOffX}, ${rootOffY}) scale(${rootZoom})`);
-          imgWrap.appendChild(imgEl);
-          imgG.appendChild(imgWrap);
-        } else {
-          imgG.appendChild(imgEl);
+        imgG.appendChild(imgEl);
+
+        // Mesurer l'aspect naturel si non encore mémorisé
+        if (!node.imageAspect) {
+          const tmpImg = new Image();
+          tmpImg.onload = () => {
+            if (tmpImg.naturalWidth && tmpImg.naturalHeight) {
+              const asp = tmpImg.naturalWidth / tmpImg.naturalHeight;
+              if (Math.abs((node.imageAspect || 1) - asp) > 0.01) {
+                node.imageAspect = asp;
+                this.drawNodes(this.tree);
+              }
+            }
+          };
+          tmpImg.src = rootImgSrc;
         }
 
         // Teinte polychrome harmonisée pour le médaillon central (mix des branches)
@@ -3932,32 +3982,36 @@ const MindMapView = {
           const vW = boxW;
           const vH = isTopImage ? topImgH : boxH;
           const vCx = 0;
-          const vCy = isTopImage ? (-boxH / 2 + topImgH / 2) : 0;
-          const bZoom = (typeof node.imageZoom === 'number' && node.imageZoom >= 0.5) ? node.imageZoom : 1.0;
-          const bPanX = typeof node.imagePanX === 'number' ? node.imagePanX : 0;
-          const bPanY = typeof node.imagePanY === 'number' ? node.imagePanY : 0;
-          const bOffX = (bPanX / 100) * vW;
-          const bOffY = (bPanY / 100) * vH;
+          const imgAspect = node.imageAspect || 1.0;
+          const cover = this.calcImageCover(vW, vH, imgAspect, node.imageZoom, node.imagePanX, node.imagePanY);
 
           const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
           imgEl.setAttribute('href', branchImgSrc);
-          imgEl.setAttribute('x', -vW / 2);
-          imgEl.setAttribute('y', isTopImage ? -boxH / 2 : -boxH / 2);
-          imgEl.setAttribute('width', vW);
-          imgEl.setAttribute('height', vH);
-          imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+          imgEl.setAttribute('x', vCx - cover.renderW / 2 + cover.offsetX);
+          imgEl.setAttribute('y', vCy - cover.renderH / 2 + cover.offsetY);
+          imgEl.setAttribute('width', cover.renderW);
+          imgEl.setAttribute('height', cover.renderH);
+          imgEl.setAttribute('preserveAspectRatio', 'none');
 
           if (node.imageColor === 'bw' || node.imageColor === 'tint') {
             imgEl.setAttribute('filter', 'url(#mm-filter-bw)');
           }
 
-          if (bZoom !== 1.0 || bPanX !== 0 || bPanY !== 0) {
-            const imgWrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            imgWrap.setAttribute('transform', `translate(${vCx + bOffX}, ${vCy + bOffY}) scale(${bZoom}) translate(${-vCx}, ${-vCy})`);
-            imgWrap.appendChild(imgEl);
-            imgG.appendChild(imgWrap);
-          } else {
-            imgG.appendChild(imgEl);
+          imgG.appendChild(imgEl);
+
+          // Mesurer l'aspect naturel si non encore mémorisé
+          if (!node.imageAspect) {
+            const tmpImg = new Image();
+            tmpImg.onload = () => {
+              if (tmpImg.naturalWidth && tmpImg.naturalHeight) {
+                const asp = tmpImg.naturalWidth / tmpImg.naturalHeight;
+                if (Math.abs((node.imageAspect || 1) - asp) > 0.01) {
+                  node.imageAspect = asp;
+                  this.drawNodes(this.tree);
+                }
+              }
+            };
+            tmpImg.src = branchImgSrc;
           }
 
           // Teinte harmonisée de branche
@@ -7343,10 +7397,19 @@ const MindMapView = {
     const charCountEl = overlay.querySelector('#mm-img-char-count');
 
     const updatePreviewTransform = () => {
+      const viewportEl = previewContainer.querySelector('.mm-crop-viewport');
       const previewImg = previewContainer.querySelector('.mm-crop-preview-img');
-      if (previewImg) {
-        previewImg.style.transform = `translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom})`;
-      }
+      if (!viewportEl || !previewImg) return;
+      const vW = viewportEl.clientWidth || (isRoot ? 150 : 340);
+      const vH = viewportEl.clientHeight || (isRoot ? 150 : 84);
+      const imgAspect = node.imageAspect || 1.0;
+      const cover = this.calcImageCover(vW, vH, imgAspect, selectedZoom, selectedPanX, selectedPanY);
+
+      previewImg.style.width = `${Math.round(cover.renderW)}px`;
+      previewImg.style.height = `${Math.round(cover.renderH)}px`;
+      previewImg.style.left = '50%';
+      previewImg.style.top = '50%';
+      previewImg.style.transform = `translate(calc(-50% + ${Math.round(cover.offsetX)}px), calc(-50% + ${Math.round(cover.offsetY)}px))`;
     };
 
     const setZoom = (val) => {
@@ -7381,12 +7444,27 @@ const MindMapView = {
     const onGlobalMouseMove = (e) => {
       if (!isDragging) return;
       const viewportEl = previewContainer.querySelector('.mm-crop-viewport');
-      const vW = viewportEl ? (viewportEl.clientWidth || 100) : 100;
-      const vH = viewportEl ? (viewportEl.clientHeight || 100) : 100;
+      if (!viewportEl) return;
+      const vW = viewportEl.clientWidth || (isRoot ? 150 : 340);
+      const vH = viewportEl.clientHeight || (isRoot ? 150 : 84);
+      const imgAspect = node.imageAspect || 1.0;
+      const cover = this.calcImageCover(vW, vH, imgAspect, selectedZoom, 0, 0);
+
       const dx = e.clientX - dragStartX;
       const dy = e.clientY - dragStartY;
-      selectedPanX = Math.max(-100, Math.min(100, Math.round(startPanX + (dx / vW) * 100)));
-      selectedPanY = Math.max(-100, Math.min(100, Math.round(startPanY + (dy / vH) * 100)));
+
+      if (cover.maxPanX > 0) {
+        selectedPanX = Math.max(-100, Math.min(100, Math.round(startPanX + (dx / cover.maxPanX) * 100)));
+      } else {
+        selectedPanX = 0;
+      }
+
+      if (cover.maxPanY > 0) {
+        selectedPanY = Math.max(-100, Math.min(100, Math.round(startPanY + (dy / cover.maxPanY) * 100)));
+      } else {
+        selectedPanY = 0;
+      }
+
       updatePreviewTransform();
     };
 
@@ -7409,49 +7487,91 @@ const MindMapView = {
       const tintBg = isRoot ? 'linear-gradient(135deg, #3b82f6, #ec4899, #10b981)' : (node.color || '#3b82f6');
       const tintOverlayHtml = selectedColor === 'tint' ? `<div class="mm-crop-preview-tint" style="position: absolute; inset: 0; pointer-events: none; background: ${tintBg}; mix-blend-mode: multiply; opacity: 0.72;"></div>` : '';
 
-      if (selectedMode === 'image-only') {
-        previewContainer.innerHTML = `
-          <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0;">
-            <div class="mm-crop-viewport" style="width: ${isRoot ? '88px' : '72px'}; height: ${isRoot ? '88px' : '72px'}; border-radius: ${isRoot ? '50%' : '14px'}; overflow: hidden; border: 2.5px solid ${node.color || '#3b82f6'}; box-shadow: 0 4px 14px rgba(0,0,0,0.35); position: relative; user-select: none;">
-              <img src="${dataUrl}" class="mm-crop-preview-img" style="width: 100%; height: 100%; object-fit: cover; transform: translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom}); transform-origin: center center; ${filterStyle} user-select: none; pointer-events: none;" />
-              ${tintOverlayHtml}
-            </div>
-            <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'image remplace le mot-clé (Loi de Buzan)</span>
-            <span style="font-size: 10px; opacity: 0.75; color: var(--text-secondary);">« ${this.escapeHtml(nodeText)} » reste visible au survol</span>
-          </div>
-        `;
-      } else if (selectedMode === 'top-image') {
-        previewContainer.innerHTML = `
-          <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 4px 0;">
-            <div style="width: 150px; border-radius: 12px; overflow: hidden; border: 2px solid ${node.color || '#3b82f6'}; background: var(--bg-card, #ffffff); box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
-              <div class="mm-crop-viewport" style="height: 72px; overflow: hidden; position: relative; user-select: none;">
-                <img src="${dataUrl}" class="mm-crop-preview-img" style="width: 100%; height: 100%; object-fit: cover; transform: translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom}); transform-origin: center center; ${filterStyle} user-select: none; pointer-events: none;" />
+      if (isRoot) {
+        // Le concept central est un médaillon circulaire (Buzan)
+        if (selectedMode === 'image-only') {
+          previewContainer.innerHTML = `
+            <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 6px 0;">
+              <div class="mm-crop-viewport" style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; position: relative; box-shadow: 0 4px 16px rgba(0,0,0,0.4); border: 2.5px solid var(--accent-blue, #3b82f6); user-select: none;">
+                <img src="${dataUrl}" class="mm-crop-preview-img" style="position: absolute; pointer-events: none; user-select: none; max-width: none; max-height: none; ${filterStyle}" />
                 ${tintOverlayHtml}
               </div>
-              <div style="padding: 6px 8px; text-align: center; border-top: 1px solid rgba(148,163,184,0.25); color: var(--text-primary); font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 12)}</span>` : ''}
-                <span>${this.escapeHtml(nodeText)}</span>
-              </div>
+              <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'illustration remplace le texte du concept central</span>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          // background (défaut pour root)
+          previewContainer.innerHTML = `
+            <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 4px 0;">
+              <div class="mm-crop-viewport" style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; position: relative; box-shadow: 0 4px 16px rgba(0,0,0,0.4); border: 2.5px solid var(--accent-blue, #3b82f6); user-select: none;">
+                <img src="${dataUrl}" class="mm-crop-preview-img" style="position: absolute; pointer-events: none; user-select: none; max-width: none; max-height: none; ${filterStyle}" />
+                ${tintOverlayHtml}
+                <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.45); pointer-events: none;"></div>
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; padding: 10px; text-align: center;">
+                  ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex; margin-bottom: 4px;">${SvgIconsRegistry.getSvg(node.icon, 22)}</span>` : '<span style="display: inline-flex; margin-bottom: 4px;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/></svg></span>'}
+                  <span style="font-weight: 900; font-size: 15px; letter-spacing: 0.5px; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9);">${this.escapeHtml(nodeText)}</span>
+                </div>
+              </div>
+              <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Médaillon central radiant (Lois de Buzan)</span>
+            </div>
+          `;
+        }
       } else {
-        // background (défaut)
-        previewContainer.innerHTML = `
-          <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center;">
-            <div class="mm-crop-viewport" style="width: 100%; max-width: 380px; height: 140px; border-radius: 8px; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1.5px solid ${node.color || '#3b82f6'}; user-select: none;">
-              <img src="${dataUrl}" class="mm-crop-preview-img" style="width: 100%; height: 100%; object-fit: cover; transform: translate(${selectedPanX}%, ${selectedPanY}%) scale(${selectedZoom}); transform-origin: center center; ${filterStyle} user-select: none; pointer-events: none;" />
-              ${tintOverlayHtml}
-              <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.4); pointer-events: none;"></div>
-              <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(4px); border: 1.5px solid ${node.color || '#3b82f6'}; border-radius: 20px; padding: 4px 14px; display: flex; align-items: center; gap: 8px; color: #ffffff; font-weight: 800; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.5); white-space: nowrap; pointer-events: none;">
-                ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 14)}</span>` : ''}
-                <span style="text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${this.escapeHtml(nodeText)}</span>
-                ${node.ref ? `<span style="font-size: 9px; padding: 1px 6px; border-radius: 4px; background: rgba(255,255,255,0.2);">${this.escapeHtml(this.formatScripturePillRef(node.ref))}</span>` : ''}
+        // Nœuds de branches
+        if (selectedMode === 'image-only') {
+          previewContainer.innerHTML = `
+            <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0;">
+              <div class="mm-crop-viewport" style="width: 88px; height: 88px; border-radius: 14px; overflow: hidden; position: relative; box-shadow: 0 4px 14px rgba(0,0,0,0.35); border: 2.5px solid ${node.color || '#3b82f6'}; user-select: none;">
+                <img src="${dataUrl}" class="mm-crop-preview-img" style="position: absolute; pointer-events: none; user-select: none; max-width: none; max-height: none; ${filterStyle}" />
+                ${tintOverlayHtml}
+              </div>
+              <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'image remplace le mot-clé (Loi de Buzan)</span>
+              <span style="font-size: 10px; opacity: 0.75; color: var(--text-secondary);">« ${this.escapeHtml(nodeText)} » reste visible au survol</span>
+            </div>
+          `;
+        } else if (selectedMode === 'top-image') {
+          previewContainer.innerHTML = `
+            <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 4px 0;">
+              <div style="width: 170px; border-radius: 12px; overflow: hidden; border: 2px solid ${node.color || '#3b82f6'}; background: var(--bg-card, #ffffff); box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
+                <div class="mm-crop-viewport" style="height: 75px; overflow: hidden; position: relative; user-select: none;">
+                  <img src="${dataUrl}" class="mm-crop-preview-img" style="position: absolute; pointer-events: none; user-select: none; max-width: none; max-height: none; ${filterStyle}" />
+                  ${tintOverlayHtml}
+                </div>
+                <div style="padding: 6px 8px; text-align: center; border-top: 1px solid rgba(148,163,184,0.25); color: var(--text-primary); font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                  ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 12)}</span>` : ''}
+                  <span>${this.escapeHtml(nodeText)}</span>
+                </div>
               </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          // background (défaut branche)
+          previewContainer.innerHTML = `
+            <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center;">
+              <div class="mm-crop-viewport" style="width: 100%; max-width: 340px; height: 84px; border-radius: 10px; overflow: hidden; position: relative; box-shadow: 0 4px 14px rgba(0,0,0,0.3); border: 2px solid ${node.color || '#3b82f6'}; user-select: none;">
+                <img src="${dataUrl}" class="mm-crop-preview-img" style="position: absolute; pointer-events: none; user-select: none; max-width: none; max-height: none; ${filterStyle}" />
+                ${tintOverlayHtml}
+                <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.45); pointer-events: none;"></div>
+                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; color: #ffffff; font-weight: 800; font-size: 12px; pointer-events: none;">
+                  ${node.icon && typeof SvgIconsRegistry !== 'undefined' ? `<span style="display: inline-flex;">${SvgIconsRegistry.getSvg(node.icon, 14)}</span>` : ''}
+                  <span style="text-shadow: 0 1px 3px rgba(0,0,0,0.9);">${this.escapeHtml(nodeText)}</span>
+                  ${node.ref ? `<span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.2); backdrop-filter: blur(4px);">${this.escapeHtml(this.formatScripturePillRef(node.ref))}</span>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }
       }
+
+      // Mesurer le ratio d'aspect naturel dès chargement de l'image
+      const tmpImg = new Image();
+      tmpImg.onload = () => {
+        if (tmpImg.naturalWidth && tmpImg.naturalHeight) {
+          node.imageAspect = tmpImg.naturalWidth / tmpImg.naturalHeight;
+        }
+        updatePreviewTransform();
+      };
+      tmpImg.src = dataUrl;
 
       attachCropListeners();
     };
@@ -7667,6 +7787,9 @@ const MindMapView = {
         this.currentNote.rootImageZoom = selectedZoom;
         this.currentNote.rootImagePanX = selectedPanX;
         this.currentNote.rootImagePanY = selectedPanY;
+        if (node.imageAspect) {
+          this.currentNote.rootImageAspect = node.imageAspect;
+        }
       }
       this.layoutTree();
       this.draw();
