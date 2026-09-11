@@ -4893,6 +4893,18 @@
                 <button class="btn-secondary hidden" id="btn-toggle-mindmap-mode" title="Basculer entre Vue Carte et Vue Plan (Alt+P)" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0;">
                   <svg id="icon-mm-mode-outline" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                 </button>
+                <!-- Contrôles Zoom Mind Map intégrés au bandeau supérieur -->
+                <div class="mm-header-zoom-group hidden" id="mm-header-zoom-group">
+                  <button type="button" class="btn-icon-subtle" id="btn-mm-zoom-out" title="Zoom arrière (Ctrl -)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <button type="button" class="btn-icon-subtle" id="btn-mm-zoom-in" title="Zoom avant (Ctrl +)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <button type="button" class="btn-icon-subtle" id="btn-mm-fit" title="Recentrer la carte (R)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                  </button>
+                </div>
                 <!-- Menu déroulant d'Export Mind Map universel (PDF, PNG, JPG) — Zéro émoji, 100% SVG -->
                 <div class="mm-export-dropdown-wrap hidden" id="mm-export-dropdown-wrap">
                   <button type="button" class="btn-secondary btn-export-mindmap" id="btn-export-mindmap" title="Exporter la carte mentale (PDF, PNG, JPG) (Ctrl+E)" style="display: flex; align-items: center; justify-content: center; gap: 3px; min-width: 32px; height: 32px; padding: 0 7px;">

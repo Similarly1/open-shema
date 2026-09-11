@@ -2064,6 +2064,12 @@ const App = {
     const appEl = document.getElementById('app');
     if (appEl) appEl.scrollLeft = 0;
 
+    // Si le bandeau étendu de la carte mentale est actif, préserver le repli de la barre latérale
+    const mmDock = document.getElementById('mindmap-dock');
+    if (mmDock && mmDock.classList.contains('expanded')) {
+      return;
+    }
+
     if (!isDrawerOpen) {
       if (this.sidebarAutoCollapsed) {
         this.setSidebarCollapsed(false, true);

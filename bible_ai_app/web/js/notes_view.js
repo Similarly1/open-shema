@@ -72,6 +72,18 @@ const NotesView = {
       }
     });
 
+    document.getElementById('btn-mm-zoom-out')?.addEventListener('click', () => {
+      if (typeof MindMapView !== 'undefined') MindMapView.zoom(0.8);
+    });
+
+    document.getElementById('btn-mm-zoom-in')?.addEventListener('click', () => {
+      if (typeof MindMapView !== 'undefined') MindMapView.zoom(1.2);
+    });
+
+    document.getElementById('btn-mm-fit')?.addEventListener('click', () => {
+      if (typeof MindMapView !== 'undefined') MindMapView.fitView();
+    });
+
     document.getElementById('btn-toggle-mindmap-fullscreen')?.addEventListener('click', () => {
       if (typeof MindMapView !== 'undefined') {
         MindMapView.toggleFullscreen();
@@ -1949,15 +1961,16 @@ const NotesView = {
     const exportDropdownWrap = document.getElementById('mm-export-dropdown-wrap');
     const toggleModeBtn = document.getElementById('btn-toggle-mindmap-mode');
     const toggleFullscreenBtn = document.getElementById('btn-toggle-mindmap-fullscreen');
+    const zoomGroup = document.getElementById('mm-header-zoom-group');
 
     if (isMindmap) {
       this.contentInput?.classList.add('hidden');
       this.previewContainer?.classList.add('hidden');
       previewBtn?.classList.add('hidden');
       toggleModeBtn?.classList.remove('hidden');
-      // Export et Plein écran sont directement dans le dock flottant inférieur pour éviter tout doublon
-      exportDropdownWrap?.classList.add('hidden');
-      toggleFullscreenBtn?.classList.add('hidden');
+      zoomGroup?.classList.remove('hidden');
+      exportDropdownWrap?.classList.remove('hidden');
+      toggleFullscreenBtn?.classList.remove('hidden');
 
       if (mmContainer) {
         mmContainer.classList.remove('hidden');
@@ -1968,6 +1981,7 @@ const NotesView = {
     } else {
       mmContainer?.classList.add('hidden');
       toggleModeBtn?.classList.add('hidden');
+      zoomGroup?.classList.add('hidden');
       exportDropdownWrap?.classList.add('hidden');
       toggleFullscreenBtn?.classList.add('hidden');
       // Restaurer les volets si repliés automatiquement par la carte mentale

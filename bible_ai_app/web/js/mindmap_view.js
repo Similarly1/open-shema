@@ -220,24 +220,8 @@ const MindMapView = {
 
           <div class="mm-dock-separator"></div>
 
-          <!-- Îlot 3 : Navigation & Zoom -->
-          <div class="mm-dock-group" data-group="navigation">
-            <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" data-tooltip-title="Zoom avant" data-tooltip-kbd="Ctrl +">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
-            <button type="button" class="mm-dock-btn" id="mm-btn-zoom-out" data-tooltip-title="Zoom arrière" data-tooltip-kbd="Ctrl -">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
-            <button type="button" class="mm-dock-btn" id="mm-btn-fit" data-tooltip-title="Recentrer et ajuster la carte" data-tooltip-kbd="R">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-              <span class="mm-dock-label">Centrer</span>
-            </button>
-          </div>
-
-          <div class="mm-dock-separator"></div>
-
-          <!-- Îlot 4 : Affichage & Options -->
-          <div class="mm-dock-group" data-group="options">
+          <!-- Îlot 3 : Thème & Aide -->
+          <div class="mm-dock-group" data-group="theme-help">
             <button type="button" class="mm-dock-btn" id="mm-btn-theme" data-tooltip-title="Basculer Fond Sombre / Papier" data-tooltip-kbd="Thème">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
               <span class="mm-dock-label">Fond</span>
@@ -245,14 +229,6 @@ const MindMapView = {
             <button type="button" class="mm-dock-btn" id="mm-btn-palette" data-tooltip-title="Changer la palette de couleurs" data-tooltip-kbd="Palette">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
               <span class="mm-dock-label">Palette</span>
-            </button>
-            <button type="button" class="mm-dock-btn" id="mm-btn-export" data-tooltip-title="Exporter (PDF, PNG, JPG)" data-tooltip-kbd="Ctrl+E">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span class="mm-dock-label">Export</span>
-            </button>
-            <button type="button" class="mm-dock-btn" id="mm-btn-fullscreen" data-tooltip-title="Mode Plein Écran" data-tooltip-kbd="F11 / F">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-              <span class="mm-dock-label">Plein écran</span>
             </button>
             <button type="button" class="mm-dock-btn" id="mm-btn-help" data-tooltip-title="Aide raccourcis clavier" data-tooltip-kbd="?">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -721,13 +697,11 @@ const MindMapView = {
       e.currentTarget?.blur();
       this.toggleMarkerPopover();
     });
-    document.getElementById('mm-btn-zoom-in')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(1.2); });
-    document.getElementById('mm-btn-zoom-out')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(0.8); });
-    document.getElementById('mm-btn-fit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.fitView(); });
+    document.getElementById('btn-mm-zoom-in')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(1.2); });
+    document.getElementById('btn-mm-zoom-out')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.zoom(0.8); });
+    document.getElementById('btn-mm-fit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.fitView(); });
     document.getElementById('mm-btn-theme')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.togglePaperMode(); });
     document.getElementById('mm-btn-palette')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cyclePalette(); });
-    document.getElementById('mm-btn-export')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.openExportModal(); });
-    document.getElementById('mm-btn-fullscreen')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleFullscreen(); });
     document.getElementById('mm-fs-btn-exit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleFullscreen(false); });
     document.addEventListener('fullscreenchange', () => {
       const isNativeFs = !!document.fullscreenElement;
