@@ -1150,6 +1150,7 @@ const MindMapView = {
     let panX = 0;
     let panY = 0;
     let color = 'natural';
+    let aspect = 1.0;
 
     if (raw && raw.includes('|')) {
       const parts = raw.split('|');
@@ -1174,7 +1175,6 @@ const MindMapView = {
       const colorMatch = raw.match(/color:\s*([a-zA-Z\-]+)/i);
       if (colorMatch) color = colorMatch[1].trim().toLowerCase();
 
-      let aspect = 1.0;
       const aspectMatch = raw.match(/aspect:\s*([0-9.]+)/i);
       if (aspectMatch) {
         const a = parseFloat(aspectMatch[1]);
