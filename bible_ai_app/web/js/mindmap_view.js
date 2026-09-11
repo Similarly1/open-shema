@@ -2017,13 +2017,16 @@ const MindMapView = {
     if (node.isFloating) {
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 56;
+        const imgShape = node.imageShape || 'rounded';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.45) : s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = s;
+        node.width = w;
         node.height = s;
-        node.contentWidth = s;
+        node.contentWidth = w;
       } else {
         const textW = this.getTextWidth(node.text, 12, '800');
         node.textWidth = textW;
@@ -2070,9 +2073,12 @@ const MindMapView = {
       // NIVEAU 0 (Thème général / Noyau central dominant Buzan - médaillon circulaire polychrome)
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 104;
+        const imgShape = node.imageShape || 'circle';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.4) : s;
         const rootR = Math.round(s / 2);
         node.rootRadius = rootR;
-        node.width = s;
+        node.width = w;
         node.height = s;
         node.textWidth = 0;
         node.markerWidth = 0;
@@ -2097,13 +2103,16 @@ const MindMapView = {
       // NIVEAU 1 (BOIs - Règles de Buzan : mots-clés forces, affirmé et contrasté)
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 68;
+        const imgShape = node.imageShape || 'rounded';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.45) : s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = s;
+        node.width = w;
         node.height = s;
-        node.contentWidth = s;
+        node.contentWidth = w;
       } else {
         const textW = this.getTextWidth(node.text, 14, '800');
         node.textWidth = textW;
@@ -2151,13 +2160,16 @@ const MindMapView = {
       // NIVEAU 2 (Sous-branches subordonnées)
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 52;
+        const imgShape = node.imageShape || 'rounded';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.45) : s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = s;
+        node.width = w;
         node.height = s;
-        node.contentWidth = s;
+        node.contentWidth = w;
       } else {
         const textW = this.getTextWidth(node.text, 11.5, '700');
         node.textWidth = textW;
@@ -2205,13 +2217,16 @@ const MindMapView = {
       // NIVEAU 3+ (Détails fins légers)
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 44;
+        const imgShape = node.imageShape || 'rounded';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.45) : s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = s;
+        node.width = w;
         node.height = s;
-        node.contentWidth = s;
+        node.contentWidth = w;
       } else {
         const textW = this.getTextWidth(node.text, 10, '600');
         node.textWidth = textW;
@@ -2287,9 +2302,12 @@ const MindMapView = {
     if (node.level === 0) {
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 104;
+        const imgShape = node.imageShape || 'circle';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.4) : s;
         const rootR = Math.round(s / 2);
         node.rootRadius = rootR;
-        node.width = s;
+        node.width = w;
         node.height = s;
         node.textWidth = 0;
         node.markerWidth = 0;
@@ -2311,13 +2329,16 @@ const MindMapView = {
     } else if (node.level === 1) {
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 68;
+        const imgShape = node.imageShape || 'rounded';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.45) : s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = s;
+        node.width = w;
         node.height = s;
-        node.contentWidth = s;
+        node.contentWidth = w;
       } else {
         const textW = this.getTextWidth(node.text, 14, '800');
         node.textWidth = textW;
@@ -2363,13 +2384,16 @@ const MindMapView = {
     } else if (node.level === 2) {
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 52;
+        const imgShape = node.imageShape || 'rounded';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.45) : s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = s;
+        node.width = w;
         node.height = s;
-        node.contentWidth = s;
+        node.contentWidth = w;
       } else {
         const textW = this.getTextWidth(node.text, 11.5, '700');
         node.textWidth = textW;
@@ -2415,13 +2439,16 @@ const MindMapView = {
     } else {
       if (hasImg && imgMode === 'image-only') {
         const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 44;
+        const imgShape = node.imageShape || 'rounded';
+        const isPill = imgShape === 'pill';
+        const w = isPill ? Math.round(s * 1.45) : s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = s;
+        node.width = w;
         node.height = s;
-        node.contentWidth = s;
+        node.contentWidth = w;
       } else {
         const textW = this.getTextWidth(node.text, 10, '600');
         node.textWidth = textW;
@@ -3219,8 +3246,11 @@ const MindMapView = {
         this.hideTooltip();
         this.openScriptureRef(ref);
       });
-      pill.addEventListener('mouseenter', () => this.showScriptureTooltip(pill, ref));
-      pill.addEventListener('mouseleave', () => this.hideTooltip());
+      pill.addEventListener('mouseenter', () => {
+        this.cancelHideTooltip();
+        this.showScriptureTooltip(pill, ref);
+      });
+      pill.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
     });
   },
 
@@ -3573,19 +3603,20 @@ const MindMapView = {
       const childIsBox = isBox || !!child.image || !!child.isFloating;
 
       if (this.treeStructure === 'top-down') {
-        const rootR = node.rootRadius || (Math.max(node.width || 100, node.height || 100) / 2);
+        const rootHalfW = (node.width || 100) / 2;
+        const rootHalfH = (node.height || 100) / 2;
         let x1 = node.x;
         let y1;
 
         if (isRoot && totalChildren > 1) {
           const childIdx = node.children.indexOf(child);
-          const maxSpanX = Math.min(rootR * 1.4, (totalChildren - 1) * 16);
+          const maxSpanX = Math.min(rootHalfW * 1.4, (totalChildren - 1) * 16);
           const xStep = maxSpanX / (totalChildren - 1);
           x1 = node.x - maxSpanX / 2 + childIdx * xStep;
           const dx = x1 - node.x;
-          y1 = node.y + Math.sqrt(Math.max(0, rootR * rootR - dx * dx));
+          y1 = node.y + Math.sqrt(Math.max(0, rootHalfH * rootHalfH - dx * dx));
         } else if (isRoot) {
-          y1 = node.y + rootR;
+          y1 = node.y + rootHalfH;
         } else {
           y1 = nodeIsBox ? node.y + (node.height || 28) / 2 : node.y + 10;
         }
@@ -3715,11 +3746,14 @@ const MindMapView = {
         const childSide = child.side || 'right';
         const dir = childSide === 'right' ? 1 : -1;
 
-        // Position de départ sur le bloc principal : ventilation élégante le long du pourtour de l'ellipse
+        // Position de départ sur le bloc principal : ventilation élégante le long du pourtour de la forme
         let x1, y1;
         let totalOnSide = 1;
         if (isRoot) {
-          const rootR = node.rootRadius || (Math.max(node.width || 100, node.height || 100) / 2);
+          const rootHalfW = (node.width || 100) / 2;
+          const rootHalfH = (node.height || 100) / 2;
+          const isRootImgOnly = !!(node.image) && (node.imageMode === 'image-only');
+          const rootShape = node.imageShape || 'circle';
           const sameSideChildren = node.children
             .filter(c => (c.side || 'right') === childSide)
             .sort((a, b) => a.y - b.y);
@@ -3727,17 +3761,26 @@ const MindMapView = {
           const idxOnSide = sameSideChildren.indexOf(child);
 
           if (totalOnSide <= 1) {
-            x1 = dir * rootR;
+            x1 = dir * rootHalfW;
             y1 = 0;
           } else {
-            // Répartition aérée sur 70% de la hauteur du médaillon central
-            const maxSpanY = Math.min(rootR * 1.4, (totalOnSide - 1) * 14);
+            // Répartition aérée sur la hauteur du médaillon central
+            const maxSpanY = Math.min(rootHalfH * 1.4, (totalOnSide - 1) * 14);
             const yStep = maxSpanY / (totalOnSide - 1);
             y1 = -maxSpanY / 2 + idxOnSide * yStep;
 
-            // Point d'ancrage calculé précisément sur la circonférence du cercle
-            const capX = Math.sqrt(Math.max(0, rootR * rootR - y1 * y1));
-            x1 = dir * capX;
+            if (isRootImgOnly && rootShape === 'pill' && rootHalfW > rootHalfH) {
+              const capW = rootHalfW - rootHalfH;
+              const capX = capW + Math.sqrt(Math.max(0, rootHalfH * rootHalfH - y1 * y1));
+              x1 = dir * capX;
+            } else if (isRootImgOnly && (rootShape === 'square' || rootShape === 'rounded')) {
+              x1 = dir * rootHalfW;
+            } else {
+              // Cercle parfait ou médaillon standard
+              const r = Math.min(rootHalfW, rootHalfH);
+              const capX = Math.sqrt(Math.max(0, r * r - y1 * y1));
+              x1 = dir * capX;
+            }
           }
         } else {
           x1 = childSide === 'right' ? node.x + node.width / 2 : node.x - node.width / 2;
@@ -4037,20 +4080,22 @@ const MindMapView = {
       }
       const isRootImgOnly = !!(rootImgSrc || node.image) && (node.imageMode === 'image-only');
       const rootShape = node.imageShape || 'circle';
-      let rootRx = rootR;
+      const rootHalfW = (node.width || rootR * 2) / 2;
+      const rootHalfH = (node.height || rootR * 2) / 2;
+      let rootRx = Math.min(rootHalfW, rootHalfH);
       if (isRootImgOnly) {
         if (rootShape === 'square') rootRx = 10;
-        else if (rootShape === 'rounded') rootRx = Math.min(32, Math.max(12, Math.round(rootR * 0.44)));
-        else if (rootShape === 'pill') rootRx = rootR;
-        else rootRx = rootR;
+        else if (rootShape === 'rounded') rootRx = Math.min(32, Math.max(12, Math.round(rootHalfH * 0.44)));
+        else if (rootShape === 'pill') rootRx = rootHalfH;
+        else rootRx = Math.min(rootHalfW, rootHalfH);
       }
 
       // Halo / aura extérieure polychrome translucide
       const auraCircle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      auraCircle.setAttribute('x', -rootR - 10);
-      auraCircle.setAttribute('y', -rootR - 10);
-      auraCircle.setAttribute('width', (rootR + 10) * 2);
-      auraCircle.setAttribute('height', (rootR + 10) * 2);
+      auraCircle.setAttribute('x', -rootHalfW - 10);
+      auraCircle.setAttribute('y', -rootHalfH - 10);
+      auraCircle.setAttribute('width', (rootHalfW + 10) * 2);
+      auraCircle.setAttribute('height', (rootHalfH + 10) * 2);
       auraCircle.setAttribute('rx', rootRx + 6);
       auraCircle.setAttribute('fill', `url(#${gradId})`);
       auraCircle.setAttribute('opacity', '0.22');
@@ -4060,10 +4105,10 @@ const MindMapView = {
 
       // Anneau de bordure élégant avec dégradé polychrome
       const ringCircle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      ringCircle.setAttribute('x', -rootR - 2.5);
-      ringCircle.setAttribute('y', -rootR - 2.5);
-      ringCircle.setAttribute('width', (rootR + 2.5) * 2);
-      ringCircle.setAttribute('height', (rootR + 2.5) * 2);
+      ringCircle.setAttribute('x', -rootHalfW - 2.5);
+      ringCircle.setAttribute('y', -rootHalfH - 2.5);
+      ringCircle.setAttribute('width', (rootHalfW + 2.5) * 2);
+      ringCircle.setAttribute('height', (rootHalfH + 2.5) * 2);
       ringCircle.setAttribute('rx', rootRx + 2);
       ringCircle.setAttribute('fill', 'none');
       ringCircle.setAttribute('stroke', `url(#${gradId})`);
@@ -4073,10 +4118,10 @@ const MindMapView = {
 
       // Forme principale avec le dégradé polychrome mixant les branches
       const mainCircle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      mainCircle.setAttribute('x', -rootR);
-      mainCircle.setAttribute('y', -rootR);
-      mainCircle.setAttribute('width', rootR * 2);
-      mainCircle.setAttribute('height', rootR * 2);
+      mainCircle.setAttribute('x', -rootHalfW);
+      mainCircle.setAttribute('y', -rootHalfH);
+      mainCircle.setAttribute('width', rootHalfW * 2);
+      mainCircle.setAttribute('height', rootHalfH * 2);
       mainCircle.setAttribute('rx', rootRx);
       mainCircle.setAttribute('fill', `url(#${gradId})`);
       mainCircle.setAttribute('class', 'mm-root-medallion');
@@ -4090,10 +4135,10 @@ const MindMapView = {
         rClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
         rClip.setAttribute('id', rootClipId);
         const cShape = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        cShape.setAttribute('x', -rootR);
-        cShape.setAttribute('y', -rootR);
-        cShape.setAttribute('width', rootR * 2);
-        cShape.setAttribute('height', rootR * 2);
+        cShape.setAttribute('x', -rootHalfW);
+        cShape.setAttribute('y', -rootHalfH);
+        cShape.setAttribute('width', rootHalfW * 2);
+        cShape.setAttribute('height', rootHalfH * 2);
         cShape.setAttribute('rx', rootRx);
         rClip.appendChild(cShape);
         defs.appendChild(rClip);
@@ -4101,8 +4146,8 @@ const MindMapView = {
         const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         imgG.setAttribute('clip-path', `url(#${rootClipId})`);
 
-        const vW = rootR * 2;
-        const vH = rootR * 2;
+        const vW = rootHalfW * 2;
+        const vH = rootHalfH * 2;
         const imgAspect = node.imageAspect || 1.0;
         const cover = this.calcImageCover(vW, vH, imgAspect, node.imageZoom, node.imagePanX, node.imagePanY);
 
@@ -4138,10 +4183,10 @@ const MindMapView = {
         // Teinte polychrome harmonisée pour le médaillon central (mix des branches)
         if (node.imageColor === 'tint') {
           const tintShape = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-          tintShape.setAttribute('x', -rootR);
-          tintShape.setAttribute('y', -rootR);
-          tintShape.setAttribute('width', rootR * 2);
-          tintShape.setAttribute('height', rootR * 2);
+          tintShape.setAttribute('x', -rootHalfW);
+          tintShape.setAttribute('y', -rootHalfH);
+          tintShape.setAttribute('width', rootHalfW * 2);
+          tintShape.setAttribute('height', rootHalfH * 2);
           tintShape.setAttribute('rx', rootRx);
           tintShape.setAttribute('fill', `url(#${gradId})`);
           tintShape.setAttribute('style', 'mix-blend-mode: multiply; opacity: 0.72;');
@@ -4248,8 +4293,11 @@ const MindMapView = {
         }
         g.appendChild(text);
       } else {
-        g.addEventListener('mouseenter', () => this.showImageOnlyTooltip(g, node));
-        g.addEventListener('mouseleave', () => this.hideTooltip());
+        g.addEventListener('mouseenter', () => {
+          this.cancelHideTooltip();
+          this.showImageOnlyTooltip(g, node);
+        });
+        g.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
       }
 
       // Bouton contextuel + pour ajouter un BOI (en mode édition uniquement)
@@ -4700,8 +4748,11 @@ const MindMapView = {
       if (!isImgOnly) {
         g.appendChild(text);
       } else {
-        hitRect.addEventListener('mouseenter', () => this.showImageOnlyTooltip(g, node));
-        hitRect.addEventListener('mouseleave', () => this.hideTooltip());
+        hitRect.addEventListener('mouseenter', () => {
+          this.cancelHideTooltip();
+          this.showImageOnlyTooltip(g, node);
+        });
+        hitRect.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
       }
 
       // Pastille Marqueur / Numéro / Priorité si présent (placé immédiatement à gauche du mot-clé, hors mode Polaroid où il est en timbre d'angle)
@@ -4834,8 +4885,11 @@ const MindMapView = {
         refText.textContent = displayRef;
         refG.appendChild(refText);
 
-        refG.addEventListener('mouseenter', () => this.showScriptureTooltip(refG, node.ref));
-        refG.addEventListener('mouseleave', () => this.hideTooltip());
+        refG.addEventListener('mouseenter', () => {
+          this.cancelHideTooltip();
+          this.showScriptureTooltip(refG, node.ref);
+        });
+        refG.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
 
         refG.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -4870,8 +4924,11 @@ const MindMapView = {
         noteIconG.innerHTML = `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="${noteIconColor}" stroke-width="2.5"/><polyline points="14 2 14 8 20 8" fill="none" stroke="${noteIconColor}" stroke-width="2.5"/><line x1="16" y1="13" x2="8" y2="13" stroke="${noteIconColor}" stroke-width="2.5"/><line x1="16" y1="17" x2="8" y2="17" stroke="${noteIconColor}" stroke-width="2.5"/>`;
         noteG.appendChild(noteIconG);
 
-        noteG.addEventListener('mouseenter', () => this.showNoteTooltip(noteG, node.note));
-        noteG.addEventListener('mouseleave', () => this.hideTooltip());
+        noteG.addEventListener('mouseenter', () => {
+          this.cancelHideTooltip();
+          this.showNoteTooltip(noteG, node.note);
+        });
+        noteG.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
 
         noteG.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -6003,14 +6060,49 @@ const MindMapView = {
     return safe;
   },
 
+  scheduleHideTooltip(delay = 350) {
+    this.cancelHideTooltip();
+    this._hideTooltipTimer = setTimeout(() => {
+      this.hideTooltip();
+    }, delay);
+  },
+
+  cancelHideTooltip() {
+    if (this._hideTooltipTimer) {
+      clearTimeout(this._hideTooltipTimer);
+      this._hideTooltipTimer = null;
+    }
+  },
+
+  scheduleHideSubTooltip(delay = 300) {
+    this.cancelHideSubTooltip();
+    this._hideSubTooltipTimer = setTimeout(() => {
+      this.hideSubTooltip();
+    }, delay);
+  },
+
+  cancelHideSubTooltip() {
+    if (this._hideSubTooltipTimer) {
+      clearTimeout(this._hideSubTooltipTimer);
+      this._hideSubTooltipTimer = null;
+    }
+  },
+
   showTooltip(targetEl, contentHtml) {
     if (!this.tooltipEl) {
       this.tooltipEl = document.createElement('div');
       this.tooltipEl.id = 'mm-floating-tooltip';
       this.tooltipEl.className = 'mm-floating-tooltip';
+      this.tooltipEl.addEventListener('mouseenter', () => {
+        this.cancelHideTooltip();
+      });
+      this.tooltipEl.addEventListener('mouseleave', () => {
+        this.scheduleHideTooltip(250);
+      });
       document.body.appendChild(this.tooltipEl);
     }
 
+    this.tooltipEl.style.pointerEvents = 'auto';
     this.tooltipEl.innerHTML = contentHtml;
     this.tooltipEl.style.display = 'block';
     this.positionTooltip(targetEl);
@@ -6044,9 +6136,130 @@ const MindMapView = {
   },
 
   hideTooltip() {
+    this.cancelHideTooltip();
+    this.cancelHideSubTooltip();
     this.currentTooltipTarget = null;
     if (this.tooltipEl) {
       this.tooltipEl.style.display = 'none';
+    }
+    this.hideSubTooltip();
+  },
+
+  hideSubTooltip() {
+    this.cancelHideSubTooltip();
+    this.currentSubTooltipTarget = null;
+    if (this.subTooltipEl) {
+      this.subTooltipEl.style.display = 'none';
+    }
+  },
+
+  positionSubTooltip(targetEl) {
+    if (!this.subTooltipEl || !targetEl) return;
+    const btnRect = (typeof targetEl.getBoundingClientRect === 'function')
+      ? targetEl.getBoundingClientRect()
+      : { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
+    const mainRect = this.tooltipEl ? this.tooltipEl.getBoundingClientRect() : btnRect;
+    const subRect = this.subTooltipEl.getBoundingClientRect();
+    const subW = subRect.width || 320;
+    const subH = subRect.height || 160;
+    const padding = 16;
+
+    // Placer par défaut à droite de l'infobulle principale, aligné sur le bouton
+    let left = mainRect.right + 10;
+    if (left + subW > window.innerWidth - padding) {
+      // Si pas assez d'espace à droite, positionner à gauche de l'infobulle principale
+      left = mainRect.left - subW - 10;
+    }
+    if (left < padding) {
+      // Si l'écran est étroit, aligner sous le bouton
+      left = Math.max(padding, Math.min(window.innerWidth - subW - padding, btnRect.left));
+    }
+
+    let top = btnRect.top - 6;
+    if (top + subH > window.innerHeight - padding) {
+      top = window.innerHeight - subH - padding;
+    }
+    if (top < padding) top = padding;
+
+    this.subTooltipEl.style.left = `${Math.round(left)}px`;
+    this.subTooltipEl.style.top = `${Math.round(top)}px`;
+  },
+
+  async showSubScriptureTooltip(targetEl, ref) {
+    if (!this.subTooltipEl) {
+      this.subTooltipEl = document.createElement('div');
+      this.subTooltipEl.id = 'mm-scripture-sub-tooltip';
+      this.subTooltipEl.className = 'mm-floating-tooltip mm-scripture-sub-tooltip';
+      this.subTooltipEl.addEventListener('mouseenter', () => {
+        this.cancelHideSubTooltip();
+        this.cancelHideTooltip();
+      });
+      this.subTooltipEl.addEventListener('mouseleave', () => {
+        this.scheduleHideSubTooltip(250);
+        this.scheduleHideTooltip(350);
+      });
+      this.subTooltipEl.addEventListener('click', () => {
+        if (this.currentSubTooltipTarget) {
+          this.hideTooltip();
+          this.openScriptureRef(this.currentSubTooltipTarget);
+        }
+      });
+      document.body.appendChild(this.subTooltipEl);
+    }
+
+    this.currentSubTooltipTarget = ref;
+    const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) 
+      ? BibleReader.currentBible1 
+      : (localStorage.getItem('bible_version') || 'Segond 21');
+    const cacheKey = `${ref}_${activeBible}`.trim().toLowerCase();
+
+    const renderContent = (verseText = null, version = null) => {
+      const displayVer = version || (typeof BibleReader !== 'undefined' && typeof BibleReader.getBibleDisplayName === 'function' 
+        ? BibleReader.getBibleDisplayName(activeBible) 
+        : activeBible);
+      let html = `
+        <div class="mm-tooltip-header">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>Texte biblique (${this.escapeHtml(displayVer)})</span>
+        </div>
+        <div class="mm-tooltip-ref" style="color:var(--accent-blue,#2563eb);">${this.escapeHtml(ref)}</div>
+      `;
+      if (verseText) {
+        html += `<div class="mm-tooltip-verse-text" style="max-height:190px;overflow-y:auto;">« ${this.formatVerseText(verseText)} »</div>`;
+      } else {
+        html += `<div class="mm-tooltip-verse-text" style="color:var(--text-muted,#94a3b8);font-style:italic;">Chargement du texte biblique...</div>`;
+      }
+      html += `<div class="mm-tooltip-hint">Cliquer pour ouvrir dans le lecteur biblique</div>`;
+      return html;
+    };
+
+    if (this._verseCache && this._verseCache[cacheKey]) {
+      const cached = this._verseCache[cacheKey];
+      this.subTooltipEl.innerHTML = renderContent(cached.text, cached.version);
+      this.subTooltipEl.style.display = 'block';
+      this.positionSubTooltip(targetEl);
+      return;
+    }
+
+    this.subTooltipEl.innerHTML = renderContent();
+    this.subTooltipEl.style.display = 'block';
+    this.positionSubTooltip(targetEl);
+
+    try {
+      this._verseCache = this._verseCache || {};
+      if (typeof API !== 'undefined' && API.getVersePreview) {
+        const res = await API.getVersePreview(ref, activeBible);
+        if (res && res.success && res.text) {
+          const verName = res.version || res.bible || (typeof BibleReader !== 'undefined' && typeof BibleReader.getBibleDisplayName === 'function' ? BibleReader.getBibleDisplayName(activeBible) : activeBible);
+          this._verseCache[cacheKey] = { text: res.text, version: verName };
+          if (this.currentSubTooltipTarget === ref && this.subTooltipEl && this.subTooltipEl.style.display !== 'none') {
+            this.subTooltipEl.innerHTML = renderContent(res.text, verName);
+            this.positionSubTooltip(targetEl);
+          }
+        }
+      }
+    } catch (err) {
+      // Ignorer si la prévisualisation échoue
     }
   },
 
@@ -6129,15 +6342,18 @@ const MindMapView = {
     `;
     if (node.ref) {
       html += `
-        <div class="mm-tooltip-ref" style="margin-top:5px;font-size:11px;font-weight:700;color:var(--accent-blue,#2563eb);display:flex;align-items:center;gap:4px;">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <span>${this.escapeHtml(node.ref)}</span>
+        <div class="mm-tooltip-ref-row" style="margin-top:6px;display:flex;align-items:center;">
+          <button type="button" class="mm-tooltip-scripture-btn" data-ref="${this.escapeHtml(node.ref)}" title="Survoler pour lire le texte ou cliquer pour ouvrir dans la Bible">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <span>${this.escapeHtml(node.ref)}</span>
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:0.75;"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
       `;
     }
     if (node.note) {
       html += `
-        <div class="mm-tooltip-body" style="margin-top:6px;font-size:11.5px;line-height:1.45;max-height:120px;overflow-y:auto;border-top:1px solid rgba(148,163,184,0.2);padding-top:5px;">
+        <div class="mm-tooltip-body" style="margin-top:6px;font-size:11.5px;line-height:1.45;max-height:140px;overflow-y:auto;border-top:1px solid rgba(148,163,184,0.2);padding-top:5px;">
           ${this.escapeHtml(node.note)}
         </div>
       `;
@@ -6147,6 +6363,24 @@ const MindMapView = {
       html += `<div class="mm-tooltip-hint" style="margin-top:6px;">${hintText}</div>`;
     }
     this.showTooltip(targetEl, html);
+
+    // Attacher les interactions de survol et clic sur le bouton de référence biblique
+    const refBtn = this.tooltipEl?.querySelector('.mm-tooltip-scripture-btn');
+    if (refBtn && node.ref) {
+      refBtn.addEventListener('mouseenter', () => {
+        this.cancelHideTooltip();
+        this.cancelHideSubTooltip();
+        this.showSubScriptureTooltip(refBtn, node.ref);
+      });
+      refBtn.addEventListener('mouseleave', () => {
+        this.scheduleHideSubTooltip(350);
+      });
+      refBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.hideTooltip();
+        this.openScriptureRef(node.ref);
+      });
+    }
   },
 
   // =========================================================================
@@ -7707,6 +7941,7 @@ const MindMapView = {
     if (isRoot && this.currentNote) {
       this.currentNote.rootImageShape = shape;
     }
+    this.layoutTree();
     this.draw();
     this.syncAndAutoSave();
     const shapeLabels = {
@@ -8156,13 +8391,14 @@ const MindMapView = {
       if (isRoot) {
         // Le concept central est un médaillon (Buzan)
         if (selectedMode === 'image-only') {
-          const previewW = Math.min(170, Math.max(80, Math.round(selectedSize * 1.15)));
-          const previewH = previewW;
+          const isPill = selectedShape === 'pill';
+          const previewH = Math.min(150, Math.max(76, Math.round(selectedSize * 1.1)));
+          const previewW = isPill ? Math.round(previewH * 1.4) : previewH;
           let previewRadius = '50%';
           if (selectedShape === 'circle') previewRadius = '50%';
           else if (selectedShape === 'pill') previewRadius = `${Math.round(previewH / 2)}px`;
           else if (selectedShape === 'square') previewRadius = '8px';
-          else previewRadius = `${Math.min(32, Math.max(12, Math.round(previewW * 0.22)))}px`;
+          else previewRadius = `${Math.min(32, Math.max(12, Math.round(previewH * 0.22)))}px`;
 
           previewContainer.innerHTML = `
             <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 6px 0;">
@@ -8193,13 +8429,14 @@ const MindMapView = {
       } else {
         // Nœuds de branches
         if (selectedMode === 'image-only') {
-          const previewW = Math.min(160, Math.max(76, Math.round(selectedSize * 1.2)));
-          const previewH = previewW;
+          const isPill = selectedShape === 'pill';
+          const previewH = Math.min(140, Math.max(70, Math.round(selectedSize * 1.1)));
+          const previewW = isPill ? Math.round(previewH * 1.45) : previewH;
           let previewRadius = '14px';
           if (selectedShape === 'circle') previewRadius = '50%';
           else if (selectedShape === 'pill') previewRadius = `${Math.round(previewH / 2)}px`;
           else if (selectedShape === 'square') previewRadius = '6px';
-          else previewRadius = `${Math.min(26, Math.max(10, Math.round(previewW * 0.22)))}px`;
+          else previewRadius = `${Math.min(26, Math.max(10, Math.round(previewH * 0.22)))}px`;
 
           previewContainer.innerHTML = `
             <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0;">

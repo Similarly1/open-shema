@@ -35411,7 +35411,7 @@ body[class*="palette-dark"] .mm-prompt-textarea::-webkit-scrollbar-thumb {
   position: fixed;
   z-index: 100000;
   display: none;
-  pointer-events: none;
+  pointer-events: auto;
   max-width: 330px;
   min-width: 160px;
   background: var(--bg-card, #ffffff);
@@ -35423,6 +35423,15 @@ body[class*="palette-dark"] .mm-prompt-textarea::-webkit-scrollbar-thumb {
   line-height: 1.45;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
   animation: mmTooltipFade 0.12s ease-out;
+}
+
+/* Sous-infobulle popover spécifique pour la lecture biblique enrichie au survol */
+.mm-scripture-sub-tooltip {
+  z-index: 100010 !important;
+  max-width: 380px;
+  min-width: 240px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
 }
 
 body.theme-dark .mm-floating-tooltip,
@@ -35460,6 +35469,55 @@ body[class*="palette-dark"] .mm-tooltip-header {
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 2px;
+}
+
+/* Bouton interactif de référence biblique au sein de l'infobulle */
+.mm-tooltip-ref-row {
+  display: flex;
+  align-items: center;
+}
+
+.mm-tooltip-scripture-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--accent-blue, #2563eb);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  user-select: none;
+}
+
+.mm-tooltip-scripture-btn:hover {
+  background: var(--accent-blue, #2563eb);
+  color: #ffffff;
+  border-color: var(--accent-blue, #2563eb);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+}
+
+.mm-tooltip-scripture-btn:active {
+  transform: translateY(0);
+}
+
+body.theme-dark .mm-tooltip-scripture-btn,
+body[class*="palette-dark"] .mm-tooltip-scripture-btn {
+  background: rgba(30, 41, 59, 0.85);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+body.theme-dark .mm-tooltip-scripture-btn:hover,
+body[class*="palette-dark"] .mm-tooltip-scripture-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.55);
 }
 
 .mm-tooltip-verse-text {
