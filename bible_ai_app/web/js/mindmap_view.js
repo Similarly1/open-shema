@@ -4248,9 +4248,8 @@ const MindMapView = {
         }
         g.appendChild(text);
       } else {
-        const rootTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        rootTitle.textContent = node.text || '';
-        g.appendChild(rootTitle);
+        g.addEventListener('mouseenter', () => this.showImageOnlyTooltip(g, node));
+        g.addEventListener('mouseleave', () => this.hideTooltip());
       }
 
       // Bouton contextuel + pour ajouter un BOI (en mode édition uniquement)
@@ -4701,25 +4700,6 @@ const MindMapView = {
       if (!isImgOnly) {
         g.appendChild(text);
       } else {
-        const nodeTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        let tooltipLines = [];
-        let header = (node.text || '').toUpperCase();
-        if (node.marker) {
-          const mDef = this.MARKER_DEFS?.[node.marker];
-          const mLabel = mDef ? mDef.label : node.marker;
-          header = `[${mLabel}] ${header}`;
-        }
-        if (node.ref) {
-          header += ` (${node.ref})`;
-        }
-        tooltipLines.push(header);
-        if (node.note) {
-          tooltipLines.push('---');
-          tooltipLines.push(node.note);
-        }
-        nodeTitle.textContent = tooltipLines.join('\n');
-        g.appendChild(nodeTitle);
-
         hitRect.addEventListener('mouseenter', () => this.showImageOnlyTooltip(g, node));
         hitRect.addEventListener('mouseleave', () => this.hideTooltip());
       }
