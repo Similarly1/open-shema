@@ -57,6 +57,15 @@ const NotesView = {
       this.createNewMindMap();
     });
 
+    document.getElementById('btn-toggle-notes-sidebar')?.addEventListener('click', () => {
+      const layout = document.querySelector('.notes-workspace-layout');
+      if (layout) {
+        layout.classList.toggle('notes-sidebar-collapsed');
+        delete layout.dataset.autoCollapsedByMindmap;
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 250);
+      }
+    });
+
     document.getElementById('btn-toggle-mindmap-mode')?.addEventListener('click', () => {
       if (typeof MindMapView !== 'undefined') {
         MindMapView.toggleViewMode();
@@ -1946,8 +1955,9 @@ const NotesView = {
       this.previewContainer?.classList.add('hidden');
       previewBtn?.classList.add('hidden');
       toggleModeBtn?.classList.remove('hidden');
-      exportDropdownWrap?.classList.remove('hidden');
-      toggleFullscreenBtn?.classList.remove('hidden');
+      // Export et Plein écran sont directement dans le dock flottant inférieur pour éviter tout doublon
+      exportDropdownWrap?.classList.add('hidden');
+      toggleFullscreenBtn?.classList.add('hidden');
 
       if (mmContainer) {
         mmContainer.classList.remove('hidden');
@@ -1960,6 +1970,15 @@ const NotesView = {
       toggleModeBtn?.classList.add('hidden');
       exportDropdownWrap?.classList.add('hidden');
       toggleFullscreenBtn?.classList.add('hidden');
+      // Restaurer les volets si repliés automatiquement par la carte mentale
+      const notesLayout = document.querySelector('.notes-workspace-layout');
+      if (notesLayout?.dataset.autoCollapsedByMindmap === 'true') {
+        notesLayout.classList.remove('notes-sidebar-collapsed');
+        delete notesLayout.dataset.autoCollapsedByMindmap;
+      }
+      if (typeof App !== 'undefined' && App.sidebarAutoCollapsed) {
+        App.setSidebarCollapsed(false, true);
+      }
       if (typeof MindMapView !== 'undefined') {
         MindMapView.closeExportDropdown();
         if (document.body.classList.contains('mindmap-fullscreen-active')) {

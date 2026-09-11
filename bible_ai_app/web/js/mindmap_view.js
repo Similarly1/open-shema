@@ -180,7 +180,7 @@ const MindMapView = {
           <div class="mm-dock-group" data-group="structure">
             <button type="button" class="mm-dock-btn" id="mm-btn-toggle-outline" data-tooltip-title="Vue Plan hiérarchique" data-tooltip-kbd="Alt+P">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              <span class="mm-dock-label">Vue Plan</span>
+              <span class="mm-dock-label">Plan</span>
             </button>
             <button type="button" class="mm-dock-btn" id="mm-btn-structure" data-tooltip-title="Squelette de mise en page" data-tooltip-kbd="Alt+S">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
@@ -224,11 +224,9 @@ const MindMapView = {
           <div class="mm-dock-group" data-group="navigation">
             <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" data-tooltip-title="Zoom avant" data-tooltip-kbd="Ctrl +">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span class="mm-dock-label">Zoom +</span>
             </button>
             <button type="button" class="mm-dock-btn" id="mm-btn-zoom-out" data-tooltip-title="Zoom arrière" data-tooltip-kbd="Ctrl -">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span class="mm-dock-label">Zoom -</span>
             </button>
             <button type="button" class="mm-dock-btn" id="mm-btn-fit" data-tooltip-title="Recentrer et ajuster la carte" data-tooltip-kbd="R">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
@@ -250,7 +248,7 @@ const MindMapView = {
             </button>
             <button type="button" class="mm-dock-btn" id="mm-btn-export" data-tooltip-title="Exporter (PDF, PNG, JPG)" data-tooltip-kbd="Ctrl+E">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span class="mm-dock-label">Exporter</span>
+              <span class="mm-dock-label">Export</span>
             </button>
             <button type="button" class="mm-dock-btn" id="mm-btn-fullscreen" data-tooltip-title="Mode Plein Écran" data-tooltip-kbd="F11 / F">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
@@ -438,47 +436,51 @@ const MindMapView = {
           </div>
         </div>
 
-        <!-- Tiroir d'aide aux raccourcis clavier -->
-        <div class="mindmap-help-drawer hidden" id="mindmap-help-drawer">
-          <div class="mm-help-header">
-            <div class="mm-help-title">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              <span>Guide Raccourcis — Mind Map Buzan</span>
+        <!-- Modale d'aide aux raccourcis clavier centrée (remplace l'ancien tiroir) -->
+        <div class="mm-help-overlay hidden" id="mm-help-overlay">
+          <div class="mindmap-help-drawer mm-help-modal" id="mindmap-help-drawer" role="dialog" aria-modal="true" aria-labelledby="mm-help-title-text">
+            <div class="mm-help-header">
+              <div class="mm-help-title" id="mm-help-title-text">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Guide des raccourcis & Gestes Mind Map</span>
+              </div>
+              <button type="button" class="btn-icon-subtle mm-help-close-btn" id="mm-btn-close-help" title="Fermer (Échap)">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
-            <button type="button" class="btn-icon-subtle" id="mm-btn-close-help">×</button>
-          </div>
-          <div class="mm-help-content">
-            <table class="mm-help-table">
-              <tr><td><kbd>1</kbd> à <kbd>9</kbd></td><td><strong>Numéroter / Marquer la branche</strong></td></tr>
-              <tr><td><kbd>0</kbd></td><td><strong>Effacer le marqueur de branche</strong></td></tr>
-              <tr><td><kbd>M</kbd></td><td><strong>Ouvrir le menu des marqueurs & priorités</strong></td></tr>
-              <tr><td><kbd>Alt+P</kbd></td><td><strong>Basculer entre Vue Carte et Vue Plan</strong></td></tr>
-              <tr><td><kbd>Alt+S</kbd></td><td><strong>Changer de squelette de mise en page</strong></td></tr>
-              <tr><td><kbd>Alt+T</kbd></td><td><strong>Styles de connecteurs & formes de nœuds</strong></td></tr>
-              <tr><td><kbd>Alt+R</kbd></td><td><strong>Réorganiser harmonieusement la carte</strong></td></tr>
-              <tr><td><kbd>Ctrl+L</kbd></td><td><strong>Créer une liaison transversale (Relation)</strong></td></tr>
-              <tr><td><kbd>Ctrl+B</kbd></td><td><strong>Créer un enclos / clôture sur la branche</strong></td></tr>
-              <tr><td><kbd>Ctrl+E</kbd></td><td><strong>Exporter la carte (PDF, PNG, JPG)</strong></td></tr>
-              <tr><td><kbd>Alt+F</kbd> ou <em>Double-clic</em></td><td><strong>Créer un sujet flottant indépendant</strong></td></tr>
-              <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
-              <tr><td><kbd>Entrée</kbd></td><td>Ajouter une branche voisine (Sœur)</td></tr>
-              <tr><td><kbd>Espace</kbd> ou <em>Double-clic</em></td><td>Modifier le mot-clé</td></tr>
-              <tr><td><kbd>F4</kbd></td><td>Ajouter / Modifier la note de branche</td></tr>
-              <tr><td><kbd>Suppr</kbd> / <kbd>Retour</kbd></td><td>Supprimer la branche, enclos ou liaison sélectionnée</td></tr>
-              <tr><td><kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd></td><td>Copier / Coller une branche</td></tr>
-              <tr><td><em>Clic Droit</em></td><td>Menu contextuel complet (branche ou fond)</td></tr>
-              <tr><td><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></td><td>Naviguer d'une branche à l'autre</td></tr>
-              <tr><td><kbd>Ctrl + Molette</kbd></td><td>Zoomer / Dézoomer</td></tr>
-              <tr><td><em>Clic-glissé fond</em></td><td>Déplacer la feuille (Panoramique)</td></tr>
-              <tr><td><kbd>R</kbd></td><td>Recentrer la vue</td></tr>
-              <tr><td><kbd>?</kbd></td><td>Afficher / Masquer cette aide</td></tr>
-            </table>
-            <div class="mm-help-tip">
-              <strong>Astuce 100% Souris :</strong> Clic droit sur n'importe quel élément pour afficher toutes les options contextuelles, ou survolez une branche pour faire apparaître <span class="badge-mini">+</span> et <span class="badge-mini">×</span>.
+            <div class="mm-help-content mm-help-body">
+              <table class="mm-help-table">
+                <tr><td><kbd>1</kbd> à <kbd>9</kbd></td><td><strong>Numéroter / Marquer la branche</strong></td></tr>
+                <tr><td><kbd>0</kbd></td><td><strong>Effacer le marqueur de branche</strong></td></tr>
+                <tr><td><kbd>M</kbd></td><td><strong>Ouvrir le menu des marqueurs & priorités</strong></td></tr>
+                <tr><td><kbd>Alt+P</kbd></td><td><strong>Basculer entre Vue Carte et Vue Plan</strong></td></tr>
+                <tr><td><kbd>Alt+S</kbd></td><td><strong>Changer de squelette de mise en page</strong></td></tr>
+                <tr><td><kbd>Alt+T</kbd></td><td><strong>Styles de connecteurs & formes de nœuds</strong></td></tr>
+                <tr><td><kbd>Alt+R</kbd></td><td><strong>Réorganiser harmonieusement la carte</strong></td></tr>
+                <tr><td><kbd>Ctrl+L</kbd></td><td><strong>Créer une liaison transversale (Relation)</strong></td></tr>
+                <tr><td><kbd>Ctrl+B</kbd></td><td><strong>Créer un enclos / clôture sur la branche</strong></td></tr>
+                <tr><td><kbd>Ctrl+E</kbd></td><td><strong>Exporter la carte (PDF, PNG, JPG)</strong></td></tr>
+                <tr><td><kbd>Alt+F</kbd> ou <em>Double-clic</em></td><td><strong>Créer un sujet flottant indépendant</strong></td></tr>
+                <tr><td><kbd>Tab</kbd></td><td>Ajouter une sous-branche (Enfant)</td></tr>
+                <tr><td><kbd>Entrée</kbd></td><td>Ajouter une branche voisine (Sœur)</td></tr>
+                <tr><td><kbd>Espace</kbd> ou <em>Double-clic</em></td><td>Modifier le mot-clé</td></tr>
+                <tr><td><kbd>F4</kbd></td><td>Ajouter / Modifier la note de branche</td></tr>
+                <tr><td><kbd>Suppr</kbd> / <kbd>Retour</kbd></td><td>Supprimer la branche, enclos ou liaison sélectionnée</td></tr>
+                <tr><td><kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd></td><td>Copier / Coller une branche</td></tr>
+                <tr><td><em>Clic Droit</em></td><td>Menu contextuel complet (branche ou fond)</td></tr>
+                <tr><td><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></td><td>Naviguer d'une branche à l'autre</td></tr>
+                <tr><td><kbd>Ctrl + Molette</kbd></td><td>Zoomer / Dézoomer</td></tr>
+                <tr><td><em>Clic-glissé fond</em></td><td>Déplacer la feuille (Panoramique)</td></tr>
+                <tr><td><kbd>R</kbd></td><td>Recentrer la vue</td></tr>
+                <tr><td><kbd>?</kbd></td><td>Afficher / Masquer cette aide</td></tr>
+              </table>
+              <div class="mm-help-tip">
+                <strong>Astuce 100% Souris :</strong> Clic droit sur n'importe quel élément pour afficher toutes les options contextuelles, ou survolez une branche pour faire apparaître <span class="badge-mini">+</span> et <span class="badge-mini">×</span>.
+              </div>
             </div>
-            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 11.5px; color: var(--text-muted);">Spécification Markdown (.md)</span>
-              <button type="button" class="btn-secondary" id="mm-btn-open-markdown-guide" style="font-size: 11px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 5px;">
+            <div class="mm-help-footer">
+              <span class="mm-help-footer-sub">Spécification Markdown (.md)</span>
+              <button type="button" class="btn-secondary" id="mm-btn-open-markdown-guide" style="font-size: 11.5px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 6px;">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <span>Guide Markdown</span>
               </button>
@@ -735,6 +737,11 @@ const MindMapView = {
     });
     document.getElementById('mm-btn-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(); });
     document.getElementById('mm-btn-close-help')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleHelpDrawer(false); });
+    document.getElementById('mm-help-overlay')?.addEventListener('click', (e) => {
+      if (e.target.id === 'mm-help-overlay') {
+        this.toggleHelpDrawer(false);
+      }
+    });
     document.getElementById('mm-btn-open-markdown-guide')?.addEventListener('click', (e) => {
       e.currentTarget?.blur();
       this.toggleHelpDrawer(false);
@@ -1085,6 +1092,12 @@ const MindMapView = {
       } else if (e.key === 'r' || e.key === 'R') {
         this.fitView();
       } else if (e.key === 'Escape') {
+        const helpOverlay = document.getElementById('mm-help-overlay');
+        if (helpOverlay && !helpOverlay.classList.contains('hidden')) {
+          e.preventDefault();
+          this.toggleHelpDrawer(false);
+          return;
+        }
         if (document.body.classList.contains('mindmap-fullscreen-active')) {
           e.preventDefault();
           this.toggleFullscreen(false);
@@ -2542,9 +2555,34 @@ const MindMapView = {
       toggleBtn.setAttribute('data-tooltip-title', newState ? 'Réduire le bandeau' : 'Développer avec libellés');
     }
 
+    // Repli / Dépli automatique des volets gauche (Menu principal & Liste des notes)
+    const notesLayout = document.querySelector('.notes-workspace-layout');
+    if (newState) {
+      if (typeof App !== 'undefined' && App.setSidebarCollapsed) {
+        App.setSidebarCollapsed(true, true);
+      }
+      if (notesLayout && !notesLayout.classList.contains('notes-sidebar-collapsed')) {
+        notesLayout.classList.add('notes-sidebar-collapsed');
+        notesLayout.dataset.autoCollapsedByMindmap = 'true';
+      }
+    } else {
+      if (typeof App !== 'undefined' && App.setSidebarCollapsed && App.sidebarAutoCollapsed) {
+        App.setSidebarCollapsed(false, true);
+      }
+      if (notesLayout && notesLayout.dataset.autoCollapsedByMindmap === 'true') {
+        notesLayout.classList.remove('notes-sidebar-collapsed');
+        delete notesLayout.dataset.autoCollapsedByMindmap;
+      }
+    }
+
     try {
       localStorage.setItem('mm_dock_expanded', newState ? 'true' : 'false');
     } catch (e) {}
+
+    // Notifier le redimensionnement pour recentrer et ajuster la carte
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 250);
   },
 
   initDockTooltips() {
@@ -2675,11 +2713,11 @@ const MindMapView = {
     if (dockBtn) {
       dockBtn.title = isOutline ? 'Basculer en Vue Carte (Alt+P)' : 'Basculer en Vue Plan (Alt+P)';
       dockBtn.classList.toggle('active', isOutline);
-      dockBtn.innerHTML = isOutline ? `
+      dockBtn.innerHTML = (isOutline ? `
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-2 7.5A4 4 0 0 0 8 22h8a4 4 0 0 0 2-7.5A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4Z"/><path d="M12 2v20"/><path d="M8 8h8"/><path d="M7 14h10"/></svg>
       ` : `
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      `;
+      `) + `<span class="mm-dock-label">${isOutline ? 'Carte' : 'Plan'}</span>`;
     }
   },
 
@@ -5685,13 +5723,14 @@ const MindMapView = {
   },
 
   toggleHelpDrawer(force = null) {
+    const overlay = document.getElementById('mm-help-overlay');
     const drawer = document.getElementById('mindmap-help-drawer');
-    if (!drawer) return;
-    if (force !== null) {
-      drawer.classList.toggle('hidden', !force);
-    } else {
-      drawer.classList.toggle('hidden');
-    }
+    const target = overlay || drawer;
+    if (!target) return;
+    const isHidden = target.classList.contains('hidden');
+    const shouldOpen = force !== null ? !!force : isHidden;
+    if (overlay) overlay.classList.toggle('hidden', !shouldOpen);
+    if (drawer && drawer !== overlay) drawer.classList.toggle('hidden', !shouldOpen);
   },
 
   openScriptureRef(ref) {
@@ -6984,7 +7023,7 @@ const MindMapView = {
     // 1. Bouton du dock flottant
     const dockBtn = document.getElementById('mm-btn-structure');
     if (dockBtn) {
-      dockBtn.innerHTML = this.STRUCTURE_ICONS[struct] || this.STRUCTURE_ICONS.radiant;
+      dockBtn.innerHTML = (this.STRUCTURE_ICONS[struct] || this.STRUCTURE_ICONS.radiant) + '<span class="mm-dock-label">Structure</span>';
       const labels = {
         'radiant': 'Squelette : Pensée radiante (Alt+S)',
         'right-tree': 'Squelette : Arbre logique à droite (Alt+S)',
@@ -9622,7 +9661,7 @@ const MindMapView = {
     if (dockBtn) {
       dockBtn.classList.toggle('active', isActive);
       dockBtn.title = isActive ? 'Quitter le plein écran (Échap ou F11)' : 'Mode Plein Écran (F11 ou F)';
-      dockBtn.innerHTML = isActive ? `
+      dockBtn.innerHTML = (isActive ? `
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/>
         </svg>
@@ -9630,7 +9669,7 @@ const MindMapView = {
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
         </svg>
-      `;
+      `) + '<span class="mm-dock-label">Plein écran</span>';
     }
   }
 };
