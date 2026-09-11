@@ -6164,19 +6164,27 @@ const MindMapView = {
     const tooltipRect = this.tooltipEl.getBoundingClientRect();
     const tooltipW = tooltipRect.width || 330;
     const tooltipH = tooltipRect.height || 140;
+    const padding = 16;
 
     // Centrage horizontal fixe sur l'élément survolé
     let left = rect.left + (rect.width / 2) - (tooltipW / 2);
-    const padding = 16;
     if (left < padding) left = padding;
     if (left + tooltipW > window.innerWidth - padding) {
       left = window.innerWidth - tooltipW - padding;
     }
 
-    // Position fixe au-dessus de l'élément (ou en dessous si manque d'espace en haut)
-    let top = rect.top - tooltipH - 6;
+    // Ancre verticale : on utilise le centre de l'élément comme référence,
+    // puis on place l'infobulle juste au-dessus (ou en dessous si pas de place).
+    // Cela évite que les grands groupes SVG fassent monter l'infobulle trop haut.
+    const centerY = rect.top + rect.height / 2;
+    const gap = 6;
+    let top = centerY - tooltipH - gap;
     if (top < padding) {
-      top = rect.bottom + 6;
+      top = centerY + gap;
+    }
+    // Si ça déborde en bas, coller au-dessus du bord visible
+    if (top + tooltipH > window.innerHeight - padding) {
+      top = window.innerHeight - tooltipH - padding;
     }
 
     this.tooltipEl.style.left = `${Math.round(left)}px`;
