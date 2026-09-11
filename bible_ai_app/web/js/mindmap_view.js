@@ -7492,7 +7492,7 @@ const MindMapView = {
             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span>Moteur : Infomaniak Flux (&lt; 3s)</span>
           </span>
-          <button type="button" class="btn-primary" id="mm-img-btn-generate" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700;">
+          <button type="button" class="btn-primary" id="mm-img-btn-generate" disabled style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; opacity: 0.5; cursor: not-allowed;">
             <span id="mm-img-gen-icon" style="display: inline-flex; align-items: center;">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/></svg>
             </span>
@@ -7760,7 +7760,22 @@ const MindMapView = {
         charCountEl.style.color = len > 360 ? '#f59e0b' : (len >= 390 ? '#ef4444' : 'var(--text-secondary)');
       }
     };
-    promptTextarea.addEventListener('input', updateCharCount);
+
+    const updateGenerateBtnState = () => {
+      if (!btnGen) return;
+      const val = (promptTextarea.value || '').trim();
+      const isLoadingPrompt = promptTextarea.disabled;
+      const isGenerating = btnGen.dataset.generating === 'true';
+      const isValid = val.length > 0 && val.length <= 390 && !isLoadingPrompt && !isGenerating;
+      btnGen.disabled = !isValid;
+      btnGen.style.opacity = isValid ? '1' : '0.5';
+      btnGen.style.cursor = isValid ? 'pointer' : 'not-allowed';
+    };
+
+    promptTextarea.addEventListener('input', () => {
+      updateCharCount();
+      updateGenerateBtnState();
+    });
 
     const closeDialog = () => {
       window.removeEventListener('mousemove', onGlobalMouseMove);
@@ -7849,38 +7864,50 @@ const MindMapView = {
     // Chargement automatique du prompt artistique
     const loadSuggestedPrompt = async () => {
       promptTextarea.disabled = true;
+      if (btnRegen) {
+        btnRegen.disabled = true;
+        btnRegen.style.opacity = '0.5';
+        btnRegen.style.cursor = 'not-allowed';
+      }
+      updateGenerateBtnState();
       statusSpan.textContent = 'Synthèse du prompt artistique contextuel...';
-      if (window.pywebview && window.pywebview.api && window.pywebview.api.get_suggested_image_prompt) {
-        try {
-          const res = await window.pywebview.api.get_suggested_image_prompt(
-            nodeText,
-            this.tree?.text || '',
-            node.parent?.text || '',
-            node.ref || '',
-            selectedStyle
-          );
-          if (res && res.success && res.prompt) {
-            let p = res.prompt.trim();
-            if (p.length > 390) p = p.slice(0, 390);
-            promptTextarea.value = p;
-            updateCharCount();
-            statusSpan.textContent = 'Prêt pour génération Flux';
-          } else {
+      try {
+        if (window.pywebview && window.pywebview.api && window.pywebview.api.get_suggested_image_prompt) {
+          try {
+            const res = await window.pywebview.api.get_suggested_image_prompt(
+              nodeText,
+              this.tree?.text || '',
+              node.parent?.text || '',
+              node.ref || '',
+              selectedStyle
+            );
+            if (res && res.success && res.prompt) {
+              let p = res.prompt.trim();
+              if (p.length > 390) p = p.slice(0, 390);
+              promptTextarea.value = p;
+              statusSpan.textContent = 'Prêt pour génération Flux';
+            } else {
+              promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art`;
+              statusSpan.textContent = 'Prêt pour génération';
+            }
+          } catch (e) {
             promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art`;
-            updateCharCount();
             statusSpan.textContent = 'Prêt pour génération';
           }
-        } catch (e) {
+        } else {
           promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art`;
-          updateCharCount();
           statusSpan.textContent = 'Prêt pour génération';
         }
-      } else {
-        promptTextarea.value = `Evocative sacred scene of ${nodeText}, dramatic lighting, fine art`;
+      } finally {
+        promptTextarea.disabled = false;
+        if (btnRegen) {
+          btnRegen.disabled = false;
+          btnRegen.style.opacity = '1';
+          btnRegen.style.cursor = 'pointer';
+        }
         updateCharCount();
-        statusSpan.textContent = 'Prêt pour génération';
+        updateGenerateBtnState();
       }
-      promptTextarea.disabled = false;
     };
 
     btnRegen?.addEventListener('click', () => loadSuggestedPrompt());
@@ -7888,15 +7915,15 @@ const MindMapView = {
     // Génération avec Infomaniak Flux
     btnGen?.addEventListener('click', async () => {
       let prompt = promptTextarea.value.trim();
-      if (!prompt) return;
+      if (!prompt || btnGen.disabled) return;
       if (prompt.length > 390) {
         prompt = prompt.slice(0, 390);
         promptTextarea.value = prompt;
         updateCharCount();
       }
 
-      btnGen.disabled = true;
-      btnGen.style.opacity = '0.6';
+      btnGen.dataset.generating = 'true';
+      updateGenerateBtnState();
       overlay.querySelector('#mm-img-gen-icon').innerHTML = '<span style="display:inline-block; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:mmSpin 0.7s linear infinite;"></span>';
       overlay.querySelector('#mm-img-gen-label').textContent = 'Génération en cours...';
       statusSpan.textContent = 'Infomaniak Flux génère votre illustration...';
@@ -7932,8 +7959,8 @@ const MindMapView = {
         statusSpan.textContent = `Erreur : ${ex.message || ex}`;
         previewContainer.innerHTML = `<div style="color: #ef4444; font-size: 12px; text-align: center; padding: 10px;">${this.escapeHtml(String(ex))}</div>`;
       } finally {
-        btnGen.disabled = false;
-        btnGen.style.opacity = '1';
+        delete btnGen.dataset.generating;
+        updateGenerateBtnState();
         overlay.querySelector('#mm-img-gen-icon').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"/></svg>';
         overlay.querySelector('#mm-img-gen-label').textContent = 'Régénérer avec Flux';
       }
