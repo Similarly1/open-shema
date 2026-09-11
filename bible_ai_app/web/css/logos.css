@@ -37690,9 +37690,10 @@ body[class*="palette-dark"] .mm-marker-clear-btn:hover {
 
 .mm-node-marker-badge circle,
 .mm-node-marker-badge rect {
-  transition: transform 0.15s ease, filter 0.15s ease;
+  transition: filter 0.15s ease;
   transform-box: fill-box;
   transform-origin: center;
+  animation: none;
 }
 
 /* Scintillement rapide droite→gauche au survol du badge marqueur */

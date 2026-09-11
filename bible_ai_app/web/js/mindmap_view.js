@@ -3258,9 +3258,12 @@ const MindMapView = {
       });
       pill.addEventListener('mouseenter', () => {
         this.cancelHideTooltip();
-        this.showScriptureTooltip(pill, ref);
+        this.scheduleShowTooltip(() => this.showScriptureTooltip(pill, ref), 300);
       });
-      pill.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
+      pill.addEventListener('mouseleave', () => {
+        this.cancelShowTooltip();
+        this.scheduleHideTooltip(350);
+      });
     });
   },
 
@@ -4903,9 +4906,12 @@ const MindMapView = {
 
         refG.addEventListener('mouseenter', () => {
           this.cancelHideTooltip();
-          this.showScriptureTooltip(refG, node.ref);
+          this.scheduleShowTooltip(() => this.showScriptureTooltip(refG, node.ref), 300);
         });
-        refG.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
+        refG.addEventListener('mouseleave', () => {
+          this.cancelShowTooltip();
+          this.scheduleHideTooltip(350);
+        });
 
         refG.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -4942,9 +4948,12 @@ const MindMapView = {
 
         noteG.addEventListener('mouseenter', () => {
           this.cancelHideTooltip();
-          this.showNoteTooltip(noteG, node.note);
+          this.scheduleShowTooltip(() => this.showNoteTooltip(noteG, node.note), 300);
         });
-        noteG.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
+        noteG.addEventListener('mouseleave', () => {
+          this.cancelShowTooltip();
+          this.scheduleHideTooltip(350);
+        });
 
         noteG.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -6090,11 +6099,20 @@ const MindMapView = {
     }
   },
 
-  scheduleShowTooltip(targetEl, node, delay = 400) {
+  // Planifie l'affichage d'une infobulle après un court délai (évite les survols fugaces)
+  // callback : fonction sans argument appelée après le délai
+  // Pour image-only : scheduleShowTooltip(() => this.showImageOnlyTooltip(g, node))
+  scheduleShowTooltip(callbackOrTargetEl, nodeOrDelay = null, delay = 400) {
     this.cancelShowTooltip();
-    this._showTooltipTimer = setTimeout(() => {
-      this.showImageOnlyTooltip(targetEl, node);
-    }, delay);
+    // Compatibilité rétro : si le premier arg est une fonction, l'appeler directement
+    if (typeof callbackOrTargetEl === 'function') {
+      this._showTooltipTimer = setTimeout(callbackOrTargetEl, nodeOrDelay || 400);
+    } else {
+      // Ancien appel : (targetEl, node, delay)
+      this._showTooltipTimer = setTimeout(() => {
+        this.showImageOnlyTooltip(callbackOrTargetEl, nodeOrDelay);
+      }, delay);
+    }
   },
 
   cancelShowTooltip() {
