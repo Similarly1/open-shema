@@ -34119,6 +34119,27 @@ body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-root-re
   filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.28));
 }
 
+/* Mode Image Seule (Camée épuré Buzan) : Masquer l'indicateur de repli au repos sauf s'il est replié */
+.mm-node-g.mm-node-img-only .mm-fold-indicator:not(.is-folded) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mm-node-g.mm-node-img-only:hover .mm-fold-indicator,
+.mm-node-g.mm-node-img-only.selected .mm-fold-indicator {
+  opacity: 1 !important;
+  pointer-events: all !important;
+}
+
+/* Badge timbre d'angle Polaroid (Mode top-image) */
+.mm-corner-marker {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mm-corner-marker:hover {
+  transform: scale(1.12);
+}
+
 .mm-branch-text {
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
   font-size: 11.5px;

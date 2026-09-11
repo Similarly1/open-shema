@@ -2056,9 +2056,10 @@ const MindMapView = {
         }
 
         if (hasImg && imgMode === 'top-image') {
-          node.contentWidth = textW;
-          node.width = Math.max(88, textW + 26);
-          node.height = 66;
+          const footerContentW = textW + (node.ref ? refW : 0) + (node.note ? noteW : 0);
+          node.contentWidth = footerContentW;
+          node.width = Math.max(104, footerContentW + 26);
+          node.height = 76; // 46px topImg + 30px footer
         } else {
           node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
           node.width = Math.max(92, node.contentWidth + 32);
@@ -2135,9 +2136,10 @@ const MindMapView = {
         }
 
         if (hasImg && imgMode === 'top-image') {
-          node.contentWidth = textW;
-          node.width = Math.max(92, textW + 28);
-          node.height = 70;
+          const footerContentW = textW + (node.ref ? refW : 0) + (node.note ? noteW : 0);
+          node.contentWidth = footerContentW;
+          node.width = Math.max(120, footerContentW + 28);
+          node.height = 82; // 52px topImg + 30px footer
         } else {
           node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
           const minW = node.image ? 116 : 96;
@@ -2188,9 +2190,10 @@ const MindMapView = {
         }
 
         if (hasImg && imgMode === 'top-image') {
-          node.contentWidth = textW;
-          node.width = Math.max(82, textW + 24);
-          node.height = 62;
+          const footerContentW = textW + (node.ref ? refW : 0) + (node.note ? noteW : 0);
+          node.contentWidth = footerContentW;
+          node.width = Math.max(100, footerContentW + 26);
+          node.height = 72; // 44px topImg + 28px footer
         } else {
           node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
           const minW = node.image ? 104 : 82;
@@ -2241,9 +2244,10 @@ const MindMapView = {
         }
 
         if (hasImg && imgMode === 'top-image') {
-          node.contentWidth = textW;
-          node.width = Math.max(76, textW + 22);
-          node.height = 58;
+          const footerContentW = textW + (node.ref ? refW : 0) + (node.note ? noteW : 0);
+          node.contentWidth = footerContentW;
+          node.width = Math.max(88, footerContentW + 24);
+          node.height = 64; // 38px topImg + 26px footer
         } else {
           node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
           const minW = node.image ? 96 : 68;
@@ -2345,9 +2349,16 @@ const MindMapView = {
           node.notePillWidth = 0;
         }
 
-        node.contentWidth = markerW + textW + refW + noteW;
-        node.width = Math.max(96, node.contentWidth + 36);
-        node.height = 36;
+        if (hasImg && imgMode === 'top-image') {
+          const footerContentW = textW + (node.ref ? refW : 0) + (node.note ? noteW : 0);
+          node.contentWidth = footerContentW;
+          node.width = Math.max(120, footerContentW + 28);
+          node.height = 82; // 52px topImg + 30px footer
+        } else {
+          node.contentWidth = markerW + textW + refW + noteW;
+          node.width = Math.max(96, node.contentWidth + 36);
+          node.height = 36;
+        }
       }
     } else if (node.level === 2) {
       if (hasImg && imgMode === 'image-only') {
@@ -2390,9 +2401,16 @@ const MindMapView = {
           node.notePillWidth = 0;
         }
 
-        node.contentWidth = markerW + textW + refW + noteW;
-        node.width = Math.max(82, node.contentWidth + 30);
-        node.height = 28;
+        if (hasImg && imgMode === 'top-image') {
+          const footerContentW = textW + (node.ref ? refW : 0) + (node.note ? noteW : 0);
+          node.contentWidth = footerContentW;
+          node.width = Math.max(100, footerContentW + 26);
+          node.height = 72; // 44px topImg + 28px footer
+        } else {
+          node.contentWidth = markerW + textW + refW + noteW;
+          node.width = Math.max(82, node.contentWidth + 30);
+          node.height = 28;
+        }
       }
     } else {
       if (hasImg && imgMode === 'image-only') {
@@ -2438,9 +2456,16 @@ const MindMapView = {
         const iconW = node.icon ? 20 : 0;
         node.iconWidth = iconW;
 
-        node.contentWidth = markerW + iconW + textW + refW + noteW;
-        node.width = Math.max(68, node.contentWidth + 26);
-        node.height = 24;
+        if (hasImg && imgMode === 'top-image') {
+          const footerContentW = textW + (node.ref ? refW : 0) + (node.note ? noteW : 0);
+          node.contentWidth = footerContentW;
+          node.width = Math.max(88, footerContentW + 24);
+          node.height = 64; // 38px topImg + 26px footer
+        } else {
+          node.contentWidth = markerW + iconW + textW + refW + noteW;
+          node.width = Math.max(68, node.contentWidth + 26);
+          node.height = 24;
+        }
       }
     }
 
@@ -3544,6 +3569,9 @@ const MindMapView = {
     const totalChildren = node.children.length;
 
     node.children.forEach(child => {
+      const nodeIsBox = isBox || !!node.image || !!node.isFloating;
+      const childIsBox = isBox || !!child.image || !!child.isFloating;
+
       if (this.treeStructure === 'top-down') {
         const rootR = node.rootRadius || (Math.max(node.width || 100, node.height || 100) / 2);
         let x1 = node.x;
@@ -3559,11 +3587,11 @@ const MindMapView = {
         } else if (isRoot) {
           y1 = node.y + rootR;
         } else {
-          y1 = isBox ? node.y + (node.height || 28) / 2 : node.y + 10;
+          y1 = nodeIsBox ? node.y + (node.height || 28) / 2 : node.y + 10;
         }
 
         const x2 = child.x;
-        const y2 = isBox ? child.y - (child.height || 28) / 2 : child.y + 10;
+        const y2 = childIsBox ? child.y - (child.height || 28) / 2 : child.y + 10;
 
         // Règles de BUZAN : hiérarchie visuelle forte (niveau 1 plus gros, s'affinant ensuite)
         let strokeWidth;
@@ -3666,7 +3694,7 @@ const MindMapView = {
         path.classList.add('mm-branch-path');
         this.viewportG.appendChild(path);
 
-        if (!isBox) {
+        if (!childIsBox) {
           // Trait de soulignement sous le mot (centré horizontalement sous le mot-clé)
           const underX1 = child.x - child.width / 2;
           const underX2 = child.x + child.width / 2;
@@ -3713,11 +3741,11 @@ const MindMapView = {
           }
         } else {
           x1 = childSide === 'right' ? node.x + node.width / 2 : node.x - node.width / 2;
-          y1 = isBox ? node.y : node.y + 10;
+          y1 = nodeIsBox ? node.y : node.y + 10;
         }
 
         const x2 = childSide === 'right' ? child.x - child.width / 2 : child.x + child.width / 2;
-        const y2 = isBox ? child.y : child.y + 10;
+        const y2 = childIsBox ? child.y : child.y + 10;
 
         // Finesse élégante et hiérarchie visuelle (affinement des liaisons vers le sujet central)
         let strokeWidth;
@@ -3843,7 +3871,7 @@ const MindMapView = {
         path.classList.add('mm-branch-path');
         this.viewportG.appendChild(path);
 
-        if (!isBox) {
+        if (!childIsBox) {
           // Branche organique continue : courbe de Bézier du point d'arrivée jusqu'au bout du texte
           // (Loi Buzan 7 : longueur branche = exactement le mot-clé, pas de trait rigide)
           const underX2 = childSide === 'right' ? child.x + child.width / 2 : child.x - child.width / 2;
@@ -3875,10 +3903,13 @@ const MindMapView = {
     const isTopDown = this.treeStructure === 'top-down';
     const isLvl1 = node.level === 1;
     const isLvl2 = node.level === 2;
-    // isBox et effectiveIsBox déclarés ici pour être accessibles dans tout drawNodes (y compris fold indicator)
+    // isBox, effectiveIsBox, isImgOnly et isTopImage déclarés ici pour être accessibles dans tout drawNodes (y compris fold indicator)
     const isBox = node.isFloating || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
     const hasImage = !!node.image;
     const effectiveIsBox = isBox || hasImage;
+    const imgMode = node.imageMode || 'background';
+    const isImgOnly = hasImage && imgMode === 'image-only';
+    const isTopImage = hasImage && imgMode === 'top-image';
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('class', `mm-node-g mm-level-${node.level} ${isRoot ? 'mm-root-node' : ''} ${isFloatingRoot ? 'mm-floating-node' : ''} ${isSelected ? 'selected' : ''} ${isConnectingSource ? 'connecting-source' : ''}`);
@@ -4233,10 +4264,11 @@ const MindMapView = {
       }
 
     } else {
-      const imgMode = node.imageMode || 'background';
-      const isImgOnly = hasImage && imgMode === 'image-only';
-      const isTopImage = hasImage && imgMode === 'top-image';
-      const topImgH = isTopImage ? (isLvl1 ? 42 : (isLvl2 ? 36 : (node.isFloating ? 38 : 32))) : 0;
+      const topImgH = isTopImage ? (isLvl1 ? 52 : (isLvl2 ? 44 : (node.isFloating ? 46 : 38))) : 0;
+
+      if (isImgOnly) {
+        g.classList.add('mm-node-img-only');
+      }
 
       const boxW = node.width;
       const boxH = node.height || (isLvl1 ? 36 : (isLvl2 ? 28 : 24));
@@ -4286,13 +4318,29 @@ const MindMapView = {
           if (nClip) nClip.remove();
           nClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
           nClip.setAttribute('id', nodeClipId);
-          const cRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-          cRect.setAttribute('x', -boxW / 2);
-          cRect.setAttribute('y', -boxH / 2);
-          cRect.setAttribute('width', boxW);
-          cRect.setAttribute('height', boxH);
-          cRect.setAttribute('rx', rx);
-          nClip.appendChild(cRect);
+
+          if (isTopImage) {
+            const halfW = boxW / 2;
+            const topY = -boxH / 2;
+            const botImgY = -boxH / 2 + topImgH;
+            const pathD = `M ${-halfW} ${topY + rx} ` +
+              `A ${rx} ${rx} 0 0 1 ${-halfW + rx} ${topY} ` +
+              `L ${halfW - rx} ${topY} ` +
+              `A ${rx} ${rx} 0 0 1 ${halfW} ${topY + rx} ` +
+              `L ${halfW} ${botImgY} ` +
+              `L ${-halfW} ${botImgY} Z`;
+            const cPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            cPath.setAttribute('d', pathD);
+            nClip.appendChild(cPath);
+          } else {
+            const cRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            cRect.setAttribute('x', -boxW / 2);
+            cRect.setAttribute('y', -boxH / 2);
+            cRect.setAttribute('width', boxW);
+            cRect.setAttribute('height', boxH);
+            cRect.setAttribute('rx', rx);
+            nClip.appendChild(cRect);
+          }
           defs.appendChild(nClip);
 
           const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -4470,7 +4518,88 @@ const MindMapView = {
       const refPillW = node.ref ? (node.refPillWidth || Math.max(38, this.getTextWidth(displayRef, 9.5, '700') + 14)) : 0;
       const notePillW = node.note ? 18 : 0;
 
-      if (node.isFloating) {
+      // Marqueur timbre d'angle pour mode Polaroid (top-image)
+      if (isTopImage && node.marker) {
+        const def = this.MARKER_DEFS[node.marker];
+        if (def) {
+          const cornerMarkerX = boxW / 2 - 13;
+          const cornerMarkerY = -boxH / 2 + 13;
+          const markerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          markerG.setAttribute('transform', `translate(${cornerMarkerX}, ${cornerMarkerY})`);
+          markerG.setAttribute('class', 'mm-node-marker-badge mm-corner-marker');
+          markerG.setAttribute('style', this.isReadOnly ? 'cursor: default;' : 'cursor: pointer;');
+          markerG.setAttribute('title', this.isReadOnly ? `Marqueur : ${def.label}` : `Marqueur : ${def.label} (Cliquer pour faire défiler)`);
+
+          const mHit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          mHit.setAttribute('r', 13);
+          mHit.setAttribute('fill', 'transparent');
+          markerG.appendChild(mHit);
+
+          if (def.isWide) {
+            const mRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            mRect.setAttribute('x', -11);
+            mRect.setAttribute('y', -8);
+            mRect.setAttribute('width', 22);
+            mRect.setAttribute('height', 16);
+            mRect.setAttribute('rx', 4.5);
+            mRect.setAttribute('fill', def.bg);
+            mRect.setAttribute('stroke', 'rgba(255, 255, 255, 0.85)');
+            mRect.setAttribute('stroke-width', '1.2');
+            mRect.setAttribute('filter', 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))');
+            markerG.appendChild(mRect);
+          } else {
+            const mCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            mCircle.setAttribute('r', 8.5);
+            mCircle.setAttribute('fill', def.bg);
+            mCircle.setAttribute('stroke', 'rgba(255, 255, 255, 0.85)');
+            mCircle.setAttribute('stroke-width', '1.2');
+            mCircle.setAttribute('filter', 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))');
+            markerG.appendChild(mCircle);
+          }
+
+          const mText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          mText.setAttribute('text-anchor', 'middle');
+          mText.setAttribute('dominant-baseline', 'central');
+          mText.setAttribute('font-size', def.isWide ? '9px' : '9.5px');
+          mText.setAttribute('font-weight', '800');
+          mText.setAttribute('fill', def.text);
+          mText.setAttribute('pointer-events', 'none');
+          mText.textContent = def.label;
+          markerG.appendChild(mText);
+
+          markerG.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (this.isReadOnly) return;
+            this.cycleNodeMarker(node.id);
+          });
+
+          g.appendChild(markerG);
+        }
+      }
+
+      if (isTopImage) {
+        // En mode Polaroid : pied de carte dédié centré contenant [Mot-clé] [Pastille biblique] [Note]
+        let totalFooterW = textW;
+        if (node.ref) totalFooterW += refPillW + 8;
+        if (node.note) totalFooterW += notePillW + 8;
+
+        let curX = -totalFooterW / 2;
+        textX = curX;
+        text.setAttribute('text-anchor', 'start');
+        text.setAttribute('x', textX);
+        curX += textW;
+
+        if (node.ref) {
+          curX += 8;
+          refX = curX + refPillW / 2;
+          curX += refPillW;
+        }
+        if (node.note) {
+          curX += 8;
+          noteX = curX + 9;
+          curX += notePillW;
+        }
+      } else if (node.isFloating) {
         if (!node.marker && !node.icon && !node.ref && !node.note) {
           text.setAttribute('text-anchor', 'middle');
           text.setAttribute('x', 0);
@@ -4573,12 +4702,30 @@ const MindMapView = {
         g.appendChild(text);
       } else {
         const nodeTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        nodeTitle.textContent = node.text || '';
+        let tooltipLines = [];
+        let header = (node.text || '').toUpperCase();
+        if (node.marker) {
+          const mDef = this.MARKER_DEFS?.[node.marker];
+          const mLabel = mDef ? mDef.label : node.marker;
+          header = `[${mLabel}] ${header}`;
+        }
+        if (node.ref) {
+          header += ` (${node.ref})`;
+        }
+        tooltipLines.push(header);
+        if (node.note) {
+          tooltipLines.push('---');
+          tooltipLines.push(node.note);
+        }
+        nodeTitle.textContent = tooltipLines.join('\n');
         g.appendChild(nodeTitle);
+
+        hitRect.addEventListener('mouseenter', () => this.showImageOnlyTooltip(g, node));
+        hitRect.addEventListener('mouseleave', () => this.hideTooltip());
       }
 
-      // Pastille Marqueur / Numéro / Priorité si présent (placé immédiatement à gauche du mot-clé)
-      if (!isImgOnly && node.marker && markerX !== null) {
+      // Pastille Marqueur / Numéro / Priorité si présent (placé immédiatement à gauche du mot-clé, hors mode Polaroid où il est en timbre d'angle)
+      if (!isImgOnly && !isTopImage && node.marker && markerX !== null) {
         const def = this.MARKER_DEFS[node.marker];
         if (def) {
           const markerG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -4629,8 +4776,8 @@ const MindMapView = {
         }
       }
 
-      // Badge Icône SVG vectorielle (pur SVG sans emoji)
-      if (!isImgOnly && node.icon && iconX !== null && typeof SvgIconsRegistry !== 'undefined') {
+      // Badge Icône SVG vectorielle (pur SVG sans emoji - masqué en mode Polaroid où l'illustration IA remplace l'icône)
+      if (!isImgOnly && !isTopImage && node.icon && iconX !== null && typeof SvgIconsRegistry !== 'undefined') {
         const iconDef = SvgIconsRegistry.get(node.icon);
         if (iconDef) {
           const iconG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -4765,7 +4912,7 @@ const MindMapView = {
         actionsG.setAttribute('class', 'mm-node-actions');
 
         const hasKids = node.children && node.children.length > 0;
-        const foldOffset = hasKids ? 14 : 0;
+        const foldOffset = hasKids ? (isImgOnly ? 20 : 14) : (isImgOnly ? 4 : 0);
         const actionY = effectiveIsBox ? 0 : 3;
         const endX = (isTopDown || node.side === 'right') ? node.width / 2 + 13 + foldOffset : -node.width / 2 - 13 - foldOffset;
         const addSubBtn = this.createActionButton('+', endX, actionY, () => this.addChildToNode(node));
@@ -4789,11 +4936,12 @@ const MindMapView = {
 
       // Coordonnées exactes à l'extrémité de la branche dans le repère local de g
       const foldDir = (isTopDown || (node.side || 'right') === 'right') ? 1 : -1;
-      const foldX = isTopDown ? 0 : foldDir * (node.width / 2 + 6);
+      const foldOffset = isImgOnly ? 10 : 6;
+      const foldX = isTopDown ? 0 : foldDir * (node.width / 2 + foldOffset);
       const foldY = isTopDown ? (effectiveIsBox ? (node.height || 28) / 2 + 7 : 17) : (effectiveIsBox ? 0 : 10);
 
       foldG.setAttribute('transform', `translate(${foldX}, ${foldY})`);
-      foldG.setAttribute('class', `mm-fold-indicator ${isCollapsed ? 'is-folded' : ''}`);
+      foldG.setAttribute('class', `mm-fold-indicator ${isCollapsed ? 'is-folded' : ''} ${isImgOnly ? 'mm-fold-img-only' : ''}`);
       foldG.setAttribute('title', isCollapsed ? `Déplier (${node.children.length} sous-branches) — [F]` : 'Replier les sous-branches — [F]');
       foldG.setAttribute('style', 'cursor: pointer;');
       foldG.setAttribute('data-node-id', node.id);
@@ -5983,6 +6131,41 @@ const MindMapView = {
       <div class="mm-tooltip-body">${this.escapeHtml(noteText)}</div>
       <div class="mm-tooltip-hint">${hintText}</div>
     `;
+    this.showTooltip(targetEl, html);
+  },
+
+  showImageOnlyTooltip(targetEl, node) {
+    this.currentTooltipTarget = null;
+    let header = this.escapeHtml((node.text || '').toUpperCase());
+    if (node.marker) {
+      const def = this.MARKER_DEFS?.[node.marker];
+      const mLabel = def ? def.label : node.marker;
+      header = `<span style="display:inline-block;padding:1px 6px;background:var(--accent-blue,#2563eb);color:#fff;border-radius:4px;font-size:10px;font-weight:800;margin-right:6px;">${this.escapeHtml(mLabel)}</span>` + header;
+    }
+    let html = `
+      <div class="mm-tooltip-header" style="font-weight:800;font-size:13px;letter-spacing:0.5px;color:var(--text-primary,#0f172a);">
+        ${header}
+      </div>
+    `;
+    if (node.ref) {
+      html += `
+        <div class="mm-tooltip-ref" style="margin-top:5px;font-size:11px;font-weight:700;color:var(--accent-blue,#2563eb);display:flex;align-items:center;gap:4px;">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>${this.escapeHtml(node.ref)}</span>
+        </div>
+      `;
+    }
+    if (node.note) {
+      html += `
+        <div class="mm-tooltip-body" style="margin-top:6px;font-size:11.5px;line-height:1.45;max-height:120px;overflow-y:auto;border-top:1px solid rgba(148,163,184,0.2);padding-top:5px;">
+          ${this.escapeHtml(node.note)}
+        </div>
+      `;
+    }
+    const hintText = this.isReadOnly ? '' : 'Double-cliquer pour renommer';
+    if (hintText) {
+      html += `<div class="mm-tooltip-hint" style="margin-top:6px;">${hintText}</div>`;
+    }
     this.showTooltip(targetEl, html);
   },
 
