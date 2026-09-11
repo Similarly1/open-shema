@@ -6165,26 +6165,42 @@ const MindMapView = {
     const tooltipW = tooltipRect.width || 330;
     const tooltipH = tooltipRect.height || 140;
     const padding = 16;
+    const gap = 8;
 
-    // Centrage horizontal fixe sur l'élément survolé
-    let left = rect.left + (rect.width / 2) - (tooltipW / 2);
-    if (left < padding) left = padding;
-    if (left + tooltipW > window.innerWidth - padding) {
-      left = window.innerWidth - tooltipW - padding;
-    }
+    // Petite pastille (réf biblique, note) → positionner à droite ou à gauche
+    // Grand nœud (médaillon SVG) → positionner au-dessus ou en dessous du centre
+    const isSmallTarget = rect.width < 120 && rect.height < 60;
 
-    // Ancre verticale : on utilise le centre de l'élément comme référence,
-    // puis on place l'infobulle juste au-dessus (ou en dessous si pas de place).
-    // Cela évite que les grands groupes SVG fassent monter l'infobulle trop haut.
-    const centerY = rect.top + rect.height / 2;
-    const gap = 6;
-    let top = centerY - tooltipH - gap;
-    if (top < padding) {
-      top = centerY + gap;
-    }
-    // Si ça déborde en bas, coller au-dessus du bord visible
-    if (top + tooltipH > window.innerHeight - padding) {
-      top = window.innerHeight - tooltipH - padding;
+    let left, top;
+
+    if (isSmallTarget) {
+      // Positionnement latéral : à droite de la pastille si la place le permet
+      const rightSpace = window.innerWidth - rect.right - gap;
+      if (rightSpace >= tooltipW + padding) {
+        left = rect.right + gap;
+      } else {
+        left = rect.left - tooltipW - gap;
+        if (left < padding) left = padding;
+      }
+      // Centrage vertical sur la pastille
+      top = rect.top + rect.height / 2 - tooltipH / 2;
+      if (top < padding) top = padding;
+      if (top + tooltipH > window.innerHeight - padding) {
+        top = window.innerHeight - tooltipH - padding;
+      }
+    } else {
+      // Grand nœud SVG : centrage horizontal, ancre sur le centre de l'élément
+      left = rect.left + (rect.width / 2) - (tooltipW / 2);
+      if (left < padding) left = padding;
+      if (left + tooltipW > window.innerWidth - padding) {
+        left = window.innerWidth - tooltipW - padding;
+      }
+      const centerY = rect.top + rect.height / 2;
+      top = centerY - tooltipH - gap;
+      if (top < padding) top = centerY + gap;
+      if (top + tooltipH > window.innerHeight - padding) {
+        top = window.innerHeight - tooltipH - padding;
+      }
     }
 
     this.tooltipEl.style.left = `${Math.round(left)}px`;

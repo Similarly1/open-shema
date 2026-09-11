@@ -363,24 +363,11 @@ class UnifiedSearchManager:
         bookstore_results: List[Dict[str, Any]] = []
         direct_store_links: List[Dict[str, str]] = []
 
-        # Pour l'affichage initial sans requête, on lance plusieurs termes populaires en parallèle
-        # pour obtenir une vitrine riche au lieu de seulement 2 livres avec "Bible" seul.
-        SHOWCASE_QUERIES = ["Bible", "Calvin", "Spurgeon", "Évangile", "Théologie"]
-        bookstore_query = clean_q if clean_q else None
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
             future_gutendex = executor.submit(self.search_gutendex_online, clean_q) if clean_q else None
             future_ia = executor.submit(self.search_internet_archive_online, clean_q) if clean_q else None
             future_wikisource = executor.submit(self.search_wikisource_online, clean_q) if clean_q else None
-            if bookstore_query:
-                future_bookstores = executor.submit(self.ebook_manager.search_all_ebooks, bookstore_query)
-            else:
-                # Vitrine initiale : plusieurs termes en parallèle, résultats fusionnés
-                future_bookstores = None
-                showcase_futures = [
-                    executor.submit(self.ebook_manager.search_all_ebooks, q)
-                    for q in SHOWCASE_QUERIES
-                ]
+            future_bookstores = executor.submit(self.ebook_manager.search_all_ebooks, clean_q)
 
             # Gutendex Online
             if future_gutendex:
@@ -423,43 +410,14 @@ class UnifiedSearchManager:
 
             # Librairies Chrétiennes
             try:
-                if future_bookstores is not None:
-                    ebook_data = future_bookstores.result()
-                    if ebook_data:
-                        raw_bookstore = ebook_data.get('results', [])
-                        direct_store_links = ebook_data.get('direct_links', [])
-                        for b in raw_bookstore:
-                            b['category'] = 'bookstores'
-                            b['action_label'] = 'Comparer / Acheter'
-                            bookstore_results.append(b)
-                else:
-                    # Vitrine initiale : fusion et dédoublonnage des résultats multi-requêtes
-                    seen_showcase_titles: set = set()
-                    all_showcase_items: List[Dict[str, Any]] = []
-                    for fut in showcase_futures:
-                        try:
-                            sd = fut.result()
-                            if sd:
-                                if not direct_store_links:
-                                    direct_store_links = sd.get('direct_links', [])
-                                for b in sd.get('results', []):
-                                    t_key = (b.get('title') or '').lower().strip()
-                                    if t_key and t_key not in seen_showcase_titles:
-                                        seen_showcase_titles.add(t_key)
-                                        b['category'] = 'bookstores'
-                                        b['action_label'] = 'Comparer / Acheter'
-                                        all_showcase_items.append(b)
-                        except Exception:
-                            pass
-                    # Trier par pertinence (Bibles en premier) puis prix
-                    all_showcase_items.sort(
-                        key=lambda g: (
-                            -self.ebook_manager.calculate_relevance_score(g.get('title', ''), 'Bible'),
-                            g.get('min_price_raw', 0) == 0,
-                            g.get('min_price_raw', 0)
-                        )
-                    )
-                    bookstore_results = all_showcase_items
+                ebook_data = future_bookstores.result()
+                if ebook_data:
+                    raw_bookstore = ebook_data.get('results', [])
+                    direct_store_links = ebook_data.get('direct_links', [])
+                    for b in raw_bookstore:
+                        b['category'] = 'bookstores'
+                        b['action_label'] = 'Comparer / Acheter'
+                        bookstore_results.append(b)
             except Exception:
                 pass
 

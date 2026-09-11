@@ -1,0 +1,414 @@
+[
+  {
+    "id": "biblio_semeur_epub",
+    "title": "La Bible du Semeur",
+    "authors": "Societe Biblique Internationale",
+    "source": "Editions Bibli'O",
+    "store_badge": "Alliance Biblique",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionsbiblio.fr/search?q=bible+du+semeur+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/1049.jpg?v=1782223058",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "semeur",
+      "sbi",
+      "nouvelle bible"
+    ]
+  },
+  {
+    "id": "biblio_segond21_epub",
+    "title": "Nouvelle Bible Segond 21",
+    "authors": "Societe Biblique de Geneve",
+    "source": "Editions Bibli'O",
+    "store_badge": "Alliance Biblique",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionsbiblio.fr/search?q=segond+21+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/products/sb1072.png?v=1708100864",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "segond",
+      "segond 21",
+      "nbs",
+      "nouvelle bible segond"
+    ]
+  },
+  {
+    "id": "biblio_nfc_epub",
+    "title": "Nouvelle Francais Courant (NFC)",
+    "authors": "Alliance Biblique Universelle",
+    "source": "Editions Bibli'O",
+    "store_badge": "Alliance Biblique",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionsbiblio.fr/search?q=NFC+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/products/sb1128_prot0.png?v=1708098561",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "nfc",
+      "francais courant",
+      "alliance biblique"
+    ]
+  },
+  {
+    "id": "blf_segond_epub",
+    "title": "Bible Segond 1910 (version classique)",
+    "authors": "Louis Segond",
+    "source": "BLF Editions",
+    "store_badge": "BLF Editions",
+    "format": "EPUB (Sans DRM)",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://blfstore.com/search?q=segond+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0474/9718/3388/files/sb1154.png?v=1705939497",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "segond",
+      "1910",
+      "louis segond",
+      "version classique"
+    ]
+  },
+  {
+    "id": "google_bible_tob",
+    "title": "Bible TOB - Traduction Oecumenique",
+    "authors": "Conseil Oecumenique des Eglises",
+    "source": "Google Play Livres",
+    "store_badge": "Google Play",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://play.google.com/store/search?q=bible+TOB",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/products/1360-mock-up.png?v=1708084564",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "tob",
+      "traduction oecumenique",
+      "catholique",
+      "protestant"
+    ]
+  },
+  {
+    "id": "google_bible_jerusalem",
+    "title": "La Bible de Jerusalem",
+    "authors": "Ecole Biblique de Jerusalem",
+    "source": "Google Play Livres",
+    "store_badge": "Google Play",
+    "format": "EPUB",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://play.google.com/store/search?q=bible+jerusalem",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/BIBLE_JERUSALEM_GROSCARAC.jpg?v=1725269205",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "jerusalem",
+      "catholique",
+      "dominicain"
+    ]
+  },
+  {
+    "id": "google_bible_colombe",
+    "title": "La Bible de la Colombe",
+    "authors": "Reginald-Ferdinand Posset",
+    "source": "Google Play Livres",
+    "store_badge": "Google Play",
+    "format": "EPUB",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://play.google.com/store/search?q=bible+colombe",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/sb1145_quadri_aplat4_2f7a5605-40f2-4811-8898-fb0189c21e1c.png?v=1717140811",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "colombe",
+      "protestant",
+      "evangelique"
+    ]
+  },
+  {
+    "id": "kobo_parole_vie",
+    "title": "La Bible - Parole de Vie",
+    "authors": "Alliance Biblique Universelle",
+    "source": "Kobo Store",
+    "store_badge": "Rakuten Kobo",
+    "format": "EPUB",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://www.kobo.com/fr/fr/search?query=bible+parole+de+vie",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/SB1089_3D.png?v=1716810205",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "parole de vie",
+      "pdv",
+      "langage contemporain"
+    ]
+  },
+  {
+    "id": "fnac_bible_darby",
+    "title": "La Sainte Bible - Version Darby",
+    "authors": "John Nelson Darby",
+    "source": "Rayon E-books Fnac",
+    "store_badge": "Fnac.com",
+    "format": "EPUB",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://www.fnac.com/SearchResult/ResultList.aspx?Search=bible+darby+epub",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/1049.jpg?v=1782223058",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "darby",
+      "brethren",
+      "dispensationalisme"
+    ]
+  },
+  {
+    "id": "pc_bible_martin",
+    "title": "La Sainte Bible - Version Martin (1744)",
+    "authors": "David Martin",
+    "source": "Publications Chretiennes",
+    "store_badge": "Pub. Chretiennes",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://publicationschretiennes.com/search?q=bible+martin+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0474/9718/3388/files/9782853008990.jpg?v=1695657230",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "martin",
+      "david martin",
+      "1744",
+      "classique",
+      "reforme"
+    ]
+  },
+  {
+    "id": "pc_bible_ostervald",
+    "title": "La Bible - Version Ostervald",
+    "authors": "Jean-Frederic Ostervald",
+    "source": "Publications Chretiennes",
+    "store_badge": "Pub. Chretiennes",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://publicationschretiennes.com/search?q=bible+ostervald+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/SB1089_3D.png?v=1716810205",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bible",
+      "ostervald",
+      "reforme",
+      "protestant",
+      "neuchatel"
+    ]
+  },
+  {
+    "id": "google_nt_semeur",
+    "title": "Nouveau Testament - Bible du Semeur",
+    "authors": "Societe Biblique Internationale",
+    "source": "Google Play Livres",
+    "store_badge": "Google Play",
+    "format": "EPUB",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://play.google.com/store/search?q=nouveau+testament+semeur",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/products/sb2677.png?v=1708099450",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "nouveau testament",
+      "nt",
+      "semeur"
+    ]
+  },
+  {
+    "id": "blf_bunyan_pelerin",
+    "title": "Le Voyage du Pelerin",
+    "authors": "John Bunyan",
+    "source": "BLF Editions",
+    "store_badge": "BLF Editions",
+    "format": "EPUB (Sans DRM)",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://blfstore.com/search?q=voyage+du+pelerin+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0474/9718/3388/products/I-Grande-6047-le-voyage-du-pelerin.net.jpg?v=1640040987",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "bunyan",
+      "pelerin",
+      "allegorie",
+      "classique",
+      "theologie"
+    ]
+  },
+  {
+    "id": "cle_lewis_fondements",
+    "title": "Les Fondements du Christianisme",
+    "authors": "C.S. Lewis",
+    "source": "Editions Cle",
+    "store_badge": "Editions Cle",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionscle.com/recherche?controller=search&s=lewis",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/SB0057-couv.png?v=1715867822",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "lewis",
+      "cs lewis",
+      "fondements",
+      "apologetique",
+      "christianisme"
+    ]
+  },
+  {
+    "id": "cle_stott_croix",
+    "title": "La Croix de Christ",
+    "authors": "John Stott",
+    "source": "Editions Cle",
+    "store_badge": "Editions Cle",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionscle.com/recherche?controller=search&s=stott",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/products/sb1048.png?v=1708097218",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "stott",
+      "croix",
+      "christ",
+      "expiation",
+      "theologie"
+    ]
+  },
+  {
+    "id": "blf_spurgeon_chequier",
+    "title": "Le Chequier de la foi",
+    "authors": "Charles Spurgeon",
+    "source": "BLF Editions",
+    "store_badge": "BLF Editions",
+    "format": "EPUB (Sans DRM)",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://blfstore.com/search?q=spurgeon+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0474/9718/3388/files/63964.jpg?v=1785918977",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "spurgeon",
+      "chequier",
+      "foi",
+      "meditations",
+      "devotion"
+    ]
+  },
+  {
+    "id": "cle_packer_connaitre_dieu",
+    "title": "Connaitre Dieu",
+    "authors": "J.I. Packer",
+    "source": "Editions Cle",
+    "store_badge": "Editions Cle",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionscle.com/recherche?controller=search&s=packer",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/BIB315707_3.jpg?v=1770650414",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "packer",
+      "connaitre dieu",
+      "theologie",
+      "saintete"
+    ]
+  },
+  {
+    "id": "cle_piper_prendre_plaisir",
+    "title": "Prendre plaisir en Dieu",
+    "authors": "John Piper",
+    "source": "Editions Cle",
+    "store_badge": "Editions Cle",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionscle.com/recherche?controller=search&s=piper",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/Monoui.png?v=1775033693",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "piper",
+      "plaisir",
+      "hedonisme chretien",
+      "dieu",
+      "joie"
+    ]
+  },
+  {
+    "id": "cle_keller_raison",
+    "title": "La Raison est pour Dieu",
+    "authors": "Timothy Keller",
+    "source": "Editions Cle",
+    "store_badge": "Editions Cle",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://editionscle.com/recherche?controller=search&s=keller",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/files/BIB322232.jpg?v=1759401110",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "keller",
+      "timothy keller",
+      "raison",
+      "apologetique",
+      "foi"
+    ]
+  },
+  {
+    "id": "pc_calvin_institution",
+    "title": "Institution de la Religion Chretienne",
+    "authors": "Jean Calvin",
+    "source": "Publications Chretiennes",
+    "store_badge": "Pub. Chretiennes",
+    "format": "EPUB / PDF",
+    "price": "Disponible",
+    "price_raw": 0.0,
+    "url": "https://publicationschretiennes.com/search?q=calvin+institution+ebook",
+    "image": "https://cdn.shopify.com/s/files/1/0762/4481/2103/products/sb0047-couv1_png.png?v=1708100427",
+    "is_direct_product": false,
+    "is_curated": true,
+    "keywords": [
+      "calvin",
+      "institution",
+      "reforme",
+      "theologie systematique",
+      "dogmatique"
+    ]
+  }
+]
