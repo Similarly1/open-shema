@@ -158,6 +158,10 @@ const MindMapView = {
             <span class="mm-fs-note-ref" id="mm-fs-note-ref" style="display: none;"></span>
           </div>
           <div class="mm-fs-bar-right">
+            <button type="button" class="mm-fs-exit-btn" id="mm-fs-btn-toggle-mode" title="Basculer Vue Carte / Plan (Alt+P)" style="margin-right: 8px;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span id="mm-fs-toggle-mode-label">Vue Plan</span>
+            </button>
             <button type="button" class="mm-fs-exit-btn" id="mm-fs-btn-exit" title="Quitter le plein écran (Échap ou F11)">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/></svg>
               <span>Quitter le plein écran</span>
@@ -479,6 +483,10 @@ const MindMapView = {
   bindEvents() {
     // 1. Panoramique à la souris (Drag)
     const onMouseDown = (e) => {
+      // En mode plan (outliner), laisser le navigateur gérer les interactions et le défilement naturel
+      if (this.viewMode === 'outline' || e.target.closest('#mindmap-outline-view, .mindmap-outline-container')) {
+        return;
+      }
       this.hideTooltip();
       if (this.connectingSourceId && !e.target.closest('.mm-node-g')) {
         this.cancelConnecting();
@@ -509,6 +517,10 @@ const MindMapView = {
     window.addEventListener('mousemove', (e) => {
       // 1. Panoramique du canevas
       if (this.isPanning) {
+        if (this.viewMode === 'outline') {
+          this.isPanning = false;
+          return;
+        }
         this.hideTooltip();
         this.viewBox.x = e.clientX - this.panStart.x;
         this.viewBox.y = e.clientY - this.panStart.y;
@@ -636,6 +648,10 @@ const MindMapView = {
 
     // 2. Zoom à la molette
     const onWheel = (e) => {
+      // En mode plan (outliner), laisser la zone de défilement défiler naturellement
+      if (this.viewMode === 'outline' || e.target.closest('#mindmap-outline-view, .mindmap-outline-container')) {
+        return;
+      }
       e.preventDefault();
       const activeEditor = document.querySelector('.mm-inline-editor');
       if (activeEditor) activeEditor.blur();
@@ -703,6 +719,7 @@ const MindMapView = {
     document.getElementById('mm-btn-theme')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.togglePaperMode(); });
     document.getElementById('mm-btn-palette')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.cyclePalette(); });
     document.getElementById('mm-fs-btn-exit')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleFullscreen(false); });
+    document.getElementById('mm-fs-btn-toggle-mode')?.addEventListener('click', (e) => { e.currentTarget?.blur(); this.toggleViewMode(); });
     document.addEventListener('fullscreenchange', () => {
       const isNativeFs = !!document.fullscreenElement;
       if (!isNativeFs && document.body.classList.contains('mindmap-fullscreen-active')) {
@@ -2827,6 +2844,12 @@ const MindMapView = {
   updateViewModeUI() {
     const isOutline = this.viewMode === 'outline';
 
+    // 0. Masquer le bandeau inférieur d'outils (dock) en mode plan
+    const dock = document.getElementById('mindmap-dock') || this.container?.querySelector('.mindmap-dock');
+    if (dock) {
+      dock.classList.toggle('hidden', isOutline);
+    }
+
     // Niveau 2 : Affichage des outils du plan dans la sous-barre
     const subbar = document.getElementById('notes-editor-subbar');
     const subbarActions = document.getElementById('notes-subbar-outline-actions');
@@ -2853,7 +2876,7 @@ const MindMapView = {
       `;
     }
 
-    // 2. Bouton dock flottant
+    // 2. Bouton dock flottant (quand visible)
     const dockBtn = document.getElementById('mm-btn-toggle-outline');
     if (dockBtn) {
       dockBtn.title = isOutline ? 'Basculer en Vue Carte (Alt+P)' : 'Basculer en Vue Plan (Alt+P)';
@@ -2864,6 +2887,14 @@ const MindMapView = {
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       `) + `<span class="mm-dock-label">${isOutline ? 'Carte' : 'Plan'}</span>`;
     }
+
+    // 3. Bouton bascule dans le bandeau plein écran
+    const fsToggleBtn = document.getElementById('mm-fs-btn-toggle-mode');
+    const fsToggleLabel = document.getElementById('mm-fs-toggle-mode-label');
+    if (fsToggleBtn && fsToggleLabel) {
+      fsToggleLabel.textContent = isOutline ? 'Vue Carte' : 'Vue Plan';
+      fsToggleBtn.title = isOutline ? 'Basculer en Vue Carte (Alt+P)' : 'Basculer en Vue Plan (Alt+P)';
+    }
   },
 
   bindOutlineToolbarEvents() {
@@ -2871,6 +2902,7 @@ const MindMapView = {
     if (!subbar || subbar.dataset.eventsBound === 'true') return;
     subbar.dataset.eventsBound = 'true';
 
+    subbar.querySelector('#mm-ot-btn-switch-map')?.addEventListener('click', () => this.toggleViewMode('map'));
     subbar.querySelector('#mm-ot-btn-expand-all')?.addEventListener('click', () => this.expandAllNodes());
     subbar.querySelector('#mm-ot-btn-collapse-all')?.addEventListener('click', () => this.collapseAllNodes());
     subbar.querySelector('#mm-ot-btn-add-boi')?.addEventListener('click', () => this.addChildToNode(this.tree));

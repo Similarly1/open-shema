@@ -34362,6 +34362,12 @@ body.theme-dark .mm-inline-editor::selection {
   max-width: calc(100% - 32px);
 }
 
+.mindmap-dock.hidden,
+.note-mindmap-container:has(.mindmap-outline-container:not(.hidden)) .mindmap-dock,
+.mindmap-wrapper:has(.mindmap-outline-container:not(.hidden)) .mindmap-dock {
+  display: none !important;
+}
+
 .mindmap-dock.expanded {
   left: 50%;
   transform: translateX(-50%);
@@ -35675,6 +35681,7 @@ body[class*="palette-dark"] .mm-tooltip-hint {
   overflow: hidden;
   background: var(--bg-primary, #f8fafc);
   z-index: 10;
+  user-select: text;
 }
 
 body.theme-dark .mindmap-outline-container,
@@ -35689,11 +35696,31 @@ body[class*="palette-dark"] .mindmap-outline-container {
 /* 1. Zone de défilement du Plan (occupant tout l'espace sous le Niveau 2) */
 .mm-outline-scroll-area {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px 24px 90px 24px;
+  padding: 20px 24px 120px 24px;
   box-sizing: border-box;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mm-outline-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mm-outline-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mm-outline-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+.mm-outline-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
 }
 
 .mm-outline-wrapper {
