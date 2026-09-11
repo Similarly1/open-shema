@@ -34240,32 +34240,49 @@ body.theme-dark .mm-inline-editor::selection {
   color: #ffffff;
 }
 
-/* Dock flottant minimaliste en bas */
+/* Dock d'outils flottant réactif par îlots thématiques (Option 3 & Option 1) */
 .mindmap-dock {
   position: absolute;
   bottom: 18px;
   right: 24px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   padding: 4px 8px;
   border-radius: 24px;
   background: var(--bg-card, #ffffff);
   border: 1px solid var(--border-color, #e2e8f0);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   z-index: 50;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.mindmap-dock.expanded {
+  border-radius: 14px;
+  padding: 4px 10px;
+  max-width: calc(100vw - 48px);
+  overflow-x: auto;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
 }
 
 body.theme-dark .mindmap-dock,
 body[class*="palette-dark"] .mindmap-dock {
-  background: rgba(30, 41, 59, 0.9);
+  background: rgba(30, 41, 59, 0.92);
   border-color: #334155;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+}
+
+.mm-dock-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .mm-dock-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 28px;
@@ -34275,7 +34292,29 @@ body[class*="palette-dark"] .mindmap-dock {
   background: transparent;
   color: var(--text-secondary, #64748b);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, width 0.2s ease, padding 0.2s ease;
+  flex-shrink: 0;
+}
+
+.mm-dock-label {
+  display: none;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+.mindmap-dock.expanded .mm-dock-btn {
+  width: auto;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  gap: 6px;
+}
+
+.mindmap-dock.expanded .mm-dock-label {
+  display: inline;
 }
 
 .mm-dock-btn:hover {
@@ -34291,14 +34330,97 @@ body[class*="palette-dark"] .mm-dock-btn:hover {
 
 .mm-dock-separator {
   width: 1px;
-  height: 16px;
+  height: 18px;
   background: var(--border-color, #e2e8f0);
-  margin: 0 2px;
+  margin: 0 4px;
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
 body.theme-dark .mm-dock-separator,
 body[class*="palette-dark"] .mm-dock-separator {
-  background: #334155;
+  background: #475569;
+}
+
+.mm-dock-toggle-btn {
+  color: var(--accent-blue, #2563eb);
+}
+
+.mm-dock-toggle-btn:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-blue, #2563eb);
+}
+
+/* Infobulle enrichie instantanée (< 80ms) */
+.mm-dock-tooltip {
+  position: fixed;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.38);
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: mmTooltipFade 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mm-dock-tooltip.hidden {
+  display: none !important;
+}
+
+.mm-dock-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: rgba(15, 23, 42, 0.94);
+  border-right: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+@keyframes mmTooltipFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mm-dock-tooltip-title {
+  color: #f8fafc;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+
+.mm-dock-tooltip-kbd {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.note-mindmap-container.paper-mode .mm-dock-tooltip {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Popover sélecteur de structure / squelette (Radiant / Arbre droit / Organigramme) */

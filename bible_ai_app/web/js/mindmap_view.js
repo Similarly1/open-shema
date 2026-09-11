@@ -174,56 +174,108 @@ const MindMapView = {
           <button type="button" class="btn-icon-subtle" id="mm-btn-cancel-connecting" title="Annuler (Échap)">×</button>
         </div>
 
-        <!-- Dock d'outils flottant minimaliste -->
-        <div class="mindmap-dock">
-          <button type="button" class="mm-dock-btn" id="mm-btn-toggle-outline" title="Basculer entre Vue Carte et Vue Plan (Alt+P)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <!-- Dock d'outils flottant réactif par îlots thématiques (Option 3 & Option 1) -->
+        <div class="mindmap-dock" id="mindmap-dock">
+          <!-- Îlot 1 : Vue & Structure -->
+          <div class="mm-dock-group" data-group="structure">
+            <button type="button" class="mm-dock-btn" id="mm-btn-toggle-outline" data-tooltip-title="Vue Plan hiérarchique" data-tooltip-kbd="Alt+P">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span class="mm-dock-label">Vue Plan</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-structure" data-tooltip-title="Squelette de mise en page" data-tooltip-kbd="Alt+S">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
+              <span class="mm-dock-label">Structure</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-styles" data-tooltip-title="Styles & Connecteurs" data-tooltip-kbd="Alt+T">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><circle cx="7" cy="12" r="3"/><path d="M10 12h5"/><rect x="15" y="9" width="6" height="6" rx="1.5"/></svg>
+              <span class="mm-dock-label">Styles</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-reorganize" data-tooltip-title="Harmoniser et réorganiser" data-tooltip-kbd="Alt+R">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+              <span class="mm-dock-label">Harmoniser</span>
+            </button>
+          </div>
+
+          <div class="mm-dock-separator"></div>
+
+          <!-- Îlot 2 : Éléments -->
+          <div class="mm-dock-group" data-group="elements">
+            <button type="button" class="mm-dock-btn" id="mm-btn-relationship" data-tooltip-title="Liaison transversale" data-tooltip-kbd="Ctrl+L">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
+              <span class="mm-dock-label">Liaison</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-boundary" data-tooltip-title="Enclos / Clôture de branche" data-tooltip-kbd="Ctrl+B">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" stroke-dasharray="4 3"/><path d="M7 8h10M7 12h6"/></svg>
+              <span class="mm-dock-label">Enclos</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-floating" data-tooltip-title="Sujet flottant indépendant" data-tooltip-kbd="Alt+F">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="7" stroke-dasharray="3 2"/><circle cx="7.5" cy="12" r="1.5" fill="currentColor"/><line x1="11" y1="12" x2="16" y2="12"/></svg>
+              <span class="mm-dock-label">Flottant</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-marker" data-tooltip-title="Marqueurs & Priorités" data-tooltip-kbd="1-9 / M">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="15.5" font-size="10" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
+              <span class="mm-dock-label">Marqueur</span>
+            </button>
+          </div>
+
+          <div class="mm-dock-separator"></div>
+
+          <!-- Îlot 3 : Navigation & Zoom -->
+          <div class="mm-dock-group" data-group="navigation">
+            <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" data-tooltip-title="Zoom avant" data-tooltip-kbd="Ctrl +">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span class="mm-dock-label">Zoom +</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-zoom-out" data-tooltip-title="Zoom arrière" data-tooltip-kbd="Ctrl -">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span class="mm-dock-label">Zoom -</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-fit" data-tooltip-title="Recentrer et ajuster la carte" data-tooltip-kbd="R">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+              <span class="mm-dock-label">Centrer</span>
+            </button>
+          </div>
+
+          <div class="mm-dock-separator"></div>
+
+          <!-- Îlot 4 : Affichage & Options -->
+          <div class="mm-dock-group" data-group="options">
+            <button type="button" class="mm-dock-btn" id="mm-btn-theme" data-tooltip-title="Basculer Fond Sombre / Papier" data-tooltip-kbd="Thème">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
+              <span class="mm-dock-label">Fond</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-palette" data-tooltip-title="Changer la palette de couleurs" data-tooltip-kbd="Palette">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+              <span class="mm-dock-label">Palette</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-export" data-tooltip-title="Exporter (PDF, PNG, JPG)" data-tooltip-kbd="Ctrl+E">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span class="mm-dock-label">Exporter</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-fullscreen" data-tooltip-title="Mode Plein Écran" data-tooltip-kbd="F11 / F">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+              <span class="mm-dock-label">Plein écran</span>
+            </button>
+            <button type="button" class="mm-dock-btn" id="mm-btn-help" data-tooltip-title="Aide raccourcis clavier" data-tooltip-kbd="?">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span class="mm-dock-label">Aide</span>
+            </button>
+          </div>
+
+          <div class="mm-dock-separator"></div>
+
+          <!-- Bouton Toggle Développer / Réduire -->
+          <button type="button" class="mm-dock-btn mm-dock-toggle-btn" id="mm-btn-dock-toggle" data-tooltip-title="Développer / Réduire le bandeau" data-tooltip-kbd="Bascule">
+            <svg class="mm-dock-icon-expand" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            <svg class="mm-dock-icon-collapse hidden" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            <span class="mm-dock-label">Réduire</span>
           </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-structure" title="Squelette de mise en page : Radiante, Arbre droit, Organigramme (Alt+S)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><line x1="9" y1="12" x2="3" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-styles" title="Styles de connecteurs et formes de nœuds (Alt+T)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><circle cx="7" cy="12" r="3"/><path d="M10 12h5"/><rect x="15" y="9" width="6" height="6" rx="1.5"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-reorganize" title="Réorganiser harmonieusement la carte (Alt+R)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-relationship" title="Créer une liaison transversale entre deux branches (Ctrl+L)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-boundary" title="Créer un enclos / clôture sur la branche (Ctrl+B)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" stroke-dasharray="4 3"/><path d="M7 8h10M7 12h6"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-floating" title="Créer un sujet flottant indépendant (Alt+F ou Double-clic)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="7" stroke-dasharray="3 2"/><circle cx="7.5" cy="12" r="1.5" fill="currentColor"/><line x1="11" y1="12" x2="16" y2="12"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-marker" title="Marqueurs, Numéros & Priorités (1-9, P1-P4, Statuts) — Touche M">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="15.5" font-size="10" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-zoom-in" title="Zoom avant (Ctrl + Molette)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-zoom-out" title="Zoom arrière">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-fit" title="Recentrer et ajuster la carte à l'écran (R)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-theme" title="Basculer Fond Thème / Feuille Blanche">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-palette" title="Changer la palette de couleurs">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-export" title="Exporter la carte mentale en PDF / PNG / JPG (Ctrl+E)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-fullscreen" title="Mode Plein Écran (F11 ou F)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-          </button>
-          <button type="button" class="mm-dock-btn" id="mm-btn-help" title="Aide raccourcis clavier (?)">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </button>
+        </div>
+
+        <!-- Composant infobulle flottante instantanée -->
+        <div id="mm-dock-tooltip" class="mm-dock-tooltip hidden">
+          <span class="mm-dock-tooltip-title"></span>
+          <kbd class="mm-dock-tooltip-kbd"></kbd>
         </div>
 
         <!-- Popover de sélection du squelette / structure -->
@@ -690,6 +742,15 @@ const MindMapView = {
         SettingsView.openMarkdownGuideModal('mindmap');
       }
     });
+
+    // Bascule Développer / Réduire du bandeau d'outils
+    document.getElementById('mm-btn-dock-toggle')?.addEventListener('click', (e) => {
+      e.currentTarget?.blur();
+      this.toggleDockExpanded();
+    });
+
+    // Initialiser les infobulles enrichies instantanées du bandeau
+    this.initDockTooltips();
 
     // Écouteurs de la modale d'exportation Mind Map
     document.getElementById('btn-close-mm-export-modal')?.addEventListener('click', () => this.closeExportModal());
@@ -2456,6 +2517,103 @@ const MindMapView = {
     } else {
       this.draw();
     }
+  },
+
+  toggleDockExpanded(forceState) {
+    const dock = document.getElementById('mindmap-dock') || document.querySelector('.mindmap-dock');
+    if (!dock) return;
+    const isCurrentlyExp = dock.classList.contains('expanded');
+    const newState = (typeof forceState === 'boolean') ? forceState : !isCurrentlyExp;
+    dock.classList.toggle('expanded', newState);
+
+    const iconExpand = dock.querySelector('.mm-dock-icon-expand');
+    const iconCollapse = dock.querySelector('.mm-dock-icon-collapse');
+    const toggleBtn = dock.querySelector('#mm-btn-dock-toggle');
+    const toggleLabel = toggleBtn?.querySelector('.mm-dock-label');
+
+    if (iconExpand && iconCollapse) {
+      iconExpand.classList.toggle('hidden', newState);
+      iconCollapse.classList.toggle('hidden', !newState);
+    }
+    if (toggleLabel) {
+      toggleLabel.textContent = newState ? 'Réduire' : 'Développer';
+    }
+    if (toggleBtn) {
+      toggleBtn.setAttribute('data-tooltip-title', newState ? 'Réduire le bandeau' : 'Développer avec libellés');
+    }
+
+    try {
+      localStorage.setItem('mm_dock_expanded', newState ? 'true' : 'false');
+    } catch (e) {}
+  },
+
+  initDockTooltips() {
+    const dock = document.getElementById('mindmap-dock') || document.querySelector('.mindmap-dock');
+    const tooltipEl = document.getElementById('mm-dock-tooltip');
+    if (!dock || !tooltipEl) return;
+
+    try {
+      const savedExpanded = localStorage.getItem('mm_dock_expanded') === 'true';
+      if (savedExpanded) {
+        this.toggleDockExpanded(true);
+      }
+    } catch (e) {}
+
+    let hideTimeout = null;
+
+    const showTooltip = (btn) => {
+      const title = btn.getAttribute('data-tooltip-title') || btn.getAttribute('title');
+      const kbd = btn.getAttribute('data-tooltip-kbd');
+      if (!title) return;
+
+      const titleEl = tooltipEl.querySelector('.mm-dock-tooltip-title');
+      const kbdEl = tooltipEl.querySelector('.mm-dock-tooltip-kbd');
+      if (titleEl) titleEl.textContent = title;
+      if (kbdEl) {
+        if (kbd) {
+          kbdEl.textContent = kbd;
+          kbdEl.style.display = 'inline-flex';
+        } else {
+          kbdEl.style.display = 'none';
+        }
+      }
+
+      tooltipEl.classList.remove('hidden');
+
+      const btnRect = btn.getBoundingClientRect();
+      const tipRect = tooltipEl.getBoundingClientRect();
+
+      const top = btnRect.top - tipRect.height - 8;
+      const left = btnRect.left + (btnRect.width / 2) - (tipRect.width / 2);
+
+      tooltipEl.style.top = `${Math.max(8, top)}px`;
+      tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth - tipRect.width - 8, left))}px`;
+    };
+
+    const hideTooltip = () => {
+      tooltipEl.classList.add('hidden');
+    };
+
+    dock.querySelectorAll('.mm-dock-btn').forEach(btn => {
+      // Retirer l'attribut title natif pour éviter les infobulles grises lentes du navigateur
+      const nativeTitle = btn.getAttribute('title');
+      if (nativeTitle && !btn.getAttribute('data-tooltip-title')) {
+        btn.setAttribute('data-tooltip-title', nativeTitle);
+      }
+      btn.removeAttribute('title');
+
+      btn.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
+        showTooltip(btn);
+      });
+      btn.addEventListener('mouseleave', () => {
+        clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(hideTooltip, 60);
+      });
+      btn.addEventListener('click', () => {
+        hideTooltip();
+      });
+    });
   },
 
   toggleViewMode(targetMode = null) {
@@ -7825,20 +7983,48 @@ const MindMapView = {
       return dx >= 0 ? { x: (node.x || 0) + (node.width || 120) / 2, y: node.y || 0 } : { x: (node.x || 0) - (node.width || 120) / 2, y: node.y || 0 };
     }
 
+    const isBox = node.isFloating || !!node.image || this.nodeShape === 'rounded-rect' || this.nodeShape === 'pill';
+
     if (this.treeStructure === 'top-down') {
       if (targetPoint.y >= node.y) {
-        return { x: node.x, y: node.y + 12 };
+        return { x: node.x, y: isBox ? node.y + (node.height || 28) / 2 : node.y + 12 };
       } else {
-        return { x: node.x, y: node.y - 12 };
+        return { x: node.x, y: isBox ? node.y - (node.height || 28) / 2 : node.y - 12 };
       }
     }
 
     // Structure Radiant ou Right-tree
-    const halfW = (node.width || 80) / 2;
-    if (targetPoint.x >= node.x) {
-      return { x: node.x + halfW, y: node.y + 3 };
+    if (isBox) {
+      const halfW = (node.width || 80) / 2;
+      const halfH = (node.height || 28) / 2;
+      const dx = targetPoint.x - node.x;
+      const dy = targetPoint.y - node.y;
+      if (Math.abs(dy) > Math.abs(dx) * 1.5) {
+        return dy >= 0 ? { x: node.x, y: node.y + halfH } : { x: node.x, y: node.y - halfH };
+      }
+      return dx >= 0 ? { x: node.x + halfW, y: node.y } : { x: node.x - halfW, y: node.y };
+    }
+
+    // Mode SOULIGNÉ (Buzan classique : mot-clé posé sur la branche maîtresse)
+    // Ne jamais ancrer à l'extrême bout de la ligne pour ne pas couper le départ des sous-branches
+    const dy = targetPoint.y - node.y;
+    const dx = targetPoint.x - node.x;
+
+    // Si la cible est nettement plus haute (au-dessus du mot-clé)
+    if (dy < -12) {
+      return { x: node.x, y: node.y - 14 };
+    }
+    // Si la cible est nettement plus basse (sous la ligne de soulignement)
+    if (dy > 12) {
+      return { x: node.x, y: node.y + 12 };
+    }
+
+    // Trajectoire quasi-horizontale : flanc immédiat du mot-clé
+    const textHalfW = Math.min((node.width || 80) / 2, (node.textWidth || 60) / 2 + 16);
+    if (dx >= 0) {
+      return { x: node.x + textHalfW, y: node.y + 3 };
     } else {
-      return { x: node.x - halfW, y: node.y + 3 };
+      return { x: node.x - textHalfW, y: node.y + 3 };
     }
   },
 
