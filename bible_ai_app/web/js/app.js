@@ -832,6 +832,9 @@ const App = {
     if (targetEl) {
       targetEl.classList.add('active');
     }
+    if (cleanViewName !== 'notes') {
+      document.body.classList.remove('has-mindmap');
+    }
 
     // Synchroniser l'état actif de la barre latérale et des sous-menus
     document.querySelectorAll('#sidebar .nav-item, .sidebar-menu .nav-item, .sidebar-nav .nav-item, .sidebar-footer .nav-item, .nav-sub-item').forEach(b => {

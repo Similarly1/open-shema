@@ -1964,6 +1964,7 @@ const NotesView = {
     const zoomGroup = document.getElementById('mm-header-zoom-group');
 
     if (isMindmap) {
+      document.body.classList.add('has-mindmap');
       this.contentInput?.classList.add('hidden');
       this.previewContainer?.classList.add('hidden');
       previewBtn?.classList.add('hidden');
@@ -1979,6 +1980,7 @@ const NotesView = {
         }
       }
     } else {
+      document.body.classList.remove('has-mindmap');
       mmContainer?.classList.add('hidden');
       toggleModeBtn?.classList.add('hidden');
       zoomGroup?.classList.add('hidden');

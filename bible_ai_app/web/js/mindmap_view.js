@@ -2454,6 +2454,7 @@ const MindMapView = {
 
   render(note) {
     this.currentNote = note;
+    document.body.classList.add('has-mindmap');
     if (!this.container) this.init();
 
     this.tree = this.parseMarkdownToTree(note.title, note.content);
@@ -5671,10 +5672,6 @@ const MindMapView = {
     this.draw();
     this.fitView();
     this.syncAndAutoSave();
-
-    if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast('Carte réorganisée harmonieusement');
-    }
   },
 
   togglePaperMode() {
@@ -6962,15 +6959,6 @@ const MindMapView = {
     }
     this.updateStructureUI();
     this.syncAndAutoSave();
-
-    if (typeof App !== 'undefined' && App.showToast) {
-      const labels = {
-        'radiant': 'Squelette : Pensée radiante (Buzan bilatérale)',
-        'right-tree': 'Squelette : Arbre logique à droite',
-        'top-down': 'Squelette : Organigramme descendant'
-      };
-      App.showToast(labels[structureName] || `Structure : ${structureName}`);
-    }
   },
 
   cycleStructure() {
@@ -7027,15 +7015,6 @@ const MindMapView = {
     }
     this.updateStylesUI();
     this.syncAndAutoSave();
-
-    if (typeof App !== 'undefined' && App.showToast) {
-      const labels = {
-        'curve': 'Branches : Courbes fluides de Bézier',
-        'orthogonal': 'Branches : Angles droits (Équerre)',
-        'straight': 'Branches : Lignes droites'
-      };
-      App.showToast(labels[styleName] || `Connecteur : ${styleName}`);
-    }
   },
 
   setNodeShape(shapeName) {
@@ -7047,15 +7026,6 @@ const MindMapView = {
     }
     this.updateStylesUI();
     this.syncAndAutoSave();
-
-    if (typeof App !== 'undefined' && App.showToast) {
-      const labels = {
-        'underline': 'Forme des nœuds : Souligné épuré',
-        'rounded-rect': 'Forme des nœuds : Rectangle arrondi',
-        'pill': 'Forme des nœuds : Capsule / Pilule'
-      };
-      App.showToast(labels[shapeName] || `Forme : ${shapeName}`);
-    }
   },
 
   toggleStylesPopover(force = null) {

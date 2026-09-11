@@ -16877,6 +16877,15 @@ body.ai-disabled .ai-feature-only {
   flex-direction: column;
   gap: 8px;
   pointer-events: none;
+  transition: bottom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Surélévation du toast au-dessus du bandeau d'outils de la carte mentale (évite toute superposition) */
+body.has-mindmap #app-toast-container,
+body.mindmap-fullscreen-active #app-toast-container,
+body:has(#mindmap-dock:not(.hidden)) #app-toast-container,
+#view-notes.active:has(#note-mindmap-container:not(.hidden)) #app-toast-container {
+  bottom: 76px;
 }
 
 .app-toast-item {
