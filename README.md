@@ -9,6 +9,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Similarly1/open-shema/releases/tag/v0.3.0"><img src="https://img.shields.io/badge/Version-v0.3.0-blue.svg" alt="Version v0.3.0"></a>
+  <img src="https://img.shields.io/badge/Microsoft%20Store-Bient%C3%B4t%20Disponible-0078D4?logo=windows&logoColor=white" alt="Microsoft Store Bientôt Disponible">
+  <img src="https://img.shields.io/badge/Taille-~321%20Mo%20(All%C3%A9g%C3%A9e)-green" alt="Taille allégée">
   <img src="https://img.shields.io/badge/Licence-MIT-blue.svg" alt="License MIT">
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/Interface-PyWebView%20%2F%20Edge%20WebView2-informational" alt="WebView2">
@@ -56,10 +59,11 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
    - [📚 2. Dictionnaires Historiques & Lexiques Originaux](#-2-dictionnaires-historiques--lexiques-originaux)
    - [💬 3. Bibliothèque de Commentaires & Multi-Fenêtrage](#-3-bibliothèque-de-commentaires--multi-fenêtrage)
    - [🔬 4. Atelier de Passage, Péricopes & Cartographie](#-4-atelier-de-passage-péricopes--cartographie)
-   - [🎙️ 5. Studio de Prédication & Banque d'Illustrations](#-5-studio-de-prédication--banque-dillustrations)
+   - [🎙️ 5. Studio de Prédication, Banque d'Illustrations & Corpus UPVR](#-5-studio-de-prédication-banque-dillustrations--corpus-upvr)
    - [📖 6. Espace Théologie & Flux d'Articles](#-6-espace-théologie--flux-darticles)
    - [🎨 7. Ressources Visuelles & BibleProject](#-7-ressources-visuelles--bibleproject)
    - [🧠 8. Assistant IA Exégétique & RAG Haute Précision](#-8-assistant-ia-exégétique--rag-haute-précision)
+   - [🧠 9. Cartes Mentales Radiantes (Méthode Tony Buzan)](#-9-cartes-mentales-radiantes-méthode-tony-buzan)
 2. [📦 Accès aux Ressources & Modules (`open-shema-data`)](#-accès-aux-ressources--modules-open-shema-data)
 3. [🗃️ Formats Ouverts, Interopérabilité & Écosystème Agentique](#️-formats-ouverts-interopérabilité--écosystème-agentique)
 4. [🛠️ Architecture & Confidentialité](#️-architecture--confidentialité)
@@ -117,7 +121,7 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 ---
 
-### 🎙️ 5. Studio de Prédication & Banque d'Illustrations
+### 🎙️ 5. Studio de Prédication, Banque d'Illustrations & Corpus UPVR
 
 > 🛡️ **Règle Fondamentale de Non-Délégation & Respect de la Patte Humaine** :  
 > Open Shema a été délibérément calibré pour **ne jamais rédiger de prédications toutes faites** ni se substituer au prédicateur. L'IA n'est pas là pour penser, méditer ou prier à votre place. La prédication vivante n'est pas une récitation lisse et aseptisée générée par un modèle statistique : c'est la Parole de Dieu proclamée par un serviteur imparfait, dépendant de la puissance du Saint-Esprit opérant dans la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9). L'IA intervient exclusivement comme **assistant de laboratoire et miroir critique maïeutique** : elle fournit la matière brute exégétique, éprouve votre proposition centrale et vous accompagne sans jamais voler votre voix.
@@ -132,6 +136,10 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
   * Plus de 4 200 illustrations pastorales indexées et canevas homilétiques issus de prédications réelles.
 * **Mode Pupitre Live & Gestionnaire d'Archives** :
   * Présentation plein écran avec chronomètre discret pour la chaire, sans générer de diaporamas superficiels.
+* **🎙️ Corpus Pastoral « Un pasteur vous répond » (Florent Varak - UPVR)** :
+  * Intégration Deep RAG de centaines d'épisodes pastoraux transcrits et analysés.
+  * **Lecteur audio streaming intégré** : Écoutez l'extrait audio MP3 officiel directement au sein de l'application pendant votre préparation de prédication ou d'étude.
+  * Cartes de réponses pastorales épurées avec citations exactes et infobulles bibliques interactives.
 
 ---
 
@@ -192,6 +200,19 @@ Open Shema intègre un questionnaire d'alignement guidé en **4 étapes** permet
    - Précisez votre zone géographique et culturelle (*France, Suisse romande, Belgique, Québec, Afrique de l'Ouest/Centrale, Antilles, etc.*).
    - Sélectionnez votre tradition théologique (*Évangélique / Réformée, Baptiste, CAEF / Libre, Presbytérienne, Pentecôtiste, Luthérienne...*).
    - **Confession de foi personnalisée** : Vous pouvez copier-coller directement la déclaration de foi de votre église locale ou les confessions historiques de votre choix (*Westminster, La Rochelle, Londres 1689, CNEF...*) afin que l'assistant comprenne et respecte pleinement votre ancrage doctrinal.
+
+---
+
+### 🧠 9. Cartes Mentales Radiantes (Méthode Tony Buzan)
+
+Open Shema intègre un studio complet de mindmapping organique conçu pour la méditation textuelle, l'élaboration de sermons et la mémorisation visuelle :
+
+* **Branches Organiques & Polychromes** : Courbes fluides et coniques épousant la pensée rayonnante, coloration dynamique harmonisée par famille thématique.
+* **Catalogue de 121 Icônes Vectorielles SVG Pures** : Symboles théologiques, bibliques et conceptuels nobles, 100% vectoriels (zéro émoji), réactifs au mode clair/sombre.
+* **Médaillons Centraux & Illustrations IA** : Recadrage, zoom interactif et styles d'affichage visuels (Camée épuré, Carte Polaroid, Medallion seul).
+* **Infobulles Bibliques Riches au Survol** : Survoler un nœud ou une référence scripturaire affiche instantanément le texte biblique complet sans quitter le canevas.
+* **Cadres de Regroupement & Liaisons Transversales** : Regroupez vos branches par sections logiques et tracez des passerelles thématiques entre différentes parties du texte.
+* **Export Haute Résolution** : Exportez vos schémas en SVG vectoriel ou PNG haute fidélité pour vos supports d'enseignement ou d'étude.
 
 ---
 
@@ -258,13 +279,27 @@ Open Shema a été pensé pour que **l'utilisateur ne soit jamais prisonnier de 
 
 ---
 
-## 🚀 Démarrage Rapide
+## 🚀 Téléchargement & Démarrage
 
-### Prérequis
+### ⚡ 1. Version Portable Autonome (Disponible Immédiatement)
+- **Téléchargement direct :** Téléchargez l'archive [`OpenShema.zip` (~321 Mo)](https://github.com/Similarly1/open-shema/releases/download/v0.3.0/OpenShema.zip) depuis la [Release v0.3.0](https://github.com/Similarly1/open-shema/releases/tag/v0.3.0).
+- **Aucune installation requise :** Décompressez l'archive où vous le souhaitez (disque dur, clé USB, dossier personnel).
+- **Lancement immédiat :** Double-cliquez sur `OpenShema.exe` pour démarrer.
+- **Mises à jour :** L'application intègre son propre système de vérification et de mise à jour automatique.
+
+### 🏪 2. Microsoft Store *(Bientôt Disponible — En cours de déploiement)*
+> ⏳ **Bientôt disponible :** Le paquet officiel certifié (`.msix`) a été préparé et est actuellement en cours de validation par Microsoft. L'arrivée sur le Store permettra prochainement d'installer Open Shema en un clic et de bénéficier des mises à jour silencieuses directement gérées par Windows.
+
+> 🪶 **Application Allégée & Assistant au Premier Démarrage (First Run Wizard)** :  
+> L'archive d'installation de base a été considérablement allégée (réduite de **556 Mo à ~321 Mo**). Au premier lancement, un assistant intuitif vous propose de choisir votre configuration (installation complète personnalisée ou mode épuré). Les grands corpus encyclopédiques (comme les 2 437 gravures du Dictionnaire Vigouroux) se téléchargent en un clic à la demande depuis le catalogue officiel `open-shema-data`.
+
+### 🛠️ Installation depuis les sources (pour contributeurs)
+
+#### Prérequis
 - Windows 10/11 (avec runtime Microsoft Edge WebView2, présent par défaut)
 - Python 3.10 ou supérieur
 
-### Installation depuis les sources
+#### Lancement en mode développement
 
 ```bash
 # 1. Cloner le dépôt
