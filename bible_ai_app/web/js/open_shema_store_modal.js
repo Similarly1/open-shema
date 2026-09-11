@@ -821,6 +821,10 @@ const OpenShemaStore = {
     }).forEach(m => pdList.push({ ...m, category: 'public_domain', source: 'Logos Community Wiki', badge_label: 'Logos PB', action_label: 'Importer DOCX', is_free: true }));
 
     this.unifiedResults.public_domain = pdList;
+    // Vider les librairies pendant la recherche : elles seront mises à jour par le backend
+    if (q) {
+      this.unifiedResults.bookstores = [];
+    }
     this._updateFacetCounts();
   },
 

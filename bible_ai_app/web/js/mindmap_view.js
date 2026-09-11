@@ -4268,7 +4268,7 @@ const MindMapView = {
         const textBaseY = node.icon ? Math.round(rootR * 0.34) : 0;
         text.setAttribute('dominant-baseline', 'central');
         text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('class', 'mm-root-text');
+        text.setAttribute('class', `mm-root-text${rootImgSrc ? ' mm-root-text-on-image' : ''}`);
         text.setAttribute('fill', '#ffffff');
         text.setAttribute('pointer-events', 'none');
         text.setAttribute('style', 'text-shadow: 0 1px 4px rgba(0,0,0,0.6); font-weight: 900;');
@@ -4305,9 +4305,12 @@ const MindMapView = {
       } else {
         g.addEventListener('mouseenter', () => {
           this.cancelHideTooltip();
-          this.showImageOnlyTooltip(g, node);
+          this.scheduleShowTooltip(g, node, 400);
         });
-        g.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
+        g.addEventListener('mouseleave', () => {
+          this.cancelShowTooltip();
+          this.scheduleHideTooltip(350);
+        });
       }
 
       // Bouton contextuel + pour ajouter un BOI (en mode édition uniquement)
@@ -4760,9 +4763,12 @@ const MindMapView = {
       } else {
         hitRect.addEventListener('mouseenter', () => {
           this.cancelHideTooltip();
-          this.showImageOnlyTooltip(g, node);
+          this.scheduleShowTooltip(g, node, 400);
         });
-        hitRect.addEventListener('mouseleave', () => this.scheduleHideTooltip(350));
+        hitRect.addEventListener('mouseleave', () => {
+          this.cancelShowTooltip();
+          this.scheduleHideTooltip(350);
+        });
       }
 
       // Pastille Marqueur / Numéro / Priorité si présent (placé immédiatement à gauche du mot-clé, hors mode Polaroid où il est en timbre d'angle)
@@ -6084,6 +6090,20 @@ const MindMapView = {
     }
   },
 
+  scheduleShowTooltip(targetEl, node, delay = 400) {
+    this.cancelShowTooltip();
+    this._showTooltipTimer = setTimeout(() => {
+      this.showImageOnlyTooltip(targetEl, node);
+    }, delay);
+  },
+
+  cancelShowTooltip() {
+    if (this._showTooltipTimer) {
+      clearTimeout(this._showTooltipTimer);
+      this._showTooltipTimer = null;
+    }
+  },
+
   scheduleHideSubTooltip(delay = 300) {
     this.cancelHideSubTooltip();
     this._hideSubTooltipTimer = setTimeout(() => {
@@ -6136,9 +6156,9 @@ const MindMapView = {
     }
 
     // Position fixe au-dessus de l'élément (ou en dessous si manque d'espace en haut)
-    let top = rect.top - tooltipH - 10;
+    let top = rect.top - tooltipH - 6;
     if (top < padding) {
-      top = rect.bottom + 10;
+      top = rect.bottom + 6;
     }
 
     this.tooltipEl.style.left = `${Math.round(left)}px`;
@@ -6148,6 +6168,7 @@ const MindMapView = {
   hideTooltip() {
     this.cancelHideTooltip();
     this.cancelHideSubTooltip();
+    this.cancelShowTooltip();
     this.currentTooltipTarget = null;
     if (this.tooltipEl) {
       this.tooltipEl.style.display = 'none';
@@ -9303,7 +9324,7 @@ const MindMapView = {
       }
 
       // Étiquette flottante centrale
-      const labelText = (rel.label || 'VOIR AUSSI').toUpperCase();
+      const labelText = (rel.label || 'voir aussi').toLowerCase();
       const textW = this.getTextWidth(labelText, 9.5, '700');
       const pillW = Math.max(54, textW + 18);
       const pillH = 20;

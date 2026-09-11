@@ -33528,6 +33528,11 @@ body.mindmap-fullscreen-active .mindmap-dock:hover {
   fill: #0f172a !important;
 }
 
+/* Quand le médaillon a une image de fond sombre, le texte reste blanc même en mode feuille blanche */
+.note-mindmap-container.paper-mode .mm-root-text.mm-root-text-on-image {
+  fill: #ffffff !important;
+}
+
 /* Boîtes de branches & sujets flottants */
 .note-mindmap-container.paper-mode .mm-branch-box,
 .note-mindmap-container.paper-mode .mm-floating-box {
@@ -35512,6 +35517,8 @@ body[class*="palette-dark"] .mm-prompt-textarea::-webkit-scrollbar-thumb {
   z-index: 100010 !important;
   max-width: 380px;
   min-width: 240px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
   cursor: pointer;
 }
@@ -36304,27 +36311,29 @@ body[class*="palette-dark"] .mm-connecting-text kbd {
 
 .mm-rel-label-rect {
   fill: var(--bg-card, #ffffff);
-  stroke: var(--border-color, #cbd5e1);
-  stroke-width: 1.2px;
+  stroke: var(--border-color, #e2e8f0);
+  stroke-width: 1px;
+  opacity: 0.85;
   transition: all 0.15s ease;
 }
 
 body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-rel-label-rect,
 body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-rel-label-rect {
   fill: #1e293b;
-  stroke: #475569;
+  stroke: #334155;
 }
 
 .mm-rel-label-text {
-  font-size: 10px;
-  font-weight: 700;
-  fill: var(--text-secondary, #475569);
-  letter-spacing: 0.3px;
+  font-size: 9px;
+  font-weight: 500;
+  fill: var(--text-secondary, #94a3b8);
+  letter-spacing: 0;
+  opacity: 0.75;
 }
 
 body.theme-dark .note-mindmap-container:not(.paper-mode) .mm-rel-label-text,
 body[class*="palette-dark"] .note-mindmap-container:not(.paper-mode) .mm-rel-label-text {
-  fill: #94a3b8;
+  fill: #64748b;
 }
 
 .mm-relationship-g:hover .mm-rel-label-rect,
@@ -37686,10 +37695,17 @@ body[class*="palette-dark"] .mm-marker-clear-btn:hover {
   transform-origin: center;
 }
 
+/* Scintillement rapide droite→gauche au survol du badge marqueur */
+@keyframes mm-marker-shimmer {
+  0%   { transform: scale(1.12) translateX(5px); filter: brightness(1.18) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  100% { transform: scale(1.12) translateX(-5px); filter: brightness(1.25) drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+}
+
 .mm-node-marker-badge:hover circle,
 .mm-node-marker-badge:hover rect {
-  transform: scale(1.15);
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35)) brightness(1.12);
+  animation: mm-marker-shimmer 0.28s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 /* 3. Badge Marqueur dans la Vue Plan (Outliner) */

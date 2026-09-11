@@ -95,12 +95,16 @@ class EbookFinderManager:
         default_format = store_info.get('default_format', 'EPUB')
 
         seen_urls = set()
-        # On teste la requête brute et la variante avec suffixe 'ebook'
-        queries_to_try = [query]
-        if not re.search(r'\b(ebook|numérique|epub)\b', query, re.IGNORECASE):
-            queries_to_try.append(f"{query} ebook")
+        # On teste la requête brute et la variante avec suffixe 'ebook'.
+        # La variante ebook est marquée comme telle pour assouplir le filtre :
+        # si la boutique renvoie un produit à la requête "Bible ebook", c'est
+        # qu'il est numérique même si le titre ne le dit pas explicitement.
+        has_ebook = bool(re.search(r'\b(ebook|numérique|epub)\b', query, re.IGNORECASE))
+        queries_to_try = [(query, has_ebook)]  # (requête, is_ebook_query)
+        if not has_ebook:
+            queries_to_try.append((f"{query} ebook", True))
 
-        for q in queries_to_try:
+        for q, is_ebook_query in queries_to_try:
             encoded_query = urllib.parse.quote(q)
             url = f"https://{domain}/search/suggest.json?q={encoded_query}&resources[type]=product&resources[limit]=8"
 
@@ -122,31 +126,36 @@ class EbookFinderManager:
                         price = prod.get('price') or ''
                         image = prod.get('image') or ''
 
-                        # FILTRE STRICT E-BOOK
-                        if self.is_strictly_ebook(raw_title, prod_url):
-                            clean_t = self.clean_ebook_title(raw_title)
-                            
-                            # Correction du protocole d'image si nécessaire
-                            if image.startswith('//'):
-                                image = f"https:{image}"
+                        # FILTRE E-BOOK :
+                        # - Si la requête envoyée contenait déjà "ebook", on fait confiance
+                        #   au moteur de la boutique : le produit est numérique.
+                        # - Sinon on applique le filtre strict pour exclure les livres papier.
+                        if not is_ebook_query and not self.is_strictly_ebook(raw_title, prod_url):
+                            continue
 
-                            curr_sym = store_info.get('currency_symbol', '€')
-                            price_formatted = f"{float(price):.2f} {curr_sym}" if price else "Disponible"
+                        clean_t = self.clean_ebook_title(raw_title)
+                        
+                        # Correction du protocole d'image si nécessaire
+                        if image.startswith('//'):
+                            image = f"https:{image}"
 
-                            results.append({
-                                'id': f"{domain}_{prod.get('id', hash(prod_url))}",
-                                'title': clean_t if clean_t else raw_title,
-                                'raw_title': raw_title,
-                                'source': name,
-                                'store_badge': badge,
-                                'format': default_format,
-                                'price': price_formatted,
-                                'price_raw': float(price) if price else 0.0,
-                                'currency': curr_sym,
-                                'url': f"https://{domain}{prod_url}",
-                                'image': image,
-                                'is_direct_product': True
-                            })
+                        curr_sym = store_info.get('currency_symbol', '€')
+                        price_formatted = f"{float(price):.2f} {curr_sym}" if price else "Disponible"
+
+                        results.append({
+                            'id': f"{domain}_{prod.get('id', hash(prod_url))}",
+                            'title': clean_t if clean_t else raw_title,
+                            'raw_title': raw_title,
+                            'source': name,
+                            'store_badge': badge,
+                            'format': default_format,
+                            'price': price_formatted,
+                            'price_raw': float(price) if price else 0.0,
+                            'currency': curr_sym,
+                            'url': f"https://{domain}{prod_url}",
+                            'image': image,
+                            'is_direct_product': True
+                        })
             except Exception:
                 continue
 
