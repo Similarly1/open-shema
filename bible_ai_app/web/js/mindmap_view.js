@@ -1173,8 +1173,15 @@ const MindMapView = {
 
       const colorMatch = raw.match(/color:\s*([a-zA-Z\-]+)/i);
       if (colorMatch) color = colorMatch[1].trim().toLowerCase();
+
+      let aspect = 1.0;
+      const aspectMatch = raw.match(/aspect:\s*([0-9.]+)/i);
+      if (aspectMatch) {
+        const a = parseFloat(aspectMatch[1]);
+        if (!isNaN(a) && a > 0.1 && a < 10) aspect = Math.round(a * 100) / 100;
+      }
     }
-    return { image, mode, zoom, panX, panY, color };
+    return { image, mode, zoom, panX, panY, color, aspect: aspect || 1.0 };
   },
 
   serializeImageDirective(node) {
@@ -1191,6 +1198,9 @@ const MindMapView = {
     }
     if (node.imageColor && node.imageColor !== 'natural') {
       parts.push(`color: ${node.imageColor}`);
+    }
+    if (typeof node.imageAspect === 'number' && Math.abs(node.imageAspect - 1.0) > 0.01) {
+      parts.push(`aspect: ${Math.round(node.imageAspect * 100) / 100}`);
     }
     return parts.join(' | ');
   },
@@ -1228,6 +1238,7 @@ const MindMapView = {
     let rootImagePanX = 0;
     let rootImagePanY = 0;
     let rootImageColor = 'natural';
+    let rootImageAspect = 1.0;
     let rootTitle = (title || 'CONCEPT CENTRAL').toUpperCase();
     if (markdownContent) {
       const rootIconMatch = markdownContent.match(/<!--\s*mindmap-root-icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
@@ -1243,6 +1254,7 @@ const MindMapView = {
         rootImagePanX = parsed.panX;
         rootImagePanY = parsed.panY;
         rootImageColor = parsed.color;
+        if (parsed.aspect) rootImageAspect = parsed.aspect;
       }
     }
     const titleIconMatch = rootTitle.match(/::([a-zA-Z0-9_-]+):?/i);
@@ -1264,6 +1276,9 @@ const MindMapView = {
       rootImagePanY = this.currentNote.rootImagePanY || 0;
       rootImageColor = this.currentNote.rootImageColor || 'natural';
     }
+    if (this.currentNote && this.currentNote.rootImageAspect) {
+      rootImageAspect = this.currentNote.rootImageAspect;
+    }
 
     const root = {
       id: 'root',
@@ -1275,6 +1290,7 @@ const MindMapView = {
       imagePanX: rootImagePanX,
       imagePanY: rootImagePanY,
       imageColor: rootImageColor,
+      imageAspect: rootImageAspect,
       ref: '',
       children: [],
       side: 'center',
@@ -1364,6 +1380,7 @@ const MindMapView = {
         let imagePanX = 0;
         let imagePanY = 0;
         let imageColor = 'natural';
+        let imageAspect = 1.0;
         const imageMatch = text.match(/<!--\s*image:\s*([\s\S]*?)\s*-->/i);
         if (imageMatch) {
           const parsed = this.parseImageDirective(imageMatch[1].trim());
@@ -1373,6 +1390,7 @@ const MindMapView = {
           imagePanX = parsed.panX;
           imagePanY = parsed.panY;
           imageColor = parsed.color;
+          if (parsed.aspect) imageAspect = parsed.aspect;
           text = text.replace(imageMatch[0], '').trim();
         }
 
@@ -1400,6 +1418,7 @@ const MindMapView = {
           imagePanX: imagePanX,
           imagePanY: imagePanY,
           imageColor: imageColor,
+          imageAspect: imageAspect || null,
           ref: ref,
           note: noteText,
           children: [],
@@ -3923,16 +3942,15 @@ const MindMapView = {
         this.resolveNodeImageDataUrl(node);
       }
       if (rootImgSrc && defs) {
-        const rootClipId = `mm-root-clip-${node.id || 'r'}`;
+        const rootClipId = `mm-root-clip-${node.id || 'root'}`;
         let rClip = defs.querySelector(`#${rootClipId}`);
-        if (!rClip) {
-          rClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-          rClip.setAttribute('id', rootClipId);
-          const cCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          cCircle.setAttribute('r', rootR);
-          rClip.appendChild(cCircle);
-          defs.appendChild(rClip);
-        }
+        if (rClip) rClip.remove();
+        rClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+        rClip.setAttribute('id', rootClipId);
+        const cCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        cCircle.setAttribute('r', rootR);
+        rClip.appendChild(cCircle);
+        defs.appendChild(rClip);
 
         const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         imgG.setAttribute('clip-path', `url(#${rootClipId})`);
@@ -4153,6 +4171,7 @@ const MindMapView = {
           const vW = boxW;
           const vH = isTopImage ? topImgH : boxH;
           const vCx = 0;
+          const vCy = isTopImage ? (-boxH / 2 + topImgH / 2) : 0;
           const imgAspect = node.imageAspect || 1.0;
           const cover = this.calcImageCover(vW, vH, imgAspect, node.imageZoom, node.imagePanX, node.imagePanY);
 
@@ -7341,6 +7360,19 @@ const MindMapView = {
     const node = this.findNode(nodeId);
     if (!node) return;
 
+    if (node.image && !node.imageDataUrl && !(node.image.startsWith('data:') || node.image.startsWith('http'))) {
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.load_mindmap_image_data_url) {
+        try {
+          const res = await window.pywebview.api.load_mindmap_image_data_url(node.image);
+          if (res && res.success && res.dataUrl) {
+            node.imageDataUrl = res.dataUrl;
+          }
+        } catch (e) {
+          console.warn('Erreur chargement image modale:', e);
+        }
+      }
+    }
+
     // Supprimer une modale existante
     document.getElementById('mm-image-gen-overlay')?.remove();
 
@@ -7485,7 +7517,7 @@ const MindMapView = {
             <button type="button" id="mm-crop-zoom-out" title="Dézoomer" style="background: var(--bg-secondary, #334155); border: 1px solid var(--border-color, #475569); color: var(--text-primary); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
-            <input type="range" id="mm-crop-zoom-range" class="mm-crop-zoom-slider" min="100" max="250" step="5" value="${Math.round(selectedZoom * 100)}" style="width: 85px;" />
+            <input type="range" id="mm-crop-zoom-range" class="mm-crop-zoom-slider" min="100" max="300" step="5" value="${Math.round(selectedZoom * 100)}" style="width: 85px;" />
             <button type="button" id="mm-crop-zoom-in" title="Zoomer" style="background: var(--bg-secondary, #334155); border: 1px solid var(--border-color, #475569); color: var(--text-primary); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
@@ -7554,7 +7586,7 @@ const MindMapView = {
     };
 
     const setZoom = (val) => {
-      selectedZoom = Math.max(1.0, Math.min(2.5, Math.round(val * 100) / 100));
+      selectedZoom = Math.max(1.0, Math.min(3.0, Math.round(val * 100) / 100));
       if (zoomRange) zoomRange.value = Math.round(selectedZoom * 100);
       if (zoomVal) zoomVal.textContent = `${Math.round(selectedZoom * 100)}%`;
       updatePreviewTransform();
