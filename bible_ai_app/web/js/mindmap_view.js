@@ -1223,6 +1223,14 @@ const MindMapView = {
   },
 
   parseMarkdownToTree(title, markdownContent) {
+    // Si markdownContent contient un en-tête YAML Frontmatter (ex: importation brute), le détacher du corps
+    if (markdownContent && typeof markdownContent === 'string' && markdownContent.trim().startsWith('---')) {
+      const parts = markdownContent.split('---');
+      if (parts.length >= 3) {
+        markdownContent = parts.slice(2).join('---').trim();
+      }
+    }
+
     // Détection de la directive de structure <!-- mindmap-layout: radiant|right-tree|top-down -->
     let structure = 'radiant';
     let connector = 'curve';
@@ -2016,48 +2024,47 @@ const MindMapView = {
         node.width = s;
         node.height = s;
         node.contentWidth = s;
-        return;
-      }
-      const textW = this.getTextWidth(node.text, 12, '800');
-      node.textWidth = textW;
-
-      let markerW = 0;
-      if (node.marker) {
-        const isP = String(node.marker).toLowerCase().startsWith('p');
-        node.markerWidth = isP ? 22 : 18;
-        markerW = node.markerWidth + 6;
       } else {
-        node.markerWidth = 0;
-      }
+        const textW = this.getTextWidth(node.text, 12, '800');
+        node.textWidth = textW;
 
-      let refW = 0;
-      if (node.ref) {
-        const displayRef = this.formatScripturePillRef(node.ref);
-        const refTextW = this.getTextWidth(displayRef, 9, '700');
-        node.refPillWidth = Math.max(38, Math.min(94, refTextW + 14));
-        refW = node.refPillWidth + 8;
-      } else {
-        node.refPillWidth = 0;
-      }
+        let markerW = 0;
+        if (node.marker) {
+          const isP = String(node.marker).toLowerCase().startsWith('p');
+          node.markerWidth = isP ? 22 : 18;
+          markerW = node.markerWidth + 6;
+        } else {
+          node.markerWidth = 0;
+        }
 
-      let noteW = 0;
-      if (node.note) {
-        node.notePillWidth = 18;
-        noteW = 18 + 8;
-      } else {
-        node.notePillWidth = 0;
-      }
+        let refW = 0;
+        if (node.ref) {
+          const displayRef = this.formatScripturePillRef(node.ref);
+          const refTextW = this.getTextWidth(displayRef, 9, '700');
+          node.refPillWidth = Math.max(38, Math.min(94, refTextW + 14));
+          refW = node.refPillWidth + 8;
+        } else {
+          node.refPillWidth = 0;
+        }
 
-      if (hasImg && imgMode === 'top-image') {
-        node.contentWidth = textW;
-        node.width = Math.max(88, textW + 26);
-        node.height = 66;
-        return;
-      }
+        let noteW = 0;
+        if (node.note) {
+          node.notePillWidth = 18;
+          noteW = 18 + 8;
+        } else {
+          node.notePillWidth = 0;
+        }
 
-      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
-      node.width = Math.max(92, node.contentWidth + 32);
-      node.height = hasImg ? 36 : 30;
+        if (hasImg && imgMode === 'top-image') {
+          node.contentWidth = textW;
+          node.width = Math.max(88, textW + 26);
+          node.height = 66;
+        } else {
+          node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
+          node.width = Math.max(92, node.contentWidth + 32);
+          node.height = hasImg ? 36 : 30;
+        }
+      }
     } else if (node.level === 0) {
       // NIVEAU 0 (Thème général / Noyau central dominant Buzan - médaillon circulaire polychrome)
       if (hasImg && imgMode === 'image-only') {
@@ -2069,22 +2076,22 @@ const MindMapView = {
         node.textWidth = 0;
         node.markerWidth = 0;
         node.iconWidth = 0;
-        return;
-      }
-      const textW = this.getTextWidth(node.text, 15, '900');
-      node.textWidth = textW;
-      node.markerWidth = 0;
-      const iconW = node.icon ? 38 : 0;
-      node.iconWidth = iconW;
+      } else {
+        const textW = this.getTextWidth(node.text, 15, '900');
+        node.textWidth = textW;
+        node.markerWidth = 0;
+        const iconW = node.icon ? 38 : 0;
+        node.iconWidth = iconW;
 
-      // Rayon harmonieux pour le médaillon circulaire Buzan (évite tout disque démesuré sur titre long)
-      const words = (node.text || '').trim().split(/\s+/);
-      const isMultiWord = words.length >= 3 && node.text.length > 15;
-      const effectiveTextW = isMultiWord ? textW * 0.58 : textW;
-      const rootR = Math.max(node.image ? 58 : 48, Math.min(88, Math.max(effectiveTextW * 0.52 + 16, node.icon ? 56 : 46)));
-      node.rootRadius = rootR;
-      node.width = rootR * 2;
-      node.height = rootR * 2;
+        // Rayon harmonieux pour le médaillon circulaire Buzan (évite tout disque démesuré sur titre long)
+        const words = (node.text || '').trim().split(/\s+/);
+        const isMultiWord = words.length >= 3 && node.text.length > 15;
+        const effectiveTextW = isMultiWord ? textW * 0.58 : textW;
+        const rootR = Math.max(node.image ? 58 : 48, Math.min(88, Math.max(effectiveTextW * 0.52 + 16, node.icon ? 56 : 46)));
+        node.rootRadius = rootR;
+        node.width = rootR * 2;
+        node.height = rootR * 2;
+      }
     } else if (node.level === 1) {
       // NIVEAU 1 (BOIs - Règles de Buzan : mots-clés forces, affirmé et contrasté)
       if (hasImg && imgMode === 'image-only') {
@@ -2096,49 +2103,48 @@ const MindMapView = {
         node.width = s;
         node.height = s;
         node.contentWidth = s;
-        return;
-      }
-      const textW = this.getTextWidth(node.text, 14, '800');
-      node.textWidth = textW;
-
-      let markerW = 0;
-      if (node.marker) {
-        const isP = String(node.marker).toLowerCase().startsWith('p');
-        node.markerWidth = isP ? 22 : 18;
-        markerW = node.markerWidth + 6;
       } else {
-        node.markerWidth = 0;
-      }
+        const textW = this.getTextWidth(node.text, 14, '800');
+        node.textWidth = textW;
 
-      let refW = 0;
-      if (node.ref) {
-        const displayRef = this.formatScripturePillRef(node.ref);
-        const refTextW = this.getTextWidth(displayRef, 9.5, '700');
-        node.refPillWidth = Math.max(40, Math.min(100, refTextW + 16));
-        refW = node.refPillWidth + 8;
-      } else {
-        node.refPillWidth = 0;
-      }
+        let markerW = 0;
+        if (node.marker) {
+          const isP = String(node.marker).toLowerCase().startsWith('p');
+          node.markerWidth = isP ? 22 : 18;
+          markerW = node.markerWidth + 6;
+        } else {
+          node.markerWidth = 0;
+        }
 
-      let noteW = 0;
-      if (node.note) {
-        node.notePillWidth = 18;
-        noteW = 18 + 8;
-      } else {
-        node.notePillWidth = 0;
-      }
+        let refW = 0;
+        if (node.ref) {
+          const displayRef = this.formatScripturePillRef(node.ref);
+          const refTextW = this.getTextWidth(displayRef, 9.5, '700');
+          node.refPillWidth = Math.max(40, Math.min(100, refTextW + 16));
+          refW = node.refPillWidth + 8;
+        } else {
+          node.refPillWidth = 0;
+        }
 
-      if (hasImg && imgMode === 'top-image') {
-        node.contentWidth = textW;
-        node.width = Math.max(92, textW + 28);
-        node.height = 70;
-        return;
-      }
+        let noteW = 0;
+        if (node.note) {
+          node.notePillWidth = 18;
+          noteW = 18 + 8;
+        } else {
+          node.notePillWidth = 0;
+        }
 
-      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
-      const minW = node.image ? 116 : 96;
-      node.width = Math.max(minW, node.contentWidth + 36);
-      node.height = node.image ? 40 : 36; // Plus imposant que les niveaux inférieurs (36px vs 28px/24px)
+        if (hasImg && imgMode === 'top-image') {
+          node.contentWidth = textW;
+          node.width = Math.max(92, textW + 28);
+          node.height = 70;
+        } else {
+          node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
+          const minW = node.image ? 116 : 96;
+          node.width = Math.max(minW, node.contentWidth + 36);
+          node.height = node.image ? 40 : 36; // Plus imposant que les niveaux inférieurs (36px vs 28px/24px)
+        }
+      }
     } else if (node.level === 2) {
       // NIVEAU 2 (Sous-branches subordonnées)
       if (hasImg && imgMode === 'image-only') {
@@ -2150,49 +2156,48 @@ const MindMapView = {
         node.width = s;
         node.height = s;
         node.contentWidth = s;
-        return;
-      }
-      const textW = this.getTextWidth(node.text, 11.5, '700');
-      node.textWidth = textW;
-
-      let markerW = 0;
-      if (node.marker) {
-        const isP = String(node.marker).toLowerCase().startsWith('p');
-        node.markerWidth = isP ? 22 : 18;
-        markerW = node.markerWidth + 6;
       } else {
-        node.markerWidth = 0;
-      }
+        const textW = this.getTextWidth(node.text, 11.5, '700');
+        node.textWidth = textW;
 
-      let refW = 0;
-      if (node.ref) {
-        const displayRef = this.formatScripturePillRef(node.ref);
-        const refTextW = this.getTextWidth(displayRef, 9, '700');
-        node.refPillWidth = Math.max(38, Math.min(94, refTextW + 14));
-        refW = node.refPillWidth + 8;
-      } else {
-        node.refPillWidth = 0;
-      }
+        let markerW = 0;
+        if (node.marker) {
+          const isP = String(node.marker).toLowerCase().startsWith('p');
+          node.markerWidth = isP ? 22 : 18;
+          markerW = node.markerWidth + 6;
+        } else {
+          node.markerWidth = 0;
+        }
 
-      let noteW = 0;
-      if (node.note) {
-        node.notePillWidth = 18;
-        noteW = 18 + 8;
-      } else {
-        node.notePillWidth = 0;
-      }
+        let refW = 0;
+        if (node.ref) {
+          const displayRef = this.formatScripturePillRef(node.ref);
+          const refTextW = this.getTextWidth(displayRef, 9, '700');
+          node.refPillWidth = Math.max(38, Math.min(94, refTextW + 14));
+          refW = node.refPillWidth + 8;
+        } else {
+          node.refPillWidth = 0;
+        }
 
-      if (hasImg && imgMode === 'top-image') {
-        node.contentWidth = textW;
-        node.width = Math.max(82, textW + 24);
-        node.height = 62;
-        return;
-      }
+        let noteW = 0;
+        if (node.note) {
+          node.notePillWidth = 18;
+          noteW = 18 + 8;
+        } else {
+          node.notePillWidth = 0;
+        }
 
-      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
-      const minW = node.image ? 104 : 82;
-      node.width = Math.max(minW, node.contentWidth + 30);
-      node.height = node.image ? 32 : 28;
+        if (hasImg && imgMode === 'top-image') {
+          node.contentWidth = textW;
+          node.width = Math.max(82, textW + 24);
+          node.height = 62;
+        } else {
+          node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
+          const minW = node.image ? 104 : 82;
+          node.width = Math.max(minW, node.contentWidth + 30);
+          node.height = node.image ? 32 : 28;
+        }
+      }
     } else {
       // NIVEAU 3+ (Détails fins légers)
       if (hasImg && imgMode === 'image-only') {
@@ -2204,49 +2209,48 @@ const MindMapView = {
         node.width = s;
         node.height = s;
         node.contentWidth = s;
-        return;
-      }
-      const textW = this.getTextWidth(node.text, 10, '600');
-      node.textWidth = textW;
-
-      let markerW = 0;
-      if (node.marker) {
-        const isP = String(node.marker).toLowerCase().startsWith('p');
-        node.markerWidth = isP ? 22 : 18;
-        markerW = node.markerWidth + 6;
       } else {
-        node.markerWidth = 0;
-      }
+        const textW = this.getTextWidth(node.text, 10, '600');
+        node.textWidth = textW;
 
-      let refW = 0;
-      if (node.ref) {
-        const displayRef = this.formatScripturePillRef(node.ref);
-        const refTextW = this.getTextWidth(displayRef, 8.5, '700');
-        node.refPillWidth = Math.max(36, Math.min(90, refTextW + 12));
-        refW = node.refPillWidth + 6;
-      } else {
-        node.refPillWidth = 0;
-      }
+        let markerW = 0;
+        if (node.marker) {
+          const isP = String(node.marker).toLowerCase().startsWith('p');
+          node.markerWidth = isP ? 22 : 18;
+          markerW = node.markerWidth + 6;
+        } else {
+          node.markerWidth = 0;
+        }
 
-      let noteW = 0;
-      if (node.note) {
-        node.notePillWidth = 18;
-        noteW = 18 + 6;
-      } else {
-        node.notePillWidth = 0;
-      }
+        let refW = 0;
+        if (node.ref) {
+          const displayRef = this.formatScripturePillRef(node.ref);
+          const refTextW = this.getTextWidth(displayRef, 8.5, '700');
+          node.refPillWidth = Math.max(36, Math.min(90, refTextW + 12));
+          refW = node.refPillWidth + 6;
+        } else {
+          node.refPillWidth = 0;
+        }
 
-      if (hasImg && imgMode === 'top-image') {
-        node.contentWidth = textW;
-        node.width = Math.max(76, textW + 22);
-        node.height = 58;
-        return;
-      }
+        let noteW = 0;
+        if (node.note) {
+          node.notePillWidth = 18;
+          noteW = 18 + 6;
+        } else {
+          node.notePillWidth = 0;
+        }
 
-      node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
-      const minW = node.image ? 96 : 68;
-      node.width = Math.max(minW, node.contentWidth + 26);
-      node.height = node.image ? 28 : 24;
+        if (hasImg && imgMode === 'top-image') {
+          node.contentWidth = textW;
+          node.width = Math.max(76, textW + 22);
+          node.height = 58;
+        } else {
+          node.contentWidth = markerW + (node.icon ? 22 : 0) + textW + refW + noteW;
+          const minW = node.image ? 96 : 68;
+          node.width = Math.max(minW, node.contentWidth + 26);
+          node.height = node.image ? 28 : 24;
+        }
+      }
     }
 
     if (!node.children || node.children.length === 0) {
@@ -2262,7 +2266,7 @@ const MindMapView = {
     let sum = 0;
     node.children.forEach(child => {
       this.measureNode(child);
-      sum += child.totalHeight;
+      sum += (child.totalHeight || child.height + 18 || 30);
     });
     const contentHeight = Math.max(node.height + 18, sum);
     const hasBoundary = this.boundaries && this.boundaries.some(b => b.rootId === node.id);
@@ -2273,124 +2277,171 @@ const MindMapView = {
   },
 
   measureTopDown(node) {
+    const hasImg = !!node.image;
+    const imgMode = node.imageMode || 'background';
+
     if (node.level === 0) {
-      const textW = this.getTextWidth(node.text, 15, '900');
-      node.textWidth = textW;
-      node.markerWidth = 0;
-      const iconW = node.icon ? 38 : 0;
-      node.iconWidth = iconW;
-      const words = (node.text || '').trim().split(/\s+/);
-      const isMultiWord = words.length >= 3 && node.text.length > 15;
-      const effectiveTextW = isMultiWord ? textW * 0.58 : textW;
-      const rootR = Math.max(48, Math.min(82, Math.max(effectiveTextW * 0.52 + 16, node.icon ? 56 : 46)));
-      node.rootRadius = rootR;
-      node.width = rootR * 2;
-      node.height = rootR * 2;
+      if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 104;
+        const rootR = Math.round(s / 2);
+        node.rootRadius = rootR;
+        node.width = s;
+        node.height = s;
+        node.textWidth = 0;
+        node.markerWidth = 0;
+        node.iconWidth = 0;
+      } else {
+        const textW = this.getTextWidth(node.text, 15, '900');
+        node.textWidth = textW;
+        node.markerWidth = 0;
+        const iconW = node.icon ? 38 : 0;
+        node.iconWidth = iconW;
+        const words = (node.text || '').trim().split(/\s+/);
+        const isMultiWord = words.length >= 3 && node.text.length > 15;
+        const effectiveTextW = isMultiWord ? textW * 0.58 : textW;
+        const rootR = Math.max(48, Math.min(82, Math.max(effectiveTextW * 0.52 + 16, node.icon ? 56 : 46)));
+        node.rootRadius = rootR;
+        node.width = rootR * 2;
+        node.height = rootR * 2;
+      }
     } else if (node.level === 1) {
-      const textW = this.getTextWidth(node.text, 14, '800');
-      node.textWidth = textW;
-
-      let markerW = 0;
-      if (node.marker) {
-        const isP = String(node.marker).toLowerCase().startsWith('p');
-        node.markerWidth = isP ? 22 : 18;
-        markerW = node.markerWidth + 6;
-      } else {
+      if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 68;
+        node.textWidth = 0;
         node.markerWidth = 0;
-      }
-
-      let refW = 0;
-      if (node.ref) {
-        const displayRef = this.formatScripturePillRef(node.ref);
-        const refTextW = this.getTextWidth(displayRef, 9.5, '700');
-        node.refPillWidth = Math.max(40, Math.min(100, refTextW + 16));
-        refW = node.refPillWidth + 8;
-      } else {
         node.refPillWidth = 0;
-      }
-
-      let noteW = 0;
-      if (node.note) {
-        node.notePillWidth = 18;
-        noteW = 18 + 8;
-      } else {
         node.notePillWidth = 0;
-      }
+        node.width = s;
+        node.height = s;
+        node.contentWidth = s;
+      } else {
+        const textW = this.getTextWidth(node.text, 14, '800');
+        node.textWidth = textW;
 
-      node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(96, node.contentWidth + 36);
-      node.height = 36;
+        let markerW = 0;
+        if (node.marker) {
+          const isP = String(node.marker).toLowerCase().startsWith('p');
+          node.markerWidth = isP ? 22 : 18;
+          markerW = node.markerWidth + 6;
+        } else {
+          node.markerWidth = 0;
+        }
+
+        let refW = 0;
+        if (node.ref) {
+          const displayRef = this.formatScripturePillRef(node.ref);
+          const refTextW = this.getTextWidth(displayRef, 9.5, '700');
+          node.refPillWidth = Math.max(40, Math.min(100, refTextW + 16));
+          refW = node.refPillWidth + 8;
+        } else {
+          node.refPillWidth = 0;
+        }
+
+        let noteW = 0;
+        if (node.note) {
+          node.notePillWidth = 18;
+          noteW = 18 + 8;
+        } else {
+          node.notePillWidth = 0;
+        }
+
+        node.contentWidth = markerW + textW + refW + noteW;
+        node.width = Math.max(96, node.contentWidth + 36);
+        node.height = 36;
+      }
     } else if (node.level === 2) {
-      const textW = this.getTextWidth(node.text, 11.5, '700');
-      node.textWidth = textW;
-
-      let markerW = 0;
-      if (node.marker) {
-        const isP = String(node.marker).toLowerCase().startsWith('p');
-        node.markerWidth = isP ? 22 : 18;
-        markerW = node.markerWidth + 6;
-      } else {
+      if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 52;
+        node.textWidth = 0;
         node.markerWidth = 0;
-      }
-
-      let refW = 0;
-      if (node.ref) {
-        const displayRef = this.formatScripturePillRef(node.ref);
-        const refTextW = this.getTextWidth(displayRef, 9, '700');
-        node.refPillWidth = Math.max(38, Math.min(94, refTextW + 14));
-        refW = node.refPillWidth + 8;
-      } else {
         node.refPillWidth = 0;
-      }
-
-      let noteW = 0;
-      if (node.note) {
-        node.notePillWidth = 18;
-        noteW = 18 + 8;
-      } else {
         node.notePillWidth = 0;
-      }
+        node.width = s;
+        node.height = s;
+        node.contentWidth = s;
+      } else {
+        const textW = this.getTextWidth(node.text, 11.5, '700');
+        node.textWidth = textW;
 
-      node.contentWidth = markerW + textW + refW + noteW;
-      node.width = Math.max(82, node.contentWidth + 30);
-      node.height = 28;
+        let markerW = 0;
+        if (node.marker) {
+          const isP = String(node.marker).toLowerCase().startsWith('p');
+          node.markerWidth = isP ? 22 : 18;
+          markerW = node.markerWidth + 6;
+        } else {
+          node.markerWidth = 0;
+        }
+
+        let refW = 0;
+        if (node.ref) {
+          const displayRef = this.formatScripturePillRef(node.ref);
+          const refTextW = this.getTextWidth(displayRef, 9, '700');
+          node.refPillWidth = Math.max(38, Math.min(94, refTextW + 14));
+          refW = node.refPillWidth + 8;
+        } else {
+          node.refPillWidth = 0;
+        }
+
+        let noteW = 0;
+        if (node.note) {
+          node.notePillWidth = 18;
+          noteW = 18 + 8;
+        } else {
+          node.notePillWidth = 0;
+        }
+
+        node.contentWidth = markerW + textW + refW + noteW;
+        node.width = Math.max(82, node.contentWidth + 30);
+        node.height = 28;
+      }
     } else {
-      const textW = this.getTextWidth(node.text, 10, '600');
-      node.textWidth = textW;
-
-      let markerW = 0;
-      if (node.marker) {
-        const isP = String(node.marker).toLowerCase().startsWith('p');
-        node.markerWidth = isP ? 22 : 18;
-        markerW = node.markerWidth + 6;
-      } else {
+      if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 44;
+        node.textWidth = 0;
         node.markerWidth = 0;
-      }
-
-      let refW = 0;
-      if (node.ref) {
-        const displayRef = this.formatScripturePillRef(node.ref);
-        const refTextW = this.getTextWidth(displayRef, 8.5, '700');
-        node.refPillWidth = Math.max(36, Math.min(90, refTextW + 12));
-        refW = node.refPillWidth + 6;
-      } else {
         node.refPillWidth = 0;
-      }
-
-      let noteW = 0;
-      if (node.note) {
-        node.notePillWidth = 18;
-        noteW = 18 + 6;
-      } else {
         node.notePillWidth = 0;
+        node.width = s;
+        node.height = s;
+        node.contentWidth = s;
+      } else {
+        const textW = this.getTextWidth(node.text, 10, '600');
+        node.textWidth = textW;
+
+        let markerW = 0;
+        if (node.marker) {
+          const isP = String(node.marker).toLowerCase().startsWith('p');
+          node.markerWidth = isP ? 22 : 18;
+          markerW = node.markerWidth + 6;
+        } else {
+          node.markerWidth = 0;
+        }
+
+        let refW = 0;
+        if (node.ref) {
+          const displayRef = this.formatScripturePillRef(node.ref);
+          const refTextW = this.getTextWidth(displayRef, 8.5, '700');
+          node.refPillWidth = Math.max(36, Math.min(90, refTextW + 12));
+          refW = node.refPillWidth + 6;
+        } else {
+          node.refPillWidth = 0;
+        }
+
+        let noteW = 0;
+        if (node.note) {
+          node.notePillWidth = 18;
+          noteW = 18 + 6;
+        } else {
+          node.notePillWidth = 0;
+        }
+
+        const iconW = node.icon ? 20 : 0;
+        node.iconWidth = iconW;
+
+        node.contentWidth = markerW + iconW + textW + refW + noteW;
+        node.width = Math.max(68, node.contentWidth + 26);
+        node.height = 24;
       }
-
-      const iconW = node.icon ? 20 : 0;
-      node.iconWidth = iconW;
-
-      node.contentWidth = markerW + iconW + textW + refW + noteW;
-      node.width = Math.max(68, node.contentWidth + 26);
-      node.height = 24;
     }
 
     if (!node.children || node.children.length === 0) {
@@ -2406,7 +2457,7 @@ const MindMapView = {
     let sum = 0;
     node.children.forEach(child => {
       this.measureTopDown(child);
-      sum += child.totalWidth;
+      sum += (child.totalWidth || child.width + 28 || 40);
     });
     const contentWidth = Math.max(node.width + 28, sum);
     const hasBoundary = this.boundaries && this.boundaries.some(b => b.rootId === node.id);
@@ -2455,29 +2506,30 @@ const MindMapView = {
 
     if (N === 1) {
       const boi = bois[0];
-      boi.x = dir * (rootW / 2 + uniformDist + boi.width / 2);
+      boi.x = dir * (rootW / 2 + uniformDist + (boi.width || 80) / 2);
       boi.y = 0;
       this.layoutChildren(boi, side);
       return;
     }
 
     // Répartition verticale stricte garantissant l'absence totale de chevauchement entre sous-arbres
-    const totalHeight = bois.reduce((acc, b) => acc + b.totalHeight, 0);
+    const totalHeight = bois.reduce((acc, b) => acc + (b.totalHeight || b.height + 18 || 40), 0);
     let currentY = -totalHeight / 2;
 
     bois.forEach(boi => {
+      const bH = boi.totalHeight || (boi.height + 18) || 40;
       const bTop = boi.boundaryTop || 0;
       const bBot = boi.boundaryBottom || 0;
-      const cHeight = boi.contentHeight || (boi.totalHeight - bTop - bBot);
+      const cHeight = boi.contentHeight || (bH - bTop - bBot);
 
       // Centrage vertical du contenu de chaque sous-arbre dans son espace alloué dédié
       boi.y = currentY + bTop + cHeight / 2;
 
       // Position horizontale : garantit la distance uniforme par rapport au contour du médaillon central
-      boi.x = dir * (rootW / 2 + uniformDist + boi.width / 2);
+      boi.x = dir * (rootW / 2 + uniformDist + (boi.width || 80) / 2);
 
       this.layoutChildren(boi, side);
-      currentY += boi.totalHeight;
+      currentY += bH;
     });
   },
 
@@ -2486,20 +2538,21 @@ const MindMapView = {
 
     const dir = side === 'right' ? 1 : -1;
     const clearHorizGap = 76; // Espace horizontal net garanti entre bord parent et bord enfant (dégage les boutons d'action)
-    const childrenTotalHeight = parent.children.reduce((acc, c) => acc + c.totalHeight, 0);
+    const childrenTotalHeight = parent.children.reduce((acc, c) => acc + (c.totalHeight || c.height + 18 || 30), 0);
     let currentY = parent.y - childrenTotalHeight / 2;
 
     parent.children.forEach(child => {
+      const cH = child.totalHeight || (child.height + 18) || 30;
       const bTop = child.boundaryTop || 0;
       const bBot = child.boundaryBottom || 0;
-      const cHeight = child.contentHeight || (child.totalHeight - bTop - bBot);
+      const cHeight = child.contentHeight || (cH - bTop - bBot);
       const centerY = currentY + bTop + cHeight / 2;
 
-      child.x = parent.x + dir * (parent.width / 2 + clearHorizGap + child.width / 2);
+      child.x = parent.x + dir * ((parent.width || 80) / 2 + clearHorizGap + (child.width || 80) / 2);
       child.y = centerY;
 
       this.layoutChildren(child, side);
-      currentY += child.totalHeight;
+      currentY += cH;
     });
   },
 
