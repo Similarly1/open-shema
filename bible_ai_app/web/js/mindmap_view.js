@@ -1151,6 +1151,8 @@ const MindMapView = {
     let panY = 0;
     let color = 'natural';
     let aspect = 1.0;
+    let shape = null;
+    let size = null;
 
     if (raw && raw.includes('|')) {
       const parts = raw.split('|');
@@ -1180,8 +1182,17 @@ const MindMapView = {
         const a = parseFloat(aspectMatch[1]);
         if (!isNaN(a) && a > 0.1 && a < 10) aspect = Math.round(a * 100) / 100;
       }
+
+      const shapeMatch = raw.match(/shape:\s*([a-zA-Z\-]+)/i);
+      if (shapeMatch) shape = shapeMatch[1].trim().toLowerCase();
+
+      const sizeMatch = raw.match(/size:\s*([0-9]+)/i);
+      if (sizeMatch) {
+        const s = parseInt(sizeMatch[1]);
+        if (!isNaN(s) && s >= 36 && s <= 260) size = s;
+      }
     }
-    return { image, mode, zoom, panX, panY, color, aspect: aspect || 1.0 };
+    return { image, mode, zoom, panX, panY, color, aspect: aspect || 1.0, shape, size };
   },
 
   serializeImageDirective(node) {
@@ -1201,6 +1212,12 @@ const MindMapView = {
     }
     if (typeof node.imageAspect === 'number' && Math.abs(node.imageAspect - 1.0) > 0.01) {
       parts.push(`aspect: ${Math.round(node.imageAspect * 100) / 100}`);
+    }
+    if (node.imageShape) {
+      parts.push(`shape: ${node.imageShape}`);
+    }
+    if (typeof node.imageSize === 'number' && node.imageSize >= 36) {
+      parts.push(`size: ${Math.round(node.imageSize)}`);
     }
     return parts.join(' | ');
   },
@@ -1239,6 +1256,8 @@ const MindMapView = {
     let rootImagePanY = 0;
     let rootImageColor = 'natural';
     let rootImageAspect = 1.0;
+    let rootImageShape = null;
+    let rootImageSize = null;
     let rootTitle = (title || 'CONCEPT CENTRAL').toUpperCase();
     if (markdownContent) {
       const rootIconMatch = markdownContent.match(/<!--\s*mindmap-root-icon:\s*([a-zA-Z0-9_-]+)\s*-->/i);
@@ -1255,6 +1274,8 @@ const MindMapView = {
         rootImagePanY = parsed.panY;
         rootImageColor = parsed.color;
         if (parsed.aspect) rootImageAspect = parsed.aspect;
+        if (parsed.shape) rootImageShape = parsed.shape;
+        if (parsed.size) rootImageSize = parsed.size;
       }
     }
     const titleIconMatch = rootTitle.match(/::([a-zA-Z0-9_-]+):?/i);
@@ -1275,6 +1296,8 @@ const MindMapView = {
       rootImagePanX = this.currentNote.rootImagePanX || 0;
       rootImagePanY = this.currentNote.rootImagePanY || 0;
       rootImageColor = this.currentNote.rootImageColor || 'natural';
+      rootImageShape = this.currentNote.rootImageShape || null;
+      rootImageSize = this.currentNote.rootImageSize || null;
     }
     if (this.currentNote && this.currentNote.rootImageAspect) {
       rootImageAspect = this.currentNote.rootImageAspect;
@@ -1291,6 +1314,8 @@ const MindMapView = {
       imagePanY: rootImagePanY,
       imageColor: rootImageColor,
       imageAspect: rootImageAspect,
+      imageShape: rootImageShape,
+      imageSize: rootImageSize,
       ref: '',
       children: [],
       side: 'center',
@@ -1381,6 +1406,8 @@ const MindMapView = {
         let imagePanY = 0;
         let imageColor = 'natural';
         let imageAspect = 1.0;
+        let imageShape = null;
+        let imageSize = null;
         const imageMatch = text.match(/<!--\s*image:\s*([\s\S]*?)\s*-->/i);
         if (imageMatch) {
           const parsed = this.parseImageDirective(imageMatch[1].trim());
@@ -1391,6 +1418,8 @@ const MindMapView = {
           imagePanY = parsed.panY;
           imageColor = parsed.color;
           if (parsed.aspect) imageAspect = parsed.aspect;
+          if (parsed.shape) imageShape = parsed.shape;
+          if (parsed.size) imageSize = parsed.size;
           text = text.replace(imageMatch[0], '').trim();
         }
 
@@ -1419,6 +1448,8 @@ const MindMapView = {
           imagePanY: imagePanY,
           imageColor: imageColor,
           imageAspect: imageAspect || null,
+          imageShape: imageShape,
+          imageSize: imageSize,
           ref: ref,
           note: noteText,
           children: [],
@@ -1977,13 +2008,14 @@ const MindMapView = {
 
     if (node.isFloating) {
       if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 56;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = 50;
-        node.height = 50;
-        node.contentWidth = 50;
+        node.width = s;
+        node.height = s;
+        node.contentWidth = s;
         return;
       }
       const textW = this.getTextWidth(node.text, 12, '800');
@@ -2029,10 +2061,11 @@ const MindMapView = {
     } else if (node.level === 0) {
       // NIVEAU 0 (Thème général / Noyau central dominant Buzan - médaillon circulaire polychrome)
       if (hasImg && imgMode === 'image-only') {
-        const rootR = 52;
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 104;
+        const rootR = Math.round(s / 2);
         node.rootRadius = rootR;
-        node.width = rootR * 2;
-        node.height = rootR * 2;
+        node.width = s;
+        node.height = s;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.iconWidth = 0;
@@ -2055,13 +2088,14 @@ const MindMapView = {
     } else if (node.level === 1) {
       // NIVEAU 1 (BOIs - Règles de Buzan : mots-clés forces, affirmé et contrasté)
       if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 68;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = 56;
-        node.height = 56;
-        node.contentWidth = 56;
+        node.width = s;
+        node.height = s;
+        node.contentWidth = s;
         return;
       }
       const textW = this.getTextWidth(node.text, 14, '800');
@@ -2108,13 +2142,14 @@ const MindMapView = {
     } else if (node.level === 2) {
       // NIVEAU 2 (Sous-branches subordonnées)
       if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 52;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = 46;
-        node.height = 46;
-        node.contentWidth = 46;
+        node.width = s;
+        node.height = s;
+        node.contentWidth = s;
         return;
       }
       const textW = this.getTextWidth(node.text, 11.5, '700');
@@ -2161,13 +2196,14 @@ const MindMapView = {
     } else {
       // NIVEAU 3+ (Détails fins légers)
       if (hasImg && imgMode === 'image-only') {
+        const s = (node.imageSize && node.imageSize >= 36 && node.imageSize <= 260) ? node.imageSize : 44;
         node.textWidth = 0;
         node.markerWidth = 0;
         node.refPillWidth = 0;
         node.notePillWidth = 0;
-        node.width = 42;
-        node.height = 42;
-        node.contentWidth = 42;
+        node.width = s;
+        node.height = s;
+        node.contentWidth = s;
         return;
       }
       const textW = this.getTextWidth(node.text, 10, '600');
@@ -3910,9 +3946,28 @@ const MindMapView = {
         defs.appendChild(sphere);
       }
 
+      // Si une illustration IA est associée au médaillon central
+      const rootImgSrc = node.imageDataUrl || (node.image && (node.image.startsWith('data:') || node.image.startsWith('http')) ? node.image : null);
+      if (node.image && !rootImgSrc) {
+        this.resolveNodeImageDataUrl(node);
+      }
+      const isRootImgOnly = !!(rootImgSrc || node.image) && (node.imageMode === 'image-only');
+      const rootShape = node.imageShape || 'circle';
+      let rootRx = rootR;
+      if (isRootImgOnly) {
+        if (rootShape === 'square') rootRx = 10;
+        else if (rootShape === 'rounded') rootRx = Math.min(32, Math.max(12, Math.round(rootR * 0.44)));
+        else if (rootShape === 'pill') rootRx = rootR;
+        else rootRx = rootR;
+      }
+
       // Halo / aura extérieure polychrome translucide
-      const auraCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      auraCircle.setAttribute('r', rootR + 10);
+      const auraCircle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      auraCircle.setAttribute('x', -rootR - 10);
+      auraCircle.setAttribute('y', -rootR - 10);
+      auraCircle.setAttribute('width', (rootR + 10) * 2);
+      auraCircle.setAttribute('height', (rootR + 10) * 2);
+      auraCircle.setAttribute('rx', rootRx + 6);
       auraCircle.setAttribute('fill', `url(#${gradId})`);
       auraCircle.setAttribute('opacity', '0.22');
       auraCircle.setAttribute('class', 'mm-root-aura');
@@ -3920,36 +3975,43 @@ const MindMapView = {
       g.appendChild(auraCircle);
 
       // Anneau de bordure élégant avec dégradé polychrome
-      const ringCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      ringCircle.setAttribute('r', rootR + 2.5);
+      const ringCircle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      ringCircle.setAttribute('x', -rootR - 2.5);
+      ringCircle.setAttribute('y', -rootR - 2.5);
+      ringCircle.setAttribute('width', (rootR + 2.5) * 2);
+      ringCircle.setAttribute('height', (rootR + 2.5) * 2);
+      ringCircle.setAttribute('rx', rootRx + 2);
       ringCircle.setAttribute('fill', 'none');
       ringCircle.setAttribute('stroke', `url(#${gradId})`);
       ringCircle.setAttribute('stroke-width', '2.2');
       ringCircle.setAttribute('opacity', '0.7');
       g.appendChild(ringCircle);
 
-      // Cercle principal avec le dégradé polychrome mixant les branches
-      const mainCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      mainCircle.setAttribute('r', rootR);
+      // Forme principale avec le dégradé polychrome mixant les branches
+      const mainCircle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      mainCircle.setAttribute('x', -rootR);
+      mainCircle.setAttribute('y', -rootR);
+      mainCircle.setAttribute('width', rootR * 2);
+      mainCircle.setAttribute('height', rootR * 2);
+      mainCircle.setAttribute('rx', rootRx);
       mainCircle.setAttribute('fill', `url(#${gradId})`);
       mainCircle.setAttribute('class', 'mm-root-medallion');
       mainCircle.setAttribute('filter', isSelected ? 'url(#mm-select-glow)' : 'none');
       g.appendChild(mainCircle);
 
-      // Si une illustration IA est associée au médaillon central
-      const rootImgSrc = node.imageDataUrl || (node.image && (node.image.startsWith('data:') || node.image.startsWith('http')) ? node.image : null);
-      if (node.image && !rootImgSrc) {
-        this.resolveNodeImageDataUrl(node);
-      }
       if (rootImgSrc && defs) {
         const rootClipId = `mm-root-clip-${node.id || 'root'}`;
         let rClip = defs.querySelector(`#${rootClipId}`);
         if (rClip) rClip.remove();
         rClip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
         rClip.setAttribute('id', rootClipId);
-        const cCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        cCircle.setAttribute('r', rootR);
-        rClip.appendChild(cCircle);
+        const cShape = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        cShape.setAttribute('x', -rootR);
+        cShape.setAttribute('y', -rootR);
+        cShape.setAttribute('width', rootR * 2);
+        cShape.setAttribute('height', rootR * 2);
+        cShape.setAttribute('rx', rootRx);
+        rClip.appendChild(cShape);
         defs.appendChild(rClip);
 
         const imgG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -3991,15 +4053,17 @@ const MindMapView = {
 
         // Teinte polychrome harmonisée pour le médaillon central (mix des branches)
         if (node.imageColor === 'tint') {
-          const tintCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          tintCircle.setAttribute('r', rootR);
-          tintCircle.setAttribute('fill', `url(#${gradId})`);
-          tintCircle.setAttribute('style', 'mix-blend-mode: multiply; opacity: 0.72;');
-          tintCircle.setAttribute('pointer-events', 'none');
-          imgG.appendChild(tintCircle);
+          const tintShape = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          tintShape.setAttribute('x', -rootR);
+          tintShape.setAttribute('y', -rootR);
+          tintShape.setAttribute('width', rootR * 2);
+          tintShape.setAttribute('height', rootR * 2);
+          tintShape.setAttribute('rx', rootRx);
+          tintShape.setAttribute('fill', `url(#${gradId})`);
+          tintShape.setAttribute('style', 'mix-blend-mode: multiply; opacity: 0.72;');
+          tintShape.setAttribute('pointer-events', 'none');
+          imgG.appendChild(tintShape);
         }
-
-        const isRootImgOnly = !!rootImgSrc && (node.imageMode === 'image-only');
 
         if (!isRootImgOnly) {
           const darkOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -4011,8 +4075,6 @@ const MindMapView = {
 
         g.appendChild(imgG);
       }
-
-      const isRootImgOnly = !!rootImgSrc && (node.imageMode === 'image-only');
 
       if (!isRootImgOnly) {
         // Superposition sphérique 3D (volume et reflet de brillance)
@@ -4123,11 +4185,26 @@ const MindMapView = {
       const isTopImage = hasImage && imgMode === 'top-image';
       const topImgH = isTopImage ? (isLvl1 ? 42 : (isLvl2 ? 36 : (node.isFloating ? 38 : 32))) : 0;
 
-      const isPill = node.isFloating || hasImage || this.nodeShape === 'pill';
-      const rx = isImgOnly ? (isLvl1 ? 14 : (isLvl2 ? 12 : 10)) : (isPill ? (isLvl1 ? 18 : (isLvl2 ? 14 : 12)) : (isLvl1 ? 9 : (isLvl2 ? 6 : 4)));
       const boxW = node.width;
       const boxH = node.height || (isLvl1 ? 36 : (isLvl2 ? 28 : 24));
       const strokeW = node.isFloating ? '2' : (isLvl1 ? '2.4' : (isLvl2 ? '1.5' : '1.1'));
+
+      const isPill = node.isFloating || hasImage || this.nodeShape === 'pill';
+      const imgShape = node.imageShape || 'rounded';
+      let rx;
+      if (isImgOnly) {
+        if (imgShape === 'circle') {
+          rx = boxW / 2;
+        } else if (imgShape === 'pill') {
+          rx = Math.min(boxW, boxH) / 2;
+        } else if (imgShape === 'square') {
+          rx = 6;
+        } else { // 'rounded'
+          rx = Math.min(24, Math.max(8, Math.round(boxW * 0.22)));
+        }
+      } else {
+        rx = isPill ? (isLvl1 ? 18 : (isLvl2 ? 14 : 12)) : (isLvl1 ? 9 : (isLvl2 ? 6 : 4));
+      }
 
       if (effectiveIsBox) {
         // Boîte d'arrière-plan avec bordure colorée (Style XMind & Buzan : Niveau 1 plus imposant)
@@ -6455,6 +6532,42 @@ const MindMapView = {
             <span class="mm-ctx-label">Couleur : Teinte de la pastille</span>
             ${node?.imageColor === 'tint' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
           </div>
+          ${node?.imageMode === 'image-only' ? `
+            <div class="mm-ctx-divider"></div>
+            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Forme du médaillon</div>
+            <div class="mm-ctx-item" data-action="image-shape-rounded">
+              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/></svg></span>
+              <span class="mm-ctx-label">Carré arrondi</span>
+              ${(!node?.imageShape || node?.imageShape === 'rounded') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-shape-circle">
+              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></span>
+              <span class="mm-ctx-label">Cercle</span>
+              ${node?.imageShape === 'circle' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-shape-pill">
+              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="6"/></svg></span>
+              <span class="mm-ctx-label">Capsule</span>
+              ${node?.imageShape === 'pill' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Taille du médaillon</div>
+            <div class="mm-ctx-item" data-action="image-size-48">
+              <span class="mm-ctx-label">Compact (48 px)</span>
+              ${node?.imageSize === 48 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-size-72">
+              <span class="mm-ctx-label">Standard (72 px)</span>
+              ${(!node?.imageSize || node?.imageSize === 72 || node?.imageSize === 68 || node?.imageSize === 56 || node?.imageSize === 52) ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-size-96">
+              <span class="mm-ctx-label">Grand (96 px)</span>
+              ${node?.imageSize === 96 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-size-128">
+              <span class="mm-ctx-label">Héroïque (128 px)</span>
+              ${node?.imageSize === 128 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+          ` : ''}
           <div class="mm-ctx-divider"></div>
           <div class="mm-ctx-item danger" data-action="remove-image">
             <span class="mm-ctx-icon">
@@ -6593,6 +6706,42 @@ const MindMapView = {
             <span class="mm-ctx-label">Couleur : Dégradé central</span>
             ${this.tree?.imageColor === 'tint' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
           </div>
+          ${this.tree?.imageMode === 'image-only' ? `
+            <div class="mm-ctx-divider"></div>
+            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Forme du médaillon central</div>
+            <div class="mm-ctx-item" data-action="image-shape-circle">
+              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></span>
+              <span class="mm-ctx-label">Cercle classique</span>
+              ${(!this.tree?.imageShape || this.tree?.imageShape === 'circle') ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-shape-rounded">
+              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/></svg></span>
+              <span class="mm-ctx-label">Carré arrondi</span>
+              ${this.tree?.imageShape === 'rounded' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-shape-pill">
+              <span class="mm-ctx-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="6"/></svg></span>
+              <span class="mm-ctx-label">Capsule</span>
+              ${this.tree?.imageShape === 'pill' ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; text-transform: uppercase;">Taille du médaillon central</div>
+            <div class="mm-ctx-item" data-action="image-size-80">
+              <span class="mm-ctx-label">Compact (80 px)</span>
+              ${this.tree?.imageSize === 80 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-size-104">
+              <span class="mm-ctx-label">Standard (104 px)</span>
+              ${(!this.tree?.imageSize || this.tree?.imageSize === 104) ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-size-130">
+              <span class="mm-ctx-label">Grand (130 px)</span>
+              ${this.tree?.imageSize === 130 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+            <div class="mm-ctx-item" data-action="image-size-160">
+              <span class="mm-ctx-label">Héroïque (160 px)</span>
+              ${this.tree?.imageSize === 160 ? '<span class="mm-ctx-shortcut" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+            </div>
+          ` : ''}
           <div class="mm-ctx-divider"></div>
           <div class="mm-ctx-item danger" data-action="remove-image">
             <span class="mm-ctx-icon">
@@ -6907,6 +7056,28 @@ const MindMapView = {
           case 'image-color-tint':
             if (targetNodeId) {
               this.setNodeImageColor(targetNodeId, 'tint');
+            }
+            break;
+          case 'image-shape-rounded':
+          case 'image-shape-circle':
+          case 'image-shape-pill':
+          case 'image-shape-square':
+            if (targetNodeId) {
+              const shape = action.replace('image-shape-', '');
+              this.setNodeImageShape(targetNodeId, shape);
+            }
+            break;
+          case 'image-size-48':
+          case 'image-size-72':
+          case 'image-size-80':
+          case 'image-size-96':
+          case 'image-size-104':
+          case 'image-size-128':
+          case 'image-size-130':
+          case 'image-size-160':
+            if (targetNodeId) {
+              const size = parseInt(action.replace('image-size-', ''), 10);
+              this.setNodeImageSize(targetNodeId, size);
             }
             break;
           case 'remove-image':
@@ -7311,6 +7482,47 @@ const MindMapView = {
     }
   },
 
+  setNodeImageShape(nodeId, shape) {
+    if (this.isReadOnly || !nodeId) return;
+    const isRoot = (nodeId === 'root');
+    const node = this.findNode(nodeId);
+    if (!node) return;
+    node.imageShape = shape;
+    if (isRoot && this.currentNote) {
+      this.currentNote.rootImageShape = shape;
+    }
+    this.draw();
+    this.syncAndAutoSave();
+    const shapeLabels = {
+      'rounded': 'Carré arrondi',
+      'circle': 'Cercle parfait',
+      'pill': 'Capsule',
+      'square': 'Carré'
+    };
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Forme du médaillon : ${shapeLabels[shape] || shape}`);
+    }
+  },
+
+  setNodeImageSize(nodeId, size) {
+    if (this.isReadOnly || !nodeId) return;
+    const isRoot = (nodeId === 'root');
+    const node = this.findNode(nodeId);
+    if (!node) return;
+    const s = parseInt(size);
+    if (isNaN(s) || s < 36 || s > 260) return;
+    node.imageSize = s;
+    if (isRoot && this.currentNote) {
+      this.currentNote.rootImageSize = s;
+    }
+    this.layoutTree();
+    this.draw();
+    this.syncAndAutoSave();
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Taille du médaillon : ${s} px`);
+    }
+  },
+
   setNodeImageCrop(nodeId, zoom, panX, panY) {
     if (this.isReadOnly || !nodeId) return;
     const isRoot = (nodeId === 'root');
@@ -7339,6 +7551,8 @@ const MindMapView = {
     delete node.imagePanX;
     delete node.imagePanY;
     delete node.imageColor;
+    delete node.imageShape;
+    delete node.imageSize;
     if (nodeId === 'root' && this.currentNote) {
       delete this.currentNote.rootImage;
       delete this.currentNote.rootImageMode;
@@ -7346,6 +7560,8 @@ const MindMapView = {
       delete this.currentNote.rootImagePanX;
       delete this.currentNote.rootImagePanY;
       delete this.currentNote.rootImageColor;
+      delete this.currentNote.rootImageShape;
+      delete this.currentNote.rootImageSize;
     }
     this.layoutTree();
     this.draw();
@@ -7390,6 +7606,19 @@ const MindMapView = {
     let selectedStyle = 'biblical_oil';
     let selectedMode = node.imageMode || 'background';
     let selectedColor = node.imageColor || 'natural';
+    let selectedShape = node.imageShape || (isRoot ? 'circle' : 'rounded');
+    let selectedSize = (typeof node.imageSize === 'number' && node.imageSize >= 36) ? node.imageSize : (isRoot ? 104 : (node.level === 1 ? 72 : (node.level === 2 ? 52 : 48)));
+    const sizePresets = isRoot ? [
+      { label: 'Compact', size: 80 },
+      { label: 'Standard', size: 104 },
+      { label: 'Grand', size: 130 },
+      { label: 'Héroïque', size: 160 }
+    ] : [
+      { label: 'Compact', size: 48 },
+      { label: 'Standard', size: 72 },
+      { label: 'Grand', size: 96 },
+      { label: 'Héroïque', size: 128 }
+    ];
     let selectedZoom = (typeof node.imageZoom === 'number' && node.imageZoom >= 0.5) ? node.imageZoom : 1.0;
     let selectedPanX = typeof node.imagePanX === 'number' ? node.imagePanX : 0;
     let selectedPanY = typeof node.imagePanY === 'number' ? node.imagePanY : 0;
@@ -7451,6 +7680,49 @@ const MindMapView = {
               <span>Vignette + Mot</span>
             </button>
             ` : ''}
+          </div>
+        </div>
+
+        <!-- Personnalisation Forme & Taille du médaillon (affiché en mode Image seule) -->
+        <div id="mm-img-only-customization" style="display: ${selectedMode === 'image-only' ? 'block' : 'none'}; margin-bottom: 8px; padding: 8px 10px; background: rgba(0,0,0,0.16); border-radius: 8px; border: 1px solid var(--border-color, rgba(255,255,255,0.08));">
+          <!-- Forme du médaillon -->
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
+              Forme du médaillon
+            </label>
+            <div class="mm-img-shapes-row" style="display: flex; gap: 6px;">
+              <button type="button" class="mm-img-shape-pill ${selectedShape === 'rounded' ? 'active' : ''}" data-shape="rounded" style="flex: 1; padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid ${selectedShape === 'rounded' ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${selectedShape === 'rounded' ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${selectedShape === 'rounded' ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/></svg>
+                <span>Carré arrondi</span>
+              </button>
+              <button type="button" class="mm-img-shape-pill ${selectedShape === 'circle' ? 'active' : ''}" data-shape="circle" style="flex: 1; padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid ${selectedShape === 'circle' ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${selectedShape === 'circle' ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${selectedShape === 'circle' ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+                <span>Cercle</span>
+              </button>
+              <button type="button" class="mm-img-shape-pill ${selectedShape === 'pill' ? 'active' : ''}" data-shape="pill" style="flex: 1; padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid ${selectedShape === 'pill' ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${selectedShape === 'pill' ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${selectedShape === 'pill' ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s ease;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+                <span>Capsule</span>
+              </button>
+            </div>
+          </div>
+          <!-- Taille du médaillon -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <label style="font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                Taille du médaillon
+              </label>
+              <span id="mm-img-size-val" style="font-size: 11px; font-weight: 700; color: var(--accent-blue, #3b82f6);">${selectedSize} px</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <input type="range" id="mm-img-size-slider" min="${isRoot ? 70 : 40}" max="${isRoot ? 200 : 160}" step="2" value="${selectedSize}" style="flex: 1;" />
+            </div>
+            <div class="mm-img-size-presets" style="display: flex; gap: 6px;">
+              ${sizePresets.map(p => `
+                <button type="button" class="mm-img-size-preset-btn ${selectedSize === p.size ? 'active' : ''}" data-size="${p.size}" style="flex: 1; padding: 3px 6px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: 1px solid ${selectedSize === p.size ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)'}; background: ${selectedSize === p.size ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)'}; color: ${selectedSize === p.size ? '#ffffff' : 'var(--text-primary)'}; cursor: pointer; transition: all 0.15s ease;">
+                  ${p.label} (${p.size}px)
+                </button>
+              `).join('')}
+            </div>
           </div>
         </div>
 
@@ -7559,6 +7831,11 @@ const MindMapView = {
     const stylePills = overlay.querySelectorAll('.mm-img-style-pill');
     const modePills = overlay.querySelectorAll('.mm-img-mode-pill');
     const colorPills = overlay.querySelectorAll('.mm-img-color-pill');
+    const shapePills = overlay.querySelectorAll('.mm-img-shape-pill');
+    const sizeSlider = overlay.querySelector('#mm-img-size-slider');
+    const sizeVal = overlay.querySelector('#mm-img-size-val');
+    const sizePresetBtns = overlay.querySelectorAll('.mm-img-size-preset-btn');
+    const imgOnlyCustomization = overlay.querySelector('#mm-img-only-customization');
     const btnRegen = overlay.querySelector('#mm-img-btn-regen-prompt');
     const btnGen = overlay.querySelector('#mm-img-btn-generate');
     const btnApply = overlay.querySelector('#mm-img-btn-apply');
@@ -7661,15 +7938,23 @@ const MindMapView = {
       const tintOverlayHtml = selectedColor === 'tint' ? `<div class="mm-crop-preview-tint" style="position: absolute; inset: 0; pointer-events: none; background: ${tintBg}; mix-blend-mode: multiply; opacity: 0.72;"></div>` : '';
 
       if (isRoot) {
-        // Le concept central est un médaillon circulaire (Buzan)
+        // Le concept central est un médaillon (Buzan)
         if (selectedMode === 'image-only') {
+          const previewW = Math.min(170, Math.max(80, Math.round(selectedSize * 1.15)));
+          const previewH = previewW;
+          let previewRadius = '50%';
+          if (selectedShape === 'circle') previewRadius = '50%';
+          else if (selectedShape === 'pill') previewRadius = `${Math.round(previewH / 2)}px`;
+          else if (selectedShape === 'square') previewRadius = '8px';
+          else previewRadius = `${Math.min(32, Math.max(12, Math.round(previewW * 0.22)))}px`;
+
           previewContainer.innerHTML = `
             <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 6px 0;">
-              <div class="mm-crop-viewport" style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; position: relative; box-shadow: 0 4px 16px rgba(0,0,0,0.4); border: 2.5px solid var(--accent-blue, #3b82f6); user-select: none;">
+              <div class="mm-crop-viewport" style="width: ${previewW}px; height: ${previewH}px; border-radius: ${previewRadius}; overflow: hidden; position: relative; box-shadow: 0 4px 16px rgba(0,0,0,0.4); border: 2.5px solid var(--accent-blue, #3b82f6); user-select: none; transition: width 0.15s ease, height 0.15s ease, border-radius 0.15s ease;">
                 <img src="${dataUrl}" class="mm-crop-preview-img" style="position: absolute; pointer-events: none; user-select: none; max-width: none; max-height: none; ${filterStyle}" />
                 ${tintOverlayHtml}
               </div>
-              <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'illustration remplace le texte du concept central</span>
+              <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'illustration remplace le texte du concept central (${selectedSize} px)</span>
             </div>
           `;
         } else {
@@ -7692,13 +7977,21 @@ const MindMapView = {
       } else {
         // Nœuds de branches
         if (selectedMode === 'image-only') {
+          const previewW = Math.min(160, Math.max(76, Math.round(selectedSize * 1.2)));
+          const previewH = previewW;
+          let previewRadius = '14px';
+          if (selectedShape === 'circle') previewRadius = '50%';
+          else if (selectedShape === 'pill') previewRadius = `${Math.round(previewH / 2)}px`;
+          else if (selectedShape === 'square') previewRadius = '6px';
+          else previewRadius = `${Math.min(26, Math.max(10, Math.round(previewW * 0.22)))}px`;
+
           previewContainer.innerHTML = `
             <div style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 0;">
-              <div class="mm-crop-viewport" style="width: 88px; height: 88px; border-radius: 14px; overflow: hidden; position: relative; box-shadow: 0 4px 14px rgba(0,0,0,0.35); border: 2.5px solid ${node.color || '#3b82f6'}; user-select: none;">
+              <div class="mm-crop-viewport" style="width: ${previewW}px; height: ${previewH}px; border-radius: ${previewRadius}; overflow: hidden; position: relative; box-shadow: 0 4px 14px rgba(0,0,0,0.35); border: 2.5px solid ${node.color || '#3b82f6'}; user-select: none; transition: width 0.15s ease, height 0.15s ease, border-radius 0.15s ease;">
                 <img src="${dataUrl}" class="mm-crop-preview-img" style="position: absolute; pointer-events: none; user-select: none; max-width: none; max-height: none; ${filterStyle}" />
                 ${tintOverlayHtml}
               </div>
-              <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'image remplace le mot-clé (Loi de Buzan)</span>
+              <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">L'image remplace le mot-clé (${selectedSize} px)</span>
               <span style="font-size: 10px; opacity: 0.75; color: var(--text-secondary);">« ${this.escapeHtml(nodeText)} » reste visible au survol</span>
             </div>
           `;
@@ -7837,8 +8130,64 @@ const MindMapView = {
         pill.style.borderColor = 'var(--accent-blue, #2563eb)';
         pill.style.color = '#ffffff';
         selectedMode = pill.getAttribute('data-mode') || 'background';
+        if (imgOnlyCustomization) {
+          imgOnlyCustomization.style.display = (selectedMode === 'image-only') ? 'block' : 'none';
+        }
         const activeUrl = generatedImageResult?.dataUrl || currentImg;
         if (activeUrl) renderPreview(activeUrl);
+      });
+    });
+
+    // Clic sur les formes du médaillon (mode image seule)
+    shapePills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        shapePills.forEach(p => {
+          p.classList.remove('active');
+          p.style.background = 'var(--bg-secondary, #f1f5f9)';
+          p.style.borderColor = 'var(--border-color, #cbd5e1)';
+          p.style.color = 'var(--text-primary)';
+        });
+        pill.classList.add('active');
+        pill.style.background = 'var(--accent-blue, #2563eb)';
+        pill.style.borderColor = 'var(--accent-blue, #2563eb)';
+        pill.style.color = '#ffffff';
+        selectedShape = pill.getAttribute('data-shape') || 'rounded';
+        const activeUrl = generatedImageResult?.dataUrl || currentImg;
+        if (activeUrl) renderPreview(activeUrl);
+      });
+    });
+
+    // Contrôles de taille du médaillon (mode image seule)
+    const updateSizePresetsUI = (size) => {
+      sizePresetBtns.forEach(btn => {
+        const btnSize = parseInt(btn.getAttribute('data-size'));
+        const isActive = (btnSize === size);
+        btn.classList.toggle('active', isActive);
+        btn.style.background = isActive ? 'var(--accent-blue, #2563eb)' : 'var(--bg-secondary, #f1f5f9)';
+        btn.style.borderColor = isActive ? 'var(--accent-blue, #2563eb)' : 'var(--border-color, #cbd5e1)';
+        btn.style.color = isActive ? '#ffffff' : 'var(--text-primary)';
+      });
+    };
+
+    sizeSlider?.addEventListener('input', () => {
+      selectedSize = parseInt(sizeSlider.value) || 72;
+      if (sizeVal) sizeVal.textContent = `${selectedSize} px`;
+      updateSizePresetsUI(selectedSize);
+      const activeUrl = generatedImageResult?.dataUrl || currentImg;
+      if (activeUrl) renderPreview(activeUrl);
+    });
+
+    sizePresetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = parseInt(btn.getAttribute('data-size'));
+        if (s && s >= 36) {
+          selectedSize = s;
+          if (sizeSlider) sizeSlider.value = s;
+          if (sizeVal) sizeVal.textContent = `${s} px`;
+          updateSizePresetsUI(s);
+          const activeUrl = generatedImageResult?.dataUrl || currentImg;
+          if (activeUrl) renderPreview(activeUrl);
+        }
       });
     });
 
@@ -7987,9 +8336,18 @@ const MindMapView = {
         this.currentNote.rootImageZoom = selectedZoom;
         this.currentNote.rootImagePanX = selectedPanX;
         this.currentNote.rootImagePanY = selectedPanY;
+        if (selectedMode === 'image-only') {
+          this.currentNote.rootImageShape = selectedShape;
+          this.currentNote.rootImageSize = selectedSize;
+          node.imageShape = selectedShape;
+          node.imageSize = selectedSize;
+        }
         if (node.imageAspect) {
           this.currentNote.rootImageAspect = node.imageAspect;
         }
+      } else if (selectedMode === 'image-only') {
+        node.imageShape = selectedShape;
+        node.imageSize = selectedSize;
       }
       this.layoutTree();
       this.draw();
