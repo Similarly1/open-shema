@@ -127,14 +127,23 @@ class PodcastEngine:
     """Moteur central d'orchestration RAG, de scénarisation et de synthèse vocale."""
 
     EDGE_VOICES = [
-        {"id": "fr-FR-DeniseNeural", "name": "Denise (Française, vive & claire)", "gender": "Female", "role": "host"},
-        {"id": "fr-FR-HenriNeural", "name": "Henri (Français, posé & érudit)", "gender": "Male", "role": "scholar"},
-        {"id": "fr-FR-VivienneMultilingualNeural", "name": "Vivienne (Française, naturelle)", "gender": "Female", "role": "host"},
-        {"id": "fr-FR-RemyMultilingualNeural", "name": "Rémy (Français, expressif)", "gender": "Male", "role": "scholar"},
-        {"id": "fr-FR-EloiseNeural", "name": "Éloïse (Française, douce)", "gender": "Female", "role": "host"},
-        {"id": "fr-BE-CharlineNeural", "name": "Charline (Belge, posée)", "gender": "Female", "role": "host"},
-        {"id": "fr-CH-FabriceNeural", "name": "Fabrice (Suisse, posé)", "gender": "Male", "role": "scholar"},
-        {"id": "fr-CA-AntoineNeural", "name": "Antoine (Canadien)", "gender": "Male", "role": "scholar"},
+        # France
+        {"id": "fr-FR-DeniseNeural", "name": "Denise (France - Féminine, claire & vive)", "gender": "Female", "locale": "fr-FR", "region": "France", "role": "host"},
+        {"id": "fr-FR-HenriNeural", "name": "Henri (France - Masculine, posé & érudit)", "gender": "Male", "locale": "fr-FR", "region": "France", "role": "scholar"},
+        {"id": "fr-FR-VivienneMultilingualNeural", "name": "Vivienne (France - Féminine, naturelle & fluide)", "gender": "Female", "locale": "fr-FR", "region": "France", "role": "host"},
+        {"id": "fr-FR-RemyMultilingualNeural", "name": "Rémy (France - Masculine, expressif & chaleureux)", "gender": "Male", "locale": "fr-FR", "region": "France", "role": "scholar"},
+        {"id": "fr-FR-EloiseNeural", "name": "Éloïse (France - Féminine, douce & posée)", "gender": "Female", "locale": "fr-FR", "region": "France", "role": "host"},
+        # Belgique
+        {"id": "fr-BE-CharlineNeural", "name": "Charline (Belgique - Féminine, posée)", "gender": "Female", "locale": "fr-BE", "region": "Belgique", "role": "host"},
+        {"id": "fr-BE-GerardNeural", "name": "Gérard (Belgique - Masculine, calme & posé)", "gender": "Male", "locale": "fr-BE", "region": "Belgique", "role": "scholar"},
+        # Suisse
+        {"id": "fr-CH-ArianeNeural", "name": "Ariane (Suisse - Féminine, posée)", "gender": "Female", "locale": "fr-CH", "region": "Suisse", "role": "host"},
+        {"id": "fr-CH-FabriceNeural", "name": "Fabrice (Suisse - Masculine, posé & net)", "gender": "Male", "locale": "fr-CH", "region": "Suisse", "role": "scholar"},
+        # Canada
+        {"id": "fr-CA-SylvieNeural", "name": "Sylvie (Canada - Féminine, chaleureuse)", "gender": "Female", "locale": "fr-CA", "region": "Canada", "role": "host"},
+        {"id": "fr-CA-AntoineNeural", "name": "Antoine (Canada - Masculine, posé)", "gender": "Male", "locale": "fr-CA", "region": "Canada", "role": "scholar"},
+        {"id": "fr-CA-JeanNeural", "name": "Jean (Canada - Masculine, dynamique)", "gender": "Male", "locale": "fr-CA", "region": "Canada", "role": "scholar"},
+        {"id": "fr-CA-ThierryNeural", "name": "Thierry (Canada - Masculine, expressif)", "gender": "Male", "locale": "fr-CA", "region": "Canada", "role": "scholar"},
     ]
 
     DEPTH_CHAR_LIMITS = {
@@ -153,12 +162,10 @@ class PodcastEngine:
 
     @classmethod
     def get_available_voices(cls) -> Dict[str, Any]:
+        """Retourne le catalogue complet des voix neuronales françaises haute fidélité."""
         return {
-            "edge_tts": cls.EDGE_VOICES,
-            "voxtral": [
-                {"id": "default", "name": "Voix Voxtral Principale (Expressive)", "gender": "Neutral"},
-                {"id": "custom", "name": "Voix Personnalisée (Compte Mistral Payant)", "gender": "Custom"}
-            ]
+            "voices": cls.EDGE_VOICES,
+            "edge_tts": cls.EDGE_VOICES
         }
 
     @classmethod
@@ -1076,6 +1083,9 @@ class PodcastEngine:
         record["audio_file"] = audio_filename
         record["duration_seconds"] = total_duration
         record["engine"] = "edge_tts"
+        record["voice_speaker_a"] = voice_a
+        record["voice_speaker_b"] = voice_b
+        record["voice_solo"] = voice_solo
         record["status"] = "ready"
         record["updated_at"] = datetime.datetime.now().isoformat()
 
@@ -1096,102 +1106,9 @@ class PodcastEngine:
         cfg: Dict[str, Any],
         progress_callback: Optional[Callable[[int, int, str], None]] = None
     ) -> Dict[str, Any]:
-        """Synthèse via l'API Voxtral / Mistral Audio avec modulation d'intonation et fallback Edge-TTS."""
-        import requests
+        """Bascule transparente sur la synthèse Edge-TTS neuronale francophone haute fidélité."""
+        return cls._synthesize_edge_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
 
-        api_key = cfg.get("mistral_api_key", "")
-        if not api_key:
-            logger.warning("[PodcastEngine] Pas de clé Mistral configurée pour Voxtral. Bascule sur Edge-TTS.")
-            return cls._synthesize_edge_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
-
-        total_lines = len(dialogue)
-        accumulated_audio = bytearray()
-        updated_dialogue = []
-        current_timeline_sec = 0.0
-
-        for idx, item in enumerate(dialogue):
-            if progress_callback:
-                pct = int((idx / max(total_lines, 1)) * 90)
-                progress_callback(idx + 1, pct, f"Synthèse Voxtral réplique {idx + 1}/{total_lines}...")
-
-            text = item.get("text", "").strip()
-            if not text:
-                continue
-
-            clean_speech_text = cls._clean_text_for_speech(text)
-
-            v_role = str(item.get("voice_role", "A")).upper()
-            spk = str(item.get("speaker", "")).lower()
-            is_b = (v_role in ("B", "SCHOLAR")) or any(k in spk for k in ("scholar", "théolog", "exég", "henri")) or (idx % 2 == 1)
-
-            # Modulation d'intonation par prompt audio ou style si activée
-            style_instruction = "calme, posée, chaleureuse et analytique" if is_b else "interrogative, vive et dynamique"
-
-            try:
-                # Appel API Mistral Audio / Speech
-                # Note : Supporte l'endpoint officiel speech de Mistral
-                url = "https://api.mistral.ai/v1/audio/speech"
-                headers = {
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json"
-                }
-                payload = {
-                    "model": "mistral-embed" if "voxtral" not in cfg.get("voxtral_model", "") else cfg.get("voxtral_model"),
-                    "input": clean_speech_text,
-                    "voice": "fr-fr-default"
-                }
-                resp = requests.post(url, headers=headers, json=payload, timeout=45)
-                if resp.status_code == 200:
-                    line_bytes = resp.content
-                else:
-                    # Si endpoint non disponible ou refus de quota, bascule sur Edge-TTS pour cette réplique
-                    logger.warning("[PodcastEngine] Réponse Voxtral (%s) : %s. Utilisation secours Edge-TTS.", resp.status_code, resp.text[:120])
-                    line_bytes = cls._single_edge_tts_call(clean_speech_text, "fr-FR-HenriNeural" if is_b else "fr-FR-DeniseNeural")
-            except Exception as e:
-                logger.warning("[PodcastEngine] Échec appel Voxtral : %s. Utilisation secours Edge-TTS.", e)
-                line_bytes = cls._single_edge_tts_call(clean_speech_text, "fr-FR-HenriNeural" if is_b else "fr-FR-DeniseNeural")
-
-            # Estimation durée MP3 (bitrate standard ~6000 o/s)
-            line_duration = max(1.0, len(line_bytes) / 6000.0)
-            start_t = round(current_timeline_sec, 3)
-            end_t = round(start_t + line_duration, 3)
-
-            accumulated_audio.extend(line_bytes)
-
-            pause_ms = int(item.get("pause_after_ms", cfg.get("audio_studio_pause_ms", 350)))
-            pause_sec = pause_ms / 1000.0
-            current_timeline_sec = end_t + pause_sec
-
-            if pause_ms >= 100:
-                silence_frames = cls._generate_mp3_silence(pause_ms)
-                accumulated_audio.extend(silence_frames)
-
-            new_item = dict(item)
-            new_item["start_time"] = start_t
-            new_item["end_time"] = end_t
-            updated_dialogue.append(new_item)
-
-        # Sauvegarde MP3
-        audio_filename = f"{podcast_id}.mp3"
-        out_path = os.path.join(get_podcasts_dir(), audio_filename)
-        with open(out_path, "wb") as f:
-            f.write(accumulated_audio)
-
-        total_duration = round(current_timeline_sec, 2)
-        record["dialogue"] = updated_dialogue
-        record["script_dialogue"] = updated_dialogue
-        record["audio_file"] = audio_filename
-        record["duration_seconds"] = total_duration
-        record["engine"] = "voxtral"
-        record["status"] = "ready"
-        record["updated_at"] = datetime.datetime.now().isoformat()
-
-        PodcastHistory.upsert(record)
-
-        if progress_callback:
-            progress_callback(total_lines, 100, f"Épisode finalisé avec succès via Voxtral ({cls.format_duration(total_duration)})")
-
-        return record
 
     @classmethod
     def _single_edge_tts_call(cls, text: str, voice: str) -> bytes:

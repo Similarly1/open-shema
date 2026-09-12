@@ -26,15 +26,14 @@ class AudioStudioMixin:
     """Mixin pour les fonctionnalités du Studio Audio / Podcasts d'Open Shema."""
 
     def audio_studio_get_voices(self) -> Dict[str, Any]:
-        """Retourne le catalogue des voix disponibles (Edge-TTS et Voxtral)."""
+        """Retourne le catalogue complet des voix neuronales francophones disponibles."""
         try:
             data = PodcastEngine.get_available_voices()
-            all_voices = data.get("edge_tts", []) + data.get("voxtral", [])
+            voices = data.get("voices", data.get("edge_tts", []))
             return {
                 "success": True,
-                "voices": all_voices,
-                "edge_tts": data.get("edge_tts", []),
-                "voxtral": data.get("voxtral", [])
+                "voices": voices,
+                "edge_tts": voices
             }
         except Exception as e:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_voices : %s", e)

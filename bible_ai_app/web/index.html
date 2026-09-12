@@ -5410,74 +5410,100 @@
                       </div>
                     </div>
 
-                    <!-- Sélecteur de Moteur Audio -->
-                    <div class="audio-studio-engine-toggle" id="as-engine-toggle" style="margin-top: 12px;">
-                      <button type="button" class="engine-toggle-btn active" id="as-engine-btn-edge" data-engine="edge_tts">
-                        <span>Edge-TTS (Gratuit)</span>
-                      </button>
-                      <button type="button" class="engine-toggle-btn" id="as-engine-btn-voxtral" data-engine="voxtral">
-                        <span>Mistral Voxtral</span>
-                      </button>
-                    </div>
-
-                    <!-- Sélecteurs de Voix Françaises : Bloc Edge-TTS -->
-                    <div id="as-voices-edge-container" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Attribution des Voix Neuronales -->
+                    <div id="as-voices-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
                       <!-- Voix Dialogue -->
                       <div id="as-edge-dialogue-voices" style="display: flex; flex-direction: column; gap: 8px;">
                         <div class="audio-studio-form-row">
-                          <label class="audio-studio-form-label" for="as-select-voice-host">Voix Animateur</label>
+                          <label class="audio-studio-form-label" for="as-select-voice-host">Voix 1 (Animateur / Rôle A)</label>
                           <select id="as-select-voice-host" class="audio-studio-select">
-                            <option value="fr-FR-DeniseNeural">Denise (Française, vive &amp; claire)</option>
-                            <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française, naturelle)</option>
-                            <option value="fr-FR-EloiseNeural">Éloïse (Française, douce)</option>
-                            <option value="fr-BE-CharlineNeural">Charline (Belge, posée)</option>
+                            <optgroup label="France">
+                              <option value="fr-FR-DeniseNeural" selected>Denise (France - Féminine, claire &amp; vive)</option>
+                              <option value="fr-FR-HenriNeural">Henri (France - Masculine, posé &amp; érudit)</option>
+                              <option value="fr-FR-VivienneMultilingualNeural">Vivienne (France - Féminine, naturelle &amp; fluide)</option>
+                              <option value="fr-FR-RemyMultilingualNeural">Rémy (France - Masculine, expressif &amp; chaleureux)</option>
+                              <option value="fr-FR-EloiseNeural">Éloïse (France - Féminine, douce &amp; posée)</option>
+                            </optgroup>
+                            <optgroup label="Belgique">
+                              <option value="fr-BE-CharlineNeural">Charline (Belgique - Féminine, posée)</option>
+                              <option value="fr-BE-GerardNeural">Gérard (Belgique - Masculine, calme &amp; posé)</option>
+                            </optgroup>
+                            <optgroup label="Suisse">
+                              <option value="fr-CH-ArianeNeural">Ariane (Suisse - Féminine, posée)</option>
+                              <option value="fr-CH-FabriceNeural">Fabrice (Suisse - Masculine, posé &amp; net)</option>
+                            </optgroup>
+                            <optgroup label="Canada">
+                              <option value="fr-CA-SylvieNeural">Sylvie (Canada - Féminine, chaleureuse)</option>
+                              <option value="fr-CA-AntoineNeural">Antoine (Canada - Masculine, posé)</option>
+                              <option value="fr-CA-JeanNeural">Jean (Canada - Masculine, dynamique)</option>
+                              <option value="fr-CA-ThierryNeural">Thierry (Canada - Masculine, expressif)</option>
+                            </optgroup>
                           </select>
                         </div>
                         <div class="audio-studio-form-row">
-                          <label class="audio-studio-form-label" for="as-select-voice-scholar">Voix Exégète</label>
+                          <label class="audio-studio-form-label" for="as-select-voice-scholar">Voix 2 (Exégète / Rôle B)</label>
                           <select id="as-select-voice-scholar" class="audio-studio-select">
-                            <option value="fr-FR-HenriNeural">Henri (Français, posé &amp; érudit)</option>
-                            <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, expressif)</option>
-                            <option value="fr-CH-FabriceNeural">Fabrice (Suisse, posé)</option>
-                            <option value="fr-CA-AntoineNeural">Antoine (Canadien)</option>
+                            <optgroup label="France">
+                              <option value="fr-FR-HenriNeural" selected>Henri (France - Masculine, posé &amp; érudit)</option>
+                              <option value="fr-FR-DeniseNeural">Denise (France - Féminine, claire &amp; vive)</option>
+                              <option value="fr-FR-VivienneMultilingualNeural">Vivienne (France - Féminine, naturelle &amp; fluide)</option>
+                              <option value="fr-FR-RemyMultilingualNeural">Rémy (France - Masculine, expressif &amp; chaleureux)</option>
+                              <option value="fr-FR-EloiseNeural">Éloïse (France - Féminine, douce &amp; posée)</option>
+                            </optgroup>
+                            <optgroup label="Belgique">
+                              <option value="fr-BE-CharlineNeural">Charline (Belgique - Féminine, posée)</option>
+                              <option value="fr-BE-GerardNeural">Gérard (Belgique - Masculine, calme &amp; posé)</option>
+                            </optgroup>
+                            <optgroup label="Suisse">
+                              <option value="fr-CH-ArianeNeural">Ariane (Suisse - Féminine, posée)</option>
+                              <option value="fr-CH-FabriceNeural">Fabrice (Suisse - Masculine, posé &amp; net)</option>
+                            </optgroup>
+                            <optgroup label="Canada">
+                              <option value="fr-CA-SylvieNeural">Sylvie (Canada - Féminine, chaleureuse)</option>
+                              <option value="fr-CA-AntoineNeural">Antoine (Canada - Masculine, posé)</option>
+                              <option value="fr-CA-JeanNeural">Jean (Canada - Masculine, dynamique)</option>
+                              <option value="fr-CA-ThierryNeural">Thierry (Canada - Masculine, expressif)</option>
+                            </optgroup>
                           </select>
+                        </div>
+
+                        <!-- Alerte Voix Identiques avec bouton d'ajustement automatique -->
+                        <div id="as-voice-duplicate-alert" class="audio-studio-warning-box" style="display: none; margin-top: 4px; padding: 8px 10px; font-size: 11.5px; border-left: 3px solid var(--accent-orange, #e06c75); background: rgba(224, 108, 117, 0.08); border-radius: 4px;">
+                          <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <span>Attention : la Voix 1 et la Voix 2 sont identiques. Pour un dialogue naturel, deux voix distinctes sont requises.</span>
+                            <button type="button" id="btn-as-auto-fix-voices" class="btn-xs btn-secondary" style="align-self: flex-start; height: 24px; font-size: 11px; padding: 0 8px;">
+                              Ajuster automatiquement les voix
+                            </button>
+                          </div>
                         </div>
                       </div>
 
                       <!-- Voix Solo -->
                       <div id="as-edge-solo-voices" style="display: none; flex-direction: column; gap: 4px;" class="audio-studio-form-row">
-                        <label class="audio-studio-form-label" for="as-select-voice-solo">Voix Narrateur Solo</label>
+                        <label class="audio-studio-form-label" for="as-select-voice-solo">Voix Narrateur (Chronique Solo)</label>
                         <select id="as-select-voice-solo" class="audio-studio-select">
-                          <option value="fr-FR-HenriNeural">Henri (Français, posé &amp; érudit)</option>
-                          <option value="fr-FR-DeniseNeural">Denise (Française, vive &amp; claire)</option>
-                          <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française, naturelle)</option>
-                          <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, expressif)</option>
-                          <option value="fr-FR-EloiseNeural">Éloïse (Française, douce)</option>
-                          <option value="fr-BE-CharlineNeural">Charline (Belge, posée)</option>
-                          <option value="fr-CH-FabriceNeural">Fabrice (Suisse, posé)</option>
-                          <option value="fr-CA-AntoineNeural">Antoine (Canadien)</option>
+                          <optgroup label="France">
+                            <option value="fr-FR-HenriNeural" selected>Henri (France - Masculine, posé &amp; érudit)</option>
+                            <option value="fr-FR-DeniseNeural">Denise (France - Féminine, claire &amp; vive)</option>
+                            <option value="fr-FR-VivienneMultilingualNeural">Vivienne (France - Féminine, naturelle &amp; fluide)</option>
+                            <option value="fr-FR-RemyMultilingualNeural">Rémy (France - Masculine, expressif &amp; chaleureux)</option>
+                            <option value="fr-FR-EloiseNeural">Éloïse (France - Féminine, douce &amp; posée)</option>
+                          </optgroup>
+                          <optgroup label="Belgique">
+                            <option value="fr-BE-CharlineNeural">Charline (Belgique - Féminine, posée)</option>
+                            <option value="fr-BE-GerardNeural">Gérard (Belgique - Masculine, calme &amp; posé)</option>
+                          </optgroup>
+                          <optgroup label="Suisse">
+                            <option value="fr-CH-ArianeNeural">Ariane (Suisse - Féminine, posée)</option>
+                            <option value="fr-CH-FabriceNeural">Fabrice (Suisse - Masculine, posé &amp; net)</option>
+                          </optgroup>
+                          <optgroup label="Canada">
+                            <option value="fr-CA-SylvieNeural">Sylvie (Canada - Féminine, chaleureuse)</option>
+                            <option value="fr-CA-AntoineNeural">Antoine (Canada - Masculine, posé)</option>
+                            <option value="fr-CA-JeanNeural">Jean (Canada - Masculine, dynamique)</option>
+                            <option value="fr-CA-ThierryNeural">Thierry (Canada - Masculine, expressif)</option>
+                          </optgroup>
                         </select>
-                      </div>
-                    </div>
-
-                    <!-- Sélecteurs de Voix Françaises : Bloc Voxtral -->
-                    <div id="as-voices-voxtral-container" style="display: none; flex-direction: column; gap: 10px;">
-                      <div class="audio-studio-form-row">
-                        <label class="audio-studio-form-label" for="as-select-voice-voxtral">Voix &amp; Style Voxtral (Français)</label>
-                        <select id="as-select-voice-voxtral" class="audio-studio-select">
-                          <option value="default">Voxtral Standard (Voix officielle Mistral)</option>
-                          <option value="pose">Voxtral Exégète (Posé &amp; Solennel)</option>
-                          <option value="dynamique">Voxtral Animateur (Dynamique &amp; Vivant)</option>
-                          <option value="pastoral">Voxtral Pastoral (Chaleureux)</option>
-                          <option value="custom">Voix Personnalisée (Compte Mistral Payant)</option>
-                        </select>
-                      </div>
-                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
-                        <input type="checkbox" id="as-check-voxtral-modulate" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
-                        <span>Modulation intonative selon le rôle</span>
-                      </label>
-                      <div id="as-voxtral-warning" class="audio-studio-warning-box" style="display: none;">
-                        Clé API Mistral non configurée. Cliquez sur <a href="#" id="as-link-settings-mistral" style="color: inherit; text-decoration: underline; font-weight: 600;">Paramètres IA</a> pour la renseigner (ou restez sur Edge-TTS gratuit).
                       </div>
                     </div>
 
