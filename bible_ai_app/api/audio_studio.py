@@ -26,14 +26,14 @@ class AudioStudioMixin:
     """Mixin pour les fonctionnalités du Studio Audio / Podcasts d'Open Shema."""
 
     def audio_studio_get_voices(self) -> Dict[str, Any]:
-        """Retourne le catalogue complet des voix neuronales francophones disponibles."""
+        """Retourne le catalogue complet des voix neuronales francophones disponibles (Edge-TTS et Voxtral)."""
         try:
             data = PodcastEngine.get_available_voices()
-            voices = data.get("voices", data.get("edge_tts", []))
             return {
                 "success": True,
-                "voices": voices,
-                "edge_tts": voices
+                "voices": data.get("voices", data.get("edge_tts", [])),
+                "edge_tts": data.get("edge_tts", []),
+                "voxtral": data.get("voxtral", [])
             }
         except Exception as e:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_voices : %s", e)
@@ -64,6 +64,9 @@ class AudioStudioMixin:
                 "voice_speaker_a": cfg.get("audio_studio_voice_speaker_a", "fr-FR-DeniseNeural"),
                 "voice_speaker_b": cfg.get("audio_studio_voice_speaker_b", "fr-FR-HenriNeural"),
                 "voice_solo": cfg.get("audio_studio_voice_solo", "fr-FR-HenriNeural"),
+                "voxtral_voice_speaker_a": cfg.get("audio_studio_voxtral_voice_speaker_a", "voxtral-celeste"),
+                "voxtral_voice_speaker_b": cfg.get("audio_studio_voxtral_voice_speaker_b", "voxtral-aurelien"),
+                "voxtral_voice_solo": cfg.get("audio_studio_voxtral_voice_solo", "voxtral-aurelien"),
                 "pause_ms": int(cfg.get("audio_studio_pause_ms", 350)),
                 "voxtral_voice": cfg.get("audio_studio_voxtral_voice", "default"),
                 "voxtral_modulate": cfg.get("audio_studio_voxtral_modulate", True),
@@ -90,6 +93,12 @@ class AudioStudioMixin:
                 cfg["audio_studio_voice_speaker_b"] = new_settings["voice_speaker_b"]
             if "voice_solo" in new_settings:
                 cfg["audio_studio_voice_solo"] = new_settings["voice_solo"]
+            if "voxtral_voice_speaker_a" in new_settings:
+                cfg["audio_studio_voxtral_voice_speaker_a"] = new_settings["voxtral_voice_speaker_a"]
+            if "voxtral_voice_speaker_b" in new_settings:
+                cfg["audio_studio_voxtral_voice_speaker_b"] = new_settings["voxtral_voice_speaker_b"]
+            if "voxtral_voice_solo" in new_settings:
+                cfg["audio_studio_voxtral_voice_solo"] = new_settings["voxtral_voice_solo"]
             if "pause_ms" in new_settings:
                 cfg["audio_studio_pause_ms"] = int(new_settings["pause_ms"])
             if "voxtral_voice" in new_settings:

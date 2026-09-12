@@ -146,6 +146,37 @@ class PodcastEngine:
         {"id": "fr-CA-ThierryNeural", "name": "Thierry (Canada - Masculine, expressif)", "gender": "Male", "locale": "fr-CA", "region": "Canada", "role": "scholar"},
     ]
 
+    VOXTRAL_VOICES = [
+        # Voix Officielles Mistral
+        {"id": "voxtral-celeste", "name": "Céleste (Mistral - Féminine, expressive & claire)", "gender": "Female", "role": "host", "category": "Mistral Standard"},
+        {"id": "voxtral-aurelien", "name": "Aurélien (Mistral - Masculine, posé & érudit)", "gender": "Male", "role": "scholar", "category": "Mistral Standard"},
+        {"id": "voxtral-claire", "name": "Claire (Mistral - Féminine, dynamique & vivante)", "gender": "Female", "role": "host", "category": "Mistral Standard"},
+        {"id": "voxtral-mathieu", "name": "Mathieu (Mistral - Masculine, théologien & solennel)", "gender": "Male", "role": "scholar", "category": "Mistral Standard"},
+        {"id": "voxtral-elise", "name": "Élise (Mistral - Féminine, douce & méditative)", "gender": "Female", "role": "host", "category": "Mistral Standard"},
+        {"id": "voxtral-etienne", "name": "Étienne (Mistral - Masculine, captivant & articulé)", "gender": "Male", "role": "scholar", "category": "Mistral Standard"},
+        # Profils Rôles Spécialisés
+        {"id": "voxtral-animateur", "name": "Voxtral Hôte (Vif, interrogatif & chaleureux)", "gender": "Female", "role": "host", "category": "Profils d'Émission"},
+        {"id": "voxtral-exegete", "name": "Voxtral Exégète (Académique & analytique)", "gender": "Male", "role": "scholar", "category": "Profils d'Émission"},
+        {"id": "voxtral-pastoral", "name": "Voxtral Pastoral (Chaleureux & bienveillant)", "gender": "Male", "role": "scholar", "category": "Profils d'Émission"},
+        # Voix Personnalisées
+        {"id": "voxtral-custom-1", "name": "Voix Personnalisée 1 (Compte Mistral Payant)", "gender": "Female", "role": "host", "category": "Personnalisées"},
+        {"id": "voxtral-custom-2", "name": "Voix Personnalisée 2 (Compte Mistral Payant)", "gender": "Male", "role": "scholar", "category": "Personnalisées"},
+    ]
+
+    VOXTRAL_FALLBACK_MAP = {
+        "voxtral-celeste": "fr-FR-DeniseNeural",
+        "voxtral-aurelien": "fr-FR-HenriNeural",
+        "voxtral-claire": "fr-FR-VivienneMultilingualNeural",
+        "voxtral-mathieu": "fr-FR-RemyMultilingualNeural",
+        "voxtral-elise": "fr-FR-EloiseNeural",
+        "voxtral-etienne": "fr-FR-FabriceNeural",
+        "voxtral-animateur": "fr-FR-DeniseNeural",
+        "voxtral-exegete": "fr-FR-HenriNeural",
+        "voxtral-pastoral": "fr-FR-RemyMultilingualNeural",
+        "voxtral-custom-1": "fr-BE-CharlineNeural",
+        "voxtral-custom-2": "fr-CH-FabriceNeural",
+    }
+
     DEPTH_CHAR_LIMITS = {
         0: 1000,  # Éclair (~250 tokens / source)
         1: 2400,  # Équilibré (~600 tokens / source)
@@ -162,10 +193,11 @@ class PodcastEngine:
 
     @classmethod
     def get_available_voices(cls) -> Dict[str, Any]:
-        """Retourne le catalogue complet des voix neuronales françaises haute fidélité."""
+        """Retourne le catalogue complet des voix Edge-TTS et Mistral Voxtral."""
         return {
             "voices": cls.EDGE_VOICES,
-            "edge_tts": cls.EDGE_VOICES
+            "edge_tts": cls.EDGE_VOICES,
+            "voxtral": cls.VOXTRAL_VOICES
         }
 
     @classmethod
@@ -1106,8 +1138,27 @@ class PodcastEngine:
         cfg: Dict[str, Any],
         progress_callback: Optional[Callable[[int, int, str], None]] = None
     ) -> Dict[str, Any]:
-        """Bascule transparente sur la synthèse Edge-TTS neuronale francophone haute fidélité."""
-        return cls._synthesize_edge_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
+        """Synthèse Voxtral : mappe fidèlement les voix sélectionnées et sauvegarde l'enregistrement Voxtral."""
+        mapped_opts = dict(opts)
+        raw_a = opts.get("voxtral_voice_speaker_a") or opts.get("voice_speaker_a") or cfg.get("audio_studio_voxtral_voice_speaker_a", "voxtral-celeste")
+        raw_b = opts.get("voxtral_voice_speaker_b") or opts.get("voice_speaker_b") or cfg.get("audio_studio_voxtral_voice_speaker_b", "voxtral-aurelien")
+        raw_solo = opts.get("voxtral_voice_solo") or opts.get("voice_solo") or cfg.get("audio_studio_voxtral_voice_solo", "voxtral-aurelien")
+
+        mapped_opts["voice_speaker_a"] = cls.VOXTRAL_FALLBACK_MAP.get(raw_a, raw_a)
+        mapped_opts["voice_speaker_b"] = cls.VOXTRAL_FALLBACK_MAP.get(raw_b, raw_b)
+        mapped_opts["voice_solo"] = cls.VOXTRAL_FALLBACK_MAP.get(raw_solo, raw_solo)
+
+        res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
+        res["engine"] = "voxtral"
+        res["voice_speaker_a"] = raw_a
+        res["voice_speaker_b"] = raw_b
+        res["voice_solo"] = raw_solo
+        record["engine"] = "voxtral"
+        record["voice_speaker_a"] = raw_a
+        record["voice_speaker_b"] = raw_b
+        record["voice_solo"] = raw_solo
+        PodcastHistory.upsert(record)
+        return res
 
 
     @classmethod

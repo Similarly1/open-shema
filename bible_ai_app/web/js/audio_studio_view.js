@@ -134,7 +134,13 @@ const AudioStudioView = {
       selectVoiceSolo: document.getElementById('as-select-voice-solo'),
       voiceDuplicateAlert: document.getElementById('as-voice-duplicate-alert'),
       btnAutoFixVoices: document.getElementById('btn-as-auto-fix-voices'),
-      selectVoiceVoxtral: document.getElementById('as-select-voice-voxtral'),
+      voxtralDialogueVoices: document.getElementById('as-voxtral-dialogue-voices'),
+      voxtralSoloVoices: document.getElementById('as-voxtral-solo-voices'),
+      selectVoxtralHost: document.getElementById('as-select-voxtral-host'),
+      selectVoxtralScholar: document.getElementById('as-select-voxtral-scholar'),
+      selectVoxtralSolo: document.getElementById('as-select-voxtral-solo'),
+      voxtralDuplicateAlert: document.getElementById('as-voxtral-duplicate-alert'),
+      btnAutoFixVoxtralVoices: document.getElementById('btn-as-auto-fix-voxtral-voices'),
       checkVoxtralModulate: document.getElementById('as-check-voxtral-modulate'),
       voxtralWarning: document.getElementById('as-voxtral-warning'),
       linkSettingsMistral: document.getElementById('as-link-settings-mistral'),
@@ -256,7 +262,7 @@ const AudioStudioView = {
     el.engineBtnEdge?.addEventListener('click', () => this.setEngine('edge_tts'));
     el.engineBtnVoxtral?.addEventListener('click', () => this.setEngine('voxtral'));
 
-    // 1c. Changement direct des voix et synchronisation intelligente de la paire
+    // 1c. Changement direct des voix et synchronisation intelligente de la paire (Edge-TTS)
     el.selectVoiceHost?.addEventListener('change', () => {
       this.syncVoicePair(true, 'host');
     });
@@ -271,8 +277,21 @@ const AudioStudioView = {
       this.updateVoiceSummary();
       this.updateTurnCardsVoiceLabels();
     });
-    el.selectVoiceVoxtral?.addEventListener('change', (e) => {
-      this.saveVoiceOption({ voxtral_voice: e.target.value });
+
+    // 1c bis. Changement des voix et synchronisation intelligente de la paire (Mistral Voxtral)
+    el.selectVoxtralHost?.addEventListener('change', () => {
+      this.syncVoxtralVoicePair(true, 'host');
+    });
+    el.selectVoxtralScholar?.addEventListener('change', () => {
+      this.syncVoxtralVoicePair(true, 'scholar');
+    });
+    el.btnAutoFixVoxtralVoices?.addEventListener('click', () => {
+      this.syncVoxtralVoicePair(true, 'host', true);
+    });
+    el.selectVoxtralSolo?.addEventListener('change', (e) => {
+      this.saveVoiceOption({ voxtral_voice_solo: e.target.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
     });
     el.checkVoxtralModulate?.addEventListener('change', (e) => {
       this.saveVoiceOption({ voxtral_modulate: e.target.checked });
@@ -372,29 +391,46 @@ const AudioStudioView = {
   setFormat(newFormat) {
     this.format = newFormat;
     const el = this.elements;
+    const isVoxtral = (this.config?.engine === 'voxtral');
+
     if (newFormat === 'dialogue') {
       el.btnFormatDialogue?.classList.add('active');
       el.btnFormatSolo?.classList.remove('active');
       el.btnFormatStep2Dialogue?.classList.add('active');
       el.btnFormatStep2Solo?.classList.remove('active');
       if (el.metaFormat) el.metaFormat.textContent = 'Dialogue (2 voix)';
+
+      // Edge-TTS
       if (el.edgeDialogueVoices) el.edgeDialogueVoices.style.display = 'flex';
       if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'none';
       if (el.voiceDuplicateAlert) {
-        el.voiceDuplicateAlert.style.display = (el.selectVoiceHost?.value === el.selectVoiceScholar?.value) ? 'block' : 'none';
+        el.voiceDuplicateAlert.style.display = (!isVoxtral && el.selectVoiceHost?.value === el.selectVoiceScholar?.value) ? 'block' : 'none';
       }
       this.syncVoicePair(false, 'host');
+
+      // Voxtral
+      if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'flex';
+      if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'none';
+      if (el.voxtralDuplicateAlert) {
+        el.voxtralDuplicateAlert.style.display = (isVoxtral && el.selectVoxtralHost?.value === el.selectVoxtralScholar?.value) ? 'block' : 'none';
+      }
+      this.syncVoxtralVoicePair(false, 'host');
     } else {
       el.btnFormatSolo?.classList.add('active');
       el.btnFormatDialogue?.classList.remove('active');
       el.btnFormatStep2Solo?.classList.add('active');
       el.btnFormatStep2Dialogue?.classList.remove('active');
       if (el.metaFormat) el.metaFormat.textContent = 'Chronique Solo';
+
+      // Edge-TTS
       if (el.edgeDialogueVoices) el.edgeDialogueVoices.style.display = 'none';
       if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'flex';
-      if (el.voiceDuplicateAlert) {
-        el.voiceDuplicateAlert.style.display = 'none';
-      }
+      if (el.voiceDuplicateAlert) el.voiceDuplicateAlert.style.display = 'none';
+
+      // Voxtral
+      if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'none';
+      if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'flex';
+      if (el.voxtralDuplicateAlert) el.voxtralDuplicateAlert.style.display = 'none';
     }
     this.updateVoiceSummary();
     this.updateTurnCardsVoiceLabels();
@@ -414,16 +450,32 @@ const AudioStudioView = {
       if (el.voxtralWarning) {
         el.voxtralWarning.style.display = this.config.has_mistral_key ? 'none' : 'block';
       }
+      this.syncVoxtralVoicePair(false, 'host');
     } else {
       el.engineBtnEdge?.classList.add('active');
       el.engineBtnVoxtral?.classList.remove('active');
       if (el.voicesEdgeContainer) el.voicesEdgeContainer.style.display = 'flex';
       if (el.voicesVoxtralContainer) el.voicesVoxtralContainer.style.display = 'none';
-      if (el.engineBadge) el.engineBadge.textContent = 'Edge-TTS';
+      if (el.engineBadge) el.engineBadge.textContent = 'Edge-TTS (Gratuit)';
       if (el.voxtralWarning) el.voxtralWarning.style.display = 'none';
+      this.syncVoicePair(false, 'host');
+    }
+
+    // Ré-appliquer le format actuel (dialogue vs solo) sur les nouveaux conteneurs
+    if (this.format === 'solo') {
+      if (el.edgeDialogueVoices) el.edgeDialogueVoices.style.display = 'none';
+      if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'flex';
+      if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'none';
+      if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'flex';
+    } else {
+      if (el.edgeDialogueVoices) el.edgeDialogueVoices.style.display = 'flex';
+      if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'none';
+      if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'flex';
+      if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'none';
     }
 
     this.updateVoiceSummary();
+    this.updateTurnCardsVoiceLabels();
 
     if (shouldSave) {
       API.call('audio_studio_save_config', { engine });
@@ -541,7 +593,11 @@ const AudioStudioView = {
         if (el.selectVoiceHost && res.voice_speaker_a) el.selectVoiceHost.value = res.voice_speaker_a;
         if (el.selectVoiceScholar && res.voice_speaker_b) el.selectVoiceScholar.value = res.voice_speaker_b;
         if (el.selectVoiceSolo && res.voice_solo) el.selectVoiceSolo.value = res.voice_solo;
-        if (el.selectVoiceVoxtral && res.voxtral_voice) el.selectVoiceVoxtral.value = res.voxtral_voice;
+
+        if (el.selectVoxtralHost && res.voxtral_voice_speaker_a) el.selectVoxtralHost.value = res.voxtral_voice_speaker_a;
+        if (el.selectVoxtralScholar && res.voxtral_voice_speaker_b) el.selectVoxtralScholar.value = res.voxtral_voice_speaker_b;
+        if (el.selectVoxtralSolo && res.voxtral_voice_solo) el.selectVoxtralSolo.value = res.voxtral_voice_solo;
+
         if (el.checkVoxtralModulate) el.checkVoxtralModulate.checked = res.voxtral_modulate !== false;
         if (el.inputPauseMs && res.pause_ms) el.inputPauseMs.value = res.pause_ms;
 
@@ -557,8 +613,9 @@ const AudioStudioView = {
   async loadVoices() {
     try {
       const res = await API.call('audio_studio_get_voices');
-      if (res && (res.voices || res.edge_tts)) {
-        this.voices = res.voices || [];
+      if (res && (res.voices || res.edge_tts || res.voxtral)) {
+        this.voices = res.voices || res.edge_tts || [];
+        this.voxtralVoices = res.voxtral || [];
         this.populateVoiceSelects(res);
         this.updateVoiceSummary();
       }
@@ -570,64 +627,113 @@ const AudioStudioView = {
   populateVoiceSelects(voicesData) {
     const el = this.elements;
     const voices = voicesData.voices || voicesData.edge_tts || [];
-    if (!voices || voices.length === 0) return;
+    const voxtralVoices = voicesData.voxtral || [];
 
-    this.voices = voices;
+    if (voices && voices.length > 0) {
+      this.voices = voices;
 
-    // Regrouper par région géographique francophone
-    const regions = ['France', 'Belgique', 'Suisse', 'Canada'];
-    const grouped = {};
-    regions.forEach(r => { grouped[r] = []; });
+      // Regrouper par région géographique francophone
+      const regions = ['France', 'Belgique', 'Suisse', 'Canada'];
+      const grouped = {};
+      regions.forEach(r => { grouped[r] = []; });
 
-    voices.forEach(v => {
-      let reg = v.region;
-      if (!reg) {
-        if (v.locale?.includes('BE')) reg = 'Belgique';
-        else if (v.locale?.includes('CH')) reg = 'Suisse';
-        else if (v.locale?.includes('CA')) reg = 'Canada';
-        else reg = 'France';
+      voices.forEach(v => {
+        let reg = v.region;
+        if (!reg) {
+          if (v.locale?.includes('BE')) reg = 'Belgique';
+          else if (v.locale?.includes('CH')) reg = 'Suisse';
+          else if (v.locale?.includes('CA')) reg = 'Canada';
+          else reg = 'France';
+        }
+        if (!grouped[reg]) grouped[reg] = [];
+        grouped[reg].push(v);
+      });
+
+      const buildGroupedOpts = () => {
+        let html = '';
+        regions.forEach(reg => {
+          const list = grouped[reg] || [];
+          if (list.length > 0) {
+            html += `<optgroup label="${reg}">`;
+            list.forEach(v => {
+              html += `<option value="${v.id}">${this.escapeHtml(v.name)}</option>`;
+            });
+            html += `</optgroup>`;
+          }
+        });
+        return html;
+      };
+
+      const optHtml = buildGroupedOpts();
+
+      if (el.selectVoiceHost) {
+        const cur = this.config?.voice_speaker_a || el.selectVoiceHost.value || 'fr-FR-DeniseNeural';
+        el.selectVoiceHost.innerHTML = optHtml;
+        el.selectVoiceHost.value = cur;
       }
-      if (!grouped[reg]) grouped[reg] = [];
-      grouped[reg].push(v);
-    });
 
-    const buildGroupedOpts = () => {
-      let html = '';
-      regions.forEach(reg => {
-        const list = grouped[reg] || [];
+      if (el.selectVoiceScholar) {
+        const cur = this.config?.voice_speaker_b || el.selectVoiceScholar.value || 'fr-FR-HenriNeural';
+        el.selectVoiceScholar.innerHTML = optHtml;
+        el.selectVoiceScholar.value = cur;
+      }
+
+      if (el.selectVoiceSolo) {
+        const cur = this.config?.voice_solo || el.selectVoiceSolo.value || 'fr-FR-HenriNeural';
+        el.selectVoiceSolo.innerHTML = optHtml;
+        el.selectVoiceSolo.value = cur;
+      }
+
+      // Synchronisation mutuelle de la paire de voix
+      this.syncVoicePair(false, 'host');
+    }
+
+    if (voxtralVoices && voxtralVoices.length > 0) {
+      this.voxtralVoices = voxtralVoices;
+
+      const voxtralCats = ["Mistral Standard", "Profils d'Émission", "Personnalisées"];
+      const vGrouped = {};
+      voxtralCats.forEach(c => { vGrouped[c] = []; });
+
+      voxtralVoices.forEach(v => {
+        const cat = v.category || 'Mistral Standard';
+        if (!vGrouped[cat]) vGrouped[cat] = [];
+        vGrouped[cat].push(v);
+      });
+
+      let voxtralOptHtml = '';
+      voxtralCats.forEach(cat => {
+        const list = vGrouped[cat] || [];
         if (list.length > 0) {
-          html += `<optgroup label="${reg}">`;
+          voxtralOptHtml += `<optgroup label="${cat}">`;
           list.forEach(v => {
-            html += `<option value="${v.id}">${this.escapeHtml(v.name)}</option>`;
+            voxtralOptHtml += `<option value="${v.id}">${this.escapeHtml(v.name)}</option>`;
           });
-          html += `</optgroup>`;
+          voxtralOptHtml += `</optgroup>`;
         }
       });
-      return html;
-    };
 
-    const optHtml = buildGroupedOpts();
+      if (el.selectVoxtralHost) {
+        const cur = this.config?.voxtral_voice_speaker_a || el.selectVoxtralHost.value || 'voxtral-celeste';
+        el.selectVoxtralHost.innerHTML = voxtralOptHtml;
+        el.selectVoxtralHost.value = cur;
+      }
 
-    if (el.selectVoiceHost) {
-      const cur = this.config?.voice_speaker_a || el.selectVoiceHost.value || 'fr-FR-DeniseNeural';
-      el.selectVoiceHost.innerHTML = optHtml;
-      el.selectVoiceHost.value = cur;
+      if (el.selectVoxtralScholar) {
+        const cur = this.config?.voxtral_voice_speaker_b || el.selectVoxtralScholar.value || 'voxtral-aurelien';
+        el.selectVoxtralScholar.innerHTML = voxtralOptHtml;
+        el.selectVoxtralScholar.value = cur;
+      }
+
+      if (el.selectVoxtralSolo) {
+        const cur = this.config?.voxtral_voice_solo || el.selectVoxtralSolo.value || 'voxtral-pastoral';
+        el.selectVoxtralSolo.innerHTML = voxtralOptHtml;
+        el.selectVoxtralSolo.value = cur;
+      }
+
+      this.syncVoxtralVoicePair(false, 'host');
     }
 
-    if (el.selectVoiceScholar) {
-      const cur = this.config?.voice_speaker_b || el.selectVoiceScholar.value || 'fr-FR-HenriNeural';
-      el.selectVoiceScholar.innerHTML = optHtml;
-      el.selectVoiceScholar.value = cur;
-    }
-
-    if (el.selectVoiceSolo) {
-      const cur = this.config?.voice_solo || el.selectVoiceSolo.value || 'fr-FR-HenriNeural';
-      el.selectVoiceSolo.innerHTML = optHtml;
-      el.selectVoiceSolo.value = cur;
-    }
-
-    // Synchronisation mutuelle de la paire de voix
-    this.syncVoicePair(false, 'host');
     this.updateVoiceSummary();
     this.updateTurnCardsVoiceLabels();
   },
@@ -739,6 +845,110 @@ const AudioStudioView = {
     this.updateTurnCardsVoiceLabels();
   },
 
+  syncVoxtralVoicePair(isUserChange = false, changedSource = 'host', forceAutoFix = false) {
+    const el = this.elements;
+    const v1El = el.selectVoxtralHost;
+    const v2El = el.selectVoxtralScholar;
+    if (!v1El || !v2El) return;
+
+    let v1Val = v1El.value;
+    let v2Val = v2El.value;
+    const alertEl = el.voxtralDuplicateAlert;
+
+    // 1. Désactiver la voix opposée dans chaque liste
+    Array.from(v2El.options).forEach(opt => {
+      if (opt.value === v1Val) {
+        opt.disabled = true;
+        if (!opt.text.includes('(Sélectionnée en Voix 1)')) {
+          opt.dataset.origText = opt.dataset.origText || opt.text;
+          opt.text = `${opt.dataset.origText} (Sélectionnée en Voix 1)`;
+        }
+      } else {
+        opt.disabled = false;
+        if (opt.dataset.origText) {
+          opt.text = opt.dataset.origText;
+        }
+      }
+    });
+
+    Array.from(v1El.options).forEach(opt => {
+      if (opt.value === v2Val) {
+        opt.disabled = true;
+        if (!opt.text.includes('(Sélectionnée en Voix 2)')) {
+          opt.dataset.origText = opt.dataset.origText || opt.text;
+          opt.text = `${opt.dataset.origText} (Sélectionnée en Voix 2)`;
+        }
+      } else {
+        opt.disabled = false;
+        if (opt.dataset.origText) {
+          opt.text = opt.dataset.origText;
+        }
+      }
+    });
+
+    // 2. Détection et correction intelligente du doublon
+    const isDuplicate = (v1Val === v2Val);
+    if (isDuplicate || forceAutoFix) {
+      if (changedSource === 'host' || forceAutoFix) {
+        const alternate = this.getSmartAlternateVoxtralVoice(v1Val, 'scholar');
+        if (alternate) {
+          v2El.value = alternate;
+          v2Val = alternate;
+          if (isUserChange || forceAutoFix) {
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast('Voix 2 Voxtral ajustée : distincte de la Voix 1 pour un dialogue bivoix.');
+            }
+          }
+        }
+      } else {
+        const alternate = this.getSmartAlternateVoxtralVoice(v2Val, 'host');
+        if (alternate) {
+          v1El.value = alternate;
+          v1Val = alternate;
+          if (isUserChange) {
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast('Voix 1 Voxtral ajustée : distincte de la Voix 2 pour un dialogue bivoix.');
+            }
+          }
+        }
+      }
+
+      Array.from(v2El.options).forEach(opt => {
+        opt.disabled = (opt.value === v1Val);
+        if (opt.value === v1Val) {
+          opt.dataset.origText = opt.dataset.origText || opt.text.replace(' (Sélectionnée en Voix 1)', '');
+          opt.text = `${opt.dataset.origText} (Sélectionnée en Voix 1)`;
+        } else if (opt.dataset.origText) {
+          opt.text = opt.dataset.origText;
+        }
+      });
+      Array.from(v1El.options).forEach(opt => {
+        opt.disabled = (opt.value === v2Val);
+        if (opt.value === v2Val) {
+          opt.dataset.origText = opt.dataset.origText || opt.text.replace(' (Sélectionnée en Voix 2)', '');
+          opt.text = `${opt.dataset.origText} (Sélectionnée en Voix 2)`;
+        } else if (opt.dataset.origText) {
+          opt.text = opt.dataset.origText;
+        }
+      });
+    }
+
+    // Afficher ou masquer le bandeau d'alerte visuel
+    const finalDuplicate = (v1El.value === v2El.value);
+    if (alertEl) {
+      alertEl.style.display = (finalDuplicate && this.format === 'dialogue') ? 'block' : 'none';
+    }
+
+    // Sauvegarde automatique des voix choisies
+    this.saveVoiceOption({
+      voxtral_voice_speaker_a: v1El.value,
+      voxtral_voice_speaker_b: v2El.value
+    });
+
+    this.updateVoiceSummary();
+    this.updateTurnCardsVoiceLabels();
+  },
+
   getSmartAlternateVoice(currentVoiceId, targetRole = 'scholar') {
     const defaultHost = 'fr-FR-DeniseNeural';
     const defaultScholar = 'fr-FR-HenriNeural';
@@ -752,14 +962,36 @@ const AudioStudioView = {
     }
   },
 
+  getSmartAlternateVoxtralVoice(currentVoiceId, targetRole = 'scholar') {
+    const defaultHost = 'voxtral-celeste';
+    const defaultScholar = 'voxtral-aurelien';
+
+    if (targetRole === 'scholar') {
+      if (currentVoiceId !== defaultScholar) return defaultScholar;
+      return 'voxtral-exegete';
+    } else {
+      if (currentVoiceId !== defaultHost) return defaultHost;
+      return 'voxtral-claire';
+    }
+  },
+
   updateTurnCardsVoiceLabels() {
     const el = this.elements;
     const cards = el.scriptList?.querySelectorAll('.audio-studio-turn-card') || [];
     if (cards.length === 0) return;
 
-    const hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
-    const scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
-    const soloName = this.getVoiceShortName(el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
+    const isVoxtral = (this.config?.engine === 'voxtral');
+    let hostName, scholarName, soloName;
+
+    if (isVoxtral) {
+      hostName = this.getVoiceShortName(el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste');
+      scholarName = this.getVoiceShortName(el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien');
+      soloName = this.getVoiceShortName(el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral');
+    } else {
+      hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
+      scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
+      soloName = this.getVoiceShortName(el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
+    }
 
     cards.forEach(card => {
       const vRole = card.dataset.voiceRole;
@@ -781,7 +1013,8 @@ const AudioStudioView = {
 
   getVoiceShortName(voiceId) {
     if (!voiceId) return 'Voix';
-    const match = (this.voices || []).find(v => v.id === voiceId);
+    const all = [...(this.voices || []), ...(this.voxtralVoices || [])];
+    const match = all.find(v => v.id === voiceId);
     if (match && match.name) {
       return match.name.split('(')[0].trim();
     }
@@ -796,19 +1029,34 @@ const AudioStudioView = {
     const el = this.elements;
     if (!el.voiceSummary) return;
 
-    const spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural';
-    const spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural';
-    const solo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural';
+    const isVoxtral = (this.config?.engine === 'voxtral');
 
-    if (this.format === 'dialogue') {
-      el.voiceSummary.innerHTML = `<strong>Voix 1 (Animateur) :</strong> ${this.getVoiceLabel(spkA)} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.getVoiceLabel(spkB)}`;
+    if (isVoxtral) {
+      const spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste';
+      const spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien';
+      const solo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral';
+
+      if (this.format === 'dialogue') {
+        el.voiceSummary.innerHTML = `<strong>Voxtral Voix 1 (Animateur) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
+      } else {
+        el.voiceSummary.innerHTML = `<strong>Voxtral Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
+      }
     } else {
-      el.voiceSummary.innerHTML = `<strong>Voix Narrateur (Solo) :</strong> ${this.getVoiceLabel(solo)}`;
+      const spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural';
+      const spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural';
+      const solo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural';
+
+      if (this.format === 'dialogue') {
+        el.voiceSummary.innerHTML = `<strong>Voix 1 (Animateur) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
+      } else {
+        el.voiceSummary.innerHTML = `<strong>Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
+      }
     }
   },
 
   getVoiceLabel(voiceId) {
-    const match = (this.voices || []).find(v => v.id === voiceId);
+    const all = [...(this.voices || []), ...(this.voxtralVoices || [])];
+    const match = all.find(v => v.id === voiceId);
     if (match) return match.name;
     return voiceId || 'Standard';
   },
@@ -1289,9 +1537,17 @@ const AudioStudioView = {
     }
     card.dataset.voiceRole = voiceRole;
 
-    const hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
-    const scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
-    const soloName = this.getVoiceShortName(this.elements.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
+    const isVoxtral = (this.config?.engine === 'voxtral');
+    let hostName, scholarName, soloName;
+    if (isVoxtral) {
+      hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste');
+      scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien');
+      soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral');
+    } else {
+      hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
+      scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
+      soloName = this.getVoiceShortName(this.elements.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
+    }
 
     let roleClass = 'role-host';
     let displaySpeaker = '';
@@ -1464,10 +1720,17 @@ const AudioStudioView = {
       const idx = parseInt(card.dataset.turnIndex, 10);
       const textEl = card.querySelector('.audio-studio-turn-textarea');
       const pauseEl = card.querySelector('.turn-pause-input');
-      const voiceRole = card.dataset.voiceRole || (this.format === 'solo' ? 'solo' : (idx % 2 === 0 ? 'A' : 'B'));
-      const hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
-      const scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
-      const soloName = this.getVoiceShortName(this.elements.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
+      const isVoxtral = (this.config?.engine === 'voxtral');
+      let hostName, scholarName, soloName;
+      if (isVoxtral) {
+        hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste');
+        scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien');
+        soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral');
+      } else {
+        hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
+        scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
+        soloName = this.getVoiceShortName(this.elements.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
+      }
       const fallbackSpeaker = (voiceRole === 'B') ? `Exégète (${scholarName})` : (voiceRole === 'solo' ? `Narrateur (${soloName})` : `Animateur (${hostName})`);
       const speakerName = card.dataset.speakerName || fallbackSpeaker;
 
@@ -1501,13 +1764,22 @@ const AudioStudioView = {
     this.isSynthesizing = true;
 
     const el = this.elements;
+    const isVoxtral = (this.config?.engine === 'voxtral');
 
     // Contrôle et ajustement automatique en cas de doublon en mode dialogue
     if (this.format === 'dialogue') {
-      const v1 = el.selectVoiceHost?.value;
-      const v2 = el.selectVoiceScholar?.value;
-      if (v1 && v2 && v1 === v2) {
-        this.syncVoicePair(true, 'host', true);
+      if (isVoxtral) {
+        const v1 = el.selectVoxtralHost?.value;
+        const v2 = el.selectVoxtralScholar?.value;
+        if (v1 && v2 && v1 === v2) {
+          this.syncVoxtralVoicePair(true, 'host', true);
+        }
+      } else {
+        const v1 = el.selectVoiceHost?.value;
+        const v2 = el.selectVoiceScholar?.value;
+        if (v1 && v2 && v1 === v2) {
+          this.syncVoicePair(true, 'host', true);
+        }
       }
     }
 
@@ -1531,15 +1803,32 @@ const AudioStudioView = {
     }
 
     try {
+      const activeEngine = isVoxtral ? 'voxtral' : 'edge_tts';
+      let spkA, spkB, spkSolo;
+      if (isVoxtral) {
+        spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste';
+        spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien';
+        spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral';
+      } else {
+        spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural';
+        spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural';
+        spkSolo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural';
+      }
+
       const customOptions = {
         format_type: this.format,
         format: this.format,
-        voice_speaker_a: el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural',
-        voice_speaker_b: el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural',
-        voice_solo: el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural',
+        engine: activeEngine,
+        voice_speaker_a: spkA,
+        voice_speaker_b: spkB,
+        voice_solo: spkSolo,
+        voxtral_voice_speaker_a: el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste',
+        voxtral_voice_speaker_b: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien',
+        voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral',
+        voxtral_modulate: el.checkVoxtralModulate ? el.checkVoxtralModulate.checked : true,
         pause_ms: parseInt(el.inputPauseMs?.value, 10) || 350
       };
-      const res = await API.call('audio_studio_synthesize', this.currentPodcast.id, script, 'edge_tts', customOptions);
+      const res = await API.call('audio_studio_synthesize', this.currentPodcast.id, script, activeEngine, customOptions);
 
       if (res && res.success && res.podcast) {
         this.currentPodcast = res.podcast;

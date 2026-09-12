@@ -5397,6 +5397,16 @@
                       </span>
                     </div>
 
+                    <!-- Sélecteur de Moteur Vocal Interactif (Edge-TTS vs Mistral Voxtral) -->
+                    <div class="audio-studio-engine-toggle" id="as-engine-toggle" style="margin-top: 10px;">
+                      <button type="button" class="engine-toggle-btn active" id="as-engine-btn-edge" data-engine="edge_tts">
+                        <span>Edge-TTS (Gratuit)</span>
+                      </button>
+                      <button type="button" class="engine-toggle-btn" id="as-engine-btn-voxtral" data-engine="voxtral">
+                        <span>Mistral Voxtral</span>
+                      </button>
+                    </div>
+
                     <!-- Sélecteur de Format dans l'Étape 2 (Dialogue / Solo) -->
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
                       <label style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">Format de l'émission :</label>
@@ -5410,9 +5420,9 @@
                       </div>
                     </div>
 
-                    <!-- Attribution des Voix Neuronales -->
-                    <div id="as-voices-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
-                      <!-- Voix Dialogue -->
+                    <!-- Attribution des Voix Neuronales : Bloc Edge-TTS -->
+                    <div id="as-voices-edge-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                      <!-- Voix Dialogue Edge-TTS -->
                       <div id="as-edge-dialogue-voices" style="display: flex; flex-direction: column; gap: 8px;">
                         <div class="audio-studio-form-row">
                           <label class="audio-studio-form-label" for="as-select-voice-host">Voix 1 (Animateur / Rôle A)</label>
@@ -5478,7 +5488,7 @@
                         </div>
                       </div>
 
-                      <!-- Voix Solo -->
+                      <!-- Voix Solo Edge-TTS -->
                       <div id="as-edge-solo-voices" style="display: none; flex-direction: column; gap: 4px;" class="audio-studio-form-row">
                         <label class="audio-studio-form-label" for="as-select-voice-solo">Voix Narrateur (Chronique Solo)</label>
                         <select id="as-select-voice-solo" class="audio-studio-select">
@@ -5504,6 +5514,100 @@
                             <option value="fr-CA-ThierryNeural">Thierry (Canada - Masculine, expressif)</option>
                           </optgroup>
                         </select>
+                      </div>
+                    </div>
+
+                    <!-- Attribution des Voix Neuronales : Bloc Mistral Voxtral -->
+                    <div id="as-voices-voxtral-container" style="display: none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                      <!-- Voix Dialogue Voxtral -->
+                      <div id="as-voxtral-dialogue-voices" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="audio-studio-form-row">
+                          <label class="audio-studio-form-label" for="as-select-voxtral-host">Voix 1 Voxtral (Animateur / Rôle A)</label>
+                          <select id="as-select-voxtral-host" class="audio-studio-select">
+                            <optgroup label="Mistral Standard">
+                              <option value="voxtral-celeste" selected>Céleste (Mistral - Féminine, expressive &amp; claire)</option>
+                              <option value="voxtral-aurelien">Aurélien (Mistral - Masculine, posé &amp; érudit)</option>
+                              <option value="voxtral-claire">Claire (Mistral - Féminine, dynamique &amp; vivante)</option>
+                              <option value="voxtral-mathieu">Mathieu (Mistral - Masculine, théologien &amp; solennel)</option>
+                              <option value="voxtral-elise">Élise (Mistral - Féminine, douce &amp; méditative)</option>
+                              <option value="voxtral-etienne">Étienne (Mistral - Masculine, captivant &amp; articulé)</option>
+                            </optgroup>
+                            <optgroup label="Profils d'Émission">
+                              <option value="voxtral-animateur">Voxtral Hôte (Vif, interrogatif &amp; chaleureux)</option>
+                              <option value="voxtral-exegete">Voxtral Exégète (Académique &amp; analytique)</option>
+                              <option value="voxtral-pastoral">Voxtral Pastoral (Chaleureux &amp; bienveillant)</option>
+                            </optgroup>
+                            <optgroup label="Personnalisées">
+                              <option value="voxtral-custom-1">Voix Personnalisée 1 (Compte Mistral Payant)</option>
+                              <option value="voxtral-custom-2">Voix Personnalisée 2 (Compte Mistral Payant)</option>
+                            </optgroup>
+                          </select>
+                        </div>
+                        <div class="audio-studio-form-row">
+                          <label class="audio-studio-form-label" for="as-select-voxtral-scholar">Voix 2 Voxtral (Exégète / Rôle B)</label>
+                          <select id="as-select-voxtral-scholar" class="audio-studio-select">
+                            <optgroup label="Mistral Standard">
+                              <option value="voxtral-aurelien" selected>Aurélien (Mistral - Masculine, posé &amp; érudit)</option>
+                              <option value="voxtral-celeste">Céleste (Mistral - Féminine, expressive &amp; claire)</option>
+                              <option value="voxtral-claire">Claire (Mistral - Féminine, dynamique &amp; vivante)</option>
+                              <option value="voxtral-mathieu">Mathieu (Mistral - Masculine, théologien &amp; solennel)</option>
+                              <option value="voxtral-elise">Élise (Mistral - Féminine, douce &amp; méditative)</option>
+                              <option value="voxtral-etienne">Étienne (Mistral - Masculine, captivant &amp; articulé)</option>
+                            </optgroup>
+                            <optgroup label="Profils d'Émission">
+                              <option value="voxtral-exegete">Voxtral Exégète (Académique &amp; analytique)</option>
+                              <option value="voxtral-animateur">Voxtral Hôte (Vif, interrogatif &amp; chaleureux)</option>
+                              <option value="voxtral-pastoral">Voxtral Pastoral (Chaleureux &amp; bienveillant)</option>
+                            </optgroup>
+                            <optgroup label="Personnalisées">
+                              <option value="voxtral-custom-2">Voix Personnalisée 2 (Compte Mistral Payant)</option>
+                              <option value="voxtral-custom-1">Voix Personnalisée 1 (Compte Mistral Payant)</option>
+                            </optgroup>
+                          </select>
+                        </div>
+
+                        <!-- Alerte Voix Voxtral Identiques avec bouton d'ajustement automatique -->
+                        <div id="as-voxtral-duplicate-alert" class="audio-studio-warning-box" style="display: none; margin-top: 4px; padding: 8px 10px; font-size: 11.5px; border-left: 3px solid var(--accent-orange, #e06c75); background: rgba(224, 108, 117, 0.08); border-radius: 4px;">
+                          <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <span>Attention : la Voix 1 et la Voix 2 Voxtral sont identiques. Deux voix distinctes sont requises.</span>
+                            <button type="button" id="btn-as-auto-fix-voxtral-voices" class="btn-xs btn-secondary" style="align-self: flex-start; height: 24px; font-size: 11px; padding: 0 8px;">
+                              Ajuster automatiquement les voix
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Voix Solo Voxtral -->
+                      <div id="as-voxtral-solo-voices" style="display: none; flex-direction: column; gap: 4px;" class="audio-studio-form-row">
+                        <label class="audio-studio-form-label" for="as-select-voxtral-solo">Voix Narrateur Voxtral (Chronique Solo)</label>
+                        <select id="as-select-voxtral-solo" class="audio-studio-select">
+                          <optgroup label="Mistral Standard">
+                            <option value="voxtral-aurelien" selected>Aurélien (Mistral - Masculine, posé &amp; érudit)</option>
+                            <option value="voxtral-celeste">Céleste (Mistral - Féminine, expressive &amp; claire)</option>
+                            <option value="voxtral-claire">Claire (Mistral - Féminine, dynamique &amp; vivante)</option>
+                            <option value="voxtral-mathieu">Mathieu (Mistral - Masculine, théologien &amp; solennel)</option>
+                            <option value="voxtral-elise">Élise (Mistral - Féminine, douce &amp; méditative)</option>
+                            <option value="voxtral-etienne">Étienne (Mistral - Masculine, captivant &amp; articulé)</option>
+                          </optgroup>
+                          <optgroup label="Profils d'Émission">
+                            <option value="voxtral-exegete">Voxtral Exégète (Académique &amp; analytique)</option>
+                            <option value="voxtral-animateur">Voxtral Hôte (Vif, interrogatif &amp; chaleureux)</option>
+                            <option value="voxtral-pastoral">Voxtral Pastoral (Chaleureux &amp; bienveillant)</option>
+                          </optgroup>
+                          <optgroup label="Personnalisées">
+                            <option value="voxtral-custom-1">Voix Personnalisée 1 (Compte Mistral Payant)</option>
+                            <option value="voxtral-custom-2">Voix Personnalisée 2 (Compte Mistral Payant)</option>
+                          </optgroup>
+                        </select>
+                      </div>
+
+                      <!-- Options Voxtral : Modulation & Avertissement Clé API -->
+                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="checkbox" id="as-check-voxtral-modulate" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                        <span>Modulation intonative selon le rôle</span>
+                      </label>
+                      <div id="as-voxtral-warning" class="audio-studio-warning-box" style="display: none;">
+                        Clé API Mistral non configurée. Cliquez sur <a href="#" id="as-link-settings-mistral" style="color: inherit; text-decoration: underline; font-weight: 600;">Paramètres IA</a> pour la renseigner.
                       </div>
                     </div>
 
