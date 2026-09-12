@@ -29,7 +29,8 @@ class AudioStudioMixin:
     def audio_studio_get_voices(self) -> Dict[str, Any]:
         """Retourne le catalogue complet des voix neuronales francophones disponibles (Edge-TTS et Voxtral)."""
         try:
-            data = PodcastEngine.get_available_voices()
+            cfg = load_config()
+            data = PodcastEngine.get_available_voices(cfg)
             return {
                 "success": True,
                 "voices": data.get("voices", data.get("edge_tts", [])),
@@ -65,9 +66,9 @@ class AudioStudioMixin:
                 "voice_speaker_a": cfg.get("audio_studio_voice_speaker_a", "fr-FR-DeniseNeural"),
                 "voice_speaker_b": cfg.get("audio_studio_voice_speaker_b", "fr-FR-HenriNeural"),
                 "voice_solo": cfg.get("audio_studio_voice_solo", "fr-FR-HenriNeural"),
-                "voxtral_voice_speaker_a": cfg.get("audio_studio_voxtral_voice_speaker_a", "voxtral-celeste"),
-                "voxtral_voice_speaker_b": cfg.get("audio_studio_voxtral_voice_speaker_b", "voxtral-aurelien"),
-                "voxtral_voice_solo": cfg.get("audio_studio_voxtral_voice_solo", "voxtral-aurelien"),
+                "voxtral_voice_speaker_a": cfg.get("audio_studio_voxtral_voice_speaker_a", "Marie - Happy"),
+                "voxtral_voice_speaker_b": cfg.get("audio_studio_voxtral_voice_speaker_b", "Marie - Neutral"),
+                "voxtral_voice_solo": cfg.get("audio_studio_voxtral_voice_solo", "Marie - Neutral"),
                 "pause_ms": int(cfg.get("audio_studio_pause_ms", 350)),
                 "voxtral_voice": cfg.get("audio_studio_voxtral_voice", "default"),
                 "voxtral_modulate": cfg.get("audio_studio_voxtral_modulate", True),

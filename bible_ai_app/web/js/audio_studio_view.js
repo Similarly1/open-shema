@@ -535,11 +535,13 @@ const AudioStudioView = {
       }
     ];
 
-    const v = parseInt(slider.value, 10);
-    const l = levels[Math.min(Math.max(v, 0), levels.length - 1)];
-    if (tokensEl) tokensEl.textContent = l.tokens;
-    if (timeEl) timeEl.textContent = l.time;
-    if (descEl) descEl.textContent = l.desc;
+    const v = isNaN(parseInt(slider.value, 10)) ? 1 : parseInt(slider.value, 10);
+    const l = levels[Math.min(Math.max(v, 0), levels.length - 1)] || levels[1];
+    if (l) {
+      if (tokensEl) tokensEl.textContent = l.tokens;
+      if (timeEl) timeEl.textContent = l.time;
+      if (descEl) descEl.textContent = l.desc;
+    }
   },
 
   // =========================================================================
@@ -627,7 +629,6 @@ const AudioStudioView = {
   populateVoiceSelects(voicesData) {
     const el = this.elements;
     const voices = voicesData.voices || voicesData.edge_tts || [];
-    const voxtralVoices = voicesData.voxtral || [];
 
     if (voices && voices.length > 0) {
       this.voices = voices;
@@ -688,45 +689,64 @@ const AudioStudioView = {
       this.syncVoicePair(false, 'host');
     }
 
+    // Filtre strict : n'afficher que les voix Voxtral en français
+    const isFrenchVoxtral = (v) => {
+      if (!v) return false;
+      const name = (v.name || '').toLowerCase();
+      const id = (v.id || '').toLowerCase();
+      if (name.includes('marie') || id.includes('marie')) return true;
+      const langs = Array.isArray(v.languages) ? v.languages : (typeof v.languages === 'string' ? [v.languages] : []);
+      return langs.some(lang => {
+        const l = String(lang).toLowerCase().replace('-', '_').trim();
+        return l === 'fr' || l.startsWith('fr_') || l.includes('french') || l.includes('francais') || l.includes('français');
+      });
+    };
+    const voxtralVoices = (voicesData.voxtral || []).filter(isFrenchVoxtral);
+
     if (voxtralVoices && voxtralVoices.length > 0) {
       this.voxtralVoices = voxtralVoices;
 
-      const voxtralCats = ["Mistral Standard", "Profils d'Émission", "Personnalisées"];
       const vGrouped = {};
-      voxtralCats.forEach(c => { vGrouped[c] = []; });
-
+      const catOrder = [];
       voxtralVoices.forEach(v => {
-        const cat = v.category || 'Mistral Standard';
-        if (!vGrouped[cat]) vGrouped[cat] = [];
+        const cat = v.category || 'Intonations disponibles';
+        if (!vGrouped[cat]) {
+          vGrouped[cat] = [];
+          catOrder.push(cat);
+        }
         vGrouped[cat].push(v);
       });
 
       let voxtralOptHtml = '';
-      voxtralCats.forEach(cat => {
+      catOrder.forEach(cat => {
         const list = vGrouped[cat] || [];
         if (list.length > 0) {
-          voxtralOptHtml += `<optgroup label="${cat}">`;
+          voxtralOptHtml += `<optgroup label="${this.escapeHtml(cat)}">`;
           list.forEach(v => {
-            voxtralOptHtml += `<option value="${v.id}">${this.escapeHtml(v.name)}</option>`;
+            voxtralOptHtml += `<option value="${this.escapeHtml(v.id)}">${this.escapeHtml(v.name)}</option>`;
           });
           voxtralOptHtml += `</optgroup>`;
         }
       });
 
+      const defaultA = voxtralVoices.find(v => v.id === 'Marie - Happy' || v.name.toLowerCase().includes('joyeuse') || v.name.toLowerCase().includes('happy'))?.id || voxtralVoices[0]?.id || 'Marie - Happy';
+      const defaultB = voxtralVoices.find(v => v.id === 'Marie - Neutral' || v.name.toLowerCase().includes('neutre') || v.name.toLowerCase().includes('neutral'))?.id || voxtralVoices[1]?.id || voxtralVoices[0]?.id || 'Marie - Neutral';
+      const defaultSolo = defaultB;
+
       if (el.selectVoxtralHost) {
-        const cur = this.config?.voxtral_voice_speaker_a || el.selectVoxtralHost.value || 'voxtral-celeste';
+        const cur = this.config?.voxtral_voice_speaker_a || (el.selectVoxtralHost.value && !el.selectVoxtralHost.value.startsWith('voxtral-') ? el.selectVoxtralHost.value : defaultA);
         el.selectVoxtralHost.innerHTML = voxtralOptHtml;
         el.selectVoxtralHost.value = cur;
       }
 
       if (el.selectVoxtralScholar) {
-        const cur = this.config?.voxtral_voice_speaker_b || el.selectVoxtralScholar.value || 'voxtral-aurelien';
+        const cur = this.config?.voxtral_voice_speaker_b || (el.selectVoxtralScholar.value && !el.selectVoxtralScholar.value.startsWith('voxtral-') ? el.selectVoxtralScholar.value : defaultB);
         el.selectVoxtralScholar.innerHTML = voxtralOptHtml;
         el.selectVoxtralScholar.value = cur;
       }
 
       if (el.selectVoxtralSolo) {
-        const cur = this.config?.voxtral_voice_solo || el.selectVoxtralSolo.value || 'voxtral-pastoral';
+        const cur = this.config?.voxtral_voice_solo || (el.selectVoxtralSolo.value && !el.selectVoxtralSolo.value.startsWith('voxtral-') ? el.selectVoxtralSolo.value : defaultSolo);
         el.selectVoxtralSolo.innerHTML = voxtralOptHtml;
         el.selectVoxtralSolo.value = cur;
       }
@@ -963,16 +983,16 @@ const AudioStudioView = {
   },
 
   getSmartAlternateVoxtralVoice(currentVoiceId, targetRole = 'scholar') {
-    const defaultHost = 'voxtral-celeste';
-    const defaultScholar = 'voxtral-aurelien';
-
+    const list = this.voxtralVoices || [];
     if (targetRole === 'scholar') {
-      if (currentVoiceId !== defaultScholar) return defaultScholar;
-      return 'voxtral-exegete';
+      const preferred = list.find(v => (v.id !== currentVoiceId) && (v.name.toLowerCase().includes('neutre') || v.name.toLowerCase().includes('neutral') || v.name.toLowerCase().includes('grave') || v.name.toLowerCase().includes('sad') || v.name.toLowerCase().includes('ferme') || v.name.toLowerCase().includes('angry')));
+      if (preferred) return preferred.id;
     } else {
-      if (currentVoiceId !== defaultHost) return defaultHost;
-      return 'voxtral-claire';
+      const preferred = list.find(v => (v.id !== currentVoiceId) && (v.name.toLowerCase().includes('joyeuse') || v.name.toLowerCase().includes('happy') || v.name.toLowerCase().includes('enthousiaste') || v.name.toLowerCase().includes('excited') || v.name.toLowerCase().includes('curieuse') || v.name.toLowerCase().includes('curious')));
+      if (preferred) return preferred.id;
     }
+    const alternate = list.find(v => v.id !== currentVoiceId);
+    return alternate ? alternate.id : currentVoiceId;
   },
 
   updateTurnCardsVoiceLabels() {
@@ -984,9 +1004,9 @@ const AudioStudioView = {
     let hostName, scholarName, soloName;
 
     if (isVoxtral) {
-      hostName = this.getVoiceShortName(el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste');
-      scholarName = this.getVoiceShortName(el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien');
-      soloName = this.getVoiceShortName(el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral');
+      hostName = this.getVoiceShortName(el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy');
+      scholarName = this.getVoiceShortName(el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
+      soloName = this.getVoiceShortName(el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
     } else {
       hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
       scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
@@ -1005,8 +1025,8 @@ const AudioStudioView = {
         badge.textContent = `Exégète (${scholarName})`;
         card.dataset.speakerName = `Exégète (${scholarName})`;
       } else {
-        badge.textContent = `Animateur (${hostName})`;
-        card.dataset.speakerName = `Animateur (${hostName})`;
+        badge.textContent = `Animatrice (${hostName})`;
+        card.dataset.speakerName = `Animatrice (${hostName})`;
       }
     });
   },
@@ -1032,12 +1052,12 @@ const AudioStudioView = {
     const isVoxtral = (this.config?.engine === 'voxtral');
 
     if (isVoxtral) {
-      const spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste';
-      const spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien';
-      const solo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral';
+      const spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy';
+      const spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral';
+      const solo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral';
 
       if (this.format === 'dialogue') {
-        el.voiceSummary.innerHTML = `<strong>Voxtral Voix 1 (Animateur) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
+        el.voiceSummary.innerHTML = `<strong>Voxtral Voix 1 (Animatrice) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
       } else {
         el.voiceSummary.innerHTML = `<strong>Voxtral Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
       }
@@ -1047,7 +1067,7 @@ const AudioStudioView = {
       const solo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural';
 
       if (this.format === 'dialogue') {
-        el.voiceSummary.innerHTML = `<strong>Voix 1 (Animateur) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
+        el.voiceSummary.innerHTML = `<strong>Voix 1 (Animatrice) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
       } else {
         el.voiceSummary.innerHTML = `<strong>Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
       }
@@ -1355,13 +1375,9 @@ const AudioStudioView = {
 
   updateScriptProgress(pct, msg) {
     const el = this.elements;
-    if (el.btnGenerate && this.isGenerating) {
-      const cleanPct = Math.max(0, Math.min(100, parseInt(pct, 10) || 0));
-      el.btnGenerate.innerHTML = `
-        <span class="audio-studio-spinner"></span>
-        <span>${cleanPct}% — ${msg || 'Recherche & Rédaction...'}</span>
-      `;
-    }
+    const cleanPct = Math.max(0, Math.min(100, parseInt(pct, 10) || 0));
+    this.targetScriptPct = Math.max(this.targetScriptPct || 5, cleanPct);
+    if (msg) this.latestScriptMsg = msg;
   },
 
   updateSynthesisProgress(pct, msg) {
@@ -1395,14 +1411,43 @@ const AudioStudioView = {
     if (this.isGenerating) return;
     this.isGenerating = true;
 
-    // UI Loading state avec message d'étape progressif
+    this.currentScriptPct = 5;
+    this.targetScriptPct = 5;
+    this.latestScriptMsg = 'Initialisation de la recherche documentaire...';
+
+    // UI Loading state avec progression fluide en temps réel
     if (el.btnGenerate) {
       el.btnGenerate.disabled = true;
       el.btnGenerate.innerHTML = `
         <span class="audio-studio-spinner"></span>
-        <span>5% — Initialisation de la recherche documentaire...</span>
+        <span class="audio-studio-btn-label">5% — Initialisation de la recherche documentaire...</span>
       `;
     }
+
+    // Interpolateur 50ms : glisse doucement vers targetScriptPct sans jamais réinitialiser le DOM du spinner
+    if (this.scriptAnimInterval) clearInterval(this.scriptAnimInterval);
+    this.scriptAnimInterval = setInterval(() => {
+      if (this.currentScriptPct < this.targetScriptPct) {
+        const step = Math.max(0.25, (this.targetScriptPct - this.currentScriptPct) * 0.10);
+        this.currentScriptPct = Math.min(this.targetScriptPct, this.currentScriptPct + step);
+      }
+      const displayPct = Math.round(this.currentScriptPct);
+      const label = this.latestScriptMsg || 'Recherche & Rédaction...';
+      if (el.btnGenerate && this.isGenerating) {
+        const labelSpan = el.btnGenerate.querySelector('.audio-studio-btn-label');
+        const newText = `${displayPct}% — ${label}`;
+        if (labelSpan) {
+          if (labelSpan.textContent !== newText) {
+            labelSpan.textContent = newText;
+          }
+        } else {
+          el.btnGenerate.innerHTML = `
+            <span class="audio-studio-spinner"></span>
+            <span class="audio-studio-btn-label">${newText}</span>
+          `;
+        }
+      }
+    }, 50);
 
     if (typeof NotificationManager !== 'undefined') {
       NotificationManager.setWorkingState('audio-studio', true);
@@ -1426,6 +1471,10 @@ const AudioStudioView = {
       });
 
       if (res && res.success && res.podcast) {
+        if (this.scriptAnimInterval) {
+          clearInterval(this.scriptAnimInterval);
+          this.scriptAnimInterval = null;
+        }
         this.currentPodcast = res.podcast;
         this.renderScript();
         this.loadHistory();
@@ -1434,8 +1483,9 @@ const AudioStudioView = {
         if (typeof NotificationManager !== 'undefined') {
           NotificationManager.notifyAICompletion({
             title: 'Script audio prêt',
-            body: `« ${this.currentPodcast.title} » est rédigé. Vous pouvez modifier les répliques ou lancer la synthèse MP3.`,
-            view: 'audio-studio'
+            snippet: `« ${this.currentPodcast.title || query} » est rédigé. Vous pouvez modifier les répliques ou lancer la synthèse MP3.`,
+            targetView: 'audio-studio',
+            btnText: "Voir le script"
           });
         }
       } else {
@@ -1447,6 +1497,10 @@ const AudioStudioView = {
       this.showErrorToast(`Erreur technique : ${err.message || err}`);
     } finally {
       this.isGenerating = false;
+      if (this.scriptAnimInterval) {
+        clearInterval(this.scriptAnimInterval);
+        this.scriptAnimInterval = null;
+      }
       if (el.btnGenerate) {
         el.btnGenerate.disabled = false;
         el.btnGenerate.innerHTML = `
@@ -1569,9 +1623,9 @@ const AudioStudioView = {
     const isVoxtral = (this.config?.engine === 'voxtral');
     let hostName, scholarName, soloName;
     if (isVoxtral) {
-      hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste');
-      scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien');
-      soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral');
+      hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy');
+      scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
+      soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
     } else {
       hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
       scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
@@ -1673,7 +1727,7 @@ const AudioStudioView = {
     const turns = this.currentPodcast.script_dialogue;
     const isSolo = (this.format === 'solo');
     const voiceRole = isSolo ? 'solo' : (turns.length % 2 === 0 ? 'A' : 'B');
-    const nextSpeaker = isSolo ? 'Orateur Solo' : (turns.length % 2 === 0 ? 'Animateur (Denise)' : 'Exégète (Henri)');
+    const nextSpeaker = isSolo ? 'Narrateur' : (turns.length % 2 === 0 ? 'Animatrice' : 'Exégète');
 
     turns.push({
       speaker: nextSpeaker,
@@ -1749,12 +1803,14 @@ const AudioStudioView = {
       const idx = parseInt(card.dataset.turnIndex, 10);
       const textEl = card.querySelector('.audio-studio-turn-textarea');
       const pauseEl = card.querySelector('.turn-pause-input');
+      // Lire le rôle depuis le dataset de la card (défini lors du rendu)
+      const voiceRole = card.dataset.voiceRole || (idx % 2 === 0 ? 'A' : 'B');
       const isVoxtral = (this.config?.engine === 'voxtral');
       let hostName, scholarName, soloName;
       if (isVoxtral) {
-        hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste');
-        scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien');
-        soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral');
+        hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy');
+        scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
+        soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
       } else {
         hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
         scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
@@ -1854,9 +1910,9 @@ const AudioStudioView = {
       const activeEngine = isVoxtral ? 'voxtral' : 'edge_tts';
       let spkA, spkB, spkSolo;
       if (isVoxtral) {
-        spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste';
-        spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien';
-        spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral';
+        spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy';
+        spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral';
+        spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral';
       } else {
         spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural';
         spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural';
@@ -1870,9 +1926,9 @@ const AudioStudioView = {
         voice_speaker_a: spkA,
         voice_speaker_b: spkB,
         voice_solo: spkSolo,
-        voxtral_voice_speaker_a: el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'voxtral-celeste',
-        voxtral_voice_speaker_b: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'voxtral-aurelien',
-        voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'voxtral-pastoral',
+        voxtral_voice_speaker_a: el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy',
+        voxtral_voice_speaker_b: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral',
+        voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral',
         voxtral_modulate: el.checkVoxtralModulate ? el.checkVoxtralModulate.checked : true,
         pause_ms: parseInt(el.inputPauseMs?.value, 10) || 350
       };
@@ -1907,8 +1963,9 @@ const AudioStudioView = {
         if (typeof NotificationManager !== 'undefined') {
           NotificationManager.notifyAICompletion({
             title: 'Épisode audio généré',
-            body: `L'audio de « ${this.currentPodcast.title} » est prêt pour l'écoute ou le téléchargement.`,
-            view: 'audio-studio'
+            snippet: `L'audio de « ${this.currentPodcast.title || 'Votre épisode'} » est prêt pour l'écoute ou le téléchargement.`,
+            targetView: 'audio-studio',
+            btnText: "Écouter l'épisode"
           });
         }
       } else {

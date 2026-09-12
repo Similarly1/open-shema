@@ -763,9 +763,12 @@
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: audioStudioSpin 0.75s linear infinite;
+  -webkit-animation: audioStudioSpin 0.75s linear infinite;
   vertical-align: middle;
   flex-shrink: 0;
   box-sizing: border-box;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes audioStudioSpin {
@@ -1294,6 +1297,35 @@
   border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
 }
 
+.as-step-nav-bar button,
+.as-step-nav-bar .btn-secondary,
+.as-step-nav-bar .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.as-step-nav-bar button svg,
+.as-step-nav-bar .btn-secondary svg {
+  flex-shrink: 0;
+  display: block;
+}
+
+.as-step-nav-bar button span,
+.as-step-nav-bar .btn-secondary span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
 /* ===================================================== */
 /* ÉTAPE 3 : RÉGIE D'ÉCOUTE & KARAOKÉ                    */
 /* ===================================================== */
@@ -1333,6 +1365,35 @@
   border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
   margin-bottom: 16px;
   flex-shrink: 0;
+}
+
+.as-karaoke-header button,
+.as-karaoke-header .btn-secondary,
+.as-karaoke-header .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.as-karaoke-header button svg,
+.as-karaoke-header .btn-secondary svg,
+.as-karaoke-header .btn-primary svg {
+  flex-shrink: 0;
+  display: block;
+}
+
+.as-karaoke-header button span,
+.as-karaoke-header .btn-secondary span,
+.as-karaoke-header .btn-primary span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .as-karaoke-title {

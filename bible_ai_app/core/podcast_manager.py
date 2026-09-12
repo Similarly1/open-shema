@@ -15,6 +15,7 @@ import os
 import sys
 import re
 import json
+import base64
 import time
 import uuid
 import asyncio
@@ -146,36 +147,33 @@ class PodcastEngine:
         {"id": "fr-CA-ThierryNeural", "name": "Thierry (Canada - Masculine, expressif)", "gender": "Male", "locale": "fr-CA", "region": "Canada", "role": "scholar"},
     ]
 
-    VOXTRAL_VOICES = [
-        # Voix Officielles Mistral
-        {"id": "voxtral-celeste", "name": "Céleste (Mistral - Féminine, expressive & claire)", "gender": "Female", "role": "host", "category": "Mistral Standard"},
-        {"id": "voxtral-aurelien", "name": "Aurélien (Mistral - Masculine, posé & érudit)", "gender": "Male", "role": "scholar", "category": "Mistral Standard"},
-        {"id": "voxtral-claire", "name": "Claire (Mistral - Féminine, dynamique & vivante)", "gender": "Female", "role": "host", "category": "Mistral Standard"},
-        {"id": "voxtral-mathieu", "name": "Mathieu (Mistral - Masculine, théologien & solennel)", "gender": "Male", "role": "scholar", "category": "Mistral Standard"},
-        {"id": "voxtral-elise", "name": "Élise (Mistral - Féminine, douce & méditative)", "gender": "Female", "role": "host", "category": "Mistral Standard"},
-        {"id": "voxtral-etienne", "name": "Étienne (Mistral - Masculine, captivant & articulé)", "gender": "Male", "role": "scholar", "category": "Mistral Standard"},
-        # Profils Rôles Spécialisés
-        {"id": "voxtral-animateur", "name": "Voxtral Hôte (Vif, interrogatif & chaleureux)", "gender": "Female", "role": "host", "category": "Profils d'Émission"},
-        {"id": "voxtral-exegete", "name": "Voxtral Exégète (Académique & analytique)", "gender": "Male", "role": "scholar", "category": "Profils d'Émission"},
-        {"id": "voxtral-pastoral", "name": "Voxtral Pastoral (Chaleureux & bienveillant)", "gender": "Male", "role": "scholar", "category": "Profils d'Émission"},
-        # Voix Personnalisées
-        {"id": "voxtral-custom-1", "name": "Voix Personnalisée 1 (Compte Mistral Payant)", "gender": "Female", "role": "host", "category": "Personnalisées"},
-        {"id": "voxtral-custom-2", "name": "Voix Personnalisée 2 (Compte Mistral Payant)", "gender": "Male", "role": "scholar", "category": "Personnalisées"},
+    # Intonations Voxtral disponibles sur compte gratuit Mistral (voix 'Marie' avec variations d'émotion).
+    # Ces identifiants sont les "name" retournés par GET /v1/audio/voices.
+    # Sur compte gratuit : une seule voix de base (ex: Marie) avec plusieurs intonations.
+    # Sur compte payant : l'API retourne des UUIDs supplémentaires (voix personnalisées).
+    VOXTRAL_DEFAULT_VOICES = [
+        # Intonations disponibles sur compte gratuit (Français)
+        {"id": "Marie - Neutral",  "name": "Marie - Neutre (naturelle, posée)",      "gender": "Female", "role": "both",    "category": "Intonations Marie (Français)", "languages": ["fr"]},
+        {"id": "Marie - Happy",    "name": "Marie - Joyeuse (chaleureuse, vivante)", "gender": "Female", "role": "host",   "category": "Intonations Marie (Français)", "languages": ["fr"]},
+        {"id": "Marie - Excited",  "name": "Marie - Enthousiaste (dynamique)",       "gender": "Female", "role": "host",   "category": "Intonations Marie (Français)", "languages": ["fr"]},
+        {"id": "Marie - Curious",  "name": "Marie - Curieuse (interrogative)",       "gender": "Female", "role": "host",   "category": "Intonations Marie (Français)", "languages": ["fr"]},
+        {"id": "Marie - Sad",      "name": "Marie - Grave (méditative)",             "gender": "Female", "role": "scholar","category": "Intonations Marie (Français)", "languages": ["fr"]},
+        {"id": "Marie - Angry",    "name": "Marie - Ferme (sérieuse)",               "gender": "Female", "role": "scholar","category": "Intonations Marie (Français)", "languages": ["fr"]},
     ]
 
-    VOXTRAL_FALLBACK_MAP = {
-        "voxtral-celeste": "fr-FR-DeniseNeural",
-        "voxtral-aurelien": "fr-FR-HenriNeural",
-        "voxtral-claire": "fr-FR-VivienneMultilingualNeural",
-        "voxtral-mathieu": "fr-FR-RemyMultilingualNeural",
-        "voxtral-elise": "fr-FR-EloiseNeural",
-        "voxtral-etienne": "fr-FR-FabriceNeural",
-        "voxtral-animateur": "fr-FR-DeniseNeural",
-        "voxtral-exegete": "fr-FR-HenriNeural",
-        "voxtral-pastoral": "fr-FR-RemyMultilingualNeural",
-        "voxtral-custom-1": "fr-BE-CharlineNeural",
-        "voxtral-custom-2": "fr-CH-FabriceNeural",
+    # Correspondance intonation Voxtral -> voix Edge-TTS pour le fallback (sans clé API Mistral)
+    VOXTRAL_EMOTION_EDGE_MAP = {
+        "Marie - Neutral":  "fr-FR-DeniseNeural",
+        "Marie - Happy":    "fr-FR-VivienneMultilingualNeural",
+        "Marie - Excited":  "fr-FR-DeniseNeural",
+        "Marie - Curious":  "fr-FR-VivienneMultilingualNeural",
+        "Marie - Sad":      "fr-FR-EloiseNeural",
+        "Marie - Angry":    "fr-FR-HenriNeural",
+        "Marie - Fearful":  "fr-FR-EloiseNeural",
     }
+
+    VOXTRAL_MODEL = "voxtral-mini-tts-2603"
+    VOXTRAL_API_BASE = "https://api.mistral.ai/v1"
 
     DEPTH_CHAR_LIMITS = {
         0: 1000,  # Éclair (~250 tokens / source)
@@ -192,12 +190,98 @@ class PodcastEngine:
     }
 
     @classmethod
-    def get_available_voices(cls) -> Dict[str, Any]:
+    def fetch_voxtral_voices(cls, api_key: str) -> list:
+        """
+        Interroge l'API Mistral pour obtenir la liste des voix disponibles sur le compte.
+        Filtre STRICTEMENT pour ne retourner que les voix en français.
+        Retourne VOXTRAL_DEFAULT_VOICES si la clé est absente ou si l'appel échoue.
+        """
+        if not api_key:
+            return cls.VOXTRAL_DEFAULT_VOICES
+        try:
+            import httpx
+            url = f"{cls.VOXTRAL_API_BASE}/audio/voices?limit=100"
+            headers = {"Authorization": f"Bearer {api_key}"}
+            resp = httpx.get(url, headers=headers, timeout=10.0)
+            resp.raise_for_status()
+            data = resp.json()
+            items = data.get("items", data.get("voices", data.get("data", [])))
+            if not items:
+                return cls.VOXTRAL_DEFAULT_VOICES
+
+            french_marie_map = {
+                "marie - happy": "Marie - Joyeuse (chaleureuse, vivante)",
+                "marie - excited": "Marie - Enthousiaste (dynamique)",
+                "marie - neutral": "Marie - Neutre (naturelle, posée)",
+                "marie - curious": "Marie - Curieuse (interrogative)",
+                "marie - sad": "Marie - Grave (méditative)",
+                "marie - angry": "Marie - Ferme (sérieuse)",
+            }
+
+            voices = []
+            for item in items:
+                # Filtrage strict de la langue : uniquement le français
+                langs = item.get("languages") or []
+                if isinstance(langs, str):
+                    langs = [langs]
+                if item.get("language"):
+                    langs.append(item.get("language"))
+
+                is_fr = False
+                for l in langs:
+                    l_norm = str(l).strip().lower().replace("-", "_")
+                    if l_norm == "fr" or l_norm.startswith("fr_") or "french" in l_norm or "francais" in l_norm or "français" in l_norm:
+                        is_fr = True
+                        break
+
+                v_id = item.get("id", "")
+                v_name = item.get("name", v_id)
+
+                if not is_fr:
+                    v_name_low = str(v_name).lower()
+                    v_id_low = str(v_id).lower()
+                    if "marie" in v_name_low or "marie" in v_id_low or "français" in v_name_low or "francais" in v_name_low:
+                        is_fr = True
+
+                if not is_fr:
+                    continue
+
+                # C'est une voix française
+                v_name_key = str(v_name).strip().lower()
+                display_name = french_marie_map.get(v_name_key, v_name)
+                category = "Intonations Marie (Français)" if "marie" in v_name_key else "Voix personnalisées (Mistral)"
+                role = "host" if any(k in v_name_key for k in ("happy", "joyeuse", "excited", "enthousiaste", "curious", "curieuse")) else "scholar" if any(k in v_name_key for k in ("sad", "grave", "angry", "ferme", "fearful")) else "both"
+
+                voices.append({
+                    "id": v_id,
+                    "name": display_name,
+                    "languages": ["fr"],
+                    "gender": "Female" if "marie" in v_name_key else "Unknown",
+                    "role": role,
+                    "category": category
+                })
+
+            if not voices:
+                return cls.VOXTRAL_DEFAULT_VOICES
+
+            logger.info("[PodcastEngine] %d voix Voxtral françaises chargées depuis l'API Mistral.", len(voices))
+            return voices
+        except Exception as e_fetch:
+            logger.debug("[PodcastEngine] Impossible de charger les voix Mistral : %s", e_fetch)
+            return cls.VOXTRAL_DEFAULT_VOICES
+
+    @classmethod
+    def get_available_voices(cls, cfg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Retourne le catalogue complet des voix Edge-TTS et Mistral Voxtral."""
+        voxtral_voices = cls.VOXTRAL_DEFAULT_VOICES
+        if cfg:
+            api_key = cfg.get("mistral_api_key", "")
+            if api_key:
+                voxtral_voices = cls.fetch_voxtral_voices(api_key)
         return {
             "voices": cls.EDGE_VOICES,
             "edge_tts": cls.EDGE_VOICES,
-            "voxtral": cls.VOXTRAL_VOICES
+            "voxtral": voxtral_voices
         }
 
     @classmethod
@@ -300,6 +384,8 @@ class PodcastEngine:
 
         # A. Passage biblique de référence
         if active_sources.get("bibles", True) and parsed_bounds:
+            if progress_callback:
+                progress_callback(14, "Lecture du passage biblique de référence...")
             try:
                 from core.bible_json_loader import BibleJsonLoader
                 b_code = parsed_bounds["book_code"]
@@ -323,6 +409,8 @@ class PodcastEngine:
 
         # B. Commentaires bibliques
         if active_sources.get("commentaries", True) and parsed_bounds:
+            if progress_callback:
+                progress_callback(18, "Consultation des commentaires exégétiques...")
             try:
                 from core.commentary_loader import CommentaryLoader
                 b_code = parsed_bounds["book_code"]
@@ -348,6 +436,8 @@ class PodcastEngine:
 
         # C. Ouvrages de théologie & traités
         if active_sources.get("theology", True):
+            if progress_callback:
+                progress_callback(23, "Recherche dans les ouvrages de théologie...")
             try:
                 from core.theology_reader_manager import TheologyReaderManager
                 theo_seen = set()
@@ -374,6 +464,8 @@ class PodcastEngine:
 
         # D. Dictionnaires bibliques & Lexiques Strong
         if active_sources.get("dictionaries", True):
+            if progress_callback:
+                progress_callback(29, "Consultation des dictionnaires bibliques & lexiques Strong...")
             try:
                 from core.dictionary_manager import DictionaryManager
                 dict_seen = set()
@@ -422,6 +514,8 @@ class PodcastEngine:
 
         # E. Articles contemporains & Blogs
         if active_sources.get("articles", True):
+            if progress_callback:
+                progress_callback(33, "Recherche dans les articles contemporains...")
             try:
                 from core.articles_manager import ArticlesManager
                 art_mgr = ArticlesManager.get_instance()
@@ -449,6 +543,8 @@ class PodcastEngine:
 
         # F. Réflexions Pastorales (UPVR - Florent Varak)
         if active_sources.get("upvr", True) and cfg.get("include_upvr_in_ai", True):
+            if progress_callback:
+                progress_callback(37, "Consultation des réflexions pastorales (UPVR)...")
             try:
                 from core.upvr_manager import UPVRManager
                 upvr_mgr = UPVRManager.get_instance()
@@ -473,6 +569,8 @@ class PodcastEngine:
                 logger.debug("[build_context] Erreur extraction UPVR : %s", e_upvr)
 
         # G. Recherche Vectorielle Dense (ChromaDB / VectorDB)
+        if progress_callback:
+            progress_callback(40, "Recherche sémantique dense dans toute la bibliothèque (ChromaDB)...")
         try:
             from core.database import VectorDB
             vdb = VectorDB(api_keys=cfg)
@@ -512,6 +610,8 @@ class PodcastEngine:
 
         # H. Notes personnelles (.md)
         if active_sources.get("notes", True) and cfg.get("include_notes_in_ai", True):
+            if progress_callback:
+                progress_callback(43, "Lecture de vos notes personnelles...")
             try:
                 from core.notes_manager import NotesManager
                 notes_text = NotesManager.build_ai_notes_context(passage_ref=subject_or_ref, question=subject_or_ref, config=cfg)
@@ -527,7 +627,7 @@ class PodcastEngine:
                 logger.debug("[build_context] Erreur notes : %s", e_notes)
 
         if progress_callback:
-            progress_callback(45, "Évaluation de pertinence croisée (Reranking BGE-M3)...")
+            progress_callback(47, "Évaluation de pertinence croisée (Reranking BGE-M3)...")
 
         # 3. Dédoublonnage et Reranking sémantique
         dedup_chunks = []
@@ -815,15 +915,22 @@ class PodcastEngine:
                 "- Il n'y a qu'UN SEUL orateur enseignant/pasteur ('narrator').\n"
                 "- AUCUN dialogue, AUCUNE animatrice, AUCUN échange de questions-réponses.\n"
                 "- Rédigez le script sous la forme d'un exposé oral continu et chaleureux, découpé en 8 à 14 sections thématiques suivies.\n"
-                "- Dans le JSON, chaque élément du tableau 'dialogue' doit avoir 'speaker': 'narrator', 'speaker_name': 'Henri', 'voice_role': 'solo'.\n\n"
+                "- Dans le JSON, chaque élément du tableau 'dialogue' doit avoir 'speaker': 'narrator', 'speaker_name': 'Narrateur', 'voice_role': 'solo'.\n\n"
             )
         else:
             format_instruction = (
                 "FORMAT DEMANDÉ : **DIALOGUE EN DUO (DEUX INTERVENANTS DISTINCTS)**\n"
-                "- Locuteur A ('host' / Denise) : pose les questions, anime et relance.\n"
-                "- Locuteur B ('scholar' / Henri) : répond de façon développée et érudite.\n"
-                "- Alternez obligatoirement entre 'host' et 'scholar' à chaque réplique.\n\n"
+                "- Locuteur A ('host') : pose les questions, anime et relance la réflexion.\n"
+                "- Locuteur B ('scholar') : répond de façon développée, exégétique et érudite.\n"
+                "- Alternez obligatoirement entre 'host' et 'scholar' à chaque réplique.\n"
+                "- Dans le JSON, utilisez 'speaker_name': 'Animatrice' pour le rôle A et 'speaker_name': 'Exégète' pour le rôle B.\n\n"
             )
+
+        no_names_rule = (
+            "INTERDICTION FORMELLE DE CITER DES PRÉNOMS OU NOMS D'INTERVENANTS (RÈGLE CRITIQUE) :\n"
+            "- Ne mentionnez JAMAIS aucun prénom ni nom pour désigner ou interpeller les intervenants (interdiction absolue de dire « Henri », « Denise », ou tout autre prénom dans le texte parlé).\n"
+            "- Les intervenants s'adressent directement l'un à l'autre de manière fluide et naturelle (ex: « Entrons directement dans le vif du sujet... », « C'est un point capital... », « Que dit le texte au verset suivant ? », « Tout à fait... »).\n\n"
+        )
 
         phonetic_rule = (
             "EXIGENCE IMPÉRATIVE DE PRONONCIATION AUDIO DES RÉFÉRENCES BIBLIQUES :\n"
@@ -844,6 +951,7 @@ class PodcastEngine:
             f"Sujet ou passage ciblé : **{subject_or_ref}**\n"
             f"Mode d'étude appliqué : **{mode_title}**\n\n"
             f"{format_instruction}"
+            f"{no_names_rule}"
             f"{phonetic_rule}"
             f"{mode_block}"
             f"{focal_block}"
@@ -1438,27 +1546,180 @@ class PodcastEngine:
         cfg: Dict[str, Any],
         progress_callback: Optional[Callable[[int, int, str], None]] = None
     ) -> Dict[str, Any]:
-        """Synthèse Voxtral : mappe fidèlement les voix sélectionnées et sauvegarde l'enregistrement Voxtral."""
-        mapped_opts = dict(opts)
-        raw_a = opts.get("voxtral_voice_speaker_a") or opts.get("voice_speaker_a") or cfg.get("audio_studio_voxtral_voice_speaker_a", "voxtral-celeste")
-        raw_b = opts.get("voxtral_voice_speaker_b") or opts.get("voice_speaker_b") or cfg.get("audio_studio_voxtral_voice_speaker_b", "voxtral-aurelien")
-        raw_solo = opts.get("voxtral_voice_solo") or opts.get("voice_solo") or cfg.get("audio_studio_voxtral_voice_solo", "voxtral-aurelien")
+        """
+        Synthèse vocale neuronale via Mistral Voxtral Speech API (POST /v1/audio/speech).
+        Interroge dynamiquement le compte Mistral pour utiliser les voix disponibles (ex: Marie et ses intonations).
+        En cas d'absence de clé ou d'indisponibilité momentanée du service, un repli transparent sur Edge-TTS
+        est assuré pour garantir la production ininterrompue de l'audio.
+        """
+        api_key = (cfg.get("mistral_api_key") or "").strip()
+        raw_a = opts.get("voxtral_voice_speaker_a") or opts.get("voice_speaker_a") or cfg.get("audio_studio_voxtral_voice_speaker_a", "Marie - Happy")
+        raw_b = opts.get("voxtral_voice_speaker_b") or opts.get("voice_speaker_b") or cfg.get("audio_studio_voxtral_voice_speaker_b", "Marie - Neutral")
+        raw_solo = opts.get("voxtral_voice_solo") or opts.get("voice_solo") or cfg.get("audio_studio_voxtral_voice_solo", "Marie - Neutral")
 
-        mapped_opts["voice_speaker_a"] = cls.VOXTRAL_FALLBACK_MAP.get(raw_a, raw_a)
-        mapped_opts["voice_speaker_b"] = cls.VOXTRAL_FALLBACK_MAP.get(raw_b, raw_b)
-        mapped_opts["voice_solo"] = cls.VOXTRAL_FALLBACK_MAP.get(raw_solo, raw_solo)
+        # Fallback global si aucune clé API Mistral n'est configurée
+        if not api_key:
+            logger.warning("[PodcastEngine] Aucune clé API Mistral configurée pour Voxtral. Repli automatique sur Edge-TTS.")
+            mapped_opts = dict(opts)
+            mapped_opts["voice_speaker_a"] = cls.VOXTRAL_EMOTION_EDGE_MAP.get(raw_a, "fr-FR-DeniseNeural")
+            mapped_opts["voice_speaker_b"] = cls.VOXTRAL_EMOTION_EDGE_MAP.get(raw_b, "fr-FR-HenriNeural")
+            mapped_opts["voice_solo"] = cls.VOXTRAL_EMOTION_EDGE_MAP.get(raw_solo, "fr-FR-HenriNeural")
 
-        res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
-        res["engine"] = "voxtral"
-        res["voice_speaker_a"] = raw_a
-        res["voice_speaker_b"] = raw_b
-        res["voice_solo"] = raw_solo
+            res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
+            res["engine"] = "voxtral"
+            res["voice_speaker_a"] = raw_a
+            res["voice_speaker_b"] = raw_b
+            res["voice_solo"] = raw_solo
+            record["engine"] = "voxtral"
+            record["voice_speaker_a"] = raw_a
+            record["voice_speaker_b"] = raw_b
+            record["voice_solo"] = raw_solo
+            PodcastHistory.upsert(record)
+            return res
+
+        # Récupérer les voix disponibles sur le compte Mistral
+        voices_list = cls.fetch_voxtral_voices(api_key)
+
+        def _resolve_voxtral_voice_id(v_req: str) -> str:
+            if not v_req:
+                return "marie"
+            v_clean = str(v_req).strip()
+            # Si c'est déjà un UUID de voix personnalisée Mistral
+            if re.match(r'^[0-9a-fA-F-]{32,36}$', v_clean):
+                return v_clean
+            # Correspondance exacte ID ou Nom
+            for v in voices_list:
+                if v.get("name", "").strip().lower() == v_clean.lower() or v.get("id", "").strip().lower() == v_clean.lower():
+                    return v.get("id")
+            # Correspondance par mot-clé d'émotion
+            req_low = v_clean.lower()
+            for v in voices_list:
+                v_str = (v.get("name", "") + " " + v.get("id", "")).lower()
+                for emo in ["excited", "happy", "joyeuse", "sad", "grave", "curious", "curieuse", "angry", "ferme", "fearful", "douce", "neutral", "neutre"]:
+                    if emo in req_low and emo in v_str:
+                        return v.get("id")
+            # Par défaut voix Marie
+            for v in voices_list:
+                if "marie" in (v.get("name", "") + " " + v.get("id", "")).lower():
+                    return v.get("id")
+            if voices_list and voices_list[0].get("id"):
+                return voices_list[0].get("id")
+            return "marie"
+
+        import httpx
+
+        total_lines = len(dialogue)
+        accumulated_audio = bytearray()
+        updated_dialogue = []
+        current_timeline_sec = 0.0
+
+        for idx, item in enumerate(dialogue):
+            if progress_callback:
+                pct = int(8 + (idx / max(total_lines, 1)) * 84)
+                speaker_label = item.get("speaker_name", f"Locuteur {item.get('voice_role', 'A')}")
+                progress_callback(idx + 1, pct, f"Synthèse Voxtral {idx + 1}/{total_lines} ({speaker_label})...")
+
+            text = item.get("text", "").strip()
+            if not text:
+                continue
+
+            v_role = str(item.get("voice_role", "")).upper()
+            spk = str(item.get("speaker", "")).lower()
+            fmt = str(record.get("format_type") or record.get("format") or "").lower()
+
+            if fmt == "solo" and v_role != "B" and not any(k in spk for k in ("scholar", "théolog", "exég")):
+                chosen_raw_voice = raw_solo
+                fallback_edge = cls.VOXTRAL_EMOTION_EDGE_MAP.get(raw_solo, "fr-FR-HenriNeural")
+            elif v_role in ("B", "SCHOLAR") or any(k in spk for k in ("scholar", "théologien", "theologien", "exégète", "exegete", "chercheur")):
+                chosen_raw_voice = raw_b
+                fallback_edge = cls.VOXTRAL_EMOTION_EDGE_MAP.get(raw_b, "fr-FR-HenriNeural")
+            elif v_role in ("A", "HOST", "ANIMATEUR") or any(k in spk for k in ("host", "animateur", "animatrice")):
+                chosen_raw_voice = raw_a
+                fallback_edge = cls.VOXTRAL_EMOTION_EDGE_MAP.get(raw_a, "fr-FR-DeniseNeural")
+            else:
+                chosen_raw_voice = raw_a if (idx % 2 == 0) else raw_b
+                fallback_edge = cls.VOXTRAL_EMOTION_EDGE_MAP.get(chosen_raw_voice, "fr-FR-DeniseNeural" if (idx % 2 == 0) else "fr-FR-HenriNeural")
+
+            target_voice_id = _resolve_voxtral_voice_id(chosen_raw_voice)
+            clean_speech_text = cls._clean_text_for_speech(text)
+
+            line_bytes = None
+            try:
+                headers = {
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "model": cls.VOXTRAL_MODEL,
+                    "input": clean_speech_text,
+                    "voice_id": target_voice_id,
+                    "response_format": "mp3"
+                }
+                resp = httpx.post(f"{cls.VOXTRAL_API_BASE}/audio/speech", headers=headers, json=payload, timeout=60.0)
+                if resp.status_code == 200:
+                    ct = resp.headers.get("content-type", "")
+                    if "application/json" in ct:
+                        res_json = resp.json()
+                        audio_b64 = res_json.get("audio_data") or res_json.get("audio")
+                        if audio_b64:
+                            line_bytes = base64.b64decode(audio_b64)
+                    else:
+                        line_bytes = resp.content
+                else:
+                    logger.warning("[PodcastEngine] Erreur Voxtral (%d): %s. Fallback Edge-TTS pour cette réplique.", resp.status_code, resp.text[:120])
+            except Exception as e_vox:
+                logger.warning("[PodcastEngine] Exception appel Voxtral : %s. Fallback Edge-TTS pour cette réplique.", e_vox)
+
+            # Repli unitaire Edge-TTS si l'appel API a échoué
+            if not line_bytes:
+                line_bytes = cls._single_edge_tts_call(clean_speech_text, fallback_edge)
+
+            line_duration = max(0.5, len(line_bytes) / 6000.0) if line_bytes else 1.0
+            start_t = round(current_timeline_sec, 3)
+            end_t = round(start_t + line_duration, 3)
+
+            if line_bytes:
+                accumulated_audio.extend(line_bytes)
+
+            pause_ms = int(item.get("pause_after_ms", cfg.get("audio_studio_pause_ms", 350)))
+            pause_sec = pause_ms / 1000.0
+            current_timeline_sec = end_t + pause_sec
+
+            if pause_ms >= 100:
+                silence_frames = cls._generate_mp3_silence(pause_ms)
+                accumulated_audio.extend(silence_frames)
+
+            new_item = dict(item)
+            new_item["start_time"] = start_t
+            new_item["end_time"] = end_t
+            updated_dialogue.append(new_item)
+
+        if progress_callback:
+            progress_callback(total_lines, 95, "Consolidation du fichier MP3 Voxtral...")
+
+        audio_filename = f"{podcast_id}.mp3"
+        out_path = os.path.join(get_podcasts_dir(), audio_filename)
+        with open(out_path, "wb") as f:
+            f.write(accumulated_audio)
+
+        total_duration = round(current_timeline_sec, 2)
+        record["dialogue"] = updated_dialogue
+        record["script_dialogue"] = updated_dialogue
+        record["audio_file"] = audio_filename
+        record["duration_seconds"] = total_duration
         record["engine"] = "voxtral"
         record["voice_speaker_a"] = raw_a
         record["voice_speaker_b"] = raw_b
         record["voice_solo"] = raw_solo
+        record["status"] = "ready"
+        record["updated_at"] = datetime.datetime.now().isoformat()
+
         PodcastHistory.upsert(record)
-        return res
+
+        if progress_callback:
+            progress_callback(total_lines, 100, f"Épisode Voxtral finalisé avec succès ({cls.format_duration(total_duration)})")
+
+        return record
 
 
     @classmethod

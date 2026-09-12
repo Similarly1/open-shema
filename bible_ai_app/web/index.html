@@ -3921,7 +3921,7 @@
                       <strong class="prompt-card-title">Studio Audio — Format Dialogue (2 Voix)</strong>
                       <span class="prompt-status-badge is-default" id="badge-audio-studio-dialogue-status">Par défaut</span>
                     </div>
-                    <p class="prompt-card-desc">Instructions de mise en scène radiophonique entre l'animatrice curieuse (Denise) et l'exégète érudit (Henri), avec ancrage strict sur le corpus indexé.</p>
+                    <p class="prompt-card-desc">Instructions de mise en scène radiophonique entre l'animatrice curieuse et l'exégète érudit, avec ancrage strict sur le corpus indexé.</p>
                   </div>
                   <div class="prompt-card-actions">
                     <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-audio-studio-dialogue-prompt">
@@ -4119,7 +4119,7 @@
                 <!-- Duo de Voix Edge-TTS -->
                 <div class="form-row two-cols" style="margin-bottom: 12px;">
                   <div class="form-group">
-                    <label for="cfg-audio-studio-voice-a">Voix Locuteur A (Animateur / Denise) :</label>
+                    <label for="cfg-audio-studio-voice-a">Voix Locuteur A (Animatrice) :</label>
                     <select id="cfg-audio-studio-voice-a" class="select-field full-w">
                       <option value="fr-FR-DeniseNeural" selected>Denise (Française, vive &amp; claire — Recommandée)</option>
                       <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française, naturelle)</option>
@@ -4128,7 +4128,7 @@
                     </select>
                   </div>
                   <div class="form-group">
-                    <label for="cfg-audio-studio-voice-b">Voix Locuteur B (Exégète / Henri) :</label>
+                    <label for="cfg-audio-studio-voice-b">Voix Locuteur B (Exégète) :</label>
                     <select id="cfg-audio-studio-voice-b" class="select-field full-w">
                       <option value="fr-FR-HenriNeural" selected>Henri (Français, posé &amp; érudit — Recommandé)</option>
                       <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, expressif)</option>
@@ -5425,7 +5425,7 @@
                       <!-- Voix Dialogue Edge-TTS -->
                       <div id="as-edge-dialogue-voices" style="display: flex; flex-direction: column; gap: 8px;">
                         <div class="audio-studio-form-row">
-                          <label class="audio-studio-form-label" for="as-select-voice-host">Voix 1 (Animateur / Rôle A)</label>
+                          <label class="audio-studio-form-label" for="as-select-voice-host">Voix 1 (Animatrice / Rôle A)</label>
                           <select id="as-select-voice-host" class="audio-studio-select">
                             <optgroup label="France">
                               <option value="fr-FR-DeniseNeural" selected>Denise (France - Féminine, claire &amp; vive)</option>
@@ -5522,46 +5522,28 @@
                       <!-- Voix Dialogue Voxtral -->
                       <div id="as-voxtral-dialogue-voices" style="display: flex; flex-direction: column; gap: 8px;">
                         <div class="audio-studio-form-row">
-                          <label class="audio-studio-form-label" for="as-select-voxtral-host">Voix 1 Voxtral (Animateur / Rôle A)</label>
+                          <label class="audio-studio-form-label" for="as-select-voxtral-host">Voix 1 Voxtral (Animatrice / Rôle A)</label>
                           <select id="as-select-voxtral-host" class="audio-studio-select">
-                            <optgroup label="Mistral Standard">
-                              <option value="voxtral-celeste" selected>Céleste (Mistral - Féminine, expressive &amp; claire)</option>
-                              <option value="voxtral-aurelien">Aurélien (Mistral - Masculine, posé &amp; érudit)</option>
-                              <option value="voxtral-claire">Claire (Mistral - Féminine, dynamique &amp; vivante)</option>
-                              <option value="voxtral-mathieu">Mathieu (Mistral - Masculine, théologien &amp; solennel)</option>
-                              <option value="voxtral-elise">Élise (Mistral - Féminine, douce &amp; méditative)</option>
-                              <option value="voxtral-etienne">Étienne (Mistral - Masculine, captivant &amp; articulé)</option>
-                            </optgroup>
-                            <optgroup label="Profils d'Émission">
-                              <option value="voxtral-animateur">Voxtral Hôte (Vif, interrogatif &amp; chaleureux)</option>
-                              <option value="voxtral-exegete">Voxtral Exégète (Académique &amp; analytique)</option>
-                              <option value="voxtral-pastoral">Voxtral Pastoral (Chaleureux &amp; bienveillant)</option>
-                            </optgroup>
-                            <optgroup label="Personnalisées">
-                              <option value="voxtral-custom-1">Voix Personnalisée 1 (Compte Mistral Payant)</option>
-                              <option value="voxtral-custom-2">Voix Personnalisée 2 (Compte Mistral Payant)</option>
+                            <optgroup label="Intonations Marie (Français)">
+                              <option value="Marie - Happy" selected>Marie - Joyeuse (chaleureuse, vivante)</option>
+                              <option value="Marie - Neutral">Marie - Neutre (naturelle, posée)</option>
+                              <option value="Marie - Excited">Marie - Enthousiaste (dynamique)</option>
+                              <option value="Marie - Curious">Marie - Curieuse (interrogative)</option>
+                              <option value="Marie - Sad">Marie - Grave (méditative)</option>
+                              <option value="Marie - Angry">Marie - Ferme (sérieuse)</option>
                             </optgroup>
                           </select>
                         </div>
                         <div class="audio-studio-form-row">
                           <label class="audio-studio-form-label" for="as-select-voxtral-scholar">Voix 2 Voxtral (Exégète / Rôle B)</label>
                           <select id="as-select-voxtral-scholar" class="audio-studio-select">
-                            <optgroup label="Mistral Standard">
-                              <option value="voxtral-aurelien" selected>Aurélien (Mistral - Masculine, posé &amp; érudit)</option>
-                              <option value="voxtral-celeste">Céleste (Mistral - Féminine, expressive &amp; claire)</option>
-                              <option value="voxtral-claire">Claire (Mistral - Féminine, dynamique &amp; vivante)</option>
-                              <option value="voxtral-mathieu">Mathieu (Mistral - Masculine, théologien &amp; solennel)</option>
-                              <option value="voxtral-elise">Élise (Mistral - Féminine, douce &amp; méditative)</option>
-                              <option value="voxtral-etienne">Étienne (Mistral - Masculine, captivant &amp; articulé)</option>
-                            </optgroup>
-                            <optgroup label="Profils d'Émission">
-                              <option value="voxtral-exegete">Voxtral Exégète (Académique &amp; analytique)</option>
-                              <option value="voxtral-animateur">Voxtral Hôte (Vif, interrogatif &amp; chaleureux)</option>
-                              <option value="voxtral-pastoral">Voxtral Pastoral (Chaleureux &amp; bienveillant)</option>
-                            </optgroup>
-                            <optgroup label="Personnalisées">
-                              <option value="voxtral-custom-2">Voix Personnalisée 2 (Compte Mistral Payant)</option>
-                              <option value="voxtral-custom-1">Voix Personnalisée 1 (Compte Mistral Payant)</option>
+                            <optgroup label="Intonations Marie (Français)">
+                              <option value="Marie - Neutral" selected>Marie - Neutre (naturelle, posée)</option>
+                              <option value="Marie - Happy">Marie - Joyeuse (chaleureuse, vivante)</option>
+                              <option value="Marie - Excited">Marie - Enthousiaste (dynamique)</option>
+                              <option value="Marie - Curious">Marie - Curieuse (interrogative)</option>
+                              <option value="Marie - Sad">Marie - Grave (méditative)</option>
+                              <option value="Marie - Angry">Marie - Ferme (sérieuse)</option>
                             </optgroup>
                           </select>
                         </div>
@@ -5581,22 +5563,13 @@
                       <div id="as-voxtral-solo-voices" style="display: none; flex-direction: column; gap: 4px;" class="audio-studio-form-row">
                         <label class="audio-studio-form-label" for="as-select-voxtral-solo">Voix Narrateur Voxtral (Chronique Solo)</label>
                         <select id="as-select-voxtral-solo" class="audio-studio-select">
-                          <optgroup label="Mistral Standard">
-                            <option value="voxtral-aurelien" selected>Aurélien (Mistral - Masculine, posé &amp; érudit)</option>
-                            <option value="voxtral-celeste">Céleste (Mistral - Féminine, expressive &amp; claire)</option>
-                            <option value="voxtral-claire">Claire (Mistral - Féminine, dynamique &amp; vivante)</option>
-                            <option value="voxtral-mathieu">Mathieu (Mistral - Masculine, théologien &amp; solennel)</option>
-                            <option value="voxtral-elise">Élise (Mistral - Féminine, douce &amp; méditative)</option>
-                            <option value="voxtral-etienne">Étienne (Mistral - Masculine, captivant &amp; articulé)</option>
-                          </optgroup>
-                          <optgroup label="Profils d'Émission">
-                            <option value="voxtral-exegete">Voxtral Exégète (Académique &amp; analytique)</option>
-                            <option value="voxtral-animateur">Voxtral Hôte (Vif, interrogatif &amp; chaleureux)</option>
-                            <option value="voxtral-pastoral">Voxtral Pastoral (Chaleureux &amp; bienveillant)</option>
-                          </optgroup>
-                          <optgroup label="Personnalisées">
-                            <option value="voxtral-custom-1">Voix Personnalisée 1 (Compte Mistral Payant)</option>
-                            <option value="voxtral-custom-2">Voix Personnalisée 2 (Compte Mistral Payant)</option>
+                          <optgroup label="Intonations Marie (Français)">
+                            <option value="Marie - Neutral" selected>Marie - Neutre (naturelle, posée)</option>
+                            <option value="Marie - Happy">Marie - Joyeuse (chaleureuse, vivante)</option>
+                            <option value="Marie - Excited">Marie - Enthousiaste (dynamique)</option>
+                            <option value="Marie - Curious">Marie - Curieuse (interrogative)</option>
+                            <option value="Marie - Sad">Marie - Grave (méditative)</option>
+                            <option value="Marie - Angry">Marie - Ferme (sérieuse)</option>
                           </optgroup>
                         </select>
                       </div>
