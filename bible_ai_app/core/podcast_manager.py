@@ -206,20 +206,27 @@ class PodcastEngine:
         subject_or_ref: str,
         sources_options: Optional[Dict[str, Any]] = None,
         config: Optional[Dict[str, Any]] = None,
-        db_instance: Any = None
+        db_instance: Any = None,
+        progress_callback: Optional[Callable[[int, str], None]] = None
     ) -> str:
         """
-        Collecte et extrait le corpus documentaire selon les options configurées :
-        - Détection de passage biblique direct
-        - Recherche sémantique ChromaDB avec filtre sur sources
-        - Reranking BGE-M3
-        - Curation sémantique (LLM Curateur)
-        - Application du budget de tokens
-        - Profil herméneutique
+        Collecte et extrait le corpus documentaire approfondi selon les options configurées :
+        - Détection et parsing précis du passage biblique
+        - Extraction des versets bibliques de référence
+        - Extraction des commentaires exégétiques historiques et contemporains
+        - Recherche sémantique dans les ouvrages de théologie et traités
+        - Extraction des dictionnaires bibliques et lexique Strong
+        - Recherche des articles contemporains et blogs
+        - Extraction des réflexions pastorales (UPVR / Florent Varak)
+        - Notes personnelles de l'utilisateur (.md)
+        - Recherche vectorielle dense ChromaDB
+        - Reranking sémantique local (Cross-Encoder BGE-M3)
+        - Curation intermédiaire LLM
+        - Profil herméneutique (« Mon Église »)
         """
         cfg = config or load_config()
         opts = sources_options or {}
-        
+
         active_sources = opts.get("sources", {
             "bibles": True,
             "commentaries": True,
@@ -229,123 +236,404 @@ class PodcastEngine:
             "upvr": True,
             "theology": True
         })
-        
+
         depth_level = int(opts.get("context_depth", cfg.get("audio_studio_context_depth", 1)))
         max_chars_per_doc = cls.DEPTH_CHAR_LIMITS.get(depth_level, 2400)
         top_k_docs = cls.DEPTH_DOC_COUNTS.get(depth_level, 5)
-        
+
         enable_rerank = opts.get("enable_reranking", cfg.get("audio_studio_enable_rerank", True))
         enable_curator = opts.get("enable_curator", cfg.get("audio_studio_enable_curator", False))
         include_profile = opts.get("include_profile", cfg.get("audio_studio_include_profile", True))
 
-        sections: List[str] = []
+        if progress_callback:
+            progress_callback(12, "Recherche documentaire multi-sources dans votre bibliothèque...")
 
-        # 1. Extraction directe si le sujet contient une référence biblique valide
-        passage_text = cls._try_extract_passage_text(subject_or_ref, cfg)
-        if passage_text:
-            sections.append(f"=== PASSAGE BIBLIQUE D'ÉTUDE ===\n{passage_text}\n")
-
-        # 2. Recherche documentaire RAG si base vectorielle disponible
+        # 1. Parsing du passage biblique potentiel
+        parsed_bounds = None
         try:
-            from core.rag_pipeline import RAGPipeline
-            rag = RAGPipeline.get_instance(db=db_instance, config=cfg)
+            from core.passage_study_manager import PassageStudyManager
+            parsed_bounds = PassageStudyManager.parse_passage_bounds(subject_or_ref)
+        except Exception:
+            pass
 
-            # Convertir les flags de sources en liste de types
-            allowed_types = []
-            if active_sources.get("bibles"): allowed_types.extend(["bible", "bibles", "scripture"])
-            if active_sources.get("commentaries"): allowed_types.extend(["commentary", "commentaries"])
-            if active_sources.get("dictionaries"): allowed_types.extend(["dictionary", "dictionaries", "lexicon", "strong"])
-            if active_sources.get("articles"): allowed_types.extend(["article", "articles", "feed"])
-            if active_sources.get("notes"): allowed_types.extend(["note", "notes", "personal_note"])
-            if active_sources.get("upvr"): allowed_types.extend(["upvr", "pastoral"])
-            if active_sources.get("theology"): allowed_types.extend(["theology", "book", "ebook", "treatise"])
+        if not parsed_bounds:
+            try:
+                from core.reference_parser import parse_smart_book_input
+                parsed = parse_smart_book_input(subject_or_ref)
+                if parsed and parsed.get("book"):
+                    b_code = parsed.get("code") or parsed.get("book")
+                    ch = int(parsed.get("chapter") or 1)
+                    v_start = int(parsed.get("verse_start") or parsed.get("verse") or 1)
+                    v_end = int(parsed.get("verse_end") or v_start)
+                    parsed_bounds = {
+                        "book_code": b_code,
+                        "french_book": parsed.get("book", b_code),
+                        "start_ch": ch,
+                        "start_v": v_start,
+                        "end_ch": ch,
+                        "end_v": v_end
+                    }
+            except Exception:
+                pass
 
-            # Recherche vectorielle
-            candidates = rag.retrieve_candidates(
+        # 2. Extraction des mots-clés thématiques
+        stop_words_fr = {
+            "quel", "quelle", "quels", "quelles", "etait", "étaient", "était", "etaient", "etre", "être",
+            "dans", "avec", "pour", "selon", "entre", "cette", "cet", "ces", "leurs", "leur", "notre", "nos",
+            "votre", "vos", "mon", "ton", "son", "sa", "ses", "comme", "tout", "tous", "toute", "toutes",
+            "comment", "pourquoi", "vision", "texte", "temps", "epoque", "époque", "cadre", "plus", "aussi",
+            "faire", "fais", "fait", "avoir", "sujet", "point", "points", "dessus", "dessous", "alors", "ainsi",
+            "bible", "verset", "versets", "chapitre", "chapitres", "livre", "livres", "sur", "sous", "par",
+            "une", "des", "les", "aux", "est", "sont", "podcast", "emission", "émission"
+        }
+        clean_subject = subject_or_ref
+        if parsed_bounds and parsed_bounds.get("raw_reference"):
+            clean_subject = clean_subject.replace(parsed_bounds["raw_reference"], " ")
+
+        parentheses_matches = re.findall(r'[\"«\((.*?)\)»\"]', clean_subject)
+        priority_terms = [m.strip() for m in parentheses_matches if len(m.strip()) > 2 and m.strip().lower() not in stop_words_fr]
+        general_words = [w for w in re.findall(r'[a-zA-ZÀ-ÿ]{3,}', clean_subject) if w.lower() not in stop_words_fr]
+        keywords = list(dict.fromkeys(priority_terms + general_words))
+
+        raw_chunks: List[Dict[str, Any]] = []
+        scripture_sections: List[str] = []
+
+        # A. Passage biblique de référence
+        if active_sources.get("bibles", True) and parsed_bounds:
+            try:
+                from core.bible_json_loader import BibleJsonLoader
+                b_code = parsed_bounds["book_code"]
+                ch = parsed_bounds["start_ch"]
+                s_v = parsed_bounds["start_v"]
+                e_v = min(parsed_bounds.get("end_v", s_v), 60)
+                version = cfg.get("primary_bible", "LSG")
+                book = BibleJsonLoader.load_book(version, b_code)
+                if book and "chapters" in book and str(ch) in book["chapters"]:
+                    ch_verses = book["chapters"][str(ch)]
+                    v_lines = []
+                    for vn in range(s_v, e_v + 1):
+                        txt = ch_verses.get(str(vn))
+                        if txt:
+                            clean_t = re.sub(r'<[^>]+>', '', txt).strip()
+                            v_lines.append(f"{b_code} {ch}:{vn} — {clean_t}")
+                    if v_lines:
+                        scripture_sections.append(f"=== PASSAGE BIBLIQUE D'ÉTUDE ({version} — {parsed_bounds.get('french_book', b_code)} {ch}:{s_v}–{e_v}) ===\n" + "\n".join(v_lines))
+            except Exception as e_bib:
+                logger.debug("[build_context] Erreur extraction biblique : %s", e_bib)
+
+        # B. Commentaires bibliques
+        if active_sources.get("commentaries", True) and parsed_bounds:
+            try:
+                from core.commentary_loader import CommentaryLoader
+                b_code = parsed_bounds["book_code"]
+                ch = parsed_bounds["start_ch"]
+                s_v = parsed_bounds["start_v"]
+                e_v = min(parsed_bounds.get("end_v", s_v), 60)
+                comm_res = CommentaryLoader.get_all_comments_for_verse_range(b_code, ch, s_v, e_v)
+                docs = comm_res.get("documents", [])
+                metas = comm_res.get("metadatas", [])
+                for i, doc in enumerate(docs[:top_k_docs * 3]):
+                    meta = metas[i] if i < len(metas) else {}
+                    author = meta.get("name") or meta.get("author") or "Commentaire"
+                    ref = meta.get("reference") or f"{b_code} {ch}"
+                    raw_chunks.append({
+                        "id": f"comm_{author}_{i}",
+                        "type": "Commentaire",
+                        "name": f"{author} ({ref})",
+                        "text": f"### Commentaire [{author}] sur {ref} :\n{doc}",
+                        "metadata": {"type": "Commentaire", "name": author, "ref": ref}
+                    })
+            except Exception as e_comm:
+                logger.debug("[build_context] Erreur extraction commentaires : %s", e_comm)
+
+        # C. Ouvrages de théologie & traités
+        if active_sources.get("theology", True):
+            try:
+                from core.theology_reader_manager import TheologyReaderManager
+                theo_seen = set()
+                search_terms = keywords[:5] if keywords else [subject_or_ref]
+                for term in search_terms:
+                    t_res = TheologyReaderManager.search_theology_books(term, limit=3)
+                    if t_res:
+                        for tr in t_res[:2]:
+                            b_title = tr.get("book_title") or tr.get("title") or "Ouvrage Théologique"
+                            t_key = f"{b_title}:{term}".lower()
+                            if t_key not in theo_seen:
+                                theo_seen.add(t_key)
+                                snippet = tr.get("snippet") or tr.get("text") or ""
+                                if snippet:
+                                    raw_chunks.append({
+                                        "id": f"theo_{b_title}_{term}",
+                                        "type": "Théologie",
+                                        "name": b_title,
+                                        "text": f"### Ouvrage de Théologie [{b_title}] (sur '{term}') :\n{snippet}",
+                                        "metadata": {"type": "Théologie", "name": b_title, "author": tr.get("author", "")}
+                                    })
+            except Exception as e_theo:
+                logger.debug("[build_context] Erreur extraction théologie : %s", e_theo)
+
+        # D. Dictionnaires bibliques & Lexiques Strong
+        if active_sources.get("dictionaries", True):
+            try:
+                from core.dictionary_manager import DictionaryManager
+                dict_seen = set()
+                search_terms = keywords[:6] if keywords else [subject_or_ref]
+                for term in search_terms:
+                    d_res = DictionaryManager.lookup(term)
+                    if (not d_res or not d_res.get("matches")) and term.endswith("s") and len(term) > 4:
+                        d_res = DictionaryManager.lookup(term[:-1])
+                    if d_res and d_res.get("matches"):
+                        for m in d_res["matches"][:2]:
+                            dict_name = m.get("dict_name", "Dictionnaire")
+                            art_title = m.get("title", term)
+                            d_key = f"{dict_name}:{art_title}".lower()
+                            if d_key not in dict_seen:
+                                dict_seen.add(d_key)
+                                snippet = m.get("preview") or m.get("full_text") or ""
+                                if snippet:
+                                    raw_chunks.append({
+                                        "id": f"dict_{term}_{dict_name}",
+                                        "type": "Dictionnaire",
+                                        "name": f"{dict_name} ({art_title})",
+                                        "text": f"### Entrée de Dictionnaire [{dict_name} : {art_title}] :\n{snippet}",
+                                        "metadata": {"type": "Dictionnaire", "name": dict_name}
+                                    })
+            except Exception as e_dict:
+                logger.debug("[build_context] Erreur extraction dictionnaires : %s", e_dict)
+
+            # Lexique Strong pour le passage
+            if parsed_bounds:
+                try:
+                    from core.strong_helper import StrongLexiconHelper
+                    b_code = parsed_bounds["book_code"]
+                    ch = parsed_bounds["start_ch"]
+                    v = parsed_bounds["start_v"]
+                    strong_entry = StrongLexiconHelper.get_verse_lexicon_block(b_code, ch, v)
+                    if strong_entry and isinstance(strong_entry, dict) and strong_entry.get("text"):
+                        raw_chunks.append({
+                            "id": f"strong_{b_code}_{ch}_{v}",
+                            "type": "Dictionnaire",
+                            "name": f"Lexique Strong ({b_code} {ch}:{v})",
+                            "text": f"### Analyse Lexicale & Racines ({b_code} {ch}:{v}) :\n{strong_entry.get('text')}",
+                            "metadata": {"type": "Dictionnaire", "name": "Strong Lexicon"}
+                        })
+                except Exception as e_str:
+                    logger.debug("[build_context] Erreur Strong : %s", e_str)
+
+        # E. Articles contemporains & Blogs
+        if active_sources.get("articles", True):
+            try:
+                from core.articles_manager import ArticlesManager
+                art_mgr = ArticlesManager.get_instance()
+                art_seen = set()
+                if parsed_bounds:
+                    b_code = parsed_bounds["book_code"]
+                    ch = parsed_bounds["start_ch"]
+                    passage_articles = art_mgr.get_articles_for_passage(b_code, ch, limit=3)
+                    for pa in passage_articles:
+                        art_id = pa.get("id")
+                        if art_id and art_id not in art_seen:
+                            art_seen.add(art_id)
+                            content = pa.get("content_markdown") or pa.get("summary") or ""
+                            src_name = pa.get("source_name") or "Article"
+                            title = pa.get("title") or "Article"
+                            raw_chunks.append({
+                                "id": f"article_{art_id}",
+                                "type": "Article",
+                                "name": f"{src_name} ({title})",
+                                "text": f"### Article contemporain [{src_name} : {title}] :\n{content}",
+                                "metadata": {"type": "Article", "name": f"{src_name} ({title})"}
+                            })
+            except Exception as e_art:
+                logger.debug("[build_context] Erreur extraction articles : %s", e_art)
+
+        # F. Réflexions Pastorales (UPVR - Florent Varak)
+        if active_sources.get("upvr", True) and cfg.get("include_upvr_in_ai", True):
+            try:
+                from core.upvr_manager import UPVRManager
+                upvr_mgr = UPVRManager.get_instance()
+                if upvr_mgr.is_installed() and parsed_bounds:
+                    b_code = parsed_bounds["book_code"]
+                    ch = parsed_bounds["start_ch"]
+                    v = parsed_bounds["start_v"]
+                    pastoral_eps = upvr_mgr.get_episodes_for_passage(b_code, ch, verse=v, limit=3)
+                    for pep in pastoral_eps:
+                        ep_num = pep.get("episode_number")
+                        resume = pep.get("resume_analytique") or pep.get("these_centrale") or ""
+                        ep_title = pep.get("titre") or f"Épisode #{ep_num}"
+                        if resume:
+                            raw_chunks.append({
+                                "id": f"upvr_{ep_num}",
+                                "type": "Pastorale",
+                                "name": f"UPVR #{ep_num} ({ep_title})",
+                                "text": f"### Réflexion Pastorale [Un pasteur vous répond #{ep_num} : {ep_title}] :\n{resume}",
+                                "metadata": {"type": "Pastorale", "name": f"UPVR #{ep_num}"}
+                            })
+            except Exception as e_upvr:
+                logger.debug("[build_context] Erreur extraction UPVR : %s", e_upvr)
+
+        # G. Recherche Vectorielle Dense (ChromaDB / VectorDB)
+        try:
+            from core.database import VectorDB
+            vdb = VectorDB(api_keys=cfg)
+            embed_model = cfg.get("embedding_model", "bge_multilingual_gemma2 (Infomaniak)")
+            search_res = vdb.search_semantic(
                 query=subject_or_ref,
-                top_k=top_k_docs * 3,
-                embedding_model=cfg.get("embedding_model")
+                n_results=top_k_docs * 3,
+                embedding_model=embed_model
             )
+            v_docs = search_res.get("documents", [[]])[0] if search_res else []
+            v_metas = search_res.get("metadatas", [[]])[0] if search_res else []
+            v_ids = search_res.get("ids", [[]])[0] if search_res else []
+            for idx, doc in enumerate(v_docs):
+                meta = v_metas[idx] if idx < len(v_metas) else {}
+                raw_id = v_ids[idx] if idx < len(v_ids) else f"vec_{idx}"
+                doc_type = (meta.get("type") or meta.get("source_type") or "Ouvrage").lower()
 
-            # Filtrage selon les types de sources cochés
-            filtered = []
-            for c in candidates:
-                meta = c.get("metadata", {})
-                doc_type = (meta.get("type") or meta.get("category") or "book").lower()
-                if not allowed_types or any(t in doc_type for t in allowed_types) or doc_type in allowed_types:
-                    filtered.append(c)
+                # Filtrage selon les sources cochées
+                is_allowed = True
+                if "pastoral" in doc_type and not active_sources.get("upvr", True): is_allowed = False
+                elif "article" in doc_type and not active_sources.get("articles", True): is_allowed = False
+                elif "commentary" in doc_type and not active_sources.get("commentaries", True): is_allowed = False
+                elif "dict" in doc_type and not active_sources.get("dictionaries", True): is_allowed = False
+                elif "theology" in doc_type and not active_sources.get("theology", True): is_allowed = False
 
-            if not filtered and candidates:
-                filtered = candidates[:top_k_docs]
+                if is_allowed:
+                    s_name = meta.get("name") or meta.get("title") or meta.get("book") or "Bibliothèque"
+                    raw_chunks.append({
+                        "id": f"vdb_{raw_id}",
+                        "type": "Recherche Vectorielle",
+                        "name": s_name,
+                        "text": f"### Extrait de [{s_name}] :\n{doc}",
+                        "metadata": meta
+                    })
+        except Exception as e_vdb:
+            logger.debug("[build_context] Erreur VectorDB : %s", e_vdb)
 
-            # Reranking sémantique local
-            reranked = rag.rerank_candidates(
-                query=subject_or_ref,
-                candidates=filtered,
-                top_k=top_k_docs,
-                enable_rerank=enable_rerank
-            )
-
-            # Curation intermédiaire si demandée
-            if enable_curator and reranked:
-                curated = rag.curate_context(
-                    query=subject_or_ref,
-                    documents=reranked,
-                    curation_model=cfg.get("curator_model"),
-                    fallback_model=cfg.get("curator_fallback_model")
-                )
-                reranked = curated
-
-            # Formater les extraits documentaires en respectant le quota de caractères
-            if reranked:
-                doc_lines = ["=== EXTRAITS DOCUMENTAIRES SÉLECTIONNÉS ==="]
-                for idx, doc in enumerate(reranked, 1):
-                    meta = doc.get("metadata", {})
-                    source_name = meta.get("name") or meta.get("source") or meta.get("book") or f"Document {idx}"
-                    text = doc.get("text", "").strip()
-                    if len(text) > max_chars_per_doc:
-                        text = text[:max_chars_per_doc] + "..."
-                    doc_lines.append(f"[{source_name}]\n{text}\n")
-                sections.append("\n".join(doc_lines))
-
-        except Exception as e:
-            logger.warning("[PodcastEngine] Recherche RAG ignorée ou non disponible : %s", e)
-
-        # 3. Notes personnelles contextuelles
-        if active_sources.get("notes"):
+        # H. Notes personnelles (.md)
+        if active_sources.get("notes", True) and cfg.get("include_notes_in_ai", True):
             try:
                 from core.notes_manager import NotesManager
-                notes_ctx = NotesManager.build_ai_notes_context(passage_ref=subject_or_ref, question=subject_or_ref, config=cfg)
-                if notes_ctx and notes_ctx.strip():
-                    sections.append(f"=== NOTES PERSONNELLES DE L'UTILISATEUR ===\n{notes_ctx.strip()}\n")
-            except Exception as e:
-                logger.debug("NotesManager ignored : %s", e)
+                notes_text = NotesManager.build_ai_notes_context(passage_ref=subject_or_ref, question=subject_or_ref, config=cfg)
+                if notes_text and notes_text.strip():
+                    raw_chunks.append({
+                        "id": "user_notes",
+                        "type": "Notes",
+                        "name": "Notes personnelles (.md)",
+                        "text": f"### Notes personnelles de l'utilisateur :\n{notes_text.strip()}",
+                        "metadata": {"type": "Notes", "name": "Notes personnelles"}
+                    })
+            except Exception as e_notes:
+                logger.debug("[build_context] Erreur notes : %s", e_notes)
 
-        # 4. Passeport Herméneutique (« Mon Église »)
+        if progress_callback:
+            progress_callback(45, "Évaluation de pertinence croisée (Reranking BGE-M3)...")
+
+        # 3. Dédoublonnage et Reranking sémantique
+        dedup_chunks = []
+        seen_ids = set()
+        seen_snippets = set()
+        for chunk in raw_chunks:
+            c_id = chunk.get("id")
+            snip = (chunk.get("text") or "")[:80].strip().lower()
+            if c_id not in seen_ids and snip not in seen_snippets:
+                seen_ids.add(c_id)
+                seen_snippets.add(snip)
+                dedup_chunks.append(chunk)
+
+        selected_chunks = dedup_chunks
+        if enable_rerank and len(dedup_chunks) > 1:
+            try:
+                from core.reranker import LocalReranker
+                reranker = LocalReranker.get_instance()
+                candidate_chunks = dedup_chunks[:25]
+                selected_chunks = reranker.rerank(query=subject_or_ref, documents=candidate_chunks, top_k=top_k_docs * 3)
+            except Exception as e_rr:
+                logger.info("[build_context] Reranking bypass : %s", e_rr)
+                selected_chunks = dedup_chunks[:top_k_docs * 3]
+        else:
+            selected_chunks = dedup_chunks[:top_k_docs * 3]
+
+        if progress_callback:
+            progress_callback(72, "Curation et structuration du corpus documentaire...")
+
+        # 4. Curation intermédiaire si activée
+        if enable_curator and selected_chunks:
+            try:
+                from core.rag_pipeline import RAGPipeline
+                rag_pipe = RAGPipeline.get_instance(config=cfg)
+                curator_m = cfg.get("curator_model") or cfg.get("rag_curation_model")
+                curator_fb = cfg.get("curator_fallback_model") or cfg.get("rag_curation_fallback_model")
+                curated = rag_pipe.curate_context(
+                    query=subject_or_ref,
+                    documents=selected_chunks,
+                    curation_model=curator_m,
+                    fallback_model=curator_fb
+                )
+                if curated:
+                    selected_chunks = curated
+            except Exception as e_cur:
+                logger.info("[build_context] Curation bypass : %s", e_cur)
+
+        # 5. Organisation des sections par catégories sourcées
+        sections: List[str] = list(scripture_sections)
+
+        by_type: Dict[str, List[str]] = {}
+        for chunk in selected_chunks:
+            c_type = chunk.get("type", "Document")
+            txt = chunk.get("text", "").strip()
+            if len(txt) > max_chars_per_doc:
+                txt = txt[:max_chars_per_doc] + "..."
+            by_type.setdefault(c_type, []).append(txt)
+
+        category_titles = {
+            "Commentaire": "=== EXTRAITS DE COMMENTAIRES EXÉGÉTIQUES ===",
+            "Théologie": "=== OUVRAGES DE THÉOLOGIE & TRAITÉS ===",
+            "Dictionnaire": "=== DICTIONNAIRES BIBLIQUES & LEXIQUES ===",
+            "Article": "=== ARTICLES CONTEMPORAINS & BLOGS ===",
+            "Pastorale": "=== RÉFLEXIONS PASTORALES (FLORENT VARAK - UPVR) ===",
+            "Notes": "=== NOTES PERSONNELLES DE L'UTILISATEUR ===",
+            "Recherche Vectorielle": "=== EXTRAITS DOCUMENTAIRES DE LA BIBLIOTHÈQUE ==="
+        }
+
+        for c_type, items in by_type.items():
+            title = category_titles.get(c_type, f"=== EXTRAITS : {c_type.upper()} ===")
+            sections.append(f"{title}\n" + "\n\n".join(items))
+
+        # 6. Passeport Herméneutique (« Mon Église »)
         if include_profile:
             profile_text = cfg.get("theological_profile_prompt", "").strip()
             if profile_text:
                 sections.append(f"=== ORIENTATION THÉOLOGIQUE ET HERMÉNEUTIQUE (« MON ÉGLISE ») ===\n{profile_text}\n")
 
-        return "\n\n".join(sections).strip()
+        final_corpus = "\n\n".join(sections).strip()
+        logger.info("[PodcastEngine] Corpus RAG consolidé pour '%s' : %d caractères, %d extraits retenus.", subject_or_ref, len(final_corpus), len(selected_chunks))
+        return final_corpus
 
     @classmethod
     def _try_extract_passage_text(cls, query: str, config: Dict[str, Any]) -> str:
         """Tente d'extraire les versets réels si la chaîne est une référence biblique (ex: Romains 5:1-11)."""
         try:
-            from core.reference_parser import parse_smart_book_input
-            res = parse_smart_book_input(query)
-            if res and res.get("book"):
+            from core.passage_study_manager import PassageStudyManager
+            p = PassageStudyManager.parse_passage_bounds(query)
+            if p:
                 from core.bible_json_loader import BibleJsonLoader
-                b_code = res["book"]
-                ch = res.get("chapter", 1)
-                v_start = res.get("verse_start", 1)
-                v_end = res.get("verse_end", res.get("verse_start", 25))
+                b_code = p["book_code"]
+                ch = p["start_ch"]
+                s_v = p["start_v"]
+                e_v = min(p.get("end_v", s_v), 60)
                 version = config.get("primary_bible", "LSG")
-                verses = BibleJsonLoader.get_passage(version, b_code, ch, v_start, v_end)
-                if verses:
-                    lines = [f"{b_code} {ch}:{v['verse']} — {v.get('text', '')}" for v in verses]
-                    return "\n".join(lines)
+                book = BibleJsonLoader.load_book(version, b_code)
+                if book and "chapters" in book and str(ch) in book["chapters"]:
+                    ch_verses = book["chapters"][str(ch)]
+                    v_lines = []
+                    for vn in range(s_v, e_v + 1):
+                        txt = ch_verses.get(str(vn))
+                        if txt:
+                            clean_t = re.sub(r'<[^>]+>', '', txt).strip()
+                            v_lines.append(f"{b_code} {ch}:{vn} — {clean_t}")
+                    if v_lines:
+                        return "\n".join(v_lines)
         except Exception:
             pass
         return ""
@@ -458,7 +746,8 @@ class PodcastEngine:
         provider: Optional[str] = None,
         model: Optional[str] = None,
         study_mode: str = "auto",
-        focal_questions: Optional[List[str]] = None
+        focal_questions: Optional[List[str]] = None,
+        progress_callback: Optional[Callable[[int, str], None]] = None
     ) -> Dict[str, Any]:
         """
         Génère le script textuel structuré en JSON strict (Transcript-First).
@@ -479,7 +768,7 @@ class PodcastEngine:
             system_prompt = cfg.get("prompt_audio_studio_dialogue") or DEFAULT_AUDIO_STUDIO_DIALOGUE_PROMPT
 
         # 2. Construction du contexte herméneutique sourcé
-        corpus_context = cls.build_context(subject_or_ref, sources_options, cfg, db_instance)
+        corpus_context = cls.build_context(subject_or_ref, sources_options, cfg, db_instance, progress_callback=progress_callback)
 
         if not corpus_context:
             corpus_context = f"Sujet d'étude : {subject_or_ref}\n(Analyse basée sur les textes bibliques et théologiques associés)."
@@ -576,6 +865,9 @@ class PodcastEngine:
 
         raw_response = None
         last_error = None
+        if progress_callback:
+            progress_callback(80, f"Rédaction de l'émission par l'IA ({primary_model})...")
+
         for m_name in models_to_try:
             try:
                 client, _, _ = cls._create_llm_client_for_model(m_name, cfg)
@@ -595,6 +887,9 @@ class PodcastEngine:
             if last_error:
                 raise last_error
             raise Exception("Aucune clé API IA (Google Gemini, Mistral ou Infomaniak) n'a pu générer le script audio.")
+
+        if progress_callback:
+            progress_callback(95, "Validation et structuration du script...")
 
         # 4. Nettoyage et parsing JSON
         parsed_script = cls._clean_and_parse_json(raw_response)
@@ -663,6 +958,8 @@ class PodcastEngine:
 
         # Sauvegarder dans l'historique
         PodcastHistory.upsert(podcast_record)
+        if progress_callback:
+            progress_callback(100, "Script audio rédigé avec succès !")
         return podcast_record
 
     @classmethod
@@ -979,7 +1276,7 @@ class PodcastEngine:
                 "title": "Script Audio",
                 "format": f_val,
                 "format_type": f_val,
-                "created_at": datetime.now().isoformat(),
+                "created_at": datetime.datetime.now().isoformat(),
                 "script_dialogue": script_dialogue or []
             }
             PodcastHistory.upsert(record)
@@ -1031,7 +1328,7 @@ class PodcastEngine:
 
             for idx, item in enumerate(dialogue):
                 if progress_callback:
-                    pct = int((idx / max(total_lines, 1)) * 90)
+                    pct = int(8 + (idx / max(total_lines, 1)) * 84)
                     speaker_label = item.get("speaker_name", f"Locuteur {item.get('voice_role', 'A')}")
                     progress_callback(idx + 1, pct, f"Synthèse réplique {idx + 1}/{total_lines} ({speaker_label})...")
 
@@ -1100,6 +1397,9 @@ class PodcastEngine:
         except Exception as e:
             logger.error("[PodcastEngine] Erreur synthèse Edge-TTS : %s", e)
             raise Exception(f"Erreur lors de la synthèse vocale Edge-TTS : {str(e)}")
+
+        if progress_callback:
+            progress_callback(total_lines, 95, "Consolidation du fichier MP3 et calcul des temps...")
 
         # Écriture du fichier MP3 consolidé
         audio_filename = f"{podcast_id}.mp3"

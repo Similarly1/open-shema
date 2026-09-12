@@ -1350,8 +1350,37 @@ const AudioStudioView = {
   },
 
   // =========================================================================
-  // RÉDACTION DU SCRIPT (LLM + RAG)
+  // RÉDACTION DU SCRIPT (LLM + RAG) & PROGRESSION EN TEMPS RÉEL
   // =========================================================================
+
+  updateScriptProgress(pct, msg) {
+    const el = this.elements;
+    if (el.btnGenerate && this.isGenerating) {
+      const cleanPct = Math.max(0, Math.min(100, parseInt(pct, 10) || 0));
+      el.btnGenerate.innerHTML = `
+        <span class="audio-studio-spinner"></span>
+        <span>${cleanPct}% — ${msg || 'Recherche & Rédaction...'}</span>
+      `;
+    }
+  },
+
+  updateSynthesisProgress(pct, msg) {
+    const el = this.elements;
+    const cleanPct = Math.max(0, Math.min(100, parseInt(pct, 10) || 0));
+    this.targetSynthesisPct = Math.max(this.targetSynthesisPct || 0, cleanPct);
+    if (msg) this.latestSynthesisMsg = msg;
+
+    if (el.progressBox && el.progressBox.style.display !== 'flex') {
+      el.progressBox.style.display = 'flex';
+    }
+    if (el.progressMsg && msg) {
+      el.progressMsg.textContent = msg;
+    }
+    if (!this.synthesisAnimInterval) {
+      if (el.progressPct) el.progressPct.textContent = `${cleanPct}%`;
+      if (el.progressBarFill) el.progressBarFill.style.width = `${cleanPct}%`;
+    }
+  },
 
   async generateScript() {
     const el = this.elements;
@@ -1366,12 +1395,12 @@ const AudioStudioView = {
     if (this.isGenerating) return;
     this.isGenerating = true;
 
-    // UI Loading state
+    // UI Loading state avec message d'étape progressif
     if (el.btnGenerate) {
       el.btnGenerate.disabled = true;
       el.btnGenerate.innerHTML = `
         <span class="audio-studio-spinner"></span>
-        <span>Recherche &amp; Rédaction...</span>
+        <span>5% — Initialisation de la recherche documentaire...</span>
       `;
     }
 
@@ -1791,12 +1820,31 @@ const AudioStudioView = {
       `;
     }
 
+    this.currentSynthesisPct = 5;
+    this.targetSynthesisPct = 8;
+    this.latestSynthesisMsg = 'Préparation des voix et découpage phonétique...';
+
     if (el.progressBox) {
       el.progressBox.style.display = 'flex';
       if (el.progressPct) el.progressPct.textContent = '5%';
       if (el.progressBarFill) el.progressBarFill.style.width = '5%';
-      if (el.progressMsg) el.progressMsg.textContent = 'Préparation des voix et découpage phonétique...';
+      if (el.progressMsg) el.progressMsg.textContent = this.latestSynthesisMsg;
     }
+
+    // Intervalle d'animation fluide vers la valeur cible envoyée par le backend
+    if (this.synthesisAnimInterval) clearInterval(this.synthesisAnimInterval);
+    this.synthesisAnimInterval = setInterval(() => {
+      if (this.currentSynthesisPct < this.targetSynthesisPct) {
+        const step = Math.max(0.35, (this.targetSynthesisPct - this.currentSynthesisPct) * 0.12);
+        this.currentSynthesisPct = Math.min(this.targetSynthesisPct, this.currentSynthesisPct + step);
+        const displayPct = Math.round(this.currentSynthesisPct);
+        if (el.progressPct) el.progressPct.textContent = `${displayPct}%`;
+        if (el.progressBarFill) el.progressBarFill.style.width = `${displayPct}%`;
+      }
+      if (this.latestSynthesisMsg && el.progressMsg) {
+        el.progressMsg.textContent = this.latestSynthesisMsg;
+      }
+    }, 50);
 
     if (typeof NotificationManager !== 'undefined') {
       NotificationManager.setWorkingState('audio-studio', true);
@@ -1831,6 +1879,13 @@ const AudioStudioView = {
       const res = await API.call('audio_studio_synthesize', this.currentPodcast.id, script, activeEngine, customOptions);
 
       if (res && res.success && res.podcast) {
+        if (this.synthesisAnimInterval) {
+          clearInterval(this.synthesisAnimInterval);
+          this.synthesisAnimInterval = null;
+        }
+        this.currentSynthesisPct = 100;
+        this.targetSynthesisPct = 100;
+
         this.currentPodcast = res.podcast;
         this.renderScript();
 
@@ -1840,11 +1895,11 @@ const AudioStudioView = {
 
         if (el.progressPct) el.progressPct.textContent = '100%';
         if (el.progressBarFill) el.progressBarFill.style.width = '100%';
-        if (el.progressMsg) el.progressMsg.textContent = 'Synthèse terminée avec succès !';
+        if (el.progressMsg) el.progressMsg.textContent = 'Synthèse audio terminée avec succès !';
 
         setTimeout(() => {
           if (el.progressBox) el.progressBox.style.display = 'none';
-        }, 2500);
+        }, 2200);
 
         this.loadHistory();
         this.goToStep(3); // Aller automatiquement à l'étape 3 : Régie d'écoute & Karaoké !
@@ -1857,15 +1912,27 @@ const AudioStudioView = {
           });
         }
       } else {
+        if (this.synthesisAnimInterval) {
+          clearInterval(this.synthesisAnimInterval);
+          this.synthesisAnimInterval = null;
+        }
         const errMsg = res?.error || 'Erreur lors de la synthèse vocale';
         this.showErrorToast(`Erreur de synthèse : ${errMsg}`);
         if (el.progressBox) el.progressBox.style.display = 'none';
       }
     } catch (err) {
+      if (this.synthesisAnimInterval) {
+        clearInterval(this.synthesisAnimInterval);
+        this.synthesisAnimInterval = null;
+      }
       console.error('[AudioStudioView] Erreur startSynthesis:', err);
       this.showErrorToast(`Erreur de synthèse vocale : ${err.message || err}`);
       if (el.progressBox) el.progressBox.style.display = 'none';
     } finally {
+      if (this.synthesisAnimInterval) {
+        clearInterval(this.synthesisAnimInterval);
+        this.synthesisAnimInterval = null;
+      }
       this.isSynthesizing = false;
       if (el.btnSynthesize) {
         el.btnSynthesize.disabled = false;

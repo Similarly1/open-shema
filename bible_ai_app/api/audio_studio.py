@@ -20,6 +20,7 @@ logger = logging.getLogger("api_audio_studio")
 
 from core.podcast_manager import PodcastEngine, PodcastHistory, get_podcasts_dir
 from core.config import load_config, save_config
+from api.window import get_global_window
 
 
 class AudioStudioMixin:
@@ -175,6 +176,27 @@ class AudioStudioMixin:
 
             cfg = load_config()
             db_inst = getattr(self, "db", None)
+
+            def _script_progress(pct: int, msg: str):
+                try:
+                    win = get_global_window()
+                    if win:
+                        clean_msg = str(msg).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"')
+                        win.evaluate_js(f"window.AudioStudioView && window.AudioStudioView.updateScriptProgress({int(pct)}, '{clean_msg}')")
+                except Exception as _e_prog:
+                    logger.debug("[audio_studio_generate_script] evaluate_js error: %s", _e_prog)
+
+                try:
+                    from core.task_manager import TaskManager
+                    TaskManager.push_event("task_progress", {
+                        "task_id": "audio_studio_script_gen",
+                        "title": "Rédaction Studio Audio",
+                        "progress": pct,
+                        "message": msg
+                    })
+                except Exception:
+                    pass
+
             res = PodcastEngine.generate_script(
                 subject_or_ref=str(subject_or_ref),
                 format_type=str(format_type),
@@ -182,7 +204,8 @@ class AudioStudioMixin:
                 config=cfg,
                 db_instance=db_inst,
                 study_mode=str(study_mode),
-                focal_questions=focal_questions
+                focal_questions=focal_questions,
+                progress_callback=_script_progress
             )
             return {"success": True, "podcast": res}
         except Exception as e:
@@ -208,6 +231,14 @@ class AudioStudioMixin:
             podcast_id = str(podcast_id)
 
             def _progress(step_idx: int, pct: int, msg: str):
+                try:
+                    win = get_global_window()
+                    if win:
+                        clean_msg = str(msg).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"')
+                        win.evaluate_js(f"window.AudioStudioView && window.AudioStudioView.updateSynthesisProgress({int(pct)}, '{clean_msg}')")
+                except Exception as _e_prog:
+                    logger.debug("[audio_studio_synthesize] evaluate_js error: %s", _e_prog)
+
                 try:
                     from core.task_manager import TaskManager
                     TaskManager.push_event("task_progress", {
