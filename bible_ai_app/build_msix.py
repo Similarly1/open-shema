@@ -208,6 +208,61 @@ def build_msix(rebuild_binary=False):
     generate_store_assets()
     generate_appx_manifest()
 
+    # Nettoyage de sécurité des binaires incompatibles avec le pipeline de signature du Store (0x800700C1)
+    internal_dir = os.path.join(APP_DIR, "_internal")
+    files_to_purge = [
+        os.path.join(internal_dir, "tcl86t.dll"),
+        os.path.join(internal_dir, "tk86t.dll"),
+        os.path.join(internal_dir, "_tkinter.pyd"),
+        os.path.join(internal_dir, "webview", "lib", "WebBrowserInterop.x86.dll"),
+    ]
+    dirs_to_purge = [
+        os.path.join(internal_dir, "tcl"),
+        os.path.join(internal_dir, "tk"),
+        os.path.join(internal_dir, "tcl8"),
+        os.path.join(internal_dir, "clr_loader", "ffi", "dlls", "x86"),
+        os.path.join(internal_dir, "webview", "lib", "runtimes", "win-x86"),
+        os.path.join(internal_dir, "webview", "lib", "runtimes", "win-arm64"),
+    ]
+    for f in files_to_purge:
+        if os.path.exists(f):
+            try:
+                os.remove(f)
+            except Exception:
+                pass
+    for d in dirs_to_purge:
+        if os.path.exists(d):
+            try:
+                shutil.rmtree(d)
+            except Exception:
+                pass
+
+    # Retrait du marqueur .portable du conteneur MSIX (les données écrites doivent aller dans %LOCALAPPDATA%)
+    portable_f = os.path.join(APP_DIR, ".portable")
+    if os.path.exists(portable_f):
+        try:
+            os.remove(portable_f)
+        except Exception:
+            pass
+
+    # Nettoyage des données utilisateur locales résiduelles de test dans data/
+    root_data_dir = os.path.join(APP_DIR, "data")
+    if os.path.exists(root_data_dir):
+        try:
+            shutil.rmtree(root_data_dir)
+        except Exception:
+            pass
+    os.makedirs(root_data_dir, exist_ok=True)
+    for sub in ["bibles", "commentaires", "theology", "dictionaries", "sermons", "notes", "conversations", "covers"]:
+        os.makedirs(os.path.join(root_data_dir, sub), exist_ok=True)
+    with open(os.path.join(root_data_dir, "library.json"), "w", encoding="utf-8") as f:
+        f.write("{}\n")
+    with open(os.path.join(root_data_dir, "dictionaries", "registry.json"), "w", encoding="utf-8") as f:
+        f.write("[]\n")
+    src_cfg = os.path.join(CURRENT_DIR, "data", "config.example.json")
+    if os.path.exists(src_cfg):
+        shutil.copy2(src_cfg, os.path.join(root_data_dir, "config.json"))
+
     # Appel de MakeAppx pack
     if os.path.exists(OUTPUT_MSIX):
         try:

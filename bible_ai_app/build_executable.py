@@ -61,6 +61,11 @@ def build():
         "--hidden-import=pymupdf",
         "--hidden-import=fitz",
         "--hidden-import=core.paths",
+        # Exclusions de modules non utilisés provoquant des incompatibilités de binaire
+        "--exclude-module=tkinter",
+        "--exclude-module=_tkinter",
+        "--exclude-module=tcl",
+        "--exclude-module=tk",
         "webview_app.py"
     ]
 
@@ -170,6 +175,36 @@ def build():
             if os.path.exists(dest_assets):
                 shutil.rmtree(dest_assets)
             shutil.copytree(src_assets, dest_assets)
+
+        # 4. Purge des binaires incompatibles avec le pipeline de signature Windows Store (erreur 0x800700C1)
+        # Élimine les résidus Tcl/Tk et les DLLs d'architectures étrangères (x86, ARM64)
+        print("-> Nettoyage des binaires et dépendances incompatibles Store (anti-0x800700C1)...")
+        files_to_purge = [
+            os.path.join(dist_app_dir, "_internal", "tcl86t.dll"),
+            os.path.join(dist_app_dir, "_internal", "tk86t.dll"),
+            os.path.join(dist_app_dir, "_internal", "_tkinter.pyd"),
+            os.path.join(dist_app_dir, "_internal", "webview", "lib", "WebBrowserInterop.x86.dll"),
+        ]
+        dirs_to_purge = [
+            os.path.join(dist_app_dir, "_internal", "tcl"),
+            os.path.join(dist_app_dir, "_internal", "tk"),
+            os.path.join(dist_app_dir, "_internal", "tcl8"),
+            os.path.join(dist_app_dir, "_internal", "clr_loader", "ffi", "dlls", "x86"),
+            os.path.join(dist_app_dir, "_internal", "webview", "lib", "runtimes", "win-x86"),
+            os.path.join(dist_app_dir, "_internal", "webview", "lib", "runtimes", "win-arm64"),
+        ]
+        for f in files_to_purge:
+            if os.path.exists(f):
+                try:
+                    os.remove(f)
+                except Exception:
+                    pass
+        for d in dirs_to_purge:
+            if os.path.exists(d):
+                try:
+                    shutil.rmtree(d)
+                except Exception:
+                    pass
 
         print("\n[SUCCÈS] Build généré avec succès dans 'dist/OpenShema/' !")
         print("Pour tester : dist\\OpenShema\\OpenShema.exe\n")
