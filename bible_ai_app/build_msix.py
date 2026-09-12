@@ -220,6 +220,8 @@ def build_msix(rebuild_binary=False):
         os.path.join(internal_dir, "tcl"),
         os.path.join(internal_dir, "tk"),
         os.path.join(internal_dir, "tcl8"),
+        os.path.join(internal_dir, "_tcl_data"),
+        os.path.join(internal_dir, "_tk_data"),
         os.path.join(internal_dir, "clr_loader", "ffi", "dlls", "x86"),
         os.path.join(internal_dir, "webview", "lib", "runtimes", "win-x86"),
         os.path.join(internal_dir, "webview", "lib", "runtimes", "win-arm64"),

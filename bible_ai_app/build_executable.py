@@ -189,6 +189,8 @@ def build():
             os.path.join(dist_app_dir, "_internal", "tcl"),
             os.path.join(dist_app_dir, "_internal", "tk"),
             os.path.join(dist_app_dir, "_internal", "tcl8"),
+            os.path.join(dist_app_dir, "_internal", "_tcl_data"),
+            os.path.join(dist_app_dir, "_internal", "_tk_data"),
             os.path.join(dist_app_dir, "_internal", "clr_loader", "ffi", "dlls", "x86"),
             os.path.join(dist_app_dir, "_internal", "webview", "lib", "runtimes", "win-x86"),
             os.path.join(dist_app_dir, "_internal", "webview", "lib", "runtimes", "win-arm64"),
