@@ -44,6 +44,7 @@ const App = {
       { name: 'SettingsView', init: () => SettingsView.init() },
       { name: 'SearchView', init: () => SearchView.init() },
       { name: 'AIStudyView', init: () => AIStudyView.init() },
+      { name: 'AudioStudioView', init: () => (typeof AudioStudioView !== 'undefined' && AudioStudioView.init()) },
       { name: 'NotesView', init: () => NotesView.init() },
       { name: 'DictView', init: () => DictView.init() },
       { name: 'MapsView', init: () => MapsView.init() },
@@ -489,6 +490,7 @@ const App = {
       { id: 'library', visible: true },
       { id: 'search', visible: true },
       { id: 'ai', visible: true },
+      { id: 'audio-studio', visible: true },
       { id: 'notes', visible: true },
       { id: 'sermons', visible: true },
       { id: 'maps', visible: true },
@@ -889,6 +891,12 @@ const App = {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof AIStudyView !== 'undefined') {
         AIStudyView.onViewActivated();
+      }
+    } else if (cleanViewName === 'audio-studio') {
+      if (drawerEl) drawerEl.classList.add('collapsed');
+      if (typeof AudioStudioView !== 'undefined') {
+        AudioStudioView.loadConfiguration();
+        AudioStudioView.loadHistory();
       }
     } else if (viewName === 'sermons') {
       if (drawerEl) drawerEl.classList.add('collapsed');

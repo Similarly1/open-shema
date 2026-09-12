@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/logos.css?v=5.0">
   <link rel="stylesheet" href="css/articles.css">
   <link rel="stylesheet" href="css/first_run_wizard.css">
+  <link rel="stylesheet" href="css/audio_studio.css">
 
   <style id="vintage-core-styles">
     /* Fix pour le sélecteur de mode IA dans le volet droit */
@@ -1349,6 +1350,17 @@
             </svg>
           </span>
           <span class="nav-label">Assistant d'Étude</span>
+        </button>
+        <button class="nav-item" data-nav-id="audio-studio" data-view="audio-studio" id="nav-audio-studio" title="Studio Audio &amp; Podcasts">
+          <span class="nav-icon">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="8" y1="22" x2="16" y2="22"/>
+            </svg>
+          </span>
+          <span class="nav-label">Studio Audio</span>
         </button>
         <button class="nav-item" data-nav-id="notes" data-view="notes" id="nav-notes" title="Notes">
           <span class="nav-icon">
@@ -3395,6 +3407,62 @@
                   </p>
                 </div>
 
+                <!-- Bloc 11 : Studio Audio — Suggestion d'axes & questions clés -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <span>11. Studio Audio — Suggestion d'Axes & Questions Clés</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Studio Audio</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-audio-axes-model">Modèle principal (Axes) :</label>
+                      <select id="cfg-audio-axes-model" class="select-field full-w ai-model-select" data-pair="audio-axes">
+                        <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-audio-axes-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-audio-axes-fallback-model" class="select-field full-w ai-model-select" data-pair="audio-axes">
+                        <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">
+                    Génère instantanément les 3 à 4 questions directrices ou axes clés d'étude pour co-construire l'émission.
+                  </p>
+                </div>
+
+                <!-- Bloc 12 : Studio Audio — Rédaction des Scripts (Dialogue & Solo) -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                      <span>12. Studio Audio — Rédaction des Scripts (Dialogue & Solo)</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Studio Audio</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-audio-script-model">Modèle principal (Script) :</label>
+                      <select id="cfg-audio-script-model" class="select-field full-w ai-model-select" data-pair="audio-script">
+                        <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-audio-script-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-audio-script-fallback-model" class="select-field full-w ai-model-select" data-pair="audio-script">
+                        <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">
+                    Rédige l'intégralité du dialogue ou de la chronique avec profondeur exégétique et respect des règles phonétiques.
+                  </p>
+                </div>
+
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               
               <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
@@ -3845,6 +3913,90 @@
                   <!-- Champ caché synchronisé -->
                   <textarea id="cfg-curator-system-prompt" style="display: none;"></textarea>
                 </div>
+
+                <!-- Carte 10 : Studio Audio — Format Dialogue (Animateur & Exégète) -->
+                <div class="prompt-setting-card" id="prompt-card-audio-studio-dialogue" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Studio Audio — Format Dialogue (2 Voix)</strong>
+                      <span class="prompt-status-badge is-default" id="badge-audio-studio-dialogue-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Instructions de mise en scène radiophonique entre l'animatrice curieuse (Denise) et l'exégète érudit (Henri), avec ancrage strict sur le corpus indexé.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-audio-studio-dialogue-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-audio-studio-dialogue-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-audio-studio-dialogue" style="display: none;"></textarea>
+                </div>
+
+                <!-- Carte 11 : Studio Audio — Format Chronique Solo (Exégèse continue) -->
+                <div class="prompt-setting-card" id="prompt-card-audio-studio-solo" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Studio Audio — Chronique Solo (1 Voix)</strong>
+                      <span class="prompt-status-badge is-default" id="badge-audio-studio-solo-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Directives de narration et d'exposition textuelle continue pour masterclass et chroniques méditatives à une voix.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-audio-studio-solo-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-audio-studio-solo-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-audio-studio-solo" style="display: none;"></textarea>
+                </div>
+
+                <!-- Carte 12 : Studio Audio — Suggestion d'axes & questions clés -->
+                <div class="prompt-setting-card" id="prompt-card-audio-studio-axes" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Studio Audio — Suggestion d'Axes & Questions Clés</strong>
+                      <span class="prompt-status-badge is-default" id="badge-audio-studio-axes-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Directives pour formuler 3 à 4 questions directrices ou axes clés d'étude selon le passage et le mode herméneutique choisi.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-audio-studio-axes-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-audio-studio-axes-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-audio-studio-axes" style="display: none;"></textarea>
+                </div>
               </div>
 
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
@@ -3941,6 +4093,103 @@
                       </div>
                     </div>
                     <input type="checkbox" id="cfg-notify-ai-inapp" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent-gold, #c89b3c);">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Carte : Paramètres Studio Audio & Synthèse Vocale -->
+              <div class="settings-card" id="card-audio-studio-settings" style="margin-top: 18px;">
+                <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #ea580c);"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><path d="M2 10v3"/><path d="M22 10v3"/></svg>
+                  <span>Studio Audio &amp; Podcasts (Synthèse Vocale)</span>
+                </div>
+                <p class="card-desc" style="margin-bottom: 14px;">
+                  Configurez le moteur de voix par défaut, l'attribution des voix neuronales pour chaque rôle et les paramètres d'ancrage RAG des émissions.
+                </p>
+
+                <!-- Moteur Vocal Principal -->
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label for="cfg-audio-studio-engine">Moteur de synthèse vocale par défaut :</label>
+                  <select id="cfg-audio-studio-engine" class="select-field full-w" style="height: 38px;">
+                    <option value="edge_tts" selected>Microsoft Edge-TTS (Neural — 100% Gratuit, illimité, sans clé)</option>
+                    <option value="voxtral">Mistral Voxtral (Voix expressive / Utilise votre clé API Mistral)</option>
+                  </select>
+                </div>
+
+                <!-- Duo de Voix Edge-TTS -->
+                <div class="form-row two-cols" style="margin-bottom: 12px;">
+                  <div class="form-group">
+                    <label for="cfg-audio-studio-voice-a">Voix Locuteur A (Animateur / Denise) :</label>
+                    <select id="cfg-audio-studio-voice-a" class="select-field full-w">
+                      <option value="fr-FR-DeniseNeural" selected>Denise (Française, vive &amp; claire — Recommandée)</option>
+                      <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française, naturelle)</option>
+                      <option value="fr-FR-EloiseNeural">Éloïse (Française, douce)</option>
+                      <option value="fr-BE-CharlineNeural">Charline (Belge, posée)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="cfg-audio-studio-voice-b">Voix Locuteur B (Exégète / Henri) :</label>
+                    <select id="cfg-audio-studio-voice-b" class="select-field full-w">
+                      <option value="fr-FR-HenriNeural" selected>Henri (Français, posé &amp; érudit — Recommandé)</option>
+                      <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, expressif)</option>
+                      <option value="fr-CH-FabriceNeural">Fabrice (Suisse, posé)</option>
+                      <option value="fr-CA-AntoineNeural">Antoine (Canadien)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Voix Chronique Solo & Pause -->
+                <div class="form-row two-cols" style="margin-bottom: 16px;">
+                  <div class="form-group">
+                    <label for="cfg-audio-studio-voice-solo">Voix Chronique Solo (1 Voix) :</label>
+                    <select id="cfg-audio-studio-voice-solo" class="select-field full-w">
+                      <option value="fr-FR-HenriNeural" selected>Henri (Français, posé &amp; érudit)</option>
+                      <option value="fr-FR-DeniseNeural">Denise (Française, claire)</option>
+                      <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, dynamique)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="cfg-audio-studio-pause-ms">Pause entre les répliques (ms) :</label>
+                    <input type="number" id="cfg-audio-studio-pause-ms" class="text-field full-w" min="100" max="2000" step="50" value="350">
+                  </div>
+                </div>
+
+                <!-- Options Avancées Voxtral & Curation RAG -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                  <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Options Avancées Mistral &amp; RAG</span>
+                  </div>
+
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-audio-studio-context-depth">Profondeur de contexte par source :</label>
+                      <select id="cfg-audio-studio-context-depth" class="select-field full-w">
+                        <option value="0">Éclair (~250 tokens / source)</option>
+                        <option value="1" selected>Équilibré (~600 tokens / source — Recommandé)</option>
+                        <option value="2">Approfondi (~1200 tokens / source)</option>
+                        <option value="3">Exhaustif (~2000 tokens / source)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-audio-studio-voxtral-voice">Identifiant Voix Voxtral (si payant) :</label>
+                      <input type="text" id="cfg-audio-studio-voxtral-voice" class="text-field full-w" placeholder="default ou ID custom">
+                    </div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; color: var(--text-primary);">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                      <input type="checkbox" id="cfg-audio-studio-voxtral-modulate" checked style="accent-color: var(--accent-orange);">
+                      <span>Différencier les rôles par intonation sur Mistral Voxtral</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                      <input type="checkbox" id="cfg-audio-studio-enable-rerank" checked style="accent-color: var(--accent-orange);">
+                      <span>Reranking sémantique local BGE-M3 avant scénarisation</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                      <input type="checkbox" id="cfg-audio-studio-enable-curator" style="accent-color: var(--accent-orange);">
+                      <span>Passer les extraits par le LLM Curateur intermédiaire</span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -4816,6 +5065,588 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- VUE STUDIO AUDIO & PODCASTS (STEPPER GUIDÉ EN 3 ÉTAPES)-->
+      <!-- ===================================================== -->
+      <div class="app-view" id="view-audio-studio">
+        <div class="audio-studio-container">
+          <!-- Barre supérieure avec Stepper et tiroir d'historique -->
+          <header class="audio-studio-topbar">
+            <div class="audio-studio-brand">
+              <div class="audio-studio-title-badge">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="22"/>
+                  <line x1="8" y1="22" x2="16" y2="22"/>
+                </svg>
+                <span>Studio Audio</span>
+              </div>
+            </div>
+
+            <!-- Stepper linéaire 1 -> 2 -> 3 -->
+            <nav class="audio-studio-stepper" aria-label="Progression du Studio Audio">
+              <button type="button" class="as-step-item active" data-step="1" id="as-step-btn-1">
+                <span class="as-step-badge">1</span>
+                <span class="as-step-label">Sujet &amp; Mode</span>
+              </button>
+              <div class="as-step-conn" id="as-conn-1-2"></div>
+              <button type="button" class="as-step-item disabled" data-step="2" id="as-step-btn-2">
+                <span class="as-step-badge">2</span>
+                <span class="as-step-label">Script &amp; Voix</span>
+              </button>
+              <div class="as-step-conn" id="as-conn-2-3"></div>
+              <button type="button" class="as-step-item disabled" data-step="3" id="as-step-btn-3">
+                <span class="as-step-badge">3</span>
+                <span class="as-step-label">Régie d'Écoute</span>
+              </button>
+            </nav>
+
+            <!-- Actions de droite : Historique escamotable & Nouveau -->
+            <div class="audio-studio-top-actions">
+              <button type="button" class="btn-secondary as-history-toggle-btn" id="btn-as-history-drawer-toggle" title="Voir l'historique des épisodes">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>Historique</span>
+                <span class="as-history-counter-badge" id="as-history-counter-badge">0</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Zone de contenu des 3 étapes -->
+          <div class="as-wizard-content">
+
+            <!-- ============================================== -->
+            <!-- ÉTAPE 1 : SUJET, MODE D'ÉTUDE & SOURCES RAG     -->
+            <!-- ============================================== -->
+            <section class="as-wizard-pane is-active" id="as-step-1-pane">
+              <div class="as-step1-container">
+                <div class="as-step1-hero">
+                  <h2 class="as-step1-heading">Créer un nouvel épisode audio</h2>
+                  <p class="as-step1-subheading">Sélectionnez votre passage ou thème, choisissez l'angle herméneutique et configurez votre émission.</p>
+                </div>
+
+                <!-- 1. Saisie du Sujet ou Passage -->
+                <div class="as-card as-card-primary">
+                  <div class="as-card-header">
+                    <span class="as-card-title">1. Passage ou Sujet d'Étude</span>
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="audio-studio-addon-btn" id="btn-audio-studio-book-picker" title="Choisir un livre et chapitre">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+                        <span>Passage</span>
+                      </button>
+                      <button type="button" class="audio-studio-addon-icon-btn" id="btn-audio-studio-sync-bible" title="Synchroniser avec le lecteur biblique actif">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="as-subject-input-wrap">
+                    <svg class="audio-studio-search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="audio-studio-subject-input" class="audio-studio-input"
+                      placeholder="Ex : Romains 8:28-39, La résurrection en 1 Corinthiens 15, Les alliances divines..." autocomplete="off">
+                  </div>
+
+                  <!-- Co-construction : Suggestion d'axes / questions clés (plan d'attaque) -->
+                  <div class="as-focal-questions-block">
+                    <div class="as-focal-actions">
+                      <button type="button" class="btn-secondary btn-sm as-btn-suggest-axes" id="btn-as-suggest-axes">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                        <span>Suggérer des axes / questions clés</span>
+                      </button>
+                      <span class="as-focal-hint">Optionnel : permet d'orienter précisément les répliques avant rédaction</span>
+                    </div>
+
+                    <!-- Conteneur des axes suggérés (masqué par défaut) -->
+                    <div class="as-focal-container hidden" id="as-focal-container">
+                      <div class="as-focal-list" id="as-focal-list">
+                        <!-- Injecté dynamiquement par JS -->
+                      </div>
+                      <div class="as-focal-add-wrap">
+                        <button type="button" class="btn-text btn-sm" id="btn-as-add-focal-question" style="font-size: 11.5px; color: var(--accent-orange); display: inline-flex; align-items: center; gap: 4px; background: transparent; border: none; cursor: pointer; padding: 4px 0;">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                          <span>Ajouter un axe personnalisé</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Modes d'Étude Théologique -->
+                <div class="as-card">
+                  <div class="as-card-header">
+                    <span class="as-card-title">2. Mode &amp; Angle Herméneutique</span>
+                    <span class="as-card-tip">Identique aux modes de l'Assistant IA</span>
+                  </div>
+
+                  <div class="as-modes-grid" id="as-modes-grid">
+                    <!-- Mode Auto -->
+                    <div class="as-mode-chip active" data-mode="auto">
+                      <div class="as-mode-chip-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                      </div>
+                      <div class="as-mode-chip-body">
+                        <div class="as-mode-chip-title">Détection Automatique</div>
+                        <div class="as-mode-chip-desc">L'IA adapte l'angle herméneutique en équilibrant exégèse, histoire et doctrine.</div>
+                      </div>
+                    </div>
+
+                    <!-- Mode Exégèse -->
+                    <div class="as-mode-chip" data-mode="exegesis">
+                      <div class="as-mode-chip-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                      </div>
+                      <div class="as-mode-chip-body">
+                        <div class="as-mode-chip-title">Exégèse Approfondie</div>
+                        <div class="as-mode-chip-desc">Structure textuelle, chiasmes, syntaxe, flux logique verset par verset.</div>
+                      </div>
+                    </div>
+
+                    <!-- Mode Historique -->
+                    <div class="as-mode-chip" data-mode="historical">
+                      <div class="as-mode-chip-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="2" y1="20" x2="22" y2="20"></line><line x1="6" y1="20" x2="6" y2="4"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="2" y1="4" x2="22" y2="4"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="14" y1="20" x2="14" y2="4"></line></svg>
+                      </div>
+                      <div class="as-mode-chip-body">
+                        <div class="as-mode-chip-title">Contexte Historique</div>
+                        <div class="as-mode-chip-desc">Arrière-plan gréco-romain/proche-oriental, archéologie, cadre impérial.</div>
+                      </div>
+                    </div>
+
+                    <!-- Mode Prédication -->
+                    <div class="as-mode-chip" data-mode="sermon">
+                      <div class="as-mode-chip-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                      </div>
+                      <div class="as-mode-chip-body">
+                        <div class="as-mode-chip-title">Préparation de Prédication</div>
+                        <div class="as-mode-chip-desc">Idée maîtresse (Big Idea), plan homilétique et applications pour l'Église.</div>
+                      </div>
+                    </div>
+
+                    <!-- Mode Théologie -->
+                    <div class="as-mode-chip" data-mode="theology">
+                      <div class="as-mode-chip-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      </div>
+                      <div class="as-mode-chip-body">
+                        <div class="as-mode-chip-title">Théologie Systématique</div>
+                        <div class="as-mode-chip-desc">Débats doctrinaux, réformateurs et confessions de foi historiques.</div>
+                      </div>
+                    </div>
+
+                    <!-- Mode Lexical -->
+                    <div class="as-mode-chip" data-mode="lexical">
+                      <div class="as-mode-chip-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                      </div>
+                      <div class="as-mode-chip-body">
+                        <div class="as-mode-chip-title">Analyse Lexicale (Grec / Hébreu)</div>
+                        <div class="as-mode-chip-desc">Racines Strong, nuances morphologiques, Septante et sens contextuel.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Sources Documentaires & Paramètres RAG -->
+                <div class="as-card">
+                  <div class="as-card-header">
+                    <span class="as-card-title">3. Sources Documentaires &amp; Corpus RAG</span>
+                  </div>
+
+                  <div class="as-step1-format-row">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Structure du script :</label>
+                    <div class="audio-studio-format-pill">
+                      <button type="button" class="format-btn active" id="btn-audio-format-dialogue" data-format="dialogue" title="Générer un échange à deux intervenants">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <span>Dialogue (2 voix)</span>
+                      </button>
+                      <button type="button" class="format-btn" id="btn-audio-format-solo" data-format="solo" title="Générer une chronique théologique continue">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span>Chronique Solo</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Accordéon Dépliable des Sources RAG -->
+                  <details class="as-sources-details" id="as-sources-details">
+                    <summary class="as-sources-summary">
+                      <span>Corpus documentaires et profondeur RAG</span>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="as-sources-content">
+                      <div class="audio-studio-sources-grid" style="margin-top: 10px;">
+                        <label><input type="checkbox" id="as-opt-src-bibles" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Bibles</span></label>
+                        <label><input type="checkbox" id="as-opt-src-comms" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Commentaires</span></label>
+                        <label><input type="checkbox" id="as-opt-src-dict" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Dictionnaires</span></label>
+                        <label><input type="checkbox" id="as-opt-src-articles" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Articles</span></label>
+                        <label><input type="checkbox" id="as-opt-src-notes" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Notes (.md)</span></label>
+                        <label><input type="checkbox" id="as-opt-src-upvr" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Textes UPVR</span></label>
+                        <label style="grid-column: span 2;"><input type="checkbox" id="as-opt-src-theology" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Théologie systématique</span></label>
+                      </div>
+
+                      <div style="margin-top: 14px;">
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                          <span>Profondeur du Contexte / Source</span>
+                        </label>
+                        <input type="range" id="as-opt-context-depth" class="ctx-depth-range-input" min="0" max="3" step="1" value="1">
+                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+                          <span>Éclair</span>
+                          <span>Équilibré</span>
+                          <span>Approfondi</span>
+                          <span>Exhaustif</span>
+                        </div>
+                        <div id="as-ctx-depth-card" style="background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px;">
+                          <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span id="as-ctx-depth-tokens" style="font-size: 12px; font-weight: 700; color: var(--accent-orange);">~600 tokens / source</span>
+                            <span id="as-ctx-depth-time" style="font-size: 11px; font-weight: 600; color: var(--text-muted);">≈ 30–60 s</span>
+                          </div>
+                          <div id="as-ctx-depth-desc" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                            Bon compromis rapidité de génération et richesse doctrinale.
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 12px;">
+                        <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                          <input type="checkbox" id="as-opt-rerank" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                          <span>Reranking sémantique local (BGE-M3)</span>
+                        </label>
+                        <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                          <input type="checkbox" id="as-opt-curator" style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                          <span>LLM Curateur intermédiaire</span>
+                        </label>
+                        <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                          <input type="checkbox" id="as-opt-profile" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                          <span>Inclure le profil théologique (« Mon Église »)</span>
+                        </label>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+
+                <!-- Bouton d'action principal Étape 1 -->
+                <div class="as-step1-cta-wrap">
+                  <button type="button" class="btn-primary as-btn-generate-main" id="btn-audio-studio-generate">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+                    </svg>
+                    <span>Rédiger le script (Étape 2)</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- ÉTAPE 2 : SCRIPT & CONFIGURATION DES VOIX       -->
+            <!-- ============================================== -->
+            <section class="as-wizard-pane" id="as-step-2-pane">
+              <div class="as-step2-layout">
+                <!-- Volet Gauche (2/3) : Script & Répliques éditables -->
+                <div class="as-step2-script-pane">
+                  <!-- En-tête de l'épisode -->
+                  <div class="audio-studio-script-header" id="audio-studio-script-header">
+                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                      <input type="text" id="audio-studio-episode-title" class="audio-studio-script-title-input" placeholder="Titre de l'épisode (généré ou personnalisé)..." value="Nouveau script audio">
+                      <div style="display: flex; align-items: center; gap: 6px;">
+                        <button type="button" class="btn-secondary btn-sm" id="btn-audio-studio-clear-script" title="Réinitialiser le script" style="font-size: 11.5px; height: 26px; padding: 0 8px;">
+                          Réinitialiser
+                        </button>
+                      </div>
+                    </div>
+                    <div class="audio-studio-script-meta-row">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <span id="audio-studio-meta-format" class="audio-studio-source-pill" style="font-weight: 600;">Dialogue</span>
+                        <span id="audio-studio-meta-mode" class="audio-studio-source-pill" style="color: var(--accent-orange);">Auto</span>
+                        <span id="audio-studio-meta-turns" style="color: var(--text-muted);">0 réplique</span>
+                        <span id="audio-studio-meta-duration" style="color: var(--text-muted); font-family: monospace;">Durée estimée : ~0 min</span>
+                      </div>
+                      <div class="audio-studio-sources-pills" id="audio-studio-script-sources-pills">
+                        <!-- Badges des sources -->
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Liste des répliques -->
+                  <div class="audio-studio-script-list" id="audio-studio-script-list">
+                    <!-- Injecté dynamiquement par audio_studio_view.js -->
+                  </div>
+
+                  <!-- Bouton d'ajout d'une réplique manuelle -->
+                  <div id="audio-studio-add-turn-container">
+                    <button type="button" class="audio-studio-add-turn-btn" id="btn-audio-studio-add-turn">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      <span>Ajouter une réplique</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Volet Droit (1/3) : Synthèse Vocale & Voix -->
+                <div class="as-step2-side-pane">
+                  <div class="audio-studio-player-card" id="audio-studio-synthesis-card">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="font-size: 13px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                        <span>Moteur &amp; Voix Neuronales</span>
+                      </span>
+                      <span id="audio-studio-engine-badge" class="audio-studio-source-pill" style="font-size: 11px;">
+                        Edge-TTS
+                      </span>
+                    </div>
+
+                    <!-- Sélecteur de Format dans l'Étape 2 (Dialogue / Solo) -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                      <label style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">Format de l'émission :</label>
+                      <div class="audio-studio-format-pill">
+                        <button type="button" class="format-btn active" id="btn-audio-step2-format-dialogue" data-format="dialogue" title="Mode Dialogue (2 voix)">
+                          <span>Dialogue (2 voix)</span>
+                        </button>
+                        <button type="button" class="format-btn" id="btn-audio-step2-format-solo" data-format="solo" title="Mode Chronique Solo">
+                          <span>Chronique Solo</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Sélecteur de Moteur Audio -->
+                    <div class="audio-studio-engine-toggle" id="as-engine-toggle" style="margin-top: 12px;">
+                      <button type="button" class="engine-toggle-btn active" id="as-engine-btn-edge" data-engine="edge_tts">
+                        <span>Edge-TTS (Gratuit)</span>
+                      </button>
+                      <button type="button" class="engine-toggle-btn" id="as-engine-btn-voxtral" data-engine="voxtral">
+                        <span>Mistral Voxtral</span>
+                      </button>
+                    </div>
+
+                    <!-- Sélecteurs de Voix Françaises : Bloc Edge-TTS -->
+                    <div id="as-voices-edge-container" style="display: flex; flex-direction: column; gap: 10px;">
+                      <!-- Voix Dialogue -->
+                      <div id="as-edge-dialogue-voices" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="audio-studio-form-row">
+                          <label class="audio-studio-form-label" for="as-select-voice-host">Voix Animateur</label>
+                          <select id="as-select-voice-host" class="audio-studio-select">
+                            <option value="fr-FR-DeniseNeural">Denise (Française, vive &amp; claire)</option>
+                            <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française, naturelle)</option>
+                            <option value="fr-FR-EloiseNeural">Éloïse (Française, douce)</option>
+                            <option value="fr-BE-CharlineNeural">Charline (Belge, posée)</option>
+                          </select>
+                        </div>
+                        <div class="audio-studio-form-row">
+                          <label class="audio-studio-form-label" for="as-select-voice-scholar">Voix Exégète</label>
+                          <select id="as-select-voice-scholar" class="audio-studio-select">
+                            <option value="fr-FR-HenriNeural">Henri (Français, posé &amp; érudit)</option>
+                            <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, expressif)</option>
+                            <option value="fr-CH-FabriceNeural">Fabrice (Suisse, posé)</option>
+                            <option value="fr-CA-AntoineNeural">Antoine (Canadien)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Voix Solo -->
+                      <div id="as-edge-solo-voices" style="display: none; flex-direction: column; gap: 4px;" class="audio-studio-form-row">
+                        <label class="audio-studio-form-label" for="as-select-voice-solo">Voix Narrateur Solo</label>
+                        <select id="as-select-voice-solo" class="audio-studio-select">
+                          <option value="fr-FR-HenriNeural">Henri (Français, posé &amp; érudit)</option>
+                          <option value="fr-FR-DeniseNeural">Denise (Française, vive &amp; claire)</option>
+                          <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française, naturelle)</option>
+                          <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, expressif)</option>
+                          <option value="fr-FR-EloiseNeural">Éloïse (Française, douce)</option>
+                          <option value="fr-BE-CharlineNeural">Charline (Belge, posée)</option>
+                          <option value="fr-CH-FabriceNeural">Fabrice (Suisse, posé)</option>
+                          <option value="fr-CA-AntoineNeural">Antoine (Canadien)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- Sélecteurs de Voix Françaises : Bloc Voxtral -->
+                    <div id="as-voices-voxtral-container" style="display: none; flex-direction: column; gap: 10px;">
+                      <div class="audio-studio-form-row">
+                        <label class="audio-studio-form-label" for="as-select-voice-voxtral">Voix &amp; Style Voxtral (Français)</label>
+                        <select id="as-select-voice-voxtral" class="audio-studio-select">
+                          <option value="default">Voxtral Standard (Voix officielle Mistral)</option>
+                          <option value="pose">Voxtral Exégète (Posé &amp; Solennel)</option>
+                          <option value="dynamique">Voxtral Animateur (Dynamique &amp; Vivant)</option>
+                          <option value="pastoral">Voxtral Pastoral (Chaleureux)</option>
+                          <option value="custom">Voix Personnalisée (Compte Mistral Payant)</option>
+                        </select>
+                      </div>
+                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="checkbox" id="as-check-voxtral-modulate" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                        <span>Modulation intonative selon le rôle</span>
+                      </label>
+                      <div id="as-voxtral-warning" class="audio-studio-warning-box" style="display: none;">
+                        Clé API Mistral non configurée. Cliquez sur <a href="#" id="as-link-settings-mistral" style="color: inherit; text-decoration: underline; font-weight: 600;">Paramètres IA</a> pour la renseigner (ou restez sur Edge-TTS gratuit).
+                      </div>
+                    </div>
+
+                    <!-- Pause inter-répliques -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--text-secondary); border-top: 1px solid var(--border-color); padding-top: 10px;">
+                      <span>Pause inter-répliques</span>
+                      <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="number" id="as-input-pause-ms" value="350" min="100" max="2500" step="50" style="width: 54px; height: 26px; text-align: center; font-size: 11.5px; border-radius: 4px; background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); color: var(--text-primary);">
+                        <span>ms</span>
+                      </div>
+                    </div>
+
+                    <!-- Bouton de lancement de synthèse MP3 -->
+                    <button type="button" class="btn-primary" id="btn-audio-studio-synthesize" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 13.5px; font-weight: 600; width: 100%;">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      <span>Générer l'audio MP3 (Étape 3)</span>
+                    </button>
+
+                    <!-- Zone de progression de la synthèse -->
+                    <div class="audio-studio-progress-box" id="audio-studio-progress-box" style="display: none;">
+                      <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+                        <span id="audio-studio-progress-title" style="color: var(--accent-orange);">Synthèse en cours...</span>
+                        <span id="audio-studio-progress-pct" style="color: var(--text-primary);">0%</span>
+                      </div>
+                      <div class="audio-studio-progress-bar-bg">
+                        <div class="audio-studio-progress-bar-fill" id="audio-studio-progress-bar-fill" style="width: 0%;"></div>
+                      </div>
+                      <div id="audio-studio-progress-msg" style="font-size: 11px; color: var(--text-secondary);">
+                        Initialisation du moteur audio...
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Navigation d'étape en bas du volet -->
+                  <div class="as-step-nav-bar">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-as-nav-to-step1">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                      <span>Modifier sujet &amp; mode</span>
+                    </button>
+                    <button type="button" class="btn-secondary btn-sm" id="btn-as-nav-to-step3" style="display: none;">
+                      <span>Régie d'écoute</span>
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- ÉTAPE 3 : RÉGIE D'ÉCOUTE & KARAOKÉ SYNCHRONISÉ  -->
+            <!-- ============================================== -->
+            <section class="as-wizard-pane" id="as-step-3-pane">
+              <div class="as-step3-layout">
+                <!-- Volet Gauche (2/3) : Script en Mode Karaoké Dynamique -->
+                <div class="as-step3-karaoke-pane">
+                  <div class="as-karaoke-header">
+                    <div>
+                      <h3 class="as-karaoke-title" id="as-karaoke-episode-title">Titre de l'épisode</h3>
+                      <p class="as-karaoke-subtitle" id="as-karaoke-episode-summary">Résumé de l'épisode audio</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="btn-secondary btn-sm" id="btn-as-step3-back-to-step2">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <span>Éditer le script</span>
+                      </button>
+                      <button type="button" class="btn-primary btn-sm" id="btn-as-step3-new-episode">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Nouvel épisode</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Conteneur défilant du script avec mise en surbrillance automatique -->
+                  <div class="as-karaoke-script-flow" id="as-karaoke-script-flow">
+                    <!-- Les répliques en lecture seule synchronisées avec l'audio -->
+                  </div>
+                </div>
+
+                <!-- Volet Droit (1/3) : Lecteur Audio & Téléchargement -->
+                <div class="as-step3-player-pane">
+                  <div class="audio-studio-player-card" id="audio-studio-player-card">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="font-size: 13px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                        <span>Lecteur Audio</span>
+                      </span>
+                      <span id="audio-studio-player-status" style="font-size: 11px; color: var(--text-muted);">
+                        Prêt à la lecture
+                      </span>
+                    </div>
+
+                    <!-- Élément audio HTML5 masqué -->
+                    <audio id="audio-studio-html5-player" preload="metadata" style="display: none;"></audio>
+
+                    <!-- Interface du lecteur avec timeline -->
+                    <div class="audio-studio-player-widget">
+                      <div class="audio-studio-timeline-row">
+                        <input type="range" class="audio-studio-seekbar" id="audio-studio-seekbar" min="0" max="100" value="0" step="0.1">
+                        <div class="audio-studio-time-labels">
+                          <span id="audio-player-current-time">00:00</span>
+                          <span id="audio-player-duration">00:00</span>
+                        </div>
+                      </div>
+
+                      <div class="audio-studio-controls-row">
+                        <!-- Vitesse de lecture -->
+                        <button type="button" class="audio-studio-speed-btn" id="btn-audio-player-speed" title="Modifier la vitesse de lecture">
+                          1.0x
+                        </button>
+
+                        <!-- Bouton central Lecture / Pause -->
+                        <button type="button" class="audio-studio-main-play-btn" id="btn-audio-player-play" title="Lire / Pause">
+                          <svg id="audio-player-icon-play" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                          <svg id="audio-player-icon-pause" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                        </button>
+
+                        <!-- Avancer de 10s -->
+                        <button type="button" class="btn-icon btn-sm" id="btn-audio-player-skip" title="Avancer de 10s" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center;">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m13 19 9-7-9-7v14z"/><path d="m2 19 9-7-9-7v14z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Actions sur l'épisode produit -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                      <button type="button" class="btn-secondary btn-sm" id="btn-audio-player-download" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11.5px; height: 32px;" disabled>
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Télécharger MP3</span>
+                      </button>
+                      <button type="button" class="btn-secondary btn-sm" id="btn-audio-player-export-note" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11.5px; height: 32px;" disabled>
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>Exporter Note</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </div> <!-- /.as-wizard-content -->
+
+          <!-- ============================================== -->
+          <!-- TIROIR LATÉRAL ESCAMOTABLE : HISTORIQUE         -->
+          <!-- ============================================== -->
+          <div class="as-history-backdrop" id="as-history-backdrop"></div>
+          <aside class="as-history-drawer" id="as-history-drawer">
+            <div class="as-history-drawer-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span style="font-size: 14px; font-weight: 700; color: var(--text-primary);">Historique des Épisodes</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button type="button" class="btn-icon btn-sm" id="btn-audio-studio-refresh-history" title="Actualiser l'historique" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                </button>
+                <button type="button" class="btn-icon btn-sm" id="btn-as-history-drawer-close" title="Fermer le panneau" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center;">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="as-history-drawer-body">
+              <div class="audio-studio-history-list" id="audio-studio-history-list">
+                <!-- Injecté dynamiquement par audio_studio_view.js -->
+              </div>
+            </div>
+          </aside>
+
+        </div> <!-- /.audio-studio-container -->
       </div>
 
       <!-- ===================================================== -->
@@ -10206,6 +11037,7 @@ Recevons ce don gratuit dans la prière.</code></pre>
   <script src="js/settings_view.js?v=5.2"></script>
   <script src="js/search_view.js"></script>
   <script src="js/ai_study_view.js"></script>
+  <script src="js/audio_studio_view.js"></script>
   <script src="js/svg_icons_registry.js"></script>
   <script src="js/mindmap_view.js"></script>
   <script src="js/mindmap_preview_modal.js"></script>

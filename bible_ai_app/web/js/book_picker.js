@@ -275,10 +275,23 @@ const BookPicker = {
   currentOptions: null,
 
   open(currentBookCode, currentChapter, customCallback = null, options = {}) {
+    if (typeof currentBookCode === 'object' && currentBookCode !== null) {
+      const opt = currentBookCode;
+      customCallback = opt.onSelect || opt.callback || customCallback;
+      options = opt;
+      currentBookCode = opt.bookCode || opt.book || null;
+      currentChapter = opt.chapter || 1;
+    } else if (typeof currentBookCode === 'function') {
+      customCallback = currentBookCode;
+      currentBookCode = null;
+      currentChapter = 1;
+    }
+
     this.activeCallback = customCallback;
     this.currentOptions = options || {};
 
-    let targetBook = this.booksData.find(b => b.code.toLowerCase() === (currentBookCode || '').toLowerCase());
+    const cleanBookStr = (typeof currentBookCode === 'string') ? currentBookCode : '';
+    let targetBook = this.booksData.find(b => b.code.toLowerCase() === cleanBookStr.toLowerCase());
     if (!targetBook) {
       const activeBible = (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) ? BibleReader.currentBible1 : null;
       const firstB = (activeBible && typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
@@ -301,6 +314,45 @@ const BookPicker = {
       this.popoverEl.style.margin = '0';
       this.popoverEl.style.zIndex = '1001';
       if (this.backdropEl) this.backdropEl.style.zIndex = '1000';
+    } else {
+      // Positionnement contextuel sous un bouton déclencheur (ancre)
+      const anchorEl = this.currentOptions.anchor || this.currentOptions.anchorEl;
+      if (anchorEl && typeof anchorEl.getBoundingClientRect === 'function' && this.popoverEl) {
+        const rect = anchorEl.getBoundingClientRect();
+        const popoverWidth = 680;
+        const popoverHeight = 480;
+
+        let top = rect.bottom + 6;
+        // Aligner le bord droit du popover sur le bord droit de l'ancre si possible
+        let left = rect.right - popoverWidth;
+
+        // Si le popover dépasse à gauche, on l'aligne plutôt sur le bord gauche de l'ancre
+        if (left < 16) {
+          left = Math.max(16, rect.left);
+        }
+        // Empêcher tout débordement à droite
+        if (left + popoverWidth > window.innerWidth - 16) {
+          left = Math.max(16, window.innerWidth - popoverWidth - 16);
+        }
+
+        // Si le popover dépasse en bas de la fenêtre, l'afficher au-dessus de l'ancre
+        if (top + popoverHeight > window.innerHeight - 16) {
+          if (rect.top - popoverHeight - 6 >= 16) {
+            top = rect.top - popoverHeight - 6;
+          } else {
+            top = Math.max(16, window.innerHeight - popoverHeight - 16);
+          }
+        }
+
+        this.popoverEl.classList.remove('centered');
+        this.popoverEl.style.position = 'fixed';
+        this.popoverEl.style.top = `${top}px`;
+        this.popoverEl.style.left = `${left}px`;
+        this.popoverEl.style.transform = 'none';
+        this.popoverEl.style.margin = '0';
+        this.popoverEl.style.zIndex = '1001';
+        if (this.backdropEl) this.backdropEl.style.zIndex = '1000';
+      }
     }
 
     // Gestion du bouton de suppression de référence

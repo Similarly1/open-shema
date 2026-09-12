@@ -101,6 +101,11 @@ const SettingsView = {
       sub: 'Chat théologique interactif & synthèses IA',
       icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>`
     },
+    'audio-studio': {
+      name: 'Studio Audio & Podcasts',
+      sub: 'Génération de dialogues exégétiques & chroniques audio',
+      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><path d="M2 10v3"/><path d="M22 10v3"/></svg>`
+    },
     notes: {
       name: 'Notes',
       sub: 'Gestionnaire de notes d’étude personnelles et carnets',
@@ -537,6 +542,118 @@ Schéma JSON :
   DEFAULT_CURATOR_PROMPT: `Vous êtes un assistant expert en épuration et synthèse théologique.
 Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une synthèse ultra-dense et précise en conservant fidèlement toutes les définitions théologiques, arguments et références bibliques, tout en supprimant les bavardages et informations redondantes.`,
 
+  DEFAULT_AUDIO_STUDIO_DIALOGUE_PROMPT: `Vous êtes un duo d'animateurs et d'exégètes concevant un podcast d'étude biblique et théologique de haute tenue (format NotebookLM / émission exégétique radio).
+Votre mission est de produire un dialogue oral captivant, pédagogique et rigoureux, qui décortique le passage biblique ou la question théologique soumise.
+
+RÔLES DES LOCUTEURS :
+- Locuteur A (Animateur / Denise) : Curieuse, vive, pédagogue et proche de l'auditeur. Elle introduit l'épisode, pose les questions que se pose le chrétien ou l'étudiant, relance, demande d'éclaircir les termes ardus ou les concepts abstraits, et assure le rythme et les transitions.
+- Locuteur B (Exégète / Henri) : Érudit, posé, bienveillant et rigoureux. Il ancre chaque réponse dans les textes bibliques, les lexiques hébreu/grec et les commentaires fournis. Il explique le sens littéraire et théologique avec clarté sans jamais se perdre dans un jargon abstrait.
+
+RÈGLES CRITIQUES :
+1. ANCRAGE HERMÉNEUTIQUE STRICT (ZÉRO HALLUCINATION) :
+   - Basez votre discussion EXCLUSIVEMENT sur les extraits fournis (textes bibliques, dictionnaires, commentaires, notes personnelles, théologie).
+   - N'inventez aucun commentaire ni fait extérieur. Si une question posée dépasse les éléments du texte, l'exégète doit humblement reconnaître que le texte ne se prononce pas sur ce point.
+2. CITATIONS NATURELLES À L'ORAL :
+   - Citez les chapitres, versets et auteurs de façon vivante et fluide (ex: « comme Paul l'écrit au verset 8 », « Calvin souligne dans son commentaire que... »).
+3. TON ET FLUIDITÉ RADIOPHONIQUE :
+   - Rédigez pour l'écoute orale : phrases directes, naturelles, avec des relances vivantes (« Exactement », « C'est un point capital », « Attends, comment comprendre cela ? »).
+   - Évitez les formules de politesse religieuses artificielles.
+4. PRONONCIATION AUDIO ET RÉFÉRENCES BIBLIQUES (RÈGLE ABSOLUE POUR LA VOIX NEURONALE) :
+   - Ne JAMAIS écrire les références sous forme chiffrée avec deux-points (ex: "Romains 2:1", "Jean 3:16" ou "2:4"), car les moteurs de synthèse vocale les lisent comme des heures ("2 heures 1", "3 heures 16", "2 heures 4") !
+   - Écrivez TOUJOURS les références bibliques intégralement en toutes lettres :
+     * Écrivez « Romains chapitre 2, verset 1 » (au lieu de « Romains 2:1 »).
+     * Écrivez « Jean chapitre 3, verset 16 » (au lieu de « Jean 3:16 »).
+     * Écrivez « versets 1 à 5 » (au lieu de « v. 1-5 » ou « 1-5 »).
+     * Écrivez « chapitre 2 » (au lieu de « ch. 2 » ou « chap. 2 »).
+     * Écrivez « après Jésus-Christ » ou « avant Jésus-Christ » (au lieu de « apr. J.-C. » ou « av. J.-C. »).
+5. PROFONDEUR EXÉGÉTIQUE & LONGUEUR SUBSTANTIELLE :
+   - Développez une émission consistante et approfondie, avec la même rigueur et le même niveau d'érudition que l'Assistant d'Étude d'Open Shema.
+   - Fournissez au moins 12 à 18 répliques substantielles (chaque intervention de l'exégète doit être un paragraphe développé de 3 à 6 phrases explicatives, analysant le texte et les commentaires).
+   - Structurez la discussion : 1) Introduction & accroche du passage, 2) Contexte littéraire & historique, 3) Analyse détaillée des versets pivots et mots originaux, 4) Apports et divergences des commentateurs, 5) Portée théologique et application.
+6. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
+   - Vous devez renvoyer UNIQUEMENT un objet JSON valide, sans aucun texte avant ni après, sans balises markdown \`\`\`json autour.
+   - Schéma JSON attendu :
+{
+  "title": "Titre captivant de l'épisode",
+  "summary": "Court résumé de 2 phrases",
+  "sources_cited": ["Romains chapitre 5, versets 1 à 5", "Commentaire Calvin"],
+  "dialogue": [
+    {
+      "speaker": "host",
+      "speaker_name": "Denise",
+      "voice_role": "A",
+      "text": "Texte oral parlé par l'animatrice...",
+      "pause_after_ms": 350
+    },
+    {
+      "speaker": "scholar",
+      "speaker_name": "Henri",
+      "voice_role": "B",
+      "text": "Texte oral parlé par l'exégète...",
+      "pause_after_ms": 400
+    }
+  ]
+} `,
+
+  DEFAULT_AUDIO_STUDIO_SOLO_PROMPT: `Vous êtes un enseignant et pasteur théologien enregistrant une chronique ou masterclass biblique audio d'exposition textuelle.
+Il s'agit d'une CHRONIQUE SOLO PAR UN SEUL INTERVENANT. Ne mettez AUCUN dialogue, AUCUNE réplique d'animatrice, AUCUN échange de questions-réponses.
+Toutes les sections du texte sont dites par un seul et même orateur enseignant (speaker: "narrator", voice_role: "solo").
+Votre mission est de produire une étude orale vivante, articulée, profonde et appliquée du passage ou de la question soumise.
+
+POSTURE & TON :
+- Ton chaleureux, posé, réfléchi, pédagogique et inspirant.
+- Style oral soigné : articulations logiques claires, questions oratoires, respirations, mise en valeur des Écritures et application à la vie chrétienne.
+- Rythme propice à l'écoute attentive et à la méditation.
+
+RÈGLES CRITIQUES :
+1. ANCRAGE HERMÉNEUTIQUE STRICT (ZÉRO HALLUCINATION) :
+   - Basez votre propos EXCLUSIVEMENT sur les extraits fournis. N'inventez aucune spéculation extérieure.
+2. CITATIONS NATURELLES & PRONONCIATION AUDIO DES RÉFÉRENCES BIBLIQUES :
+   - Ne JAMAIS écrire les références sous forme chiffrée avec deux-points (ex: "Romains 2:1", "Jean 3:16" ou "2:4"), car les moteurs vocaux les lisent comme des heures ("2 heures 1", "3 heures 16") !
+   - Écrivez TOUJOURS les références bibliques intégralement en toutes lettres :
+     * Écrivez « Romains chapitre 2, verset 1 » (au lieu de « Romains 2:1 »).
+     * Écrivez « Jean chapitre 3, verset 16 » (au lieu de « Jean 3:16 »).
+     * Écrivez « versets 1 à 5 » (au lieu de « v. 1-5 »).
+     * Écrivez « chapitre 2 » (au lieu de « ch. 2 »).
+     * Écrivez « après Jésus-Christ » ou « avant Jésus-Christ » (au lieu de « apr. J.-C. »).
+3. PROFONDEUR & SUBSTANCE :
+   - Développez au moins 8 à 12 sections majeures et substantielles (style masterclass exégétique détaillée).
+4. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
+   - Vous devez renvoyer UNIQUEMENT un objet JSON valide, sans aucun texte avant ni après, sans balises markdown \`\`\`json autour.
+   - Schéma JSON attendu :
+{
+  "title": "Titre évocateur de la chronique",
+  "summary": "Court résumé de 2 phrases",
+  "sources_cited": ["Romains 5:1-5"],
+  "dialogue": [
+    {
+      "speaker": "narrator",
+      "speaker_name": "Henri",
+      "voice_role": "solo",
+      "text": "Paragraphe de la chronique orale...",
+      "pause_after_ms": 450
+    }
+  ]
+}`,
+
+  DEFAULT_AUDIO_STUDIO_AXES_PROMPT: `Tu es un conseiller éditorial et théologique de haut niveau pour l'application Open Shema.
+Ton rôle est de proposer exactement 3 ou 4 questions directrices ou axes majeurs de réflexion pour structurer un épisode audio d'étude approfondie sur le sujet ou passage soumis.
+
+RÈGLES D'OR :
+1. PERTINENCE HERMÉNEUTIQUE : Adapte précisément les questions à l'angle choisi (Exégèse, Histoire, Prédication, Théologie, Lexique ou Détection automatique).
+2. STIMULATION INTELLECTUELLE : Chaque axe doit être précis, profond, incisif et stimulant pour l'auditeur, sans question bateau ni bavardage superficiel.
+3. STYLE SOBRE : Reste neutre et direct, sans formule de politesse, salutation ni fioriture religieuse.
+4. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
+Rends UNIQUEMENT un objet JSON valide avec la clé "focus_questions" contenant un tableau de 3 ou 4 chaînes.
+Exemple :
+{
+  "focus_questions": [
+    "Quelle est l'articulation logique entre les versets clés ?",
+    "Comment le contexte historique éclaire-t-il la controverse centrale ?",
+    "Quelles sont les implications doctrinales pour la foi aujourd'hui ?"
+  ]
+}`,
+
   PROMPT_CONFIGS: {
     theological_profile: {
       title: 'System Prompt — Passeport Herméneutique (« Mon Église »)',
@@ -656,6 +773,27 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       fieldId: 'cfg-curator-system-prompt',
       badgeId: 'badge-curator-status',
       label: 'Curateur RAG'
+    },
+    audio_studio_dialogue: {
+      title: 'System Prompt — Studio Audio : Format Dialogue (Animateur & Exégète)',
+      defaultProp: 'DEFAULT_AUDIO_STUDIO_DIALOGUE_PROMPT',
+      fieldId: 'cfg-prompt-audio-studio-dialogue',
+      badgeId: 'badge-audio-studio-dialogue-status',
+      label: 'Studio Audio — Dialogue'
+    },
+    audio_studio_solo: {
+      title: 'System Prompt — Studio Audio : Format Chronique Solo (Exégèse continue)',
+      defaultProp: 'DEFAULT_AUDIO_STUDIO_SOLO_PROMPT',
+      fieldId: 'cfg-prompt-audio-studio-solo',
+      badgeId: 'badge-audio-studio-solo-status',
+      label: 'Studio Audio — Chronique Solo'
+    },
+    audio_studio_axes: {
+      title: "System Prompt — Studio Audio : Suggestion d'Axes & Questions Clés",
+      defaultProp: 'DEFAULT_AUDIO_STUDIO_AXES_PROMPT',
+      fieldId: 'cfg-prompt-audio-studio-axes',
+      badgeId: 'badge-audio-studio-axes-status',
+      label: 'Studio Audio — Axes & Questions'
     }
   },
 
@@ -987,6 +1125,10 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       if (chkStudyNotes && typeof AIStudyView !== 'undefined' && AIStudyView.currentMode !== 'free_chat') {
         chkStudyNotes.checked = e.target.checked;
       }
+      const chkAsNotes = document.getElementById('as-opt-src-notes');
+      if (chkAsNotes) {
+        chkAsNotes.checked = e.target.checked;
+      }
       if (typeof NotesView !== 'undefined') {
         NotesView.updateAiToggleVisibility();
         NotesView.renderList();
@@ -1002,6 +1144,10 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       const chkStudyUpvr = document.getElementById('ai-opt-src-upvr');
       if (chkStudyUpvr && typeof AIStudyView !== 'undefined' && AIStudyView.currentMode !== 'free_chat') {
         chkStudyUpvr.checked = e.target.checked;
+      }
+      const chkAsUpvr = document.getElementById('as-opt-src-upvr');
+      if (chkAsUpvr) {
+        chkAsUpvr.checked = e.target.checked;
       }
       this.save();
     });
@@ -1023,7 +1169,10 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       { type: 'sermon_restructure', open: 'btn-open-modal-sermon-restructure-prompt', reset: 'btn-reset-sermon-restructure-prompt' },
       { type: 'sermon_evaluation', open: 'btn-open-modal-sermon-evaluation-prompt', reset: 'btn-reset-sermon-evaluation-prompt' },
       { type: 'mindmap', open: 'btn-open-modal-mindmap-prompt', reset: 'btn-reset-mindmap-prompt' },
-      { type: 'curator', open: 'btn-open-modal-curator-prompt', reset: 'btn-reset-curator-prompt' }
+      { type: 'curator', open: 'btn-open-modal-curator-prompt', reset: 'btn-reset-curator-prompt' },
+      { type: 'audio_studio_dialogue', open: 'btn-open-modal-audio-studio-dialogue-prompt', reset: 'btn-reset-audio-studio-dialogue-prompt' },
+      { type: 'audio_studio_solo', open: 'btn-open-modal-audio-studio-solo-prompt', reset: 'btn-reset-audio-studio-solo-prompt' },
+      { type: 'audio_studio_axes', open: 'btn-open-modal-audio-studio-axes-prompt', reset: 'btn-reset-audio-studio-axes-prompt' }
     ];
 
     promptBtnBindings.forEach(item => {
@@ -1666,6 +1815,18 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
     if (c.mindmap_ai_fallback_model && document.getElementById('cfg-mindmap-ai-fallback-model')) {
       document.getElementById('cfg-mindmap-ai-fallback-model').value = c.mindmap_ai_fallback_model;
     }
+    if (c.audio_studio_axes_model && document.getElementById('cfg-audio-axes-model')) {
+      document.getElementById('cfg-audio-axes-model').value = c.audio_studio_axes_model;
+    }
+    if (c.audio_studio_axes_fallback_model && document.getElementById('cfg-audio-axes-fallback-model')) {
+      document.getElementById('cfg-audio-axes-fallback-model').value = c.audio_studio_axes_fallback_model;
+    }
+    if (c.audio_studio_script_model && document.getElementById('cfg-audio-script-model')) {
+      document.getElementById('cfg-audio-script-model').value = c.audio_studio_script_model;
+    }
+    if (c.audio_studio_script_fallback_model && document.getElementById('cfg-audio-script-fallback-model')) {
+      document.getElementById('cfg-audio-script-fallback-model').value = c.audio_studio_script_fallback_model;
+    }
     const curModel = c.curator_model || c.rag_curation_model;
     if (curModel && document.getElementById('cfg-curator-model')) {
       document.getElementById('cfg-curator-model').value = curModel;
@@ -1693,8 +1854,37 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       document.getElementById('cfg-articles-sync-freq-select').value = val;
     }
 
-    // Synchronisation et exclusion des doublons Principal / Fallback
-    this.syncAllModelPairs(false);
+    // Studio Audio & Podcast
+    if (document.getElementById('cfg-audio-studio-engine')) {
+      document.getElementById('cfg-audio-studio-engine').value = c.audio_studio_engine || 'edge_tts';
+    }
+    if (document.getElementById('cfg-audio-studio-voice-a')) {
+      document.getElementById('cfg-audio-studio-voice-a').value = c.audio_studio_voice_speaker_a || 'fr-FR-DeniseNeural';
+    }
+    if (document.getElementById('cfg-audio-studio-voice-b')) {
+      document.getElementById('cfg-audio-studio-voice-b').value = c.audio_studio_voice_speaker_b || 'fr-FR-HenriNeural';
+    }
+    if (document.getElementById('cfg-audio-studio-voice-solo')) {
+      document.getElementById('cfg-audio-studio-voice-solo').value = c.audio_studio_voice_solo || 'fr-FR-HenriNeural';
+    }
+    if (document.getElementById('cfg-audio-studio-pause-ms')) {
+      document.getElementById('cfg-audio-studio-pause-ms').value = c.audio_studio_pause_ms || 350;
+    }
+    if (document.getElementById('cfg-audio-studio-voxtral-voice')) {
+      document.getElementById('cfg-audio-studio-voxtral-voice').value = c.audio_studio_voxtral_voice || 'default';
+    }
+    if (document.getElementById('cfg-audio-studio-voxtral-modulate')) {
+      document.getElementById('cfg-audio-studio-voxtral-modulate').checked = c.audio_studio_voxtral_modulate !== false;
+    }
+    if (document.getElementById('cfg-audio-studio-context-depth')) {
+      document.getElementById('cfg-audio-studio-context-depth').value = c.audio_studio_context_depth ?? 1;
+    }
+    if (document.getElementById('cfg-audio-studio-enable-rerank')) {
+      document.getElementById('cfg-audio-studio-enable-rerank').checked = c.audio_studio_enable_rerank !== false;
+    }
+    if (document.getElementById('cfg-audio-studio-enable-curator')) {
+      document.getElementById('cfg-audio-studio-enable-curator').checked = !!c.audio_studio_enable_curator;
+    }
 
     // Chargement des prompts système (Modes de chat & Outils dédiés)
     Object.values(this.PROMPT_CONFIGS).forEach(cfg => {
@@ -1988,6 +2178,10 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       'cfg-mindmap-ai-fallback-model',
       'cfg-curator-model',
       'cfg-curator-fallback-model',
+      'cfg-audio-axes-model',
+      'cfg-audio-axes-fallback-model',
+      'cfg-audio-script-model',
+      'cfg-audio-script-fallback-model',
       'ai-opt-model'
     ];
 
@@ -2078,6 +2272,14 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
         targetVal = this.config.curator_model || this.config.rag_curation_model || currentVal;
       } else if (id === 'cfg-curator-fallback-model') {
         targetVal = this.config.curator_fallback_model || this.config.rag_curation_fallback_model || currentVal;
+      } else if (id === 'cfg-audio-axes-model') {
+        targetVal = this.config.audio_studio_axes_model || currentVal;
+      } else if (id === 'cfg-audio-axes-fallback-model') {
+        targetVal = this.config.audio_studio_axes_fallback_model || currentVal;
+      } else if (id === 'cfg-audio-script-model') {
+        targetVal = this.config.audio_studio_script_model || currentVal;
+      } else if (id === 'cfg-audio-script-fallback-model') {
+        targetVal = this.config.audio_studio_script_fallback_model || currentVal;
       }
 
       if (targetVal && enabledModels.some(m => m.id === targetVal)) {
@@ -2241,7 +2443,9 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' },
       { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' },
       { primary: 'cfg-mindmap-ai-model', fallback: 'cfg-mindmap-ai-fallback-model', label: 'Mind Map' },
-      { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' }
+      { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' },
+      { primary: 'cfg-audio-axes-model', fallback: 'cfg-audio-axes-fallback-model', label: 'Studio Audio (Axes & Questions)' },
+      { primary: 'cfg-audio-script-model', fallback: 'cfg-audio-script-fallback-model', label: 'Studio Audio (Rédaction Script)' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -2281,7 +2485,9 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       { primary: 'cfg-sermon-restructure-model', fallback: 'cfg-sermon-restructure-fallback-model', label: 'Prédication' },
       { primary: 'cfg-sermon-evaluation-model', fallback: 'cfg-sermon-evaluation-fallback-model', label: 'Audit Homilétique' },
       { primary: 'cfg-mindmap-ai-model', fallback: 'cfg-mindmap-ai-fallback-model', label: 'Mind Map' },
-      { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' }
+      { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' },
+      { primary: 'cfg-audio-axes-model', fallback: 'cfg-audio-axes-fallback-model', label: 'Studio Audio (Axes & Questions)' },
+      { primary: 'cfg-audio-script-model', fallback: 'cfg-audio-script-fallback-model', label: 'Studio Audio (Rédaction Script)' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -2780,6 +2986,28 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
       newCfg.curator_fallback_model = fb;
       newCfg.rag_curation_fallback_model = fb;
     }
+    if (document.getElementById('cfg-audio-axes-model')) {
+      newCfg.audio_studio_axes_model = document.getElementById('cfg-audio-axes-model').value;
+    }
+    if (document.getElementById('cfg-audio-axes-fallback-model')) {
+      let fb = document.getElementById('cfg-audio-axes-fallback-model').value;
+      if (fb === newCfg.audio_studio_axes_model) {
+        fb = this.getSmartFallbackModel(newCfg.audio_studio_axes_model, document.getElementById('cfg-audio-axes-fallback-model'));
+        document.getElementById('cfg-audio-axes-fallback-model').value = fb;
+      }
+      newCfg.audio_studio_axes_fallback_model = fb;
+    }
+    if (document.getElementById('cfg-audio-script-model')) {
+      newCfg.audio_studio_script_model = document.getElementById('cfg-audio-script-model').value;
+    }
+    if (document.getElementById('cfg-audio-script-fallback-model')) {
+      let fb = document.getElementById('cfg-audio-script-fallback-model').value;
+      if (fb === newCfg.audio_studio_script_model) {
+        fb = this.getSmartFallbackModel(newCfg.audio_studio_script_model, document.getElementById('cfg-audio-script-fallback-model'));
+        document.getElementById('cfg-audio-script-fallback-model').value = fb;
+      }
+      newCfg.audio_studio_script_fallback_model = fb;
+    }
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;
     }
@@ -2794,6 +3022,39 @@ Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une syn
         ArticlesView.saveSyncPreferences({ frequency: 'interval', intervalDays: parseInt(val, 10) || 3 });
       }
     }
+
+    // Studio Audio & Podcast
+    if (document.getElementById('cfg-audio-studio-engine')) {
+      newCfg.audio_studio_engine = document.getElementById('cfg-audio-studio-engine').value;
+    }
+    if (document.getElementById('cfg-audio-studio-voice-a')) {
+      newCfg.audio_studio_voice_speaker_a = document.getElementById('cfg-audio-studio-voice-a').value;
+    }
+    if (document.getElementById('cfg-audio-studio-voice-b')) {
+      newCfg.audio_studio_voice_speaker_b = document.getElementById('cfg-audio-studio-voice-b').value;
+    }
+    if (document.getElementById('cfg-audio-studio-voice-solo')) {
+      newCfg.audio_studio_voice_solo = document.getElementById('cfg-audio-studio-voice-solo').value;
+    }
+    if (document.getElementById('cfg-audio-studio-pause-ms')) {
+      newCfg.audio_studio_pause_ms = parseInt(document.getElementById('cfg-audio-studio-pause-ms').value, 10) || 350;
+    }
+    if (document.getElementById('cfg-audio-studio-voxtral-voice')) {
+      newCfg.audio_studio_voxtral_voice = document.getElementById('cfg-audio-studio-voxtral-voice').value.trim() || 'default';
+    }
+    if (document.getElementById('cfg-audio-studio-voxtral-modulate')) {
+      newCfg.audio_studio_voxtral_modulate = document.getElementById('cfg-audio-studio-voxtral-modulate').checked;
+    }
+    if (document.getElementById('cfg-audio-studio-context-depth')) {
+      newCfg.audio_studio_context_depth = parseInt(document.getElementById('cfg-audio-studio-context-depth').value, 10) || 1;
+    }
+    if (document.getElementById('cfg-audio-studio-enable-rerank')) {
+      newCfg.audio_studio_enable_rerank = document.getElementById('cfg-audio-studio-enable-rerank').checked;
+    }
+    if (document.getElementById('cfg-audio-studio-enable-curator')) {
+      newCfg.audio_studio_enable_curator = document.getElementById('cfg-audio-studio-enable-curator').checked;
+    }
+
     // Sérialisation des prompts système
     Object.values(this.PROMPT_CONFIGS).forEach(cfg => {
       if (cfg.fieldId && document.getElementById(cfg.fieldId)) {

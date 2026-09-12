@@ -111,11 +111,12 @@ from api.settings import SettingsMixin
 from api.window import WindowMixin
 from api.content import ContentMixin
 from api.updater import UpdaterMixin
+from api.audio_studio import AudioStudioMixin
 
 
 class BibleAppApi(BibleReaderMixin, CommentaryMixin, StudyMixin, AiMixin,
                   LibraryMixin, ImportMixin, SettingsMixin, WindowMixin, ContentMixin,
-                  UpdaterMixin):
+                  UpdaterMixin, AudioStudioMixin):
     """
     API Bridge exposée au Frontend Webview JavaScript.
     Chaque méthode publique est directement invocable via window.pywebview.api.<nom_methode>(...).

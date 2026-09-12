@@ -55,6 +55,9 @@ scratch_*.html
 **/data/sermons/
 **/data/notes/
 **/data/conversations/
+**/data/podcasts/
+*.mp3
+!assets/audio/*.mp3
 
 # IDEs & System files
 .vscode/

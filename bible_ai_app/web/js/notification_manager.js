@@ -263,36 +263,68 @@ const NotificationManager = {
     return container;
   },
 
-  showInAppToast({ title, snippet, targetView = 'ai', onClick = null }) {
+  showInAppToast({ title, snippet, targetView = 'ai', onClick = null, type = 'ready', tag = null, btnText = null }) {
     const container = this.createToastContainer();
     
     // Supprimer un ancien toast s'il existe
     container.innerHTML = '';
 
     const toastEl = document.createElement('div');
-    toastEl.className = 'os-floating-toast';
+    const isError = type === 'error';
+    const isSuccess = type === 'success';
+    toastEl.className = `os-floating-toast ${isError ? 'toast-error' : (isSuccess ? 'toast-success' : '')}`;
     
-    const cleanSnippet = snippet ? snippet.replace(/<[^>]*>?/gm, '').trim() : "Étude prête à être consultée.";
-    const displaySnippet = cleanSnippet.length > 80 ? cleanSnippet.substring(0, 77) + '...' : cleanSnippet;
+    const fallbackSnippet = isError ? "Une erreur est survenue." : "Étude prête à être consultée.";
+    const cleanSnippet = snippet ? snippet.replace(/<[^>]*>?/gm, '').trim() : fallbackSnippet;
+    const maxLen = 140;
+    const displaySnippet = cleanSnippet.length > maxLen ? cleanSnippet.substring(0, maxLen - 3) + '...' : cleanSnippet;
+
+    let iconSvg = `
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>
+      </svg>
+    `;
+    if (isError) {
+      iconSvg = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      `;
+    } else if (isSuccess) {
+      iconSvg = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#10b981" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      `;
+    }
+
+    const defaultTag = isError ? 'Erreur' : (isSuccess ? 'Succès' : 'Prêt');
+    const displayTag = tag || defaultTag;
+
+    const showAction = Boolean(onClick || btnText);
+    const actionLabel = btnText || "Voir l'étude";
+    const actionBtnHtml = showAction ? `
+      <div class="os-toast-actions">
+        <button type="button" class="os-toast-btn-action">
+          <span>${actionLabel}</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    ` : '';
 
     toastEl.innerHTML = `
       <div class="os-toast-icon">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>
-        </svg>
+        ${iconSvg}
       </div>
       <div class="os-toast-content">
         <div class="os-toast-header">
           <span class="os-toast-title">${title}</span>
-          <span class="os-toast-tag">Prêt</span>
+          <span class="os-toast-tag">${displayTag}</span>
         </div>
         <p class="os-toast-text">${displaySnippet}</p>
-        <div class="os-toast-actions">
-          <button type="button" class="os-toast-btn-action">
-            <span>Voir l'étude</span>
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
+        ${actionBtnHtml}
       </div>
       <button type="button" class="os-toast-close" title="Fermer">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>

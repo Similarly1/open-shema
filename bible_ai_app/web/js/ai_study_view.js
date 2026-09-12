@@ -181,10 +181,12 @@ const AIStudyView = {
       }
     });
 
-    // Synchroniser l'inclusion des notes en RAG depuis le popover du chat vers les paramètres
+    // Synchroniser l'inclusion des notes en RAG depuis le popover du chat vers les paramètres et le studio audio
     const chkOptNotes = document.getElementById('ai-opt-src-notes');
     chkOptNotes?.addEventListener('change', (e) => {
       const isChecked = e.target.checked;
+      const chkAsNotes = document.getElementById('as-opt-src-notes');
+      if (chkAsNotes) chkAsNotes.checked = isChecked;
       if (typeof SettingsView !== 'undefined' && SettingsView.config) {
         SettingsView.config.include_notes_in_ai = isChecked;
         const cfgNotes = document.getElementById('cfg-include-notes-ai');
@@ -200,10 +202,12 @@ const AIStudyView = {
       }
     });
 
-    // Synchroniser l'inclusion d'UPVR en RAG depuis le popover du chat vers les paramètres
+    // Synchroniser l'inclusion d'UPVR en RAG depuis le popover du chat vers les paramètres et le studio audio
     const chkOptUpvr = document.getElementById('ai-opt-src-upvr');
     chkOptUpvr?.addEventListener('change', (e) => {
       const isChecked = e.target.checked;
+      const chkAsUpvr = document.getElementById('as-opt-src-upvr');
+      if (chkAsUpvr) chkAsUpvr.checked = isChecked;
       if (typeof SettingsView !== 'undefined' && SettingsView.config) {
         SettingsView.config.include_upvr_in_ai = isChecked;
         const cfgUpvr = document.getElementById('cfg-include-upvr-ai');
