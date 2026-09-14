@@ -303,7 +303,7 @@ class AudioStudioMixin:
                 script_dialogue = opts.get("script_dialogue", script_dialogue)
                 engine = opts.get("engine", engine)
                 custom_opts = opts.get("custom_options") or {}
-                for k in ("bg_music", "jingle_intro", "sfx_ambient", "sfx", "ducking_enabled", "ducking_db", "mastering_enabled", "voice_speaker_a", "voice_speaker_b", "voice_solo", "calm_prosody", "rate", "pitch", "inject_breaks"):
+                for k in ("bg_music", "jingle_intro", "sfx_ambient", "sfx", "music_enabled", "jingle_enabled", "sfx_enabled", "ducking_enabled", "ducking_db", "mastering_enabled", "voice_speaker_a", "voice_speaker_b", "voice_solo", "calm_prosody", "rate", "pitch", "inject_breaks"):
                     if k in opts and k not in custom_opts:
                         custom_opts[k] = opts[k]
                 custom_options = custom_opts

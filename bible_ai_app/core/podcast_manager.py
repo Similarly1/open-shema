@@ -1561,7 +1561,47 @@ class PodcastEngine:
                     return full_path
                 logger.warning("[PodcastEngine] Fichier audio soundpack manquant pour %s : %s", track_id, full_path)
                 return None
-        return None
+    @classmethod
+    def detect_contextual_sfx(
+        cls,
+        subject: str = "",
+        title: str = "",
+        summary: str = "",
+        dialogue: Optional[List[Dict[str, Any]]] = None
+    ) -> str:
+        """
+        Détecte automatiquement l'ambiance sonore contextuelle la plus appropriée
+        en fonction du passage biblique, du sujet, du titre, du résumé et des répliques.
+        """
+        corpus = f"{subject} {title} {summary}".lower()
+        if dialogue:
+            dialogue_sample = " ".join([d.get("text", "") for d in dialogue[:8]]).lower()
+            corpus += " " + dialogue_sample
+
+        # Règles sémantiques contextuelles précises
+        if any(w in corpus for w in ["coq", "renie", "pierre", "aurore", "chant du coq", "veille"]):
+            return "sfx_rooster_crow"
+        if any(w in corpus for w in ["désert", "desert", "aride", "jean-baptiste", "jean baptiste", "voix au désert", "sauvage", "solitude"]):
+            return "sfx_desert_wind"
+        if any(w in corpus for w in ["mer", "barque", "pêche", "galilée", "tempête", "ressac", "rivage", "lac", "tibériade", "poisson"]):
+            return "sfx_ocean_shore_waves"
+        if any(w in corpus for w in ["feu", "braise", "foyer", "camp", "veillée", "flamme"]):
+            return "sfx_campfire_crackle"
+        if any(w in corpus for w in ["brebis", "berger", "pâturage", "troupeau", "agneau", "pâtre"]):
+            return "sfx_sheep_flock_bells"
+        if any(w in corpus for w in ["marché", "marche ", "ruelle", "ville", "place publique", "marchand"]):
+            return "sfx_ancient_marketplace"
+        if any(w in corpus for w in ["foule en colère", "crucifie", "pilate", "clameur", "émeute", "tribunal", "condamne"]):
+            return "sfx_angry_crowd"
+        if any(w in corpus for w in ["foule", "assemblée", "synagogue", "temple", "auditoire", "multitude", "auditeurs"]):
+            return "sfx_crowd_murmur"
+        if any(w in corpus for w in ["marche", "sentier", "voyage", "chemin", "route d'emmaüs", "emmaüs"]):
+            return "sfx_footsteps_trail"
+        if any(w in corpus for w in ["nuit", "gethsémané", "grillon", "étoile", "prière", "soir"]):
+            return "sfx_night_crickets"
+
+        # Valeur contextuelle par défaut : vent désertique doux
+        return "sfx_desert_wind"
 
     @classmethod
     def mix_voice_with_soundpack(
@@ -1795,17 +1835,46 @@ class PodcastEngine:
             res = cls._synthesize_edge_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
 
         # Mixage soundpack (ambiance musicale et/ou jingle d'introduction avec ducking sidechain)
+        log_file = os.path.join(get_podcasts_dir(), "audio_studio_mix.log")
+        def _audit_log(msg: str):
+            try:
+                now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                with open(log_file, "a", encoding="utf-8") as f_log:
+                    f_log.write(f"[{now_str}] {msg}\n")
+            except Exception:
+                pass
+
+        # Flags explicites de contrôle
+        music_enabled = opts.get("music_enabled")
+        jingle_enabled = opts.get("jingle_enabled")
+        sfx_enabled = opts.get("sfx_enabled")
+
         bg_music_id = opts.get("bg_music")
-        if bg_music_id is None:
+        jingle_intro_id = opts.get("jingle_intro")
+        sfx_ambient_id = opts.get("sfx_ambient") or opts.get("sfx")
+
+        # Résolution selon les drapeaux booléens des 2 cases à cocher
+        if music_enabled is False:
+            bg_music_id = None
+        elif bg_music_id is None:
             bg_music_id = cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")
 
-        jingle_intro_id = opts.get("jingle_intro")
-        if jingle_intro_id is None:
+        if jingle_enabled is False:
+            jingle_intro_id = None
+        elif jingle_intro_id is None:
             jingle_intro_id = cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")
 
-        sfx_ambient_id = opts.get("sfx_ambient") or opts.get("sfx")
-        if sfx_ambient_id is None:
-            sfx_ambient_id = cfg.get("audio_studio_sfx_ambient", "none")
+        if sfx_enabled is False or sfx_ambient_id in ("none", "null", "false", ""):
+            sfx_ambient_id = None
+        else:
+            # Détection automatique contextuelle si auto ou activé
+            if sfx_ambient_id in ("auto", None) or sfx_enabled is True:
+                sfx_ambient_id = cls.detect_contextual_sfx(
+                    subject=record.get("subject", ""),
+                    title=record.get("title", ""),
+                    summary=record.get("summary", ""),
+                    dialogue=dialogue
+                )
 
         # Choix explicite "none"
         if bg_music_id in ("none", "", "null", False):
@@ -1822,6 +1891,7 @@ class PodcastEngine:
         jingle_path = cls.resolve_soundpack_track_path(jingle_intro_id) if jingle_intro_id else None
         sfx_path = cls.resolve_soundpack_track_path(sfx_ambient_id) if sfx_ambient_id else None
 
+        _audit_log(f"START: Mixage podcast={podcast_id} | bg={bg_music_id} ({bg_path}) | jingle={jingle_intro_id} ({jingle_path}) | sfx={sfx_ambient_id} ({sfx_path}) | ducking={ducking_enabled} ({ducking_db}dB)")
         logger.info("[PodcastEngine] Préparation mixage audio : bg=%s (%s), jingle=%s (%s), sfx=%s (%s), ducking=%s (-%.1f dB)",
                     bg_music_id, bg_path, jingle_intro_id, jingle_path, sfx_ambient_id, sfx_path, ducking_enabled, ducking_db)
 
@@ -1834,6 +1904,8 @@ class PodcastEngine:
                 try:
                     with open(audio_path, "rb") as f:
                         speech_bytes = f.read()
+
+                    _audit_log(f"VOICE: Lu {len(speech_bytes)} octets de voix brute depuis {audio_path}")
 
                     mix_opts = {
                         "ducking_db": ducking_db if ducking_enabled else -6.0,
@@ -1858,18 +1930,25 @@ class PodcastEngine:
                         res["sfx_ambient"] = sfx_ambient_id or "none"
                         res["ducking_enabled"] = ducking_enabled
                         PodcastHistory.upsert(res)
+                        _audit_log(f"SUCCESS: Mixage soundpack terminé avec succès pour {podcast_id} (durée: {total_dur:.2f}s, taille: {len(mixed_bytes)} octets)")
                         logger.info("[PodcastEngine] Mixage soundpack réussi pour %s (durée: %.2fs, taille: %d octets)",
                                     podcast_id, total_dur, len(mixed_bytes))
                         if progress_callback:
                             total_l = len(shifted_dialogue)
                             progress_callback(total_l, 100, f"Épisode finalisé avec soundpack ({cls.format_duration(total_dur)})")
                     else:
+                        _audit_log(f"WARNING: Mixage a renvoyé un flux vide ({len(mixed_bytes)} octets)")
                         logger.warning("[PodcastEngine] Mixage soundpack a renvoyé un flux vide, voix d'origine conservée")
                 except Exception as e_mix:
+                    _audit_log(f"ERROR: Exception lors du mixage soundpack: {e_mix}")
                     logger.error("[PodcastEngine] Erreur mixage soundpack : %s", e_mix, exc_info=True)
+                    res["mix_error"] = str(e_mix)
+                    PodcastHistory.upsert(res)
             else:
+                _audit_log(f"WARNING: Fichier audio introuvable : {audio_path}")
                 logger.warning("[PodcastEngine] Fichier audio introuvable pour mixage : %s", audio_path)
         else:
+            _audit_log(f"SKIPPED: Aucun habillage sonore demandé (voix pure)")
             res["bg_music"] = "none"
             res["jingle_intro"] = "none"
             res["sfx_ambient"] = "none"

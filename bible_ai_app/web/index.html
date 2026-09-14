@@ -5670,47 +5670,17 @@
                         </span>
                       </div>
 
-                      <!-- Ambiance musicale de fond -->
-                      <div class="audio-studio-form-row" style="margin-bottom: 0;">
-                        <label class="audio-studio-form-label" for="as-select-bg-music" style="font-size: 11px; display: flex; justify-content: space-between;">
-                          <span>Ambiance musicale de fond</span>
-                        </label>
-                        <select id="as-select-bg-music" class="audio-studio-select" style="width: 100%; height: 34px; font-size: 12px;">
-                          <option value="bed_cozy_jazz_study">Étude &amp; Méditation (Nappe Jazz Douce)</option>
-                          <option value="none">Aucune musique (Voix pure)</option>
-                        </select>
-                      </div>
+                      <!-- Checkbox 1 : Musique de fond & Jingle -->
+                      <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Ajoute une nappe musicale douce et un jingle introductif d'amorce">
+                        <input type="checkbox" id="as-check-music-jingle" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
+                        <span>Musique d'ambiance de fond &amp; Jingle d'intro</span>
+                      </label>
 
-                      <!-- Jingle d'intro -->
-                      <div class="audio-studio-form-row" style="margin-bottom: 0;">
-                        <label class="audio-studio-form-label" for="as-select-jingle-intro" style="font-size: 11px; display: flex; justify-content: space-between;">
-                          <span>Jingle d'introduction</span>
-                        </label>
-                        <select id="as-select-jingle-intro" class="audio-studio-select" style="width: 100%; height: 34px; font-size: 12px;">
-                          <option value="jingle_piano_solemn">Piano Recueilli (Intro Solennelle)</option>
-                          <option value="none">Aucun jingle (Démarrage direct)</option>
-                        </select>
-                      </div>
-
-                      <!-- Bruitage sonore d'ambiance contextuel (SFX) -->
-                      <div class="audio-studio-form-row" style="margin-bottom: 0;">
-                        <label class="audio-studio-form-label" for="as-select-sfx" style="font-size: 11px; display: flex; justify-content: space-between;">
-                          <span>Bruitage sonore d'ambiance (SFX)</span>
-                        </label>
-                        <select id="as-select-sfx" class="audio-studio-select" style="width: 100%; height: 34px; font-size: 12px;">
-                          <option value="none" selected>Aucun bruitage (Par défaut)</option>
-                          <option value="sfx_rooster_crow">Chant du coq (Aurore / Reniement)</option>
-                          <option value="sfx_campfire_crackle">Feu de camp &amp; braises (Soirée / Nuit)</option>
-                          <option value="sfx_footsteps_trail">Bruits de pas sur sentier pierreux</option>
-                          <option value="sfx_ocean_shore_waves">Vagues &amp; ressac marin (Bord de mer)</option>
-                          <option value="sfx_angry_crowd">Foule en colère &amp; clameurs</option>
-                          <option value="sfx_crowd_murmur">Murmures d'assemblée &amp; chuchotements</option>
-                          <option value="sfx_ancient_marketplace">Marché antique &amp; ruelle animée</option>
-                          <option value="sfx_sheep_flock_bells">Troupeau de brebis &amp; clochettes</option>
-                          <option value="sfx_night_crickets">Nuit étoilée &amp; grillons de Judée</option>
-                          <option value="sfx_desert_wind">Vent du désert &amp; souffle aride</option>
-                        </select>
-                      </div>
+                      <!-- Checkbox 2 : Bruitages contextuels auto -->
+                      <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Détecte automatiquement les ambiances sonores selon le passage (désert, sentier, mer de Galilée, foule...)">
+                        <input type="checkbox" id="as-check-sfx-auto" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
+                        <span>Bruitages sonores d'ambiance contextuels (Auto-détectés)</span>
+                      </label>
 
                       <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Atténue la musique sous la parole (-16 dB) et la remonte doucement lors des pauses et en fin d'épisode">
                         <input type="checkbox" id="as-check-ducking" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">

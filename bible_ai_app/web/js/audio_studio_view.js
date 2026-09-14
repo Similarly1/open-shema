@@ -156,9 +156,8 @@ const AudioStudioView = {
       inputPauseMs: document.getElementById('as-input-pause-ms'),
       checkMastering: document.getElementById('as-check-mastering'),
       checkCalmProsody: document.getElementById('as-check-calm-prosody'),
-      selectBgMusic: document.getElementById('as-select-bg-music'),
-      selectJingleIntro: document.getElementById('as-select-jingle-intro'),
-      selectSfx: document.getElementById('as-select-sfx'),
+      checkMusicJingle: document.getElementById('as-check-music-jingle'),
+      checkSfxAuto: document.getElementById('as-check-sfx-auto'),
       checkDucking: document.getElementById('as-check-ducking'),
       step2CardTitle: document.getElementById('as-step2-card-title'),
       step2ActiveSummary: document.getElementById('as-step2-active-summary'),
@@ -401,11 +400,20 @@ const AudioStudioView = {
 
     // Synchronisation des labels des Custom Dropdowns lors des changements de sélection
     ['as-select-voice-host', 'as-select-voice-scholar', 'as-select-voice-solo',
-     'as-select-voxtral-host', 'as-select-voxtral-scholar', 'as-select-voxtral-solo',
-     'as-select-bg-music', 'as-select-jingle-intro', 'as-select-sfx'].forEach(id => {
+     'as-select-voxtral-host', 'as-select-voxtral-scholar', 'as-select-voxtral-solo'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', () => {
         this.refreshCustomDropdown(id);
       });
+    });
+
+    // Liaison de la case musique & jingle avec le ducking
+    el.checkMusicJingle?.addEventListener('change', () => {
+      if (el.checkDucking) {
+        el.checkDucking.disabled = !el.checkMusicJingle.checked;
+        if (el.checkDucking.parentElement) {
+          el.checkDucking.parentElement.style.opacity = el.checkMusicJingle.checked ? '1' : '0.45';
+        }
+      }
     });
 
     // 10. Lecteur Audio
@@ -662,15 +670,10 @@ const AudioStudioView = {
           el.checkCalmProsody.checked = res.calm_prosody !== false;
         }
 
-        if (el.selectBgMusic && res.bg_music) {
-          el.selectBgMusic.value = res.bg_music;
-        }
-        if (el.selectJingleIntro && res.jingle_intro) {
-          el.selectJingleIntro.value = res.jingle_intro;
-        }
-        if (el.selectSfx && res.sfx_ambient) {
-          el.selectSfx.value = res.sfx_ambient;
-        }
+        const hasMusic = (res.bg_music && res.bg_music !== 'none') || (res.jingle_intro && res.jingle_intro !== 'none');
+        const hasSfx = (res.sfx_ambient && res.sfx_ambient !== 'none');
+        if (el.checkMusicJingle) el.checkMusicJingle.checked = (typeof res.bg_music !== 'undefined') ? hasMusic : true;
+        if (el.checkSfxAuto) el.checkSfxAuto.checked = (typeof res.sfx_ambient !== 'undefined') ? hasSfx : true;
         if (el.checkDucking && typeof res.ducking_enabled !== 'undefined') {
           el.checkDucking.checked = res.ducking_enabled !== false;
         }
@@ -1193,72 +1196,13 @@ const AudioStudioView = {
       return `${s}s`;
     };
 
-    if (el.selectBgMusic) {
-      let html = '<option value="bed_cozy_jazz_study">Étude &amp; Méditation (Nappe Jazz Douce — Recommandé)</option>';
-      musicTracks.forEach(t => {
-        if (t.id !== 'bed_cozy_jazz_study') {
-          const tName = t.name || t.title || t.id;
-          const tDur = formatDur(t.duration || t.duration_sec);
-          html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
-        }
-      });
-      const otherThemes = [...jingleTracks, ...stingerTracks];
-      if (otherThemes.length > 0) {
-        html += '<optgroup label="Thèmes courts &amp; interludes">';
-        otherThemes.forEach(t => {
-          const tName = t.name || t.title || t.id;
-          const tDur = formatDur(t.duration || t.duration_sec);
-          html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
-        });
-        html += '</optgroup>';
-      }
-      html += '<option value="none">Aucune musique (Voix pure)</option>';
-      el.selectBgMusic.innerHTML = html;
-
-      const curMusic = this.config?.bg_music || 'bed_cozy_jazz_study';
-      if (el.selectBgMusic.querySelector(`option[value="${curMusic}"]`)) {
-        el.selectBgMusic.value = curMusic;
-      }
+    // Les habillages sonores sont maintenant contrôlés par les 2 cases à cocher contextuelles automatiques
+    if (el.checkMusicJingle && typeof this.config?.audio_studio_music_enabled !== 'undefined') {
+      el.checkMusicJingle.checked = !!this.config.audio_studio_music_enabled;
     }
-
-    if (el.selectJingleIntro) {
-      let html = '<option value="jingle_piano_solemn">Piano Recueilli (Intro Solennelle — Recommandé)</option>';
-      const allIntros = [...jingleTracks, ...stingerTracks];
-      allIntros.forEach(t => {
-        if (t.id !== 'jingle_piano_solemn') {
-          const tName = t.name || t.title || t.id;
-          const tDur = formatDur(t.duration || t.duration_sec);
-          html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
-        }
-      });
-      html += '<option value="none">Aucun jingle (Démarrage direct)</option>';
-      el.selectJingleIntro.innerHTML = html;
-
-      const curJingle = this.config?.jingle_intro || 'jingle_piano_solemn';
-      if (el.selectJingleIntro.querySelector(`option[value="${curJingle}"]`)) {
-        el.selectJingleIntro.value = curJingle;
-      }
+    if (el.checkSfxAuto && typeof this.config?.audio_studio_sfx_enabled !== 'undefined') {
+      el.checkSfxAuto.checked = !!this.config.audio_studio_sfx_enabled;
     }
-
-    if (el.selectSfx) {
-      const sfxTracks = tracks.filter(t => t.category === 'sfx');
-      let html = '<option value="none">Aucun bruitage (Par défaut)</option>';
-      sfxTracks.forEach(t => {
-        const tName = t.name || t.title || t.id;
-        const tDur = formatDur(t.duration || t.duration_sec);
-        html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
-      });
-      el.selectSfx.innerHTML = html;
-
-      const curSfx = this.config?.sfx_ambient || 'none';
-      if (el.selectSfx.querySelector(`option[value="${curSfx}"]`)) {
-        el.selectSfx.value = curSfx;
-      }
-    }
-
-    this.refreshCustomDropdown('as-select-bg-music');
-    this.refreshCustomDropdown('as-select-jingle-intro');
-    this.refreshCustomDropdown('as-select-sfx');
   },
 
   // =========================================================================
@@ -1442,10 +1386,7 @@ const AudioStudioView = {
       'as-select-voice-solo',
       'as-select-voxtral-host',
       'as-select-voxtral-scholar',
-      'as-select-voxtral-solo',
-      'as-select-bg-music',
-      'as-select-jingle-intro',
-      'as-select-sfx'
+      'as-select-voxtral-solo'
     ];
     dropdownIds.forEach(id => this.refreshCustomDropdown(id));
   },
@@ -2617,22 +2558,22 @@ const AudioStudioView = {
         voiceSummaryHtml = `<strong>${this.escapeHtml(vSolo)}</strong> (Chroniqueur)`;
       }
 
-      const bgMusicVal = el.selectBgMusic ? el.selectBgMusic.value : 'none';
-      const hasBgMusic = (bgMusicVal && bgMusicVal !== 'none');
-      const musicTitle = hasBgMusic ? extractVoiceName(el.selectBgMusic, 'Ambiance') : 'Aucune musique';
+      const hasMusic = el.checkMusicJingle ? el.checkMusicJingle.checked : true;
+      const hasSfx = el.checkSfxAuto ? el.checkSfxAuto.checked : true;
 
-      const jingleVal = el.selectJingleIntro ? el.selectJingleIntro.value : 'none';
-      const hasJingle = (jingleVal && jingleVal !== 'none');
-      const jingleTitle = hasJingle ? extractVoiceName(el.selectJingleIntro, 'Jingle') : 'Aucun jingle';
-
-      const sfxVal = el.selectSfx ? el.selectSfx.value : 'none';
-      const hasSfx = (sfxVal && sfxVal !== 'none');
-      const sfxTitle = hasSfx ? extractVoiceName(el.selectSfx, 'Bruitage') : 'Aucun bruitage';
+      let habillageTitle = '<span style="color: var(--text-muted);">Voix pure (Aucun habillage)</span>';
+      if (hasMusic && hasSfx) {
+        habillageTitle = '<strong>Musique &amp; Jingle</strong> + <strong>Bruitages contextuels</strong>';
+      } else if (hasMusic) {
+        habillageTitle = '<strong>Musique d\'ambiance &amp; Jingle</strong>';
+      } else if (hasSfx) {
+        habillageTitle = '<strong>Bruitages contextuels auto</strong>';
+      }
 
       const dspPills = [];
       if (el.checkMastering?.checked) dspPills.push('Mastering Studio');
       if (el.checkCalmProsody?.checked) dspPills.push('Prosodie posée');
-      if (hasBgMusic && el.checkDucking?.checked) dspPills.push('Ducking -16 dB');
+      if (hasMusic && el.checkDucking?.checked) dspPills.push('Ducking -16 dB');
       const pauseMs = parseInt(el.inputPauseMs?.value, 10) || 350;
       if (pauseMs !== 350) dspPills.push(`Pause ${pauseMs}ms`);
 
@@ -2656,7 +2597,7 @@ const AudioStudioView = {
             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             Habillage
           </span>
-          <span class="as-step2-summary-val">${hasBgMusic ? `<strong>${this.escapeHtml(musicTitle)}</strong>` : '<span style="color: var(--text-muted);">Voix pure</span>'}${hasJingle ? ` + ${this.escapeHtml(jingleTitle)}` : ''}${hasSfx ? ` + Bruitage : ${this.escapeHtml(sfxTitle)}` : ''}</span>
+          <span class="as-step2-summary-val">${habillageTitle}</span>
         </div>
         ${dspPills.length > 0 ? `
         <div class="as-step2-summary-row" style="margin-top: 2px;">
@@ -2740,10 +2681,13 @@ const AudioStudioView = {
         rate: el.checkCalmProsody?.checked ? '-6%' : '+0%',
         pitch: el.checkCalmProsody?.checked ? '-3Hz' : '+0Hz',
         inject_breaks: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
-        bg_music: (el.selectBgMusic && el.selectBgMusic.value) ? el.selectBgMusic.value : (this.config?.bg_music || 'bed_cozy_jazz_study'),
-        jingle_intro: (el.selectJingleIntro && el.selectJingleIntro.value) ? el.selectJingleIntro.value : (this.config?.jingle_intro || 'jingle_piano_solemn'),
-        sfx_ambient: (el.selectSfx && el.selectSfx.value) ? el.selectSfx.value : (this.config?.sfx_ambient || 'none'),
-        ducking_enabled: el.checkDucking ? el.checkDucking.checked : true,
+        music_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true),
+        jingle_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true),
+        sfx_enabled: (el.checkSfxAuto ? el.checkSfxAuto.checked : true),
+        bg_music: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) ? 'bed_cozy_jazz_study' : 'none',
+        jingle_intro: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) ? 'jingle_piano_solemn' : 'none',
+        sfx_ambient: (el.checkSfxAuto ? el.checkSfxAuto.checked : true) ? 'auto' : 'none',
+        ducking_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) && (el.checkDucking ? el.checkDucking.checked : true),
         ducking_db: this.config?.ducking_db || -16.0
       };
 
