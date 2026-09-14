@@ -34,6 +34,7 @@ from core.config import (
     DEFAULT_EXEGESIS_SYSTEM_PROMPT,
     DEFAULT_HISTORICAL_SYSTEM_PROMPT,
     DEFAULT_SERMON_SYSTEM_PROMPT,
+    DEFAULT_IMMERSION_SYSTEM_PROMPT,
     DEFAULT_THEOLOGY_SYSTEM_PROMPT,
     DEFAULT_LEXICAL_SYSTEM_PROMPT
 )
@@ -861,6 +862,9 @@ class PodcastEngine:
             if not focal_questions:
                 focal_questions = sources_options.get("focal_questions", focal_questions)
 
+        if study_mode in ("immersion", "narrative"):
+            format_clean = "solo"
+
         # 1. Récupération du prompt système de base
         if format_clean == "solo":
             system_prompt = cfg.get("prompt_audio_studio_solo") or DEFAULT_AUDIO_STUDIO_SOLO_PROMPT
@@ -878,6 +882,8 @@ class PodcastEngine:
             "exegesis": cfg.get("prompt_exegesis") or DEFAULT_EXEGESIS_SYSTEM_PROMPT,
             "historical": cfg.get("prompt_historical") or DEFAULT_HISTORICAL_SYSTEM_PROMPT,
             "sermon": cfg.get("prompt_sermon") or DEFAULT_SERMON_SYSTEM_PROMPT,
+            "immersion": cfg.get("prompt_immersion") or DEFAULT_IMMERSION_SYSTEM_PROMPT,
+            "narrative": cfg.get("prompt_immersion") or DEFAULT_IMMERSION_SYSTEM_PROMPT,
             "theology": cfg.get("prompt_theology") or DEFAULT_THEOLOGY_SYSTEM_PROMPT,
             "lexical": cfg.get("prompt_lexical") or DEFAULT_LEXICAL_SYSTEM_PROMPT,
         }
@@ -887,6 +893,8 @@ class PodcastEngine:
             "exegesis": "Exégèse Approfondie & Analyse Textuelle",
             "historical": "Contexte Historique, Archéologique & Culturel",
             "sermon": "Préparation de Prédication & Application Pastorale",
+            "immersion": "Immersion Narrative (Dramaturgie en 3 Actes)",
+            "narrative": "Immersion Narrative (Dramaturgie en 3 Actes)",
             "theology": "Théologie Systématique & Débats Doctrinaux",
             "lexical": "Analyse Lexicale & Langues Originales (Grec/Hébreu)"
         }.get(study_mode, "Étude Théologique")
@@ -948,6 +956,25 @@ class PodcastEngine:
             "   - INTERDICTION FORMELLE DE DOUBLER LE TERME AVEC DES CROCHETS COMME [prononcé ...] (la voix neuronale lirait les deux versions à haute voix ! Écrivez directement la graphie phonétique).\n\n"
         )
 
+        if study_mode in ("immersion", "narrative"):
+            length_instruction = (
+                "EXIGENCE SPÉCIFIQUE DU FORMAT IMMERSION NARRATIVE (ROBERT MCKEE & KENNETH BAILEY) :\n"
+                "- Durée cible : 2 min 30 à 4 minutes (soit environ 350 à 450 mots au total).\n"
+                "- Découpez le tableau 'dialogue' en 3 blocs dramatiques majeurs correspondant aux 3 Actes :\n"
+                "  1. Acte 1 (0s–45s) : Accroche sensorielle immédiate (au moins 3 sens mobilisés), événement déclencheur concret, zéro chiffre/date/encyclopédisme.\n"
+                "  2. Acte 2 (45s–2m15s) : Le Gouffre (The Gap) et la tension socio-culturelle réelle du Proche-Orient antique (Honneur/Honte, occupation romaine, codes de pureté/hospitalité, risque social).\n"
+                "  3. Acte 3 (2m15s–3m15s) : Climax dramatique et passerelle textuelle (« Need to know ») qui s'interrompt au seuil exact de la lecture de la péricope.\n"
+                "- Chaque élément du dialogue doit avoir 'speaker': 'narrator', 'speaker_name': 'Narrateur', 'voice_role': 'solo'.\n"
+                "- Insérez des balises de respiration orales [pause: 1.2s] ou [pause: 1.5s] avant les moments de tension ou de révélation.\n\n"
+            )
+        else:
+            length_instruction = (
+                "EXIGENCE CRITIQUE DE LONGUEUR ET DE PROFONDEUR EXÉGÉTIQUE :\n"
+                "- Produisez une émission consistante, substantielle et approfondie, avec la même rigueur et le même niveau d'érudition que l'Assistant d'Étude d'Open Shema.\n"
+                "- Développez au moins 12 à 18 répliques substantielles (pour un dialogue) ou 8 à 12 sections développées (pour une chronique solo).\n"
+                "- Ne vous limitez pas à un survol : parcourez le contexte littéraire et historique, décortiquez les termes grecs/hébreux clés, confrontez les avis des commentateurs fournis et dégagez les enjeux théologiques profonds.\n\n"
+            )
+
         user_prompt = (
             f"Voici le corpus documentaire et les extraits d'étude sur lesquels baser STRICTEMENT l'émission :\n\n"
             f"--- DÉBUT DU CORPUS DOCUMENTAIRE ---\n"
@@ -960,10 +987,7 @@ class PodcastEngine:
             f"{phonetic_rule}"
             f"{mode_block}"
             f"{focal_block}"
-            f"EXIGENCE CRITIQUE DE LONGUEUR ET DE PROFONDEUR EXÉGÉTIQUE :\n"
-            f"- Produisez une émission consistante, substantielle et approfondie, avec la même rigueur et le même niveau d'érudition que l'Assistant d'Étude d'Open Shema.\n"
-            f"- Développez au moins 12 à 18 répliques substantielles (pour un dialogue) ou 8 à 12 sections développées (pour une chronique solo).\n"
-            f"- Ne vous limitez pas à un survol : parcourez le contexte littéraire et historique, décortiquez les termes grecs/hébreux clés, confrontez les avis des commentateurs fournis et dégagez les enjeux théologiques profonds.\n\n"
+            f"{length_instruction}"
             f"Rappels impératifs :\n"
             f"- Basez l'émission UNIQUEMENT sur les extraits ci-dessus (zéro hallucination).\n"
             f"- Renvoyez UNIQUEMENT l'objet JSON valide avec les clés 'title', 'summary', 'sources_cited', 'dialogue'. Pas de markdown autour."
@@ -1036,9 +1060,19 @@ class PodcastEngine:
                     speaker_name = "Denise" if speaker_role == "A" else "Henri"
                     speaker_val = "host" if speaker_role == "A" else "scholar"
 
+            # Détection et conversion des balises [pause: X.Xs]
+            item_pause = int(item.get("pause_after_ms", default_pause))
+            pause_match = re.search(r'\[pause:\s*([\d\.]+)\s*s?\]', raw_text, re.IGNORECASE)
+            if pause_match:
+                try:
+                    p_sec = float(pause_match.group(1))
+                    item_pause = max(item_pause, int(p_sec * 1000))
+                except Exception:
+                    pass
+
             # Texte littéraire soigné (orthographe française, termes grecs/hébreux et citations intactes)
-            raw_text = str(item.get("text", "")).strip()
-            literary_text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+til\b', r'\1-il', raw_text)
+            raw_text_clean = re.sub(r'\[pause:\s*[\d\.]+\s*s?\]', '', raw_text).strip()
+            literary_text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+til\b', r'\1-il', raw_text_clean)
             literary_text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+telle\b', r'\1-elle', literary_text)
 
             # Script vocal / phonétique optimisé pour la synthèse TTS (références développées, énumérations posées)
@@ -1051,7 +1085,7 @@ class PodcastEngine:
                 "voice_role": speaker_role,
                 "text": literary_text,
                 "speech_text": speech_text,
-                "pause_after_ms": int(item.get("pause_after_ms", default_pause)),
+                "pause_after_ms": item_pause,
                 "start_time": 0.0,
                 "end_time": 0.0
             })
@@ -1287,6 +1321,24 @@ class PodcastEngine:
         text = re.sub(r'\bchiasme\b', 'kiasme', text, flags=re.I)
         text = re.sub(r'\bchara\b', 'kara', text, flags=re.I)
 
+        # 1bis. Termes de 1 Corinthiens 1 et corpus paulinien
+        text = re.sub(r'\bkl[êe]t[oó]s\b', 'klé-toss', text, flags=re.I)
+        text = re.sub(r'\bkal[eé][oô]\b', 'ka-lé-o', text, flags=re.I)
+        text = re.sub(r'\bap[oó]stolos\b', 'a-pos-to-loss', text, flags=re.I)
+        text = re.sub(r'\bkyrios\b', 'kou-ri-oss', text, flags=re.I)
+        text = re.sub(r'\bk[uú]rios\b', 'kou-ri-oss', text, flags=re.I)
+        text = re.sub(r'\btheos\b', 'té-oss', text, flags=re.I)
+        text = re.sub(r'\bthe[oó]s\b', 'té-oss', text, flags=re.I)
+        text = re.sub(r'\bpneuma\b', 'pneu-ma', text, flags=re.I)
+        text = re.sub(r'\bpneumatos\b', 'pneu-ma-toss', text, flags=re.I)
+        text = re.sub(r'\bsarx\b', 'sarks', text, flags=re.I)
+        text = re.sub(r'\bhamartia\b', 'ha-mar-ti-a', text, flags=re.I)
+        text = re.sub(r'\bdikaiosyn[eê]\b', 'di-ka-ï-o-su-né', text, flags=re.I)
+        text = re.sub(r'\beir[eê]n[eê]\b', 'è-ré-né', text, flags=re.I)
+        text = re.sub(r'\bekkl[eê]sia\b', 'èk-klé-si-a', text, flags=re.I)
+        text = re.sub(r'\beuangelion\b', 'é-van-gé-li-on', text, flags=re.I)
+        text = re.sub(r'\bparakl[eê]tos\b', 'pa-ra-klé-toss', text, flags=re.I)
+
         # 4. Termes grecs usuels en étude biblique (prononciation du -s final grec)
         text = re.sub(r'\bpistis\b', 'pistiss', text, flags=re.I)
         text = re.sub(r'\bnomos\b', 'nomoss', text, flags=re.I)
@@ -1298,6 +1350,24 @@ class PodcastEngine:
         text = re.sub(r'\bkoinonia\b', 'koïnonia', text, flags=re.I)
         text = re.sub(r'\bploutos\b', 'ploutoss', text, flags=re.I)
         text = re.sub(r'\bgenesis\b', 'génèssiss', text, flags=re.I)
+
+        # 4bis. Adaptation phonétique des termes cités entre guillemets comportant des signes grecs translittérés
+        def _phonetize_greek_word(m):
+            w = m.group(1)
+            lower = w.lower()
+            if lower in ('le', 'la', 'les', 'de', 'du', 'des', 'un', 'une', 'en', 'dans', 'par', 'sur', 'pour', 'est', 'qui', 'que'):
+                return m.group(0)
+            p = lower.replace('ê', 'é').replace('ô', 'o').replace('ó', 'o').replace('á', 'a').replace('í', 'i').replace('ú', 'ou')
+            p = p.replace('ph', 'f').replace('th', 't').replace('ch', 'k')
+            if p.endswith('os') and not p.endswith('oss'):
+                p = p[:-2] + 'oss'
+            elif p.endswith('es') and not p.endswith('ess'):
+                p = p[:-2] + 'èss'
+            elif p.endswith('is') and not p.endswith('iss'):
+                p = p[:-2] + 'iss'
+            return f"« {p} »"
+
+        text = re.sub(r'«\s*([a-zA-ZÀ-ÿ\^]{3,25})\s*»', _phonetize_greek_word, text)
 
         # 5. Termes hébreux classiques
         text = re.sub(r'\b(h|ch)esed\b', 'khèssèd', text, flags=re.I)
@@ -1639,12 +1709,12 @@ class PodcastEngine:
             import numpy as np
 
             opts = options or {}
-            ducking_db = float(opts.get("ducking_db", -24.0))
+            ducking_db = float(opts.get("ducking_db", -30.0))
             duck_gain = 10.0 ** (ducking_db / 20.0)
             swell_gain = 10.0 ** ((ducking_db + 8.0) / 20.0)
-            intro_gain = 10.0 ** (float(opts.get("intro_gain_db", -4.0)) / 20.0)
+            intro_gain = 10.0 ** (float(opts.get("intro_gain_db", -2.5)) / 20.0)
             music_timing = str(opts.get("music_timing", "intro_outro")).strip().lower()
-            music_intro_sec = float(opts.get("music_intro_sec", 8.0))
+            music_intro_sec = float(opts.get("music_intro_sec", 10.0))
 
             def _load_stereo(audio_input):
                 if isinstance(audio_input, (bytes, bytearray)):
@@ -1668,7 +1738,10 @@ class PodcastEngine:
                 return speech_mp3_bytes, dialogue_timestamps, 0.0
 
             has_jingle = bool(jingle_intro_path and os.path.exists(jingle_intro_path))
-            lead_in_sec = 2.0 if has_jingle else 0.5
+            has_music = bool(bg_music_path and os.path.exists(bg_music_path))
+            
+            # Si jingle ou musique présents : amorce musicale de 10 secondes pour poser l'ambiance
+            lead_in_sec = 10.0 if (has_jingle or has_music) else 0.5
             lead_in_samples = int(lead_in_sec * sample_rate)
             outro_tail_sec = 3.5 if (bg_music_path or has_jingle or sfx_path) else 0.5
             outro_tail_samples = int(outro_tail_sec * sample_rate)
@@ -1690,19 +1763,19 @@ class PodcastEngine:
                     d["end_time"] = round(float(d["end_time"]) + lead_in_sec, 3)
                 shifted_dialogue.append(d)
 
-            # 2. Piste Jingle
+            # 2. Piste Jingle (joue en solo, puis s'estompe sur les 2s précédant l'entrée de la voix)
             jingle_track = np.zeros((2, total_samples), dtype=np.float32)
             if has_jingle:
                 jingle = _load_stereo(jingle_intro_path)
                 j_len = min(jingle.shape[1], total_samples)
-                fade_down_start = int(lead_in_sec * sample_rate)
-                fade_down_end = min(fade_down_start + int(3.0 * sample_rate), j_len)
+                jingle_fade_start = max(0, lead_in_samples - int(2.0 * sample_rate))
+                jingle_fade_end = min(lead_in_samples, j_len)
                 jingle_env = np.ones(j_len, dtype=np.float32) * intro_gain
-                if fade_down_end > fade_down_start:
-                    fade_len = fade_down_end - fade_down_start
-                    jingle_env[fade_down_start:fade_down_end] = np.linspace(intro_gain, 0.0, fade_len)
-                if j_len > fade_down_end:
-                    jingle_env[fade_down_end:] = 0.0
+                if jingle_fade_end > jingle_fade_start:
+                    fade_len = jingle_fade_end - jingle_fade_start
+                    jingle_env[jingle_fade_start:jingle_fade_end] = np.linspace(intro_gain, 0.0, fade_len)
+                if j_len > jingle_fade_end:
+                    jingle_env[jingle_fade_end:] = 0.0
                 jingle_track[:, :j_len] = jingle[:, :j_len] * jingle_env
 
             # 3. Piste Musique d'ambiance avec Ducking sidechain et fondu d'extinction
@@ -1723,47 +1796,56 @@ class PodcastEngine:
                     outro_in_start = max(fade_out_end, speech_end_samp - int(3.5 * sample_rate))
 
                     if music_timing == "intro_outro" and outro_in_start > fade_out_end:
-                        # Mode Recommandé : La musique accompagne l'amorce et les premières secondes (8s),
-                        # puis s'éteint en fondu (fade-out) pour laisser la parole 100% pure pendant l'exégèse.
-                        # Elle revient en fondu doux uniquement pour la conclusion (outro).
+                        # Mode Recommandé :
+                        # - 0s à 8s : musique à plein volume pour poser l'ambiance
+                        # - 8s à 10s : descente progressive (2s avant la parole) vers le niveau ducké (-30 dB)
+                        # - 10s à 20s (10s de parole) : ducking feutré sous les premières répliques
+                        # - 20s à 24s : fondu d'extinction vers le silence complet
+                        # - Outro : retour musical sous les dernières paroles et crescendo de fin
                         env = np.zeros(total_samples, dtype=np.float32)
 
-                        # Amorçage intro
-                        intro_ramp = min(lead_in_samples, int(1.5 * sample_rate))
-                        if intro_ramp > 0:
-                            env[:intro_ramp] = np.linspace(0.0, swell_gain, intro_ramp)
-                            env[intro_ramp:lead_in_samples] = swell_gain
+                        # Amorce solo (0s à 8s)
+                        intro_ramp_down_start = max(0, lead_in_samples - int(2.0 * sample_rate))
+                        intro_ramp_in = min(int(1.5 * sample_rate), intro_ramp_down_start)
+                        if intro_ramp_in > 0:
+                            env[:intro_ramp_in] = np.linspace(0.0, intro_gain, intro_ramp_in)
+                            env[intro_ramp_in:intro_ramp_down_start] = intro_gain
                         else:
-                            env[:lead_in_samples] = swell_gain
+                            env[:intro_ramp_down_start] = intro_gain
 
-                        # Début de parole : ducking discret sous les premières phrases (-24 dB)
+                        # Descente de 2 secondes avant l'arrivée de la voix (8s à 10s)
+                        if lead_in_samples > intro_ramp_down_start:
+                            env[intro_ramp_down_start:lead_in_samples] = np.linspace(intro_gain, duck_gain, lead_in_samples - intro_ramp_down_start)
+
+                        # Sous la voix pendant 10 secondes (10s à 20s) : ducking feutré (-30 dB)
                         env[lead_in_samples:fade_out_start] = duck_gain
 
-                        # Fondu d'extinction progressif (fade-out après 8s)
+                        # Fondu d'extinction progressif (20s à 24s)
                         if fade_out_end > fade_out_start:
                             env[fade_out_start:fade_out_end] = np.linspace(duck_gain, 0.0, fade_out_end - fade_out_start)
 
-                        # Le corps central reste à 0.0 (Silence musical pour la clarté absolue de l'exégèse)
+                        # Le corps central reste à 0.0 (Silence musical pour la pureté de l'exégèse)
 
                         # Outro : remontée en douceur sous les dernières paroles puis swell final
                         if speech_end_samp > outro_in_start:
                             env[outro_in_start:speech_end_samp] = np.linspace(0.0, duck_gain, speech_end_samp - outro_in_start)
 
-                        outro_swell_end = min(total_samples, speech_end_samp + int(2.0 * sample_rate))
+                        outro_swell_end = min(total_samples, speech_end_samp + int(2.5 * sample_rate))
                         if outro_swell_end > speech_end_samp:
-                            env[speech_end_samp:outro_swell_end] = np.linspace(duck_gain, swell_gain, outro_swell_end - speech_end_samp)
+                            env[speech_end_samp:outro_swell_end] = np.linspace(duck_gain, swell_gain * 1.5, outro_swell_end - speech_end_samp)
 
                         if total_samples > outro_swell_end:
-                            env[outro_swell_end:] = np.linspace(swell_gain, 0.0, total_samples - outro_swell_end)
+                            env[outro_swell_end:] = np.linspace(swell_gain * 1.5, 0.0, total_samples - outro_swell_end)
 
                     else:
-                        # Mode continu : ambiance en nappe sur tout l'épisode avec ducking discret sous chaque parole
+                        # Mode continu : ambiance en nappe sur tout l'épisode avec ducking feutré (-30 dB) sous chaque parole
                         env = np.full(total_samples, swell_gain, dtype=np.float32)
 
-                        # Fondu d'entrée initial de l'ambiance
-                        ramp_in = int(1.5 * sample_rate)
-                        if ramp_in > 0:
-                            env[:ramp_in] = np.linspace(0.0, duck_gain, ramp_in)
+                        # Descente de 2 secondes avant l'arrivée de la voix
+                        intro_ramp_down_start = max(0, lead_in_samples - int(2.0 * sample_rate))
+                        env[:intro_ramp_down_start] = intro_gain
+                        if lead_in_samples > intro_ramp_down_start:
+                            env[intro_ramp_down_start:lead_in_samples] = np.linspace(intro_gain, duck_gain, lead_in_samples - intro_ramp_down_start)
 
                         # Ducking sous chaque réplique avec attack / release douces
                         for item in shifted_dialogue:
@@ -1992,9 +2074,9 @@ class PodcastEngine:
                     _audit_log(f"VOICE: Lu {len(speech_bytes)} octets de voix brute depuis {audio_path}")
 
                     mix_opts = {
-                        "ducking_db": ducking_db if ducking_enabled else -10.0,
+                        "ducking_db": ducking_db if ducking_enabled else -12.0,
                         "music_timing": opts.get("music_timing", cfg.get("audio_studio_music_timing", "intro_outro")),
-                        "music_intro_sec": float(opts.get("music_intro_sec", cfg.get("audio_studio_music_intro_sec", 8.0))),
+                        "music_intro_sec": float(opts.get("music_intro_sec", cfg.get("audio_studio_music_intro_sec", 10.0))),
                         "bitrate": 96000
                     }
                     mixed_bytes, shifted_dialogue, total_dur = cls.mix_voice_with_soundpack(
@@ -2015,6 +2097,58 @@ class PodcastEngine:
                         res["jingle_intro"] = jingle_intro_id or "none"
                         res["sfx_ambient"] = sfx_ambient_id or "none"
                         res["ducking_enabled"] = ducking_enabled
+
+                        # Construction de la timeline des événements audio pour affichage dans le déroulé (colonne gauche)
+                        lead_in = 10.0 if (jingle_path or bg_path) else 0.5
+                        audio_events = []
+                        if jingle_path or bg_path:
+                            j_title = "Jingle & Ambiance d'introduction"
+                            if jingle_path:
+                                j_title = "Jingle Piano Solennel & Nappe" if "solemn" in jingle_path else "Générique d'introduction & Nappe"
+                            audio_events.append({
+                                "type": "intro_music",
+                                "title": f"🎵 {j_title}",
+                                "label": "00:00 – 00:10",
+                                "description": "Amorce musicale solo (10s), descente douce à 00:08 avant la voix",
+                                "start_time": 0.0,
+                                "end_time": lead_in,
+                                "icon": "music"
+                            })
+                        if sfx_path and sfx_ambient_id:
+                            sfx_name = "Vent du Désert" if "desert" in sfx_ambient_id else sfx_ambient_id
+                            audio_events.append({
+                                "type": "sfx",
+                                "title": f"🍃 Bruitage contextuel : {sfx_name}",
+                                "label": f"00:00 – 00:{int(min(lead_in + 10.0, 20.0)):02d}",
+                                "description": "Ambiance sonore contextuelle en amorce",
+                                "start_time": 0.5,
+                                "end_time": round(min(lead_in + 10.0, 20.0), 2),
+                                "icon": "wind"
+                            })
+                        if bg_path and mix_opts.get("music_timing") == "intro_outro":
+                            fo_start = round(lead_in + mix_opts.get("music_intro_sec", 10.0), 1)
+                            audio_events.append({
+                                "type": "fadeout",
+                                "title": "🔇 Extinction musicale (Fade-out)",
+                                "label": f"{int(fo_start//60):02d}:{int(fo_start%60):02d}",
+                                "description": "Silence musical complet pour laisser place à l'écoute de l'exégèse",
+                                "start_time": fo_start,
+                                "end_time": round(fo_start + 4.0, 1),
+                                "icon": "volume-x"
+                            })
+                        if jingle_path or bg_path:
+                            outro_t = max(0.0, round(total_dur - 6.0, 1))
+                            audio_events.append({
+                                "type": "outro_music",
+                                "title": "🎵 Conclusion & Outro musical",
+                                "label": f"{int(outro_t//60):02d}:{int(outro_t%60):02d} – {int(total_dur//60):02d}:{int(total_dur%60):02d}",
+                                "description": "Remontée en crescendo de la nappe musicale et fondu final",
+                                "start_time": outro_t,
+                                "end_time": round(total_dur, 1),
+                                "icon": "music"
+                            })
+
+                        res["audio_events"] = audio_events
                         PodcastHistory.upsert(res)
                         _audit_log(f"SUCCESS: Mixage soundpack terminé avec succès pour {podcast_id} (durée: {total_dur:.2f}s, taille: {len(mixed_bytes)} octets)")
                         logger.info("[PodcastEngine] Mixage soundpack réussi pour %s (durée: %.2fs, taille: %d octets)",

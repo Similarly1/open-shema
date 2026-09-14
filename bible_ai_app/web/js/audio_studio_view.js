@@ -1724,10 +1724,18 @@ const AudioStudioView = {
       c.classList.toggle('active', c.dataset.mode === this.studyMode);
     });
 
+    if (this.studyMode === 'immersion' || this.studyMode === 'narrative') {
+      if (typeof this.setFormat === 'function') {
+        this.setFormat('solo');
+      }
+    }
+
     const labels = {
       auto: 'Auto',
       exegesis: 'Exégèse',
       historical: 'Histoire',
+      immersion: 'Immersion Narrative',
+      narrative: 'Immersion Narrative',
       sermon: 'Prédication',
       theology: 'Théologie',
       lexical: 'Lexique'
@@ -2073,6 +2081,8 @@ const AudioStudioView = {
         auto: 'Auto',
         exegesis: 'Exégèse',
         historical: 'Histoire',
+        immersion: 'Immersion Narrative',
+        narrative: 'Immersion Narrative',
         sermon: 'Prédication',
         theology: 'Théologie',
         lexical: 'Lexique'
@@ -2181,6 +2191,91 @@ const AudioStudioView = {
   // GESTION DU MODE DE TEXTE (LITTÉRAIRE VS PHONÉTIQUE TTS)
   // =========================================================================
 
+  toPhoneticScript(text) {
+    if (!text) return '';
+    let s = text;
+
+    // 1. Remplacements et développements des références bibliques
+    s = s.replace(/\b([1-3]?\s*[A-Za-zÀ-ÿ]+)\s+(\d+)[:\s]+(\d+)\s*[-–—]\s*(\d+)\b/g, '$1 chapitre $2, versets $3 à $4');
+    s = s.replace(/\b([1-3]?\s*[A-Za-zÀ-ÿ]+)\s+(\d+):(\d+)\b/g, '$1 chapitre $2, verset $3');
+    s = s.replace(/\b(\d+):(\d+)\b/g, 'chapitre $1, verset $2');
+    s = s.replace(/\b1er\b/g, 'premier');
+    s = s.replace(/\b1ère\b/g, 'première');
+    s = s.replace(/\b[Vv]{2}\.\s*(\d+)/g, 'versets $1');
+    s = s.replace(/\b[Vv]\.\s*(\d+)/g, 'verset $1');
+    s = s.replace(/\b[Cc]h\.\s*(\d+)/g, 'chapitre $1');
+
+    // 2. Équilibrage des énumérations de versets
+    s = s.replace(/(versets?\s+\d+(?:,\s*\d+)*)\s+et\s+(\d+)/gi, '$1, et $2');
+    s = s.replace(/(chapitres?\s+\d+(?:,\s*\d+)*)\s+et\s+(\d+)/gi, '$1, et $2');
+
+    // 3. Termes grecs et hébreux translittérés avec phonétique explicite
+    const terms = [
+      [/\bkl[êe]t[oó]s\b/gi, 'klé-toss'],
+      [/\bkal[eé][oô]\b/gi, 'ka-lé-o'],
+      [/\bap[oó]stolos\b/gi, 'a-pos-to-loss'],
+      [/\bmetanoia\b/gi, 'mé-ta-no-ï-a'],
+      [/\bagap[eê]\b/gi, 'a-ga-pé'],
+      [/\bkoinonia\b/gi, 'koï-no-ni-a'],
+      [/\bcharis\b/gi, 'ka-riss'],
+      [/\bpneumatos\b/gi, 'pneu-ma-toss'],
+      [/\bpneuma\b/gi, 'pneu-ma'],
+      [/\btheos\b/gi, 'té-oss'],
+      [/\bkyrios\b/gi, 'kou-ri-oss'],
+      [/\bsarx\b/gi, 'sarks'],
+      [/\bdikaiosyn[eê]\b/gi, 'di-ka-ï-o-su-né'],
+      [/\beir[eê]n[eê]\b/gi, 'è-ré-né'],
+      [/\bekkl[eê]sia\b/gi, 'èk-klé-si-a'],
+      [/\bparakl[eê]tos\b/gi, 'pa-ra-klé-toss'],
+      [/\bhamartia\b/gi, 'ha-mar-ti-a'],
+      [/\bchiasme\b/gi, 'kiasme'],
+      [/\bgenesis\b/gi, 'gé-nè-siss'],
+      [/\blogos\b/gi, 'lo-goss'],
+      [/\bkosmos\b/gi, 'kos-moss'],
+      [/\bnomos\b/gi, 'no-moss'],
+      [/\bpistis\b/gi, 'pis-tiss'],
+      [/\bhesed\b/gi, 'khè-sèd'],
+      [/\bchesed\b/gi, 'khè-sèd'],
+      [/\bberit\b/gi, 'bé-ritt'],
+      [/\bruach\b/gi, 'rou-akh'],
+      [/\bruah\b/gi, 'rou-akh'],
+      [/\bshalom\b/gi, 'cha-lom'],
+      [/\btorah\b/gi, 'to-ra'],
+      [/\byahweh\b/gi, 'ya-vé'],
+      [/\badonai\b/gi, 'a-do-na-ï'],
+      [/\belohim\b/gi, 'é-lo-him']
+    ];
+
+    for (const [rePattern, phonetic] of terms) {
+      s = s.replace(rePattern, phonetic);
+    }
+
+    // 4. Mots entre guillemets comportant des lettres grecques translittérées
+    s = s.replace(/«\s*([a-zA-ZÀ-ÿ\^]{3,25})\s*»/g, (match, word) => {
+      let p = word.toLowerCase();
+      p = p.replace(/ê/g, 'é').replace(/ô/g, 'o').replace(/ó/g, 'o').replace(/á/g, 'a').replace(/í/g, 'i').replace(/ú/g, 'ou');
+      p = p.replace(/ph/g, 'f').replace(/th/g, 't').replace(/ch/g, 'k');
+      if (p.endsWith('os') && !p.endsWith('oss')) p = p.slice(0, -2) + 'oss';
+      else if (p.endsWith('es') && !p.endsWith('ess')) p = p.slice(0, -2) + 'èss';
+      else if (p.endsWith('is') && !p.endsWith('iss')) p = p.slice(0, -2) + 'iss';
+      return `« ${p} »`;
+    });
+
+    // 5. Normalisation des respirations orales
+    s = s.replace(/;\s*/g, ' — ');
+    s = s.replace(/\s{2,}/g, ' ').trim();
+
+    return s;
+  },
+
+  getPhoneticSpeechText(turn) {
+    if (!turn) return '';
+    if (turn.speech_text && turn.speech_text.trim() && turn.speech_text.trim() !== (turn.text || '').trim()) {
+      return turn.speech_text;
+    }
+    return this.toPhoneticScript(turn.text || '');
+  },
+
   setTextMode(mode) {
     this.textMode = (mode === 'phonetic') ? 'phonetic' : 'literary';
     const isLit = (this.textMode === 'literary');
@@ -2231,7 +2326,7 @@ const AudioStudioView = {
           ta.value = turn.text || '';
           ta.placeholder = "Texte littéraire (orthographe soignée, grec intact)...";
         } else {
-          ta.value = turn.speech_text || turn.text || '';
+          ta.value = this.getPhoneticSpeechText(turn);
           ta.placeholder = "Script vocal phonétique (lu par le moteur vocal TTS)...";
         }
         this.autoResizeTextarea(ta);
@@ -2246,9 +2341,119 @@ const AudioStudioView = {
       if (!turn) return;
       const textEl = card.querySelector('.as-karaoke-text');
       if (textEl) {
-        textEl.textContent = isLit ? (turn.text || '') : (turn.speech_text || turn.text || '');
+        textEl.textContent = isLit ? (turn.text || '') : this.getPhoneticSpeechText(turn);
       }
     });
+  },
+
+  getAudioEventIconSvg(type) {
+    switch (type) {
+      case 'music':
+        return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+      case 'sfx':
+        return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>`;
+      case 'fade_out':
+        return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
+      case 'outro':
+      default:
+        return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>`;
+    }
+  },
+
+  getEpisodeAudioEvents(podcast) {
+    if (!podcast) return [];
+    if (Array.isArray(podcast.audio_events) && podcast.audio_events.length > 0) {
+      return podcast.audio_events;
+    }
+
+    const events = [];
+    const dur = podcast.duration_seconds || 120;
+    const hasMusic = (podcast.has_music !== false && podcast.bg_music !== 'none' && podcast.jingle_intro !== 'none');
+    const hasSfx = (podcast.has_sfx !== false && podcast.sfx_ambient !== 'none');
+
+    if (hasMusic) {
+      events.push({
+        id: 'event_intro_music',
+        type: 'music',
+        title: "Jingle & Nappe d'ouverture",
+        start_time: 0.0,
+        end_time: 10.0,
+        description: "Amorce musicale solo pour poser l'ambiance radiophonique"
+      });
+    }
+
+    if (hasSfx) {
+      events.push({
+        id: 'event_sfx_ambient',
+        type: 'sfx',
+        title: "Ambiance sonore contextuelle",
+        start_time: 0.0,
+        end_time: Math.min(20.0, dur),
+        description: "Bruitages et textures acoustiques d'époque"
+      });
+    }
+
+    if (hasMusic) {
+      events.push({
+        id: 'event_music_fadeout',
+        type: 'fade_out',
+        title: "Extinction musicale (Fade-out)",
+        start_time: 20.0,
+        end_time: 24.0,
+        description: "Fondu progressif pour laisser la place à la voix pure"
+      });
+
+      const outroStart = Math.max(25.0, dur - 15.0);
+      events.push({
+        id: 'event_outro_music',
+        type: 'outro',
+        title: "Générique & Outro musical",
+        start_time: outroStart,
+        end_time: dur,
+        description: "Retour musical en crescendo et fondu final"
+      });
+    }
+
+    return events;
+  },
+
+  createAudioEventCard(event, isKaraoke = false) {
+    const card = document.createElement('div');
+    card.className = 'as-timeline-event-card';
+    card.dataset.eventType = event.type || 'music';
+    if (typeof event.start_time === 'number') card.dataset.startTime = event.start_time;
+    if (typeof event.end_time === 'number') card.dataset.endTime = event.end_time;
+
+    const timeLabel = `${this.formatTime(event.start_time || 0)} – ${this.formatTime(event.end_time || 0)}`;
+    const iconSvg = this.getAudioEventIconSvg(event.type);
+
+    card.innerHTML = `
+      <div class="as-timeline-event-icon">
+        ${iconSvg}
+      </div>
+      <div class="as-timeline-event-body">
+        <div class="as-timeline-event-header">
+          <div class="as-timeline-event-title">${this.escapeHtml(event.title || 'Événement sonore')}</div>
+          <span class="as-timeline-event-badge">${timeLabel}</span>
+        </div>
+        <div class="as-timeline-event-desc">${this.escapeHtml(event.description || '')}</div>
+      </div>
+    `;
+
+    if (isKaraoke) {
+      card.title = `Cliquer pour écouter à partir de ${this.formatTime(event.start_time || 0)}`;
+      card.addEventListener('click', () => {
+        const audio = this.elements.html5Player;
+        if (audio && typeof event.start_time === 'number') {
+          audio.currentTime = event.start_time;
+          if (audio.paused) {
+            audio.play().catch(e => console.warn('[AudioStudioView] Erreur audio play:', e));
+          }
+        }
+      });
+    }
+
+    return card;
   },
 
   // =========================================================================
@@ -2312,10 +2517,31 @@ const AudioStudioView = {
 
     if (el.scriptList) {
       el.scriptList.innerHTML = '';
+      const audioEvents = this.getEpisodeAudioEvents(p);
+      const introEvent = audioEvents.find(e => e.type === 'music');
+      const sfxEvent = audioEvents.find(e => e.type === 'sfx');
+      const fadeEvent = audioEvents.find(e => e.type === 'fade_out');
+      const outroEvent = audioEvents.find(e => e.type === 'outro');
+
+      if (introEvent) {
+        el.scriptList.appendChild(this.createAudioEventCard(introEvent, false));
+      }
+      if (sfxEvent) {
+        el.scriptList.appendChild(this.createAudioEventCard(sfxEvent, false));
+      }
+
       script.forEach((turn, idx) => {
         const card = this.createTurnCard(turn, idx);
         el.scriptList.appendChild(card);
+
+        if (fadeEvent && idx === 0) {
+          el.scriptList.appendChild(this.createAudioEventCard(fadeEvent, false));
+        }
       });
+
+      if (outroEvent) {
+        el.scriptList.appendChild(this.createAudioEventCard(outroEvent, false));
+      }
     }
 
     // Mettre à jour l'état du lecteur si l'audio existe déjà
@@ -2388,7 +2614,7 @@ const AudioStudioView = {
     const pauseMs = turn.pause_after_ms || 350;
 
     const isPhonetic = (this.textMode === 'phonetic');
-    const displayVal = isPhonetic ? (turn.speech_text || turn.text || '') : (turn.text || '');
+    const displayVal = isPhonetic ? this.getPhoneticSpeechText(turn) : (turn.text || '');
     const placeholderVal = isPhonetic
       ? "Script vocal phonétique (lu par le moteur vocal TTS)..."
       : "Texte littéraire (orthographe soignée, grec intact)...";
@@ -2679,10 +2905,10 @@ const AudioStudioView = {
       } else if (el.checkCalmProsody?.checked) {
         dspPills.push('Cadence -14%');
       }
-      if (hasMusic && el.checkDucking?.checked) dspPills.push('Ducking -24 dB');
+      if (hasMusic && el.checkDucking?.checked) dspPills.push('Ducking -30 dB');
       if (hasMusic) {
         const isIntro = (!el.selectMusicTiming || el.selectMusicTiming.value === 'intro_outro');
-        dspPills.push(isIntro ? 'Intro/Outro (Fondu 8s)' : 'Ambiance continue');
+        dspPills.push(isIntro ? 'Intro (10s) / Outro' : 'Ambiance continue');
       }
       const pauseMs = parseInt(el.inputPauseMs?.value, 10) || 350;
       if (pauseMs !== 350) dspPills.push(`Pause ${pauseMs}ms`);
@@ -2798,9 +3024,9 @@ const AudioStudioView = {
         jingle_intro: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) ? 'jingle_piano_solemn' : 'none',
         sfx_ambient: (el.checkSfxAuto ? el.checkSfxAuto.checked : true) ? 'auto' : 'none',
         ducking_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) && (el.checkDucking ? el.checkDucking.checked : true),
-        ducking_db: this.config?.ducking_db || -24.0,
+        ducking_db: this.config?.ducking_db || -30.0,
         music_timing: el.selectMusicTiming?.value || 'intro_outro',
-        music_intro_sec: 8.0
+        music_intro_sec: 10.0
       };
 
       if (this.previewAudio && !this.previewAudio.paused) {
@@ -3003,6 +3229,8 @@ const AudioStudioView = {
         auto: 'Auto',
         exegesis: 'Exégèse',
         historical: 'Histoire',
+        immersion: 'Immersion Narrative',
+        narrative: 'Immersion Narrative',
         sermon: 'Prédication',
         theology: 'Théologie',
         lexical: 'Lexique'
@@ -3022,6 +3250,19 @@ const AudioStudioView = {
       ? p.script_dialogue
       : (Array.isArray(p.dialogue) ? p.dialogue : []);
 
+    const audioEvents = this.getEpisodeAudioEvents(p);
+    const introEvent = audioEvents.find(e => e.type === 'music');
+    const sfxEvent = audioEvents.find(e => e.type === 'sfx');
+    const fadeEvent = audioEvents.find(e => e.type === 'fade_out');
+    const outroEvent = audioEvents.find(e => e.type === 'outro');
+
+    if (introEvent) {
+      el.karaokeScriptFlow.appendChild(this.createAudioEventCard(introEvent, true));
+    }
+    if (sfxEvent) {
+      el.karaokeScriptFlow.appendChild(this.createAudioEventCard(sfxEvent, true));
+    }
+
     script.forEach((turn, idx) => {
       const card = document.createElement('div');
       card.className = 'as-karaoke-card';
@@ -3040,7 +3281,7 @@ const AudioStudioView = {
         : `#${idx + 1}`;
 
       const isPhonetic = (this.textMode === 'phonetic');
-      const textDisplay = isPhonetic ? (turn.speech_text || turn.text || '') : (turn.text || '');
+      const textDisplay = isPhonetic ? this.getPhoneticSpeechText(turn) : (turn.text || '');
 
       card.innerHTML = `
         <div class="as-karaoke-speaker" style="color: ${roleColor};">
@@ -3061,7 +3302,15 @@ const AudioStudioView = {
       });
 
       el.karaokeScriptFlow.appendChild(card);
+
+      if (fadeEvent && idx === 0) {
+        el.karaokeScriptFlow.appendChild(this.createAudioEventCard(fadeEvent, true));
+      }
     });
+
+    if (outroEvent) {
+      el.karaokeScriptFlow.appendChild(this.createAudioEventCard(outroEvent, true));
+    }
   },
 
   highlightActiveTurn(currentTime) {
@@ -3104,6 +3353,20 @@ const AudioStudioView = {
         }
       });
     }
+
+    // Mise en valeur synchronisée des repères d'événements sonores (intro, fadeout, outro)
+    const eventCards = (this.currentStep === 3)
+      ? (this.elements.karaokeScriptFlow?.querySelectorAll('.as-timeline-event-card') || [])
+      : (this.elements.scriptList?.querySelectorAll('.as-timeline-event-card') || []);
+
+    eventCards.forEach(ec => {
+      const start = parseFloat(ec.dataset.startTime);
+      const end = parseFloat(ec.dataset.endTime);
+      if (!isNaN(start) && !isNaN(end)) {
+        const isActive = (currentTime >= start && currentTime <= end);
+        ec.classList.toggle('active-karaoke', isActive);
+      }
+    });
   },
 
   clearKaraokeHighlight() {
@@ -3112,6 +3375,8 @@ const AudioStudioView = {
     scriptCards.forEach(c => c.classList.remove('is-karaoke-active'));
     const karaokeCards = this.elements.karaokeScriptFlow?.querySelectorAll('.as-karaoke-card') || [];
     karaokeCards.forEach(c => c.classList.remove('active-karaoke'));
+    const eventCards = document.querySelectorAll('.as-timeline-event-card');
+    eventCards.forEach(c => c.classList.remove('active-karaoke'));
   },
 
   formatTime(seconds) {
