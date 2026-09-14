@@ -158,6 +158,7 @@ const AudioStudioView = {
       checkCalmProsody: document.getElementById('as-check-calm-prosody'),
       selectBgMusic: document.getElementById('as-select-bg-music'),
       selectJingleIntro: document.getElementById('as-select-jingle-intro'),
+      selectSfx: document.getElementById('as-select-sfx'),
       checkDucking: document.getElementById('as-check-ducking'),
       step2CardTitle: document.getElementById('as-step2-card-title'),
       step2ActiveSummary: document.getElementById('as-step2-active-summary'),
@@ -401,7 +402,7 @@ const AudioStudioView = {
     // Synchronisation des labels des Custom Dropdowns lors des changements de sélection
     ['as-select-voice-host', 'as-select-voice-scholar', 'as-select-voice-solo',
      'as-select-voxtral-host', 'as-select-voxtral-scholar', 'as-select-voxtral-solo',
-     'as-select-bg-music', 'as-select-jingle-intro'].forEach(id => {
+     'as-select-bg-music', 'as-select-jingle-intro', 'as-select-sfx'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', () => {
         this.refreshCustomDropdown(id);
       });
@@ -667,6 +668,9 @@ const AudioStudioView = {
         if (el.selectJingleIntro && res.jingle_intro) {
           el.selectJingleIntro.value = res.jingle_intro;
         }
+        if (el.selectSfx && res.sfx_ambient) {
+          el.selectSfx.value = res.sfx_ambient;
+        }
         if (el.checkDucking && typeof res.ducking_enabled !== 'undefined') {
           el.checkDucking.checked = res.ducking_enabled !== false;
         }
@@ -737,19 +741,19 @@ const AudioStudioView = {
       const optHtml = buildGroupedOpts();
 
       if (el.selectVoiceHost) {
-        const cur = this.config?.voice_speaker_a || el.selectVoiceHost.value || 'fr-FR-DeniseNeural';
+        const cur = this.config?.voice_speaker_a || el.selectVoiceHost.value || 'fr-FR-VivienneMultilingualNeural';
         el.selectVoiceHost.innerHTML = optHtml;
         el.selectVoiceHost.value = cur;
       }
 
       if (el.selectVoiceScholar) {
-        const cur = this.config?.voice_speaker_b || el.selectVoiceScholar.value || 'fr-FR-HenriNeural';
+        const cur = this.config?.voice_speaker_b || el.selectVoiceScholar.value || 'fr-CH-FabriceNeural';
         el.selectVoiceScholar.innerHTML = optHtml;
         el.selectVoiceScholar.value = cur;
       }
 
       if (el.selectVoiceSolo) {
-        const cur = this.config?.voice_solo || el.selectVoiceSolo.value || 'fr-FR-HenriNeural';
+        const cur = this.config?.voice_solo || el.selectVoiceSolo.value || 'fr-CH-FabriceNeural';
         el.selectVoiceSolo.innerHTML = optHtml;
         el.selectVoiceSolo.value = cur;
       }
@@ -1044,8 +1048,8 @@ const AudioStudioView = {
   },
 
   getSmartAlternateVoice(currentVoiceId, targetRole = 'scholar') {
-    const defaultHost = 'fr-FR-DeniseNeural';
-    const defaultScholar = 'fr-FR-HenriNeural';
+    const defaultHost = 'fr-FR-VivienneMultilingualNeural';
+    const defaultScholar = 'fr-CH-FabriceNeural';
 
     if (targetRole === 'scholar') {
       if (currentVoiceId !== defaultScholar) return defaultScholar;
@@ -1082,9 +1086,9 @@ const AudioStudioView = {
       scholarName = this.getVoiceShortName(el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
       soloName = this.getVoiceShortName(el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
     } else {
-      hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
-      scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
-      soloName = this.getVoiceShortName(el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
+      hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural');
+      scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-CH-FabriceNeural');
+      soloName = this.getVoiceShortName(el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-CH-FabriceNeural');
     }
 
     cards.forEach(card => {
@@ -1136,9 +1140,9 @@ const AudioStudioView = {
         el.voiceSummary.innerHTML = `<strong>Voxtral Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
       }
     } else {
-      const spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural';
-      const spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural';
-      const solo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural';
+      const spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
+      const spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-CH-FabriceNeural';
+      const solo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-CH-FabriceNeural';
 
       if (this.format === 'dialogue') {
         el.voiceSummary.innerHTML = `<strong>Voix 1 (Animatrice) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
@@ -1236,8 +1240,25 @@ const AudioStudioView = {
       }
     }
 
+    if (el.selectSfx) {
+      const sfxTracks = tracks.filter(t => t.category === 'sfx');
+      let html = '<option value="none">Aucun bruitage (Par défaut)</option>';
+      sfxTracks.forEach(t => {
+        const tName = t.name || t.title || t.id;
+        const tDur = formatDur(t.duration || t.duration_sec);
+        html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
+      });
+      el.selectSfx.innerHTML = html;
+
+      const curSfx = this.config?.sfx_ambient || 'none';
+      if (el.selectSfx.querySelector(`option[value="${curSfx}"]`)) {
+        el.selectSfx.value = curSfx;
+      }
+    }
+
     this.refreshCustomDropdown('as-select-bg-music');
     this.refreshCustomDropdown('as-select-jingle-intro');
+    this.refreshCustomDropdown('as-select-sfx');
   },
 
   // =========================================================================
@@ -1253,7 +1274,8 @@ const AudioStudioView = {
       'as-select-voxtral-scholar',
       'as-select-voxtral-solo',
       'as-select-bg-music',
-      'as-select-jingle-intro'
+      'as-select-jingle-intro',
+      'as-select-sfx'
     ];
     dropdownIds.forEach(id => this.setupCustomDropdown(id));
   },
@@ -1316,7 +1338,7 @@ const AudioStudioView = {
 
     // Déterminer le type et les métadonnées de ce select
     const isVoxtral = selectId.includes('voxtral');
-    const isSoundpack = selectId.includes('bg-music') || selectId.includes('jingle');
+    const isSoundpack = selectId.includes('bg-music') || selectId.includes('jingle') || selectId.includes('sfx');
     const isVoice = !isSoundpack;
     const engine = isVoxtral ? 'voxtral' : 'edge';
     const role = selectId.includes('scholar') ? 'scholar' : (selectId.includes('host') ? 'host' : 'solo');
@@ -1422,7 +1444,8 @@ const AudioStudioView = {
       'as-select-voxtral-scholar',
       'as-select-voxtral-solo',
       'as-select-bg-music',
-      'as-select-jingle-intro'
+      'as-select-jingle-intro',
+      'as-select-sfx'
     ];
     dropdownIds.forEach(id => this.refreshCustomDropdown(id));
   },
@@ -2581,7 +2604,7 @@ const AudioStudioView = {
           vB = extractVoiceName(el.selectVoxtralScholar, 'Jacques');
         } else {
           vA = extractVoiceName(el.selectVoiceHost, 'Vivienne');
-          vB = extractVoiceName(el.selectVoiceScholar, 'Antoine');
+          vB = extractVoiceName(el.selectVoiceScholar, 'Fabrice');
         }
         voiceSummaryHtml = `<strong>${this.escapeHtml(vA)}</strong> (Animatrice) &amp; <strong>${this.escapeHtml(vB)}</strong> (Exégète)`;
       } else {
@@ -2589,7 +2612,7 @@ const AudioStudioView = {
         if (isVoxtral) {
           vSolo = extractVoiceName(el.selectVoxtralSolo, 'Marie');
         } else {
-          vSolo = extractVoiceName(el.selectVoiceSolo, 'Henri');
+          vSolo = extractVoiceName(el.selectVoiceSolo, 'Fabrice');
         }
         voiceSummaryHtml = `<strong>${this.escapeHtml(vSolo)}</strong> (Chroniqueur)`;
       }
@@ -2601,6 +2624,10 @@ const AudioStudioView = {
       const jingleVal = el.selectJingleIntro ? el.selectJingleIntro.value : 'none';
       const hasJingle = (jingleVal && jingleVal !== 'none');
       const jingleTitle = hasJingle ? extractVoiceName(el.selectJingleIntro, 'Jingle') : 'Aucun jingle';
+
+      const sfxVal = el.selectSfx ? el.selectSfx.value : 'none';
+      const hasSfx = (sfxVal && sfxVal !== 'none');
+      const sfxTitle = hasSfx ? extractVoiceName(el.selectSfx, 'Bruitage') : 'Aucun bruitage';
 
       const dspPills = [];
       if (el.checkMastering?.checked) dspPills.push('Mastering Studio');
@@ -2629,7 +2656,7 @@ const AudioStudioView = {
             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             Habillage
           </span>
-          <span class="as-step2-summary-val">${hasBgMusic ? `<strong>${this.escapeHtml(musicTitle)}</strong>` : '<span style="color: var(--text-muted);">Voix pure</span>'}${hasJingle ? ` + ${this.escapeHtml(jingleTitle)}` : ''}</span>
+          <span class="as-step2-summary-val">${hasBgMusic ? `<strong>${this.escapeHtml(musicTitle)}</strong>` : '<span style="color: var(--text-muted);">Voix pure</span>'}${hasJingle ? ` + ${this.escapeHtml(jingleTitle)}` : ''}${hasSfx ? ` + Bruitage : ${this.escapeHtml(sfxTitle)}` : ''}</span>
         </div>
         ${dspPills.length > 0 ? `
         <div class="as-step2-summary-row" style="margin-top: 2px;">
@@ -2691,9 +2718,9 @@ const AudioStudioView = {
         spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral';
         spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral';
       } else {
-        spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural';
-        spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural';
-        spkSolo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural';
+        spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
+        spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-CH-FabriceNeural';
+        spkSolo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-CH-FabriceNeural';
       }
 
       const customOptions = {
@@ -2715,6 +2742,7 @@ const AudioStudioView = {
         inject_breaks: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
         bg_music: (el.selectBgMusic && el.selectBgMusic.value) ? el.selectBgMusic.value : (this.config?.bg_music || 'bed_cozy_jazz_study'),
         jingle_intro: (el.selectJingleIntro && el.selectJingleIntro.value) ? el.selectJingleIntro.value : (this.config?.jingle_intro || 'jingle_piano_solemn'),
+        sfx_ambient: (el.selectSfx && el.selectSfx.value) ? el.selectSfx.value : (this.config?.sfx_ambient || 'none'),
         ducking_enabled: el.checkDucking ? el.checkDucking.checked : true,
         ducking_db: this.config?.ducking_db || -16.0
       };

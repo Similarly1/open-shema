@@ -1570,18 +1570,20 @@ class PodcastEngine:
         dialogue_timestamps: List[Dict[str, Any]],
         bg_music_path: Optional[str] = None,
         jingle_intro_path: Optional[str] = None,
+        sfx_path: Optional[str] = None,
         options: Optional[Dict[str, Any]] = None,
         sample_rate: int = 24000
     ) -> Tuple[bytes, List[Dict[str, Any]], float]:
         """
-        Mixe la voix principale avec le jingle d'introduction et la nappe musicale d'ambiance
+        Mixe la voix principale avec le jingle d'introduction, la nappe musicale d'ambiance et les bruitages (SFX)
         en appliquant un Ducking professionnel (sidechain) :
         - Jingle : démarre à 0s, joue seul en amorce (lead-in), puis s'estompe sous l'entrée de la voix.
         - Voix : commence précisément après lead_in_sec (mise à jour absolue des timestamps karaoké).
         - Musique de fond : atténuée à ducking_db (-16 dB) sous la parole, remonte doucement (+6 dB)
           lors des pauses et respirations, puis crescendo final et fondu de sortie lors de l'outro.
+        - Bruitages (SFX) : ambiance sonore contextuelle équilibrée en boucle et fondue naturellement.
         """
-        if not bg_music_path and not jingle_intro_path:
+        if not bg_music_path and not jingle_intro_path and not sfx_path:
             return speech_mp3_bytes, dialogue_timestamps, 0.0
 
         try:
@@ -1619,7 +1621,7 @@ class PodcastEngine:
             has_jingle = bool(jingle_intro_path and os.path.exists(jingle_intro_path))
             lead_in_sec = 2.0 if has_jingle else 0.5
             lead_in_samples = int(lead_in_sec * sample_rate)
-            outro_tail_sec = 3.5 if (bg_music_path or has_jingle) else 0.5
+            outro_tail_sec = 3.5 if (bg_music_path or has_jingle or sfx_path) else 0.5
             outro_tail_samples = int(outro_tail_sec * sample_rate)
 
             total_samples = lead_in_samples + speech_len + outro_tail_samples
@@ -1699,8 +1701,27 @@ class PodcastEngine:
 
                     music_track *= env
 
+            # 3b. Piste Bruitage d'ambiance contextuel (SFX)
+            sfx_track = np.zeros((2, total_samples), dtype=np.float32)
+            if sfx_path and os.path.exists(sfx_path):
+                sfx_audio = _load_stereo(sfx_path)
+                s_len = sfx_audio.shape[1]
+                if s_len > 0:
+                    s_idx = 0
+                    while s_idx < total_samples:
+                        take = min(s_len, total_samples - s_idx)
+                        sfx_track[:, s_idx:s_idx + take] = sfx_audio[:, :take]
+                        s_idx += take
+                    # Niveau sonore naturel subtil (-18 dB sous la voix) avec fondu
+                    sfx_gain = 10.0 ** (-18.0 / 20.0)
+                    sfx_track *= sfx_gain
+                    sfx_fade = min(total_samples, int(1.2 * sample_rate))
+                    if sfx_fade > 0:
+                        sfx_track[:, :sfx_fade] *= np.linspace(0.0, 1.0, sfx_fade)
+                        sfx_track[:, -sfx_fade:] *= np.linspace(1.0, 0.0, sfx_fade)
+
             # 4. Mixage final stéréo avec soft-clipping et encodage MP3
-            mixed = np.clip(voice_track + jingle_track + music_track, -1.0, 1.0)
+            mixed = np.clip(voice_track + jingle_track + music_track + sfx_track, -1.0, 1.0)
 
             out_buf = io.BytesIO()
             container = av.open(out_buf, mode='w', format='mp3')
@@ -1782,27 +1803,34 @@ class PodcastEngine:
         if jingle_intro_id is None:
             jingle_intro_id = cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")
 
+        sfx_ambient_id = opts.get("sfx_ambient") or opts.get("sfx")
+        if sfx_ambient_id is None:
+            sfx_ambient_id = cfg.get("audio_studio_sfx_ambient", "none")
+
         # Choix explicite "none"
         if bg_music_id in ("none", "", "null", False):
             bg_music_id = None
         if jingle_intro_id in ("none", "", "null", False):
             jingle_intro_id = None
+        if sfx_ambient_id in ("none", "", "null", False):
+            sfx_ambient_id = None
 
         ducking_enabled = opts.get("ducking_enabled", cfg.get("audio_studio_ducking_enabled", True))
         ducking_db = float(opts.get("ducking_db", cfg.get("audio_studio_ducking_db", -16.0)))
 
         bg_path = cls.resolve_soundpack_track_path(bg_music_id) if bg_music_id else None
         jingle_path = cls.resolve_soundpack_track_path(jingle_intro_id) if jingle_intro_id else None
+        sfx_path = cls.resolve_soundpack_track_path(sfx_ambient_id) if sfx_ambient_id else None
 
-        logger.info("[PodcastEngine] Préparation mixage audio : bg=%s (%s), jingle=%s (%s), ducking=%s (-%.1f dB)",
-                    bg_music_id, bg_path, jingle_intro_id, jingle_path, ducking_enabled, ducking_db)
+        logger.info("[PodcastEngine] Préparation mixage audio : bg=%s (%s), jingle=%s (%s), sfx=%s (%s), ducking=%s (-%.1f dB)",
+                    bg_music_id, bg_path, jingle_intro_id, jingle_path, sfx_ambient_id, sfx_path, ducking_enabled, ducking_db)
 
-        if bg_path or jingle_path:
+        if bg_path or jingle_path or sfx_path:
             audio_path = os.path.join(get_podcasts_dir(), res.get("audio_file", f"{podcast_id}.mp3"))
             if os.path.exists(audio_path):
                 if progress_callback:
                     total_l = len(res.get("dialogue", []))
-                    progress_callback(total_l, 96, "Mixage sonore de l'émission (ambiance, jingle & ducking)...")
+                    progress_callback(total_l, 96, "Mixage sonore de l'émission (ambiance, jingle, bruitages & ducking)...")
                 try:
                     with open(audio_path, "rb") as f:
                         speech_bytes = f.read()
@@ -1816,6 +1844,7 @@ class PodcastEngine:
                         dialogue_timestamps=res.get("dialogue", []),
                         bg_music_path=bg_path,
                         jingle_intro_path=jingle_path,
+                        sfx_path=sfx_path,
                         options=mix_opts
                     )
                     if total_dur > 0 and len(mixed_bytes) > 1000:
@@ -1826,6 +1855,7 @@ class PodcastEngine:
                         res["duration_seconds"] = total_dur
                         res["bg_music"] = bg_music_id or "none"
                         res["jingle_intro"] = jingle_intro_id or "none"
+                        res["sfx_ambient"] = sfx_ambient_id or "none"
                         res["ducking_enabled"] = ducking_enabled
                         PodcastHistory.upsert(res)
                         logger.info("[PodcastEngine] Mixage soundpack réussi pour %s (durée: %.2fs, taille: %d octets)",
@@ -1842,6 +1872,7 @@ class PodcastEngine:
         else:
             res["bg_music"] = "none"
             res["jingle_intro"] = "none"
+            res["sfx_ambient"] = "none"
             PodcastHistory.upsert(res)
 
         return res
@@ -1859,9 +1890,9 @@ class PodcastEngine:
         """Synthèse asynchrone via Microsoft Edge-TTS avec prosodie maîtrisée et mastering audio studio."""
         import edge_tts
 
-        voice_a = opts.get("voice_speaker_a") or cfg.get("audio_studio_voice_speaker_a", "fr-FR-DeniseNeural")
-        voice_b = opts.get("voice_speaker_b") or cfg.get("audio_studio_voice_speaker_b", "fr-FR-HenriNeural")
-        voice_solo = opts.get("voice_solo") or cfg.get("audio_studio_voice_solo", "fr-FR-HenriNeural")
+        voice_a = opts.get("voice_speaker_a") or cfg.get("audio_studio_voice_speaker_a", "fr-FR-VivienneMultilingualNeural")
+        voice_b = opts.get("voice_speaker_b") or cfg.get("audio_studio_voice_speaker_b", "fr-CH-FabriceNeural")
+        voice_solo = opts.get("voice_solo") or cfg.get("audio_studio_voice_solo", "fr-CH-FabriceNeural")
 
         # Options de prosodie (débit, hauteur, respirations)
         calm_prosody = opts.get("calm_prosody", cfg.get("audio_studio_calm_prosody", True))

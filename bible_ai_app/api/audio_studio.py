@@ -108,9 +108,9 @@ class AudioStudioMixin:
 
             return {
                 "engine": cfg.get("audio_studio_engine", "edge_tts"),
-                "voice_speaker_a": cfg.get("audio_studio_voice_speaker_a", "fr-FR-DeniseNeural"),
-                "voice_speaker_b": cfg.get("audio_studio_voice_speaker_b", "fr-FR-HenriNeural"),
-                "voice_solo": cfg.get("audio_studio_voice_solo", "fr-FR-HenriNeural"),
+                "voice_speaker_a": cfg.get("audio_studio_voice_speaker_a", "fr-FR-VivienneMultilingualNeural"),
+                "voice_speaker_b": cfg.get("audio_studio_voice_speaker_b", "fr-CH-FabriceNeural"),
+                "voice_solo": cfg.get("audio_studio_voice_solo", "fr-CH-FabriceNeural"),
                 "voxtral_voice_speaker_a": cfg.get("audio_studio_voxtral_voice_speaker_a", "Marie - Happy"),
                 "voxtral_voice_speaker_b": cfg.get("audio_studio_voxtral_voice_speaker_b", "Marie - Neutral"),
                 "voxtral_voice_solo": cfg.get("audio_studio_voxtral_voice_solo", "Marie - Neutral"),
@@ -129,6 +129,7 @@ class AudioStudioMixin:
                 "inject_breaks": bool(cfg.get("audio_studio_inject_breaks", True)),
                 "bg_music": str(cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")),
                 "jingle_intro": str(cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")),
+                "sfx_ambient": str(cfg.get("audio_studio_sfx_ambient", "none")),
                 "ducking_enabled": bool(cfg.get("audio_studio_ducking_enabled", True)),
                 "ducking_db": float(cfg.get("audio_studio_ducking_db", -16.0)),
                 "has_mistral_key": bool(cfg.get("mistral_api_key")),
@@ -190,6 +191,8 @@ class AudioStudioMixin:
                 cfg["audio_studio_bg_music"] = str(new_settings["bg_music"])
             if "jingle_intro" in new_settings:
                 cfg["audio_studio_jingle_intro"] = str(new_settings["jingle_intro"])
+            if "sfx_ambient" in new_settings:
+                cfg["audio_studio_sfx_ambient"] = str(new_settings["sfx_ambient"])
             if "ducking_enabled" in new_settings:
                 cfg["audio_studio_ducking_enabled"] = bool(new_settings["ducking_enabled"])
             if "ducking_db" in new_settings:
@@ -300,7 +303,7 @@ class AudioStudioMixin:
                 script_dialogue = opts.get("script_dialogue", script_dialogue)
                 engine = opts.get("engine", engine)
                 custom_opts = opts.get("custom_options") or {}
-                for k in ("bg_music", "jingle_intro", "ducking_enabled", "ducking_db", "mastering_enabled"):
+                for k in ("bg_music", "jingle_intro", "sfx_ambient", "sfx", "ducking_enabled", "ducking_db", "mastering_enabled", "voice_speaker_a", "voice_speaker_b", "voice_solo", "calm_prosody", "rate", "pitch", "inject_breaks"):
                     if k in opts and k not in custom_opts:
                         custom_opts[k] = opts[k]
                 custom_options = custom_opts

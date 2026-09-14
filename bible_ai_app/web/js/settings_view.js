@@ -1903,13 +1903,13 @@ Exemple :
       document.getElementById('cfg-audio-studio-engine').value = c.audio_studio_engine || 'edge_tts';
     }
     if (document.getElementById('cfg-audio-studio-voice-a')) {
-      document.getElementById('cfg-audio-studio-voice-a').value = c.audio_studio_voice_speaker_a || 'fr-FR-DeniseNeural';
+      document.getElementById('cfg-audio-studio-voice-a').value = c.audio_studio_voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
     }
     if (document.getElementById('cfg-audio-studio-voice-b')) {
-      document.getElementById('cfg-audio-studio-voice-b').value = c.audio_studio_voice_speaker_b || 'fr-FR-HenriNeural';
+      document.getElementById('cfg-audio-studio-voice-b').value = c.audio_studio_voice_speaker_b || 'fr-CH-FabriceNeural';
     }
     if (document.getElementById('cfg-audio-studio-voice-solo')) {
-      document.getElementById('cfg-audio-studio-voice-solo').value = c.audio_studio_voice_solo || 'fr-FR-HenriNeural';
+      document.getElementById('cfg-audio-studio-voice-solo').value = c.audio_studio_voice_solo || 'fr-CH-FabriceNeural';
     }
     if (document.getElementById('cfg-audio-studio-pause-ms')) {
       document.getElementById('cfg-audio-studio-pause-ms').value = c.audio_studio_pause_ms || 350;

@@ -5476,9 +5476,9 @@
                           <label class="audio-studio-form-label" for="as-select-voice-host">Voix 1 (Animatrice / Rôle A)</label>
                           <select id="as-select-voice-host" class="audio-studio-select">
                             <optgroup label="France">
-                              <option value="fr-FR-DeniseNeural" selected>Denise (France - Féminine, claire &amp; vive)</option>
+                              <option value="fr-FR-DeniseNeural">Denise (France - Féminine, claire &amp; vive)</option>
                               <option value="fr-FR-HenriNeural">Henri (France - Masculine, posé &amp; érudit)</option>
-                              <option value="fr-FR-VivienneMultilingualNeural">Vivienne (France - Féminine, naturelle &amp; fluide)</option>
+                              <option value="fr-FR-VivienneMultilingualNeural" selected>Vivienne (France - Féminine, naturelle &amp; fluide)</option>
                               <option value="fr-FR-RemyMultilingualNeural">Rémy (France - Masculine, expressif &amp; chaleureux)</option>
                               <option value="fr-FR-EloiseNeural">Éloïse (France - Féminine, douce &amp; posée)</option>
                             </optgroup>
@@ -5502,7 +5502,7 @@
                           <label class="audio-studio-form-label" for="as-select-voice-scholar">Voix 2 (Exégète / Rôle B)</label>
                           <select id="as-select-voice-scholar" class="audio-studio-select">
                             <optgroup label="France">
-                              <option value="fr-FR-HenriNeural" selected>Henri (France - Masculine, posé &amp; érudit)</option>
+                              <option value="fr-FR-HenriNeural">Henri (France - Masculine, posé &amp; érudit)</option>
                               <option value="fr-FR-DeniseNeural">Denise (France - Féminine, claire &amp; vive)</option>
                               <option value="fr-FR-VivienneMultilingualNeural">Vivienne (France - Féminine, naturelle &amp; fluide)</option>
                               <option value="fr-FR-RemyMultilingualNeural">Rémy (France - Masculine, expressif &amp; chaleureux)</option>
@@ -5514,7 +5514,7 @@
                             </optgroup>
                             <optgroup label="Suisse">
                               <option value="fr-CH-ArianeNeural">Ariane (Suisse - Féminine, posée)</option>
-                              <option value="fr-CH-FabriceNeural">Fabrice (Suisse - Masculine, posé &amp; net)</option>
+                              <option value="fr-CH-FabriceNeural" selected>Fabrice (Suisse - Masculine, posé &amp; net)</option>
                             </optgroup>
                             <optgroup label="Canada">
                               <option value="fr-CA-SylvieNeural">Sylvie (Canada - Féminine, chaleureuse)</option>
@@ -5689,6 +5689,26 @@
                         <select id="as-select-jingle-intro" class="audio-studio-select" style="width: 100%; height: 34px; font-size: 12px;">
                           <option value="jingle_piano_solemn">Piano Recueilli (Intro Solennelle)</option>
                           <option value="none">Aucun jingle (Démarrage direct)</option>
+                        </select>
+                      </div>
+
+                      <!-- Bruitage sonore d'ambiance contextuel (SFX) -->
+                      <div class="audio-studio-form-row" style="margin-bottom: 0;">
+                        <label class="audio-studio-form-label" for="as-select-sfx" style="font-size: 11px; display: flex; justify-content: space-between;">
+                          <span>Bruitage sonore d'ambiance (SFX)</span>
+                        </label>
+                        <select id="as-select-sfx" class="audio-studio-select" style="width: 100%; height: 34px; font-size: 12px;">
+                          <option value="none" selected>Aucun bruitage (Par défaut)</option>
+                          <option value="sfx_rooster_crow">Chant du coq (Aurore / Reniement)</option>
+                          <option value="sfx_campfire_crackle">Feu de camp &amp; braises (Soirée / Nuit)</option>
+                          <option value="sfx_footsteps_trail">Bruits de pas sur sentier pierreux</option>
+                          <option value="sfx_ocean_shore_waves">Vagues &amp; ressac marin (Bord de mer)</option>
+                          <option value="sfx_angry_crowd">Foule en colère &amp; clameurs</option>
+                          <option value="sfx_crowd_murmur">Murmures d'assemblée &amp; chuchotements</option>
+                          <option value="sfx_ancient_marketplace">Marché antique &amp; ruelle animée</option>
+                          <option value="sfx_sheep_flock_bells">Troupeau de brebis &amp; clochettes</option>
+                          <option value="sfx_night_crickets">Nuit étoilée &amp; grillons de Judée</option>
+                          <option value="sfx_desert_wind">Vent du désert &amp; souffle aride</option>
                         </select>
                       </div>
 
