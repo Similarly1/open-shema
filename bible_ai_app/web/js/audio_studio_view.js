@@ -54,6 +54,7 @@ const AudioStudioView = {
     this.cacheElements();
     this.bindEvents();
     this.initContextDepthSlider();
+    this.initCustomDropdowns();
     this.loadConfiguration();
     this.loadVoices();
     this.loadSoundpack();
@@ -152,9 +153,7 @@ const AudioStudioView = {
       checkMastering: document.getElementById('as-check-mastering'),
       checkCalmProsody: document.getElementById('as-check-calm-prosody'),
       selectBgMusic: document.getElementById('as-select-bg-music'),
-      btnPreviewBgMusic: document.getElementById('btn-as-preview-bg-music'),
       selectJingleIntro: document.getElementById('as-select-jingle-intro'),
-      btnPreviewJingleIntro: document.getElementById('btn-as-preview-jingle-intro'),
       checkDucking: document.getElementById('as-check-ducking'),
       btnSynthesize: document.getElementById('btn-audio-studio-synthesize'),
       progressBox: document.getElementById('audio-studio-progress-box'),
@@ -379,28 +378,26 @@ const AudioStudioView = {
     // 9. Synthèse audio & Habillage sonore (Soundpack)
     el.btnSynthesize?.addEventListener('click', () => this.startSynthesis());
 
-    el.btnPreviewBgMusic?.addEventListener('click', () => {
-      const trId = el.selectBgMusic?.value;
-      this.previewTrack(trId, el.btnPreviewBgMusic);
-    });
-
-    el.btnPreviewJingleIntro?.addEventListener('click', () => {
-      const trId = el.selectJingleIntro?.value;
-      this.previewTrack(trId, el.btnPreviewJingleIntro);
-    });
-
-    el.selectBgMusic?.addEventListener('change', () => {
-      if (this.previewAudio && !this.previewAudio.paused && this.currentPreviewBtn === el.btnPreviewBgMusic) {
-        this.previewAudio.pause();
-        el.btnPreviewBgMusic.classList.remove('active');
+    // Fermeture automatique des menus déroulants personnalisés au clic extérieur ou touche Échap
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.as-custom-select')) {
+        this.closeAllCustomDropdowns();
       }
     });
 
-    el.selectJingleIntro?.addEventListener('change', () => {
-      if (this.previewAudio && !this.previewAudio.paused && this.currentPreviewBtn === el.btnPreviewJingleIntro) {
-        this.previewAudio.pause();
-        el.btnPreviewJingleIntro.classList.remove('active');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeAllCustomDropdowns();
       }
+    });
+
+    // Synchronisation des labels des Custom Dropdowns lors des changements de sélection
+    ['as-select-voice-host', 'as-select-voice-scholar', 'as-select-voice-solo',
+     'as-select-voxtral-host', 'as-select-voxtral-scholar', 'as-select-voxtral-solo',
+     'as-select-bg-music', 'as-select-jingle-intro'].forEach(id => {
+      document.getElementById(id)?.addEventListener('change', () => {
+        this.refreshCustomDropdown(id);
+      });
     });
 
     // 10. Lecteur Audio
@@ -669,6 +666,7 @@ const AudioStudioView = {
 
         // Mise à jour de l'affichage du format actuel
         this.setFormat(this.format);
+        this.refreshAllCustomDropdowns();
         this.updateVoiceSummary();
       }
     } catch (err) {
@@ -818,6 +816,7 @@ const AudioStudioView = {
       this.syncVoxtralVoicePair(false, 'host');
     }
 
+    this.refreshAllCustomDropdowns();
     this.updateVoiceSummary();
     this.updateTurnCardsVoiceLabels();
   },
@@ -925,6 +924,8 @@ const AudioStudioView = {
       voice_speaker_b: v2El.value
     });
 
+    this.refreshCustomDropdown('as-select-voice-host');
+    this.refreshCustomDropdown('as-select-voice-scholar');
     this.updateVoiceSummary();
     this.updateTurnCardsVoiceLabels();
   },
@@ -1029,6 +1030,8 @@ const AudioStudioView = {
       voxtral_voice_speaker_b: v2El.value
     });
 
+    this.refreshCustomDropdown('as-select-voxtral-host');
+    this.refreshCustomDropdown('as-select-voxtral-scholar');
     this.updateVoiceSummary();
     this.updateTurnCardsVoiceLabels();
   },
@@ -1225,61 +1228,362 @@ const AudioStudioView = {
         el.selectJingleIntro.value = curJingle;
       }
     }
+
+    this.refreshCustomDropdown('as-select-bg-music');
+    this.refreshCustomDropdown('as-select-jingle-intro');
   },
 
-  async previewTrack(trackId, btnEl) {
-    if (!trackId || trackId === 'none') {
-      this.showInfoToast("Sélectionnez d'abord un morceau pour l'écouter.");
+  // =========================================================================
+  // MENUS DÉROULANTS PERSONNALISÉS (StudioCustomDropdown) & PRÉÉCOUTES
+  // =========================================================================
+
+  initCustomDropdowns() {
+    const dropdownIds = [
+      'as-select-voice-host',
+      'as-select-voice-scholar',
+      'as-select-voice-solo',
+      'as-select-voxtral-host',
+      'as-select-voxtral-scholar',
+      'as-select-voxtral-solo',
+      'as-select-bg-music',
+      'as-select-jingle-intro'
+    ];
+    dropdownIds.forEach(id => this.setupCustomDropdown(id));
+  },
+
+  setupCustomDropdown(selectId) {
+    const selectEl = document.getElementById(selectId);
+    if (!selectEl) return;
+
+    // Masquer le select natif tout en le gardant fonctionnel dans le DOM
+    selectEl.style.display = 'none';
+
+    let customEl = selectEl.parentNode.querySelector(`.as-custom-select[data-for="${selectId}"]`);
+    if (!customEl) {
+      customEl = document.createElement('div');
+      customEl.className = 'as-custom-select';
+      customEl.dataset.for = selectId;
+      customEl.id = `${selectId}-custom`;
+      customEl.innerHTML = `
+        <button type="button" class="as-custom-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="as-custom-trigger-label">Chargement...</span>
+          <span class="as-custom-trigger-chevron">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </button>
+        <div class="as-custom-menu" role="listbox"></div>
+      `;
+      selectEl.parentNode.insertBefore(customEl, selectEl.nextSibling);
+
+      const trigger = customEl.querySelector('.as-custom-trigger');
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = customEl.classList.contains('is-open');
+        this.closeAllCustomDropdowns();
+        if (!isOpen) {
+          customEl.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+
+    this.refreshCustomDropdown(selectId);
+  },
+
+  refreshCustomDropdown(selectId) {
+    const selectEl = document.getElementById(selectId);
+    if (!selectEl) return;
+    const customEl = selectEl.parentNode.querySelector(`.as-custom-select[data-for="${selectId}"]`);
+    if (!customEl) return;
+
+    const triggerLabel = customEl.querySelector('.as-custom-trigger-label');
+    const menuEl = customEl.querySelector('.as-custom-menu');
+    if (!menuEl) return;
+
+    const selectedOpt = selectEl.options[selectEl.selectedIndex];
+    if (triggerLabel && selectedOpt) {
+      let label = selectedOpt.text.replace(/\s*\(Sélectionnée en Voix [12]\)/, '').trim();
+      triggerLabel.textContent = label;
+      triggerLabel.title = label;
+    }
+
+    // Déterminer le type et les métadonnées de ce select
+    const isVoxtral = selectId.includes('voxtral');
+    const isSoundpack = selectId.includes('bg-music') || selectId.includes('jingle');
+    const isVoice = !isSoundpack;
+    const engine = isVoxtral ? 'voxtral' : 'edge';
+    const role = selectId.includes('scholar') ? 'scholar' : (selectId.includes('host') ? 'host' : 'solo');
+
+    menuEl.innerHTML = '';
+
+    const renderOptionItem = (opt) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = `as-custom-item ${opt.selected ? 'is-selected' : ''} ${opt.disabled ? 'is-disabled' : ''}`;
+      itemEl.dataset.value = opt.value;
+
+      let fullText = opt.text;
+      let mainTitle = fullText;
+      let subTitle = '';
+
+      const parenIdx = fullText.indexOf('(');
+      if (parenIdx > 0 && fullText.endsWith(')')) {
+        mainTitle = fullText.slice(0, parenIdx).trim();
+        subTitle = fullText.slice(parenIdx + 1, -1).trim();
+      }
+
+      const infoEl = document.createElement('div');
+      infoEl.className = 'as-custom-item-info';
+
+      const titleEl = document.createElement('span');
+      titleEl.className = 'as-custom-item-title';
+      titleEl.textContent = mainTitle;
+      infoEl.appendChild(titleEl);
+
+      if (subTitle) {
+        const subEl = document.createElement('span');
+        subEl.className = 'as-custom-item-sub';
+        subEl.textContent = subTitle;
+        infoEl.appendChild(subEl);
+      }
+      itemEl.appendChild(infoEl);
+
+      // Bouton de préécoute individuel pour les éléments auditifs valides
+      const canPreview = opt.value && opt.value !== 'none';
+      if (canPreview) {
+        const playBtn = document.createElement('button');
+        playBtn.type = 'button';
+        playBtn.className = 'as-custom-item-play';
+        playBtn.title = 'Écouter un extrait';
+        playBtn.dataset.previewId = opt.value;
+
+        const isVoicePlaying = isVoice && this.currentPreviewVoiceId === `${engine}:${opt.value}` && this.previewAudio && !this.previewAudio.paused;
+        const isTrackPlaying = isSoundpack && this.currentPreviewTrackId === opt.value && this.previewAudio && !this.previewAudio.paused;
+
+        if (isVoicePlaying || isTrackPlaying) {
+          playBtn.classList.add('is-playing');
+          itemEl.classList.add('is-playing');
+          playBtn.title = 'Arrêter la préécoute';
+          playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
+        } else {
+          playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+        }
+
+        playBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (isVoice) {
+            this.previewVoiceInItem(opt.value, engine, role, playBtn);
+          } else {
+            this.previewSoundpackTrackInItem(opt.value, playBtn);
+          }
+        });
+
+        itemEl.appendChild(playBtn);
+      }
+
+      itemEl.addEventListener('click', () => {
+        if (opt.disabled) return;
+        selectEl.value = opt.value;
+        selectEl.dispatchEvent(new Event('change'));
+        this.closeAllCustomDropdowns();
+      });
+
+      return itemEl;
+    };
+
+    Array.from(selectEl.children).forEach(child => {
+      if (child.tagName === 'OPTGROUP') {
+        const groupHeader = document.createElement('div');
+        groupHeader.className = 'as-custom-group-header';
+        groupHeader.textContent = child.label;
+        menuEl.appendChild(groupHeader);
+
+        Array.from(child.children).forEach(opt => {
+          menuEl.appendChild(renderOptionItem(opt));
+        });
+      } else if (child.tagName === 'OPTION') {
+        menuEl.appendChild(renderOptionItem(child));
+      }
+    });
+  },
+
+  refreshAllCustomDropdowns() {
+    const dropdownIds = [
+      'as-select-voice-host',
+      'as-select-voice-scholar',
+      'as-select-voice-solo',
+      'as-select-voxtral-host',
+      'as-select-voxtral-scholar',
+      'as-select-voxtral-solo',
+      'as-select-bg-music',
+      'as-select-jingle-intro'
+    ];
+    dropdownIds.forEach(id => this.refreshCustomDropdown(id));
+  },
+
+  closeAllCustomDropdowns() {
+    document.querySelectorAll('.as-custom-select.is-open').forEach(el => {
+      el.classList.remove('is-open');
+      const trigger = el.querySelector('.as-custom-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+  },
+
+  resetAllItemPlayButtons() {
+    document.querySelectorAll('.as-custom-item-play').forEach(btn => {
+      btn.classList.remove('is-playing', 'is-loading');
+      btn.title = 'Écouter un extrait';
+      btn.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+    });
+    document.querySelectorAll('.as-custom-item.is-playing').forEach(item => {
+      item.classList.remove('is-playing');
+    });
+  },
+
+  async previewVoiceInItem(voiceId, engine, role, btnEl) {
+    if (!voiceId || voiceId === 'none') return;
+
+    const previewKey = `${engine}:${voiceId}`;
+    const isCurrentPlaying = (this.currentPreviewVoiceId === previewKey && this.previewAudio && !this.previewAudio.paused);
+
+    if (this.previewAudio) {
+      this.previewAudio.pause();
+      this.previewAudio.currentTime = 0;
+    }
+    this.resetAllItemPlayButtons();
+
+    if (isCurrentPlaying) {
+      this.currentPreviewVoiceId = null;
+      this.currentPreviewTrackId = null;
       return;
     }
 
-    if (this.previewAudio && !this.previewAudio.paused) {
-      this.previewAudio.pause();
-      this.previewAudio.currentTime = 0;
-      if (this.currentPreviewBtn) {
-        this.currentPreviewBtn.classList.remove('active');
-        this.currentPreviewBtn.title = 'Écouter un extrait';
-      }
-      if (this.currentPreviewTrackId === trackId) {
-        this.currentPreviewTrackId = null;
-        this.currentPreviewBtn = null;
-        return;
-      }
+    this.currentPreviewVoiceId = previewKey;
+    this.currentPreviewTrackId = null;
+
+    if (btnEl) {
+      btnEl.classList.add('is-loading');
+      btnEl.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="as-spin"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>`;
     }
 
     try {
-      if (btnEl) btnEl.classList.add('loading');
+      const res = await API.call('audio_studio_get_voice_sample_url', voiceId, engine, role);
+      if (btnEl) {
+        btnEl.classList.remove('is-loading');
+      }
+
+      if (this.currentPreviewVoiceId !== previewKey) {
+        return;
+      }
+
+      const sampleUrl = res?.sample_url || res?.audio_url;
+      if (res && res.success && sampleUrl) {
+        if (!this.previewAudio) {
+          this.previewAudio = new Audio();
+        }
+        this.previewAudio.src = sampleUrl;
+        this.previewAudio.volume = 0.9;
+        await this.previewAudio.play();
+
+        if (btnEl) {
+          btnEl.classList.add('is-playing');
+          btnEl.closest('.as-custom-item')?.classList.add('is-playing');
+          btnEl.title = 'Arrêter la préécoute';
+          btnEl.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
+        }
+
+        this.previewAudio.onended = () => {
+          this.resetAllItemPlayButtons();
+          this.currentPreviewVoiceId = null;
+        };
+        this.previewAudio.onerror = () => {
+          this.resetAllItemPlayButtons();
+          this.currentPreviewVoiceId = null;
+        };
+      } else {
+        this.resetAllItemPlayButtons();
+        this.currentPreviewVoiceId = null;
+        this.showErrorToast("Impossible de charger l'échantillon vocal.");
+      }
+    } catch (err) {
+      this.resetAllItemPlayButtons();
+      this.currentPreviewVoiceId = null;
+      console.warn('[AudioStudioView] Erreur préécoute voix:', err);
+    }
+  },
+
+  async previewSoundpackTrackInItem(trackId, btnEl) {
+    if (!trackId || trackId === 'none') return;
+
+    const isCurrentPlaying = (this.currentPreviewTrackId === trackId && this.previewAudio && !this.previewAudio.paused);
+
+    if (this.previewAudio) {
+      this.previewAudio.pause();
+      this.previewAudio.currentTime = 0;
+    }
+    this.resetAllItemPlayButtons();
+
+    if (isCurrentPlaying) {
+      this.currentPreviewTrackId = null;
+      this.currentPreviewVoiceId = null;
+      return;
+    }
+
+    this.currentPreviewTrackId = trackId;
+    this.currentPreviewVoiceId = null;
+
+    if (btnEl) {
+      btnEl.classList.add('is-loading');
+      btnEl.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="as-spin"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>`;
+    }
+
+    try {
       const res = await API.call('audio_studio_get_soundpack_track_url', trackId);
-      if (btnEl) btnEl.classList.remove('loading');
+      if (btnEl) {
+        btnEl.classList.remove('is-loading');
+      }
+
+      if (this.currentPreviewTrackId !== trackId) {
+        return;
+      }
 
       if (res && res.success && res.audio_url) {
         if (!this.previewAudio) {
           this.previewAudio = new Audio();
         }
         this.previewAudio.src = res.audio_url;
-        this.previewAudio.volume = 0.55;
-        this.previewAudio.play();
-        this.currentPreviewTrackId = trackId;
-        this.currentPreviewBtn = btnEl;
+        this.previewAudio.volume = 0.6;
+        await this.previewAudio.play();
+
         if (btnEl) {
-          btnEl.classList.add('active');
+          btnEl.classList.add('is-playing');
+          btnEl.closest('.as-custom-item')?.classList.add('is-playing');
           btnEl.title = 'Arrêter la préécoute';
+          btnEl.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
         }
+
         this.previewAudio.onended = () => {
-          if (btnEl) {
-            btnEl.classList.remove('active');
-            btnEl.title = 'Écouter un extrait';
-          }
+          this.resetAllItemPlayButtons();
           this.currentPreviewTrackId = null;
-          this.currentPreviewBtn = null;
+        };
+        this.previewAudio.onerror = () => {
+          this.resetAllItemPlayButtons();
+          this.currentPreviewTrackId = null;
         };
       } else {
+        this.resetAllItemPlayButtons();
+        this.currentPreviewTrackId = null;
         this.showErrorToast("Impossible de charger l'extrait audio.");
       }
     } catch (err) {
-      if (btnEl) btnEl.classList.remove('loading');
-      console.warn('[AudioStudioView] Erreur préécoute track:', err);
+      this.resetAllItemPlayButtons();
+      this.currentPreviewTrackId = null;
+      console.warn('[AudioStudioView] Erreur préécoute musique:', err);
     }
+  },
+
+  // Rétrocompatibilité
+  async previewTrack(trackId, btnEl) {
+    return this.previewSoundpackTrackInItem(trackId, btnEl);
   },
 
   // =========================================================================

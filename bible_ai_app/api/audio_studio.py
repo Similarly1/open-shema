@@ -66,6 +66,26 @@ class AudioStudioMixin:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_soundpack_track_url : %s", e)
             return {"success": False, "error": str(e)}
 
+    def audio_studio_get_voice_sample_url(self, voice_id: Any, engine: str = "edge_tts", role: str = "host") -> Dict[str, Any]:
+        """Retourne l'extrait audio MP3 d'une voix sous forme de Data URL base64 pour préécoute immédiate."""
+        try:
+            if isinstance(voice_id, dict):
+                opts = voice_id
+                voice_id = opts.get("voice_id", "")
+                engine = opts.get("engine", engine)
+                role = opts.get("role", role)
+            voice_id = str(voice_id)
+
+            raw_bytes = PodcastEngine.get_voice_sample(voice_id=voice_id, engine=engine, role=role)
+            if raw_bytes and len(raw_bytes) > 500:
+                b64 = base64.b64encode(raw_bytes).decode("ascii")
+                data_url = f"data:audio/mp3;base64,{b64}"
+                return {"success": True, "audio_url": data_url, "sample_url": data_url}
+            return {"success": False, "error": f"Impossible de générer l'échantillon pour {voice_id}"}
+        except Exception as e:
+            logger.error("[AudioStudioMixin] Erreur audio_studio_get_voice_sample_url : %s", e)
+            return {"success": False, "error": str(e)}
+
     def audio_studio_get_config(self) -> Dict[str, Any]:
         """Retourne les paramètres actuels du Studio Audio."""
         try:

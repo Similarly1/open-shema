@@ -59,6 +59,7 @@ scratch_*.html
 *.mp3
 !assets/audio/*.mp3
 !**/data/audio/**/*.mp3
+**/data/audio/voice_samples/
 
 # IDEs & System files
 .vscode/

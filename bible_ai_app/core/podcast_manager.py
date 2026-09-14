@@ -2009,30 +2009,7 @@ class PodcastEngine:
         voices_list = cls.fetch_voxtral_voices(api_key)
 
         def _resolve_voxtral_voice_id(v_req: str) -> str:
-            if not v_req:
-                return "marie"
-            v_clean = str(v_req).strip()
-            # Si c'est déjà un UUID de voix personnalisée Mistral
-            if re.match(r'^[0-9a-fA-F-]{32,36}$', v_clean):
-                return v_clean
-            # Correspondance exacte ID ou Nom
-            for v in voices_list:
-                if v.get("name", "").strip().lower() == v_clean.lower() or v.get("id", "").strip().lower() == v_clean.lower():
-                    return v.get("id")
-            # Correspondance par mot-clé d'émotion
-            req_low = v_clean.lower()
-            for v in voices_list:
-                v_str = (v.get("name", "") + " " + v.get("id", "")).lower()
-                for emo in ["excited", "happy", "joyeuse", "sad", "grave", "curious", "curieuse", "angry", "ferme", "fearful", "douce", "neutral", "neutre"]:
-                    if emo in req_low and emo in v_str:
-                        return v.get("id")
-            # Par défaut voix Marie
-            for v in voices_list:
-                if "marie" in (v.get("name", "") + " " + v.get("id", "")).lower():
-                    return v.get("id")
-            if voices_list and voices_list[0].get("id"):
-                return voices_list[0].get("id")
-            return "marie"
+            return cls.resolve_voxtral_voice_id(v_req, voices_list)
 
         import httpx
 
@@ -2149,6 +2126,114 @@ class PodcastEngine:
 
         return record
 
+
+    @classmethod
+    def resolve_voxtral_voice_id(cls, v_req: str, voices_list: Optional[list] = None) -> str:
+        """Résout l'identifiant exact d'une voix ou intonation Voxtral."""
+        if not v_req:
+            return "marie"
+        v_clean = str(v_req).strip()
+        if re.match(r'^[0-9a-fA-F-]{32,36}$', v_clean):
+            return v_clean
+        vl = voices_list or cls.VOXTRAL_DEFAULT_VOICES
+        for v in vl:
+            if v.get("name", "").strip().lower() == v_clean.lower() or v.get("id", "").strip().lower() == v_clean.lower():
+                return v.get("id")
+        req_low = v_clean.lower()
+        for v in vl:
+            v_str = (v.get("name", "") + " " + v.get("id", "")).lower()
+            for emo in ["excited", "happy", "joyeuse", "sad", "grave", "curious", "curieuse", "angry", "ferme", "fearful", "douce", "neutral", "neutre"]:
+                if emo in req_low and emo in v_str:
+                    return v.get("id")
+        for v in vl:
+            if "marie" in (v.get("name", "") + " " + v.get("id", "")).lower():
+                return v.get("id")
+        if vl and vl[0].get("id"):
+            return vl[0].get("id")
+        return "marie"
+
+    @classmethod
+    def get_voice_sample(cls, voice_id: str, engine: str = "edge_tts", role: str = "host") -> bytes:
+        """
+        Retourne un échantillon audio MP3 (~2 secondes) pour une voix donnée.
+        Met en cache les extraits dans data/audio/voice_samples/<engine>_<id>.mp3.
+        """
+        if not voice_id:
+            return b""
+
+        clean_id = re.sub(r'[^a-zA-Z0-9_\-]', '_', str(voice_id)).lower()
+        samples_dir = get_user_data_path("audio", "voice_samples")
+        os.makedirs(samples_dir, exist_ok=True)
+        cache_file = os.path.join(samples_dir, f"{engine}_{clean_id}.mp3")
+
+        if os.path.exists(cache_file) and os.path.getsize(cache_file) > 500:
+            try:
+                with open(cache_file, "rb") as f:
+                    return f.read()
+            except Exception as e:
+                logger.warning("[PodcastEngine] Erreur lecture cache sample : %s", e)
+
+        v_low = voice_id.lower()
+        if "happy" in v_low or "joyeuse" in v_low:
+            sample_text = "Bienvenue dans Open Shema ! Je suis ravie d'explorer ce passage avec vous."
+        elif "sad" in v_low or "grave" in v_low:
+            sample_text = "Entrons dans ce temps de recueillement et de méditation biblique."
+        elif "curious" in v_low or "curieuse" in v_low:
+            sample_text = "Quels secrets et révélations ce passage biblique nous réserve-t-il ?"
+        elif "angry" in v_low or "ferme" in v_low:
+            sample_text = "Prenons le temps d'examiner ce texte avec toute la rigueur nécessaire."
+        elif "henri" in v_low or "fabrice" in v_low or "antoine" in v_low or "jean" in v_low or "gérard" in v_low or "gerard" in v_low or "thierry" in v_low or "scholar" in role:
+            sample_text = "Bonjour, examinons ensemble le contexte textuel et historique de ce passage."
+        elif "solo" in role:
+            sample_text = "Bienvenue dans notre chronique d'étude et de méditation biblique."
+        else:
+            sample_text = "Bienvenue dans Open Shema pour cette étude biblique."
+
+        audio_bytes = b""
+        cfg = load_config()
+
+        if engine == "voxtral":
+            mistral_key = cfg.get("mistral_api_key")
+            if mistral_key:
+                try:
+                    import httpx
+                    v_resolved = cls.resolve_voxtral_voice_id(voice_id)
+                    url = f"{cls.VOXTRAL_API_BASE}/audio/speech"
+                    headers = {
+                        "Authorization": f"Bearer {mistral_key}",
+                        "Content-Type": "application/json"
+                    }
+                    payload = {
+                        "model": cls.VOXTRAL_MODEL,
+                        "input": sample_text,
+                        "voice": v_resolved,
+                        "response_format": "mp3"
+                    }
+                    resp = httpx.post(url, headers=headers, json=payload, timeout=12.0)
+                    if resp.status_code == 200 and len(resp.content) > 500:
+                        audio_bytes = resp.content
+                except Exception as e:
+                    logger.warning("[PodcastEngine] Erreur Voxtral sample : %s", e)
+
+            if not audio_bytes:
+                mapped_edge = cls.VOXTRAL_EMOTION_EDGE_MAP.get(voice_id, "fr-FR-DeniseNeural")
+                audio_bytes = cls._single_edge_tts_call(sample_text, mapped_edge)
+        else:
+            audio_bytes = cls._single_edge_tts_call(sample_text, voice_id)
+
+        if audio_bytes and len(audio_bytes) > 500:
+            try:
+                audio_bytes = cls.apply_audio_mastering(audio_bytes, {"mastering_enabled": True})
+            except Exception:
+                pass
+
+            try:
+                with open(cache_file, "wb") as f:
+                    f.write(audio_bytes)
+            except Exception as e:
+                logger.warning("[PodcastEngine] Erreur écriture cache sample : %s", e)
+
+        return audio_bytes
 
     @classmethod
     def _single_edge_tts_call(cls, text: str, voice: str) -> bytes:
