@@ -138,6 +138,19 @@ const SettingsView = {
   draggedNavId: null,
 
   init() {
+    this.discoveredGeminiModels = this.getLocalStorageDiscoveredModels('google');
+    this.discoveredMistralModels = this.getLocalStorageDiscoveredModels('mistral');
+    this.discoveredInfomaniakModels = this.getLocalStorageDiscoveredModels('infomaniak');
+
+    // Réhydrater immédiatement les modèles choisis individuellement par l'utilisateur
+    if (!this.config) this.config = {};
+    Object.entries(this.MODEL_PAIR_CONFIG_KEYS).forEach(([selectId, key]) => {
+      const saved = this.getSelectedModel(key);
+      if (saved) {
+        this.config[key] = saved;
+      }
+    });
+
     if (this._isInitialized) {
       this.loadData();
       return;
@@ -1630,10 +1643,18 @@ Exemple :
 
   populateForm() {
     const c = this.config || {};
-    // Déterminer le mode effectif en respectant en priorité le thème actif sur document.body
-    const currentActiveTheme = document.body.classList.contains('theme-light') ? 'light' : (document.body.classList.contains('theme-dark') ? 'dark' : 'system');
-    const theme = c.theme || currentActiveTheme;
-    let palette = c.theme_palette;
+    // Déterminer le mode effectif en respectant en priorité absolue l'affichage actif et localStorage
+    const bodyIsLight = document.body.classList.contains('theme-light');
+    const bodyIsDark = document.body.classList.contains('theme-dark');
+    const currentActiveTheme = bodyIsLight ? 'light' : (bodyIsDark ? 'dark' : 'dark');
+    const savedLocalTheme = localStorage.getItem('app_theme');
+    let theme = savedLocalTheme || c.theme || currentActiveTheme;
+    if (bodyIsDark && theme === 'light' && !savedLocalTheme) {
+      theme = 'dark';
+    }
+
+    const savedLocalPalette = localStorage.getItem('app_theme_palette');
+    let palette = savedLocalPalette || c.theme_palette;
     if (!palette || (theme === 'light' && palette.startsWith('dark')) || (theme === 'dark' && palette.startsWith('light'))) {
       palette = theme === 'light' ? 'light-clean' : 'dark-slate';
     }
@@ -1758,6 +1779,16 @@ Exemple :
 
     this.config.disabled_models = Array.isArray(c.disabled_models) ? [...c.disabled_models] : [];
     this.updateModelsSummaryBadges();
+
+    // Rehydrater les modèles choisis individuellement pour ne jamais subir de régression
+    Object.entries(this.MODEL_PAIR_CONFIG_KEYS).forEach(([selectId, key]) => {
+      const saved = this.getSelectedModel(key);
+      if (saved) {
+        c[key] = saved;
+        this.config[key] = saved;
+      }
+    });
+
     this.renderAllModelSelects();
 
     if (c.chat_model && document.getElementById('cfg-chat-model')) {
@@ -1888,6 +1919,12 @@ Exemple :
     if (document.getElementById('cfg-audio-studio-enable-curator')) {
       document.getElementById('cfg-audio-studio-enable-curator').checked = !!c.audio_studio_enable_curator;
     }
+    if (document.getElementById('cfg-audio-studio-bg-music')) {
+      document.getElementById('cfg-audio-studio-bg-music').value = c.audio_studio_bg_music || 'bed_cozy_jazz_study';
+    }
+    if (document.getElementById('cfg-audio-studio-jingle-intro')) {
+      document.getElementById('cfg-audio-studio-jingle-intro').value = c.audio_studio_jingle_intro || 'jingle_piano_solemn';
+    }
 
     // Chargement des prompts système (Modes de chat & Outils dédiés)
     Object.values(this.PROMPT_CONFIGS).forEach(cfg => {
@@ -1928,6 +1965,48 @@ Exemple :
     }
   },
 
+  MODEL_PAIR_CONFIG_KEYS: {
+    'cfg-chat-model': 'chat_model',
+    'cfg-chat-fallback-model': 'chat_fallback_model',
+    'cfg-synthesis-model': 'synthesis_model',
+    'cfg-synthesis-fallback-model': 'synthesis_fallback_model',
+    'cfg-translation-model': 'translation_model',
+    'cfg-translation-fallback-model': 'translation_fallback_model',
+    'cfg-summary-model': 'summary_model',
+    'cfg-summary-fallback-model': 'summary_fallback_model',
+    'cfg-title-model': 'title_model',
+    'cfg-title-fallback-model': 'title_fallback_model',
+    'cfg-notes-ai-model': 'notes_ai_model',
+    'cfg-notes-ai-fallback-model': 'notes_ai_fallback_model',
+    'cfg-sermon-restructure-model': 'sermon_restructure_model',
+    'cfg-sermon-restructure-fallback-model': 'sermon_restructure_fallback_model',
+    'cfg-sermon-evaluation-model': 'sermon_evaluation_model',
+    'cfg-sermon-evaluation-fallback-model': 'sermon_evaluation_fallback_model',
+    'cfg-mindmap-ai-model': 'mindmap_ai_model',
+    'cfg-mindmap-ai-fallback-model': 'mindmap_ai_fallback_model',
+    'cfg-curator-model': 'curator_model',
+    'cfg-curator-fallback-model': 'curator_fallback_model',
+    'cfg-audio-axes-model': 'audio_studio_axes_model',
+    'cfg-audio-axes-fallback-model': 'audio_studio_axes_fallback_model',
+    'cfg-audio-script-model': 'audio_studio_script_model',
+    'cfg-audio-script-fallback-model': 'audio_studio_script_fallback_model'
+  },
+
+  getSelectedModel(configKey) {
+    try {
+      const val = localStorage.getItem(`open_shema_selected_model_${configKey}`);
+      if (val && typeof val === 'string' && val.trim()) return val.trim();
+    } catch (_) {}
+    return null;
+  },
+
+  setSelectedModel(configKey, modelId) {
+    if (!configKey || !modelId) return;
+    try {
+      localStorage.setItem(`open_shema_selected_model_${configKey}`, modelId);
+    } catch (_) {}
+  },
+
   getLocalStorageDiscoveredModels(provider) {
     try {
       const key = `open_shema_discovered_${provider}_models`;
@@ -1947,10 +2026,62 @@ Exemple :
     } catch (_) {}
   },
 
+  saveDiscoveredAndDisabledModels() {
+    this.setLocalStorageDiscoveredModels('google', this.discoveredGeminiModels);
+    this.setLocalStorageDiscoveredModels('mistral', this.discoveredMistralModels);
+    this.setLocalStorageDiscoveredModels('infomaniak', this.discoveredInfomaniakModels);
+
+    if (!this.config) this.config = {};
+    this.config.discovered_gemini_models = this.discoveredGeminiModels || [];
+    this.config.discovered_mistral_models = this.discoveredMistralModels || [];
+    this.config.discovered_infomaniak_models = this.discoveredInfomaniakModels || [];
+    this.config.disabled_models = this.getDisabledModels();
+
+    // S'assurer que les modèles individuels choisis ne sont jamais écrasés par d'anciens défauts
+    Object.entries(this.MODEL_PAIR_CONFIG_KEYS).forEach(([selectId, key]) => {
+      const elVal = document.getElementById(selectId)?.value;
+      const localVal = this.getSelectedModel(key);
+      const chosen = elVal || localVal || this.config[key];
+      if (chosen) {
+        this.config[key] = chosen;
+        this.setSelectedModel(key, chosen);
+      }
+    });
+
+    try {
+      API.call('save_settings', {
+        ...this.config,
+        discovered_gemini_models: this.discoveredGeminiModels || [],
+        discovered_mistral_models: this.discoveredMistralModels || [],
+        discovered_infomaniak_models: this.discoveredInfomaniakModels || [],
+        disabled_models: this.getDisabledModels()
+      });
+    } catch (e) {
+      console.warn('Erreur sauvegarde discrète des modèles:', e);
+    }
+  },
+
   getAllAvailableModels() {
     const list = [...this.ALL_MODELS_CATALOG];
     const existingIds = new Set(list.map(m => m.id));
-    for (const dm of this.discoveredGeminiModels) {
+
+    if (!this.discoveredGeminiModels || this.discoveredGeminiModels.length === 0) {
+      this.discoveredGeminiModels = (Array.isArray(this.config?.discovered_gemini_models) && this.config.discovered_gemini_models.length > 0)
+        ? [...this.config.discovered_gemini_models]
+        : this.getLocalStorageDiscoveredModels('google');
+    }
+    if (!this.discoveredMistralModels || this.discoveredMistralModels.length === 0) {
+      this.discoveredMistralModels = (Array.isArray(this.config?.discovered_mistral_models) && this.config.discovered_mistral_models.length > 0)
+        ? [...this.config.discovered_mistral_models]
+        : this.getLocalStorageDiscoveredModels('mistral');
+    }
+    if (!this.discoveredInfomaniakModels || this.discoveredInfomaniakModels.length === 0) {
+      this.discoveredInfomaniakModels = (Array.isArray(this.config?.discovered_infomaniak_models) && this.config.discovered_infomaniak_models.length > 0)
+        ? [...this.config.discovered_infomaniak_models]
+        : this.getLocalStorageDiscoveredModels('infomaniak');
+    }
+
+    for (const dm of (this.discoveredGeminiModels || [])) {
       if (!existingIds.has(dm.id)) {
         list.push({
           id: dm.id,
@@ -1962,7 +2093,7 @@ Exemple :
         existingIds.add(dm.id);
       }
     }
-    for (const dm of this.discoveredMistralModels) {
+    for (const dm of (this.discoveredMistralModels || [])) {
       if (!existingIds.has(dm.id)) {
         list.push({
           id: dm.id,
@@ -1974,7 +2105,7 @@ Exemple :
         existingIds.add(dm.id);
       }
     }
-    for (const dm of this.discoveredInfomaniakModels) {
+    for (const dm of (this.discoveredInfomaniakModels || [])) {
       if (!existingIds.has(dm.id)) {
         list.push({
           id: dm.id,
@@ -2042,7 +2173,7 @@ Exemple :
   closeModelsVisibilityModal() {
     const modal = document.getElementById('modal-models-visibility');
     if (modal) modal.classList.add('hidden');
-    this.save();
+    this.saveDiscoveredAndDisabledModels();
     this.renderAllModelSelects();
     this.updateModelsSummaryBadges();
   },
@@ -2148,7 +2279,7 @@ Exemple :
       }
     }
     this.config.disabled_models = disabled;
-    this.save();
+    this.saveDiscoveredAndDisabledModels();
     this.renderAllModelSelects();
     this.updateModelsSummaryBadges();
     if (reRenderModal) {
@@ -2235,54 +2366,9 @@ Exemple :
 
       // Aligner la sélection avec la configuration sauvegardée
       let targetVal = currentVal;
-      if (id === 'cfg-chat-model' || id === 'ai-opt-model') {
-        targetVal = this.config.chat_model || currentVal;
-      } else if (id === 'cfg-chat-fallback-model') {
-        targetVal = this.config.chat_fallback_model || currentVal;
-      } else if (id === 'cfg-synthesis-model') {
-        targetVal = this.config.synthesis_model || currentVal;
-      } else if (id === 'cfg-synthesis-fallback-model') {
-        targetVal = this.config.synthesis_fallback_model || currentVal;
-      } else if (id === 'cfg-translation-model') {
-        targetVal = this.config.translation_model || currentVal;
-      } else if (id === 'cfg-translation-fallback-model') {
-        targetVal = this.config.translation_fallback_model || currentVal;
-      } else if (id === 'cfg-summary-model') {
-        targetVal = this.config.summary_model || currentVal;
-      } else if (id === 'cfg-summary-fallback-model') {
-        targetVal = this.config.summary_fallback_model || currentVal;
-      } else if (id === 'cfg-title-model') {
-        targetVal = this.config.title_model || currentVal;
-      } else if (id === 'cfg-title-fallback-model') {
-        targetVal = this.config.title_fallback_model || currentVal;
-      } else if (id === 'cfg-notes-ai-model') {
-        targetVal = this.config.notes_ai_model || currentVal;
-      } else if (id === 'cfg-notes-ai-fallback-model') {
-        targetVal = this.config.notes_ai_fallback_model || currentVal;
-      } else if (id === 'cfg-sermon-restructure-model') {
-        targetVal = this.config.sermon_restructure_model || currentVal;
-      } else if (id === 'cfg-sermon-restructure-fallback-model') {
-        targetVal = this.config.sermon_restructure_fallback_model || currentVal;
-      } else if (id === 'cfg-sermon-evaluation-model') {
-        targetVal = this.config.sermon_evaluation_model || currentVal;
-      } else if (id === 'cfg-sermon-evaluation-fallback-model') {
-        targetVal = this.config.sermon_evaluation_fallback_model || currentVal;
-      } else if (id === 'cfg-mindmap-ai-model') {
-        targetVal = this.config.mindmap_ai_model || currentVal;
-      } else if (id === 'cfg-mindmap-ai-fallback-model') {
-        targetVal = this.config.mindmap_ai_fallback_model || currentVal;
-      } else if (id === 'cfg-curator-model') {
-        targetVal = this.config.curator_model || this.config.rag_curation_model || currentVal;
-      } else if (id === 'cfg-curator-fallback-model') {
-        targetVal = this.config.curator_fallback_model || this.config.rag_curation_fallback_model || currentVal;
-      } else if (id === 'cfg-audio-axes-model') {
-        targetVal = this.config.audio_studio_axes_model || currentVal;
-      } else if (id === 'cfg-audio-axes-fallback-model') {
-        targetVal = this.config.audio_studio_axes_fallback_model || currentVal;
-      } else if (id === 'cfg-audio-script-model') {
-        targetVal = this.config.audio_studio_script_model || currentVal;
-      } else if (id === 'cfg-audio-script-fallback-model') {
-        targetVal = this.config.audio_studio_script_fallback_model || currentVal;
+      const cfgKey = this.MODEL_PAIR_CONFIG_KEYS[id] || (id === 'ai-opt-model' ? 'chat_model' : null);
+      if (cfgKey) {
+        targetVal = this.getSelectedModel(cfgKey) || this.config[cfgKey] || currentVal;
       }
 
       if (targetVal && enabledModels.some(m => m.id === targetVal)) {
@@ -2343,7 +2429,7 @@ Exemple :
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
-        this.save();
+        this.saveDiscoveredAndDisabledModels();
         App.showToast(`✓ ${res.models.length} modèles Gemini récupérés avec succès depuis Google !`);
       } else {
         App.showToast(`Erreur Google API : ${res?.error || 'Impossible de récupérer les modèles'}`);
@@ -2381,7 +2467,7 @@ Exemple :
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
-        this.save();
+        this.saveDiscoveredAndDisabledModels();
         App.showToast(`✓ ${res.models.length} modèles Mistral récupérés avec succès depuis Mistral AI !`);
       } else {
         App.showToast(`Erreur Mistral API : ${res?.error || 'Impossible de récupérer les modèles'}`);
@@ -2421,7 +2507,7 @@ Exemple :
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
-        this.save();
+        this.saveDiscoveredAndDisabledModels();
         App.showToast(`✓ ${res.models.length} modèles Infomaniak récupérés avec succès !`);
       } else {
         App.showToast(`Erreur Infomaniak API : ${res?.error || 'Impossible de récupérer les modèles'}`);
@@ -2457,6 +2543,12 @@ Exemple :
       if (!pEl || !fEl) return;
 
       pEl.addEventListener('change', () => {
+        const key = this.MODEL_PAIR_CONFIG_KEYS[primary];
+        if (key && pEl.value) {
+          this.setSelectedModel(key, pEl.value);
+          if (!this.config) this.config = {};
+          this.config[key] = pEl.value;
+        }
         this.syncModelPair(primary, fallback, label, true);
         this.save();
       });
@@ -2468,6 +2560,12 @@ Exemple :
             fEl.value = alternate;
             App.showToast(`Le modèle de secours (${label}) doit être distinct du modèle principal.`);
           }
+        }
+        const key = this.MODEL_PAIR_CONFIG_KEYS[fallback];
+        if (key && fEl.value) {
+          this.setSelectedModel(key, fEl.value);
+          if (!this.config) this.config = {};
+          this.config[key] = fEl.value;
         }
         this.syncModelPair(primary, fallback, label, false);
         this.save();
@@ -2821,8 +2919,11 @@ Exemple :
   async save() {
     const newCfg = { ...this.config };
     newCfg.enable_ai = document.getElementById('cfg-enable-ai')?.checked !== false;
-    newCfg.theme = document.getElementById('cfg-theme').value;
-    newCfg.theme_palette = document.getElementById('cfg-theme-palette')?.value || 'dark-slate';
+    const activePill = document.querySelector('.theme-mode-pill.active');
+    const pillTheme = activePill ? activePill.dataset.theme : null;
+    const bodyIsDark = document.body.classList.contains('theme-dark');
+    newCfg.theme = pillTheme || document.getElementById('cfg-theme')?.value || (bodyIsDark ? 'dark' : 'system');
+    newCfg.theme_palette = document.getElementById('cfg-theme-palette')?.value || this.config.theme_palette || 'dark-slate';
     newCfg.reading_bg = document.getElementById('cfg-reading-bg')?.value || 'auto';
     newCfg.font_family = document.getElementById('cfg-font-family').value;
     newCfg.font_size = parseInt(document.getElementById('cfg-font-size').value);
@@ -3011,6 +3112,16 @@ Exemple :
       }
       newCfg.audio_studio_script_fallback_model = fb;
     }
+
+    // Sauvegarde miroir immédiate de tous les choix de modèles dans localStorage
+    Object.entries(this.MODEL_PAIR_CONFIG_KEYS).forEach(([selectId, key]) => {
+      const el = document.getElementById(selectId);
+      if (el && el.value) {
+        newCfg[key] = el.value;
+        this.setSelectedModel(key, el.value);
+      }
+    });
+
     if (document.getElementById('cfg-summary-word-count')) {
       newCfg.summary_word_count = parseInt(document.getElementById('cfg-summary-word-count').value) || 300;
     }
@@ -3056,6 +3167,12 @@ Exemple :
     }
     if (document.getElementById('cfg-audio-studio-enable-curator')) {
       newCfg.audio_studio_enable_curator = document.getElementById('cfg-audio-studio-enable-curator').checked;
+    }
+    if (document.getElementById('cfg-audio-studio-bg-music')) {
+      newCfg.audio_studio_bg_music = document.getElementById('cfg-audio-studio-bg-music').value;
+    }
+    if (document.getElementById('cfg-audio-studio-jingle-intro')) {
+      newCfg.audio_studio_jingle_intro = document.getElementById('cfg-audio-studio-jingle-intro').value;
     }
 
     // Sérialisation des prompts système

@@ -56,6 +56,7 @@ const AudioStudioView = {
     this.initContextDepthSlider();
     this.loadConfiguration();
     this.loadVoices();
+    this.loadSoundpack();
     this.loadHistory();
     this.setupTaskManagerListener();
     this.goToStep(1);
@@ -89,6 +90,9 @@ const AudioStudioView = {
       btnFormatStep2Dialogue: document.getElementById('btn-audio-step2-format-dialogue'),
       btnFormatStep2Solo: document.getElementById('btn-audio-step2-format-solo'),
       btnGenerate: document.getElementById('btn-audio-studio-generate'),
+      step1ReasoningBox: document.getElementById('as-step1-reasoning-box'),
+      reasoningTimer: document.getElementById('as-reasoning-timer'),
+      reasoningStepsList: document.getElementById('as-reasoning-steps-list'),
 
       // Options RAG
       srcBibles: document.getElementById('as-opt-src-bibles'),
@@ -145,6 +149,13 @@ const AudioStudioView = {
       voxtralWarning: document.getElementById('as-voxtral-warning'),
       linkSettingsMistral: document.getElementById('as-link-settings-mistral'),
       inputPauseMs: document.getElementById('as-input-pause-ms'),
+      checkMastering: document.getElementById('as-check-mastering'),
+      checkCalmProsody: document.getElementById('as-check-calm-prosody'),
+      selectBgMusic: document.getElementById('as-select-bg-music'),
+      btnPreviewBgMusic: document.getElementById('btn-as-preview-bg-music'),
+      selectJingleIntro: document.getElementById('as-select-jingle-intro'),
+      btnPreviewJingleIntro: document.getElementById('btn-as-preview-jingle-intro'),
+      checkDucking: document.getElementById('as-check-ducking'),
       btnSynthesize: document.getElementById('btn-audio-studio-synthesize'),
       progressBox: document.getElementById('audio-studio-progress-box'),
       progressTitle: document.getElementById('audio-studio-progress-title'),
@@ -302,6 +313,19 @@ const AudioStudioView = {
       this.saveVoiceOption({ pause_ms: ms });
     });
 
+    el.checkMastering?.addEventListener('change', (e) => {
+      this.saveVoiceOption({ mastering_enabled: e.target.checked });
+    });
+
+    el.checkCalmProsody?.addEventListener('change', (e) => {
+      this.saveVoiceOption({
+        calm_prosody: e.target.checked,
+        rate: e.target.checked ? '-6%' : '+0%',
+        pitch: e.target.checked ? '-3Hz' : '+0Hz',
+        inject_breaks: e.target.checked
+      });
+    });
+
     // 1d. Lien vers paramètres Mistral
     el.linkSettingsMistral?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -352,8 +376,32 @@ const AudioStudioView = {
     // 8. Ajouter une réplique manuelle
     el.btnAddTurn?.addEventListener('click', () => this.addManualTurn());
 
-    // 9. Synthèse audio
+    // 9. Synthèse audio & Habillage sonore (Soundpack)
     el.btnSynthesize?.addEventListener('click', () => this.startSynthesis());
+
+    el.btnPreviewBgMusic?.addEventListener('click', () => {
+      const trId = el.selectBgMusic?.value;
+      this.previewTrack(trId, el.btnPreviewBgMusic);
+    });
+
+    el.btnPreviewJingleIntro?.addEventListener('click', () => {
+      const trId = el.selectJingleIntro?.value;
+      this.previewTrack(trId, el.btnPreviewJingleIntro);
+    });
+
+    el.selectBgMusic?.addEventListener('change', () => {
+      if (this.previewAudio && !this.previewAudio.paused && this.currentPreviewBtn === el.btnPreviewBgMusic) {
+        this.previewAudio.pause();
+        el.btnPreviewBgMusic.classList.remove('active');
+      }
+    });
+
+    el.selectJingleIntro?.addEventListener('change', () => {
+      if (this.previewAudio && !this.previewAudio.paused && this.currentPreviewBtn === el.btnPreviewJingleIntro) {
+        this.previewAudio.pause();
+        el.btnPreviewJingleIntro.classList.remove('active');
+      }
+    });
 
     // 10. Lecteur Audio
     el.btnPlay?.addEventListener('click', () => this.togglePlay());
@@ -602,6 +650,22 @@ const AudioStudioView = {
 
         if (el.checkVoxtralModulate) el.checkVoxtralModulate.checked = res.voxtral_modulate !== false;
         if (el.inputPauseMs && res.pause_ms) el.inputPauseMs.value = res.pause_ms;
+        if (el.checkMastering && typeof res.mastering_enabled !== 'undefined') {
+          el.checkMastering.checked = res.mastering_enabled !== false;
+        }
+        if (el.checkCalmProsody && typeof res.calm_prosody !== 'undefined') {
+          el.checkCalmProsody.checked = res.calm_prosody !== false;
+        }
+
+        if (el.selectBgMusic && res.bg_music) {
+          el.selectBgMusic.value = res.bg_music;
+        }
+        if (el.selectJingleIntro && res.jingle_intro) {
+          el.selectJingleIntro.value = res.jingle_intro;
+        }
+        if (el.checkDucking && typeof res.ducking_enabled !== 'undefined') {
+          el.checkDucking.checked = res.ducking_enabled !== false;
+        }
 
         // Mise à jour de l'affichage du format actuel
         this.setFormat(this.format);
@@ -1082,6 +1146,143 @@ const AudioStudioView = {
   },
 
   // =========================================================================
+  // GESTION DU SOUNDPACK (Musiques d'ambiance, Jingles & Ducking)
+  // =========================================================================
+
+  async loadSoundpack() {
+    try {
+      const res = await API.call('audio_studio_get_soundpack');
+      if (res && res.success && res.soundpack) {
+        this.soundpack = res.soundpack;
+        this.populateSoundpackSelects(res.soundpack);
+      }
+    } catch (err) {
+      console.warn('[AudioStudioView] Erreur chargement soundpack:', err);
+    }
+  },
+
+  populateSoundpackSelects(soundpack) {
+    const el = this.elements;
+    const tracks = soundpack?.tracks || [];
+
+    const musicTracks = tracks.filter(t => t.category === 'music');
+    const jingleTracks = tracks.filter(t => t.category === 'jingle_intro' || t.category === 'jingles');
+    const stingerTracks = tracks.filter(t => t.category === 'stinger');
+
+    const formatDur = (sec) => {
+      const s = Math.round(sec || 0);
+      if (s >= 60) {
+        const m = Math.floor(s / 60);
+        const rem = (s % 60).toString().padStart(2, '0');
+        return `${m}:${rem}`;
+      }
+      return `${s}s`;
+    };
+
+    if (el.selectBgMusic) {
+      let html = '<option value="bed_cozy_jazz_study">Étude &amp; Méditation (Nappe Jazz Douce — Recommandé)</option>';
+      musicTracks.forEach(t => {
+        if (t.id !== 'bed_cozy_jazz_study') {
+          const tName = t.name || t.title || t.id;
+          const tDur = formatDur(t.duration || t.duration_sec);
+          html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
+        }
+      });
+      const otherThemes = [...jingleTracks, ...stingerTracks];
+      if (otherThemes.length > 0) {
+        html += '<optgroup label="Thèmes courts &amp; interludes">';
+        otherThemes.forEach(t => {
+          const tName = t.name || t.title || t.id;
+          const tDur = formatDur(t.duration || t.duration_sec);
+          html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
+        });
+        html += '</optgroup>';
+      }
+      html += '<option value="none">Aucune musique (Voix pure)</option>';
+      el.selectBgMusic.innerHTML = html;
+
+      const curMusic = this.config?.bg_music || 'bed_cozy_jazz_study';
+      if (el.selectBgMusic.querySelector(`option[value="${curMusic}"]`)) {
+        el.selectBgMusic.value = curMusic;
+      }
+    }
+
+    if (el.selectJingleIntro) {
+      let html = '<option value="jingle_piano_solemn">Piano Recueilli (Intro Solennelle — Recommandé)</option>';
+      const allIntros = [...jingleTracks, ...stingerTracks];
+      allIntros.forEach(t => {
+        if (t.id !== 'jingle_piano_solemn') {
+          const tName = t.name || t.title || t.id;
+          const tDur = formatDur(t.duration || t.duration_sec);
+          html += `<option value="${t.id}">${this.escapeHtml(tName)} (${tDur})</option>`;
+        }
+      });
+      html += '<option value="none">Aucun jingle (Démarrage direct)</option>';
+      el.selectJingleIntro.innerHTML = html;
+
+      const curJingle = this.config?.jingle_intro || 'jingle_piano_solemn';
+      if (el.selectJingleIntro.querySelector(`option[value="${curJingle}"]`)) {
+        el.selectJingleIntro.value = curJingle;
+      }
+    }
+  },
+
+  async previewTrack(trackId, btnEl) {
+    if (!trackId || trackId === 'none') {
+      this.showInfoToast("Sélectionnez d'abord un morceau pour l'écouter.");
+      return;
+    }
+
+    if (this.previewAudio && !this.previewAudio.paused) {
+      this.previewAudio.pause();
+      this.previewAudio.currentTime = 0;
+      if (this.currentPreviewBtn) {
+        this.currentPreviewBtn.classList.remove('active');
+        this.currentPreviewBtn.title = 'Écouter un extrait';
+      }
+      if (this.currentPreviewTrackId === trackId) {
+        this.currentPreviewTrackId = null;
+        this.currentPreviewBtn = null;
+        return;
+      }
+    }
+
+    try {
+      if (btnEl) btnEl.classList.add('loading');
+      const res = await API.call('audio_studio_get_soundpack_track_url', trackId);
+      if (btnEl) btnEl.classList.remove('loading');
+
+      if (res && res.success && res.audio_url) {
+        if (!this.previewAudio) {
+          this.previewAudio = new Audio();
+        }
+        this.previewAudio.src = res.audio_url;
+        this.previewAudio.volume = 0.55;
+        this.previewAudio.play();
+        this.currentPreviewTrackId = trackId;
+        this.currentPreviewBtn = btnEl;
+        if (btnEl) {
+          btnEl.classList.add('active');
+          btnEl.title = 'Arrêter la préécoute';
+        }
+        this.previewAudio.onended = () => {
+          if (btnEl) {
+            btnEl.classList.remove('active');
+            btnEl.title = 'Écouter un extrait';
+          }
+          this.currentPreviewTrackId = null;
+          this.currentPreviewBtn = null;
+        };
+      } else {
+        this.showErrorToast("Impossible de charger l'extrait audio.");
+      }
+    } catch (err) {
+      if (btnEl) btnEl.classList.remove('loading');
+      console.warn('[AudioStudioView] Erreur préécoute track:', err);
+    }
+  },
+
+  // =========================================================================
   // OUTILS DU PASSAGE BIBLIQUE (BookPicker & Sync)
   // =========================================================================
 
@@ -1176,6 +1377,10 @@ const AudioStudioView = {
     if (el.step1Pane) el.step1Pane.classList.toggle('is-active', step === 1);
     if (el.step2Pane) el.step2Pane.classList.toggle('is-active', step === 2);
     if (el.step3Pane) el.step3Pane.classList.toggle('is-active', step === 3);
+
+    if (step !== 1 && el.step1ReasoningBox) {
+      el.step1ReasoningBox.style.display = 'none';
+    }
 
     // Ajustements d'étape
     if (step === 2) {
@@ -1330,6 +1535,7 @@ const AudioStudioView = {
       this.elements.subjectInput.focus();
     }
     this.clearScript();
+    this.finishScriptReasoning(false);
     this.goToStep(1);
     this.showSuccessToast("Nouvel épisode initialisé.");
   },
@@ -1373,11 +1579,136 @@ const AudioStudioView = {
   // RÉDACTION DU SCRIPT (LLM + RAG) & PROGRESSION EN TEMPS RÉEL
   // =========================================================================
 
-  updateScriptProgress(pct, msg) {
+  // =========================================================================
+  // GESTION DU RAISONNEMENT PROGRESSIF & DES ÉTAPES (STYLE ASSISTANT IA)
+  // =========================================================================
+
+  initScriptReasoningSteps(sourcesOpts) {
     const el = this.elements;
-    const cleanPct = Math.max(0, Math.min(100, parseInt(pct, 10) || 0));
-    this.targetScriptPct = Math.max(this.targetScriptPct || 5, cleanPct);
-    if (msg) this.latestScriptMsg = msg;
+    if (!el.step1ReasoningBox || !el.reasoningStepsList) return;
+
+    if (this.reasoningInterval) {
+      clearInterval(this.reasoningInterval);
+      this.reasoningInterval = null;
+    }
+    if (this.reasoningTimeouts) {
+      this.reasoningTimeouts.forEach(t => clearTimeout(t));
+    }
+    this.reasoningTimeouts = [];
+
+    const hasRerank = sourcesOpts?.enable_rerank !== false;
+    const hasCurator = !!sourcesOpts?.enable_curator;
+
+    this.reasoningStepsDef = [
+      { id: 'step-intent', label: "Cadrage thématique & orientation méthodologique" },
+      { id: 'step-corpus', label: "Exploration documentaire multi-sources" },
+      ...(hasRerank ? [{ id: 'step-rerank', label: "Évaluation & pertinence croisée (Reranking BGE-M3)" }] : []),
+      ...(hasCurator ? [{ id: 'step-curator', label: "Curation & structuration du corpus documentaire" }] : []),
+      { id: 'step-llm', label: "Rédaction intégrale du script par l'IA" },
+      { id: 'step-struct', label: "Validation et découpage des répliques" }
+    ];
+
+    this.currentReasoningStepIdx = 0;
+
+    let html = '';
+    this.reasoningStepsDef.forEach((step, idx) => {
+      const state = idx === 0 ? 'active' : 'pending';
+      html += `
+        <div class="reasoning-step ${step.id} ${state}" data-step-idx="${idx}">
+          <span class="step-bullet"></span>
+          <span class="step-label">${step.label}</span>
+        </div>
+      `;
+    });
+
+    el.reasoningStepsList.innerHTML = html;
+    el.step1ReasoningBox.style.display = 'block';
+
+    // Chronomètre en direct
+    const startTime = performance.now();
+    if (el.reasoningTimer) el.reasoningTimer.textContent = '0.0s';
+    this.reasoningInterval = setInterval(() => {
+      const elapsed = ((performance.now() - startTime) / 1000).toFixed(1);
+      if (el.reasoningTimer) el.reasoningTimer.textContent = `${elapsed}s`;
+    }, 100);
+
+    // Progression initiale douce
+    const t1 = setTimeout(() => {
+      if (this.currentReasoningStepIdx === 0) {
+        this.setReasoningStepActive('step-corpus');
+      }
+    }, 600);
+    this.reasoningTimeouts.push(t1);
+  },
+
+  setReasoningStepActive(stepIdOrIdx) {
+    const el = this.elements;
+    if (!this.reasoningStepsDef || !el.reasoningStepsList) return;
+
+    let targetIdx = -1;
+    if (typeof stepIdOrIdx === 'number') {
+      targetIdx = stepIdOrIdx;
+    } else {
+      targetIdx = this.reasoningStepsDef.findIndex(s => s.id === stepIdOrIdx);
+    }
+
+    if (targetIdx < 0 || targetIdx >= this.reasoningStepsDef.length) return;
+    if (targetIdx <= this.currentReasoningStepIdx && this.currentReasoningStepIdx > 0) return;
+
+    this.currentReasoningStepIdx = targetIdx;
+
+    const stepElements = el.reasoningStepsList.querySelectorAll('.reasoning-step');
+    stepElements.forEach((stepEl, idx) => {
+      stepEl.classList.remove('pending', 'active', 'done');
+      if (idx < targetIdx) {
+        stepEl.classList.add('done');
+      } else if (idx === targetIdx) {
+        stepEl.classList.add('active');
+      } else {
+        stepEl.classList.add('pending');
+      }
+    });
+  },
+
+  updateScriptProgress(pct, msg) {
+    if (!this.isGenerating) return;
+    const lowerMsg = (msg || '').toLowerCase();
+
+    if (lowerMsg.includes('recherche') || lowerMsg.includes('lecture') || lowerMsg.includes('consultation') || lowerMsg.includes('notes') || lowerMsg.includes('chromadb')) {
+      this.setReasoningStepActive('step-corpus');
+    } else if (lowerMsg.includes('pertinence croisée') || lowerMsg.includes('rerank')) {
+      this.setReasoningStepActive('step-rerank');
+    } else if (lowerMsg.includes('curation') || lowerMsg.includes('structuration du corpus')) {
+      this.setReasoningStepActive('step-curator');
+    } else if (lowerMsg.includes('rédaction') || lowerMsg.includes('émission') || lowerMsg.includes('ia') || pct >= 75) {
+      if (pct >= 92 || lowerMsg.includes('validation') || lowerMsg.includes('structuration du script')) {
+        this.setReasoningStepActive('step-struct');
+      } else {
+        this.setReasoningStepActive('step-llm');
+      }
+    }
+  },
+
+  finishScriptReasoning(isSuccess = true) {
+    if (this.reasoningInterval) {
+      clearInterval(this.reasoningInterval);
+      this.reasoningInterval = null;
+    }
+    if (this.reasoningTimeouts) {
+      this.reasoningTimeouts.forEach(t => clearTimeout(t));
+      this.reasoningTimeouts = [];
+    }
+
+    const el = this.elements;
+    if (isSuccess && el.reasoningStepsList) {
+      const stepElements = el.reasoningStepsList.querySelectorAll('.reasoning-step');
+      stepElements.forEach(stepEl => {
+        stepEl.classList.remove('pending', 'active');
+        stepEl.classList.add('done');
+      });
+    } else if (!isSuccess && el.step1ReasoningBox) {
+      el.step1ReasoningBox.style.display = 'none';
+    }
   },
 
   updateSynthesisProgress(pct, msg) {
@@ -1411,43 +1742,14 @@ const AudioStudioView = {
     if (this.isGenerating) return;
     this.isGenerating = true;
 
-    this.currentScriptPct = 5;
-    this.targetScriptPct = 5;
-    this.latestScriptMsg = 'Initialisation de la recherche documentaire...';
-
-    // UI Loading state avec progression fluide en temps réel
+    // Bouton en état de chargement sobre, sans mention de pourcentage
     if (el.btnGenerate) {
       el.btnGenerate.disabled = true;
       el.btnGenerate.innerHTML = `
         <span class="audio-studio-spinner"></span>
-        <span class="audio-studio-btn-label">5% — Initialisation de la recherche documentaire...</span>
+        <span>Rédaction du script en cours...</span>
       `;
     }
-
-    // Interpolateur 50ms : glisse doucement vers targetScriptPct sans jamais réinitialiser le DOM du spinner
-    if (this.scriptAnimInterval) clearInterval(this.scriptAnimInterval);
-    this.scriptAnimInterval = setInterval(() => {
-      if (this.currentScriptPct < this.targetScriptPct) {
-        const step = Math.max(0.25, (this.targetScriptPct - this.currentScriptPct) * 0.10);
-        this.currentScriptPct = Math.min(this.targetScriptPct, this.currentScriptPct + step);
-      }
-      const displayPct = Math.round(this.currentScriptPct);
-      const label = this.latestScriptMsg || 'Recherche & Rédaction...';
-      if (el.btnGenerate && this.isGenerating) {
-        const labelSpan = el.btnGenerate.querySelector('.audio-studio-btn-label');
-        const newText = `${displayPct}% — ${label}`;
-        if (labelSpan) {
-          if (labelSpan.textContent !== newText) {
-            labelSpan.textContent = newText;
-          }
-        } else {
-          el.btnGenerate.innerHTML = `
-            <span class="audio-studio-spinner"></span>
-            <span class="audio-studio-btn-label">${newText}</span>
-          `;
-        }
-      }
-    }, 50);
 
     if (typeof NotificationManager !== 'undefined') {
       NotificationManager.setWorkingState('audio-studio', true);
@@ -1461,6 +1763,9 @@ const AudioStudioView = {
     sourcesOpts.study_mode = this.studyMode;
     sourcesOpts.focal_questions = activeQuestions;
 
+    // Initialisation et affichage des étapes de réflexion (style Assistant IA)
+    this.initScriptReasoningSteps(sourcesOpts);
+
     try {
       const res = await API.call('audio_studio_generate_script', {
         subject_or_ref: query,
@@ -1471,14 +1776,15 @@ const AudioStudioView = {
       });
 
       if (res && res.success && res.podcast) {
-        if (this.scriptAnimInterval) {
-          clearInterval(this.scriptAnimInterval);
-          this.scriptAnimInterval = null;
-        }
+        this.finishScriptReasoning(true);
         this.currentPodcast = res.podcast;
         this.renderScript();
         this.loadHistory();
-        this.goToStep(2); // Auto-avance fluide vers l'Étape 2 !
+
+        // Pause fluide de 400ms pour voir l'achèvement des étapes avant d'avancer
+        setTimeout(() => {
+          this.goToStep(2);
+        }, 400);
 
         if (typeof NotificationManager !== 'undefined') {
           NotificationManager.notifyAICompletion({
@@ -1489,17 +1795,19 @@ const AudioStudioView = {
           });
         }
       } else {
+        this.finishScriptReasoning(false);
         const errMsg = res?.error || 'Erreur lors de la génération du script';
         this.showErrorToast(errMsg);
       }
     } catch (err) {
+      this.finishScriptReasoning(false);
       console.error('[AudioStudioView] Erreur generateScript:', err);
       this.showErrorToast(`Erreur technique : ${err.message || err}`);
     } finally {
       this.isGenerating = false;
-      if (this.scriptAnimInterval) {
-        clearInterval(this.scriptAnimInterval);
-        this.scriptAnimInterval = null;
+      if (this.reasoningInterval) {
+        clearInterval(this.reasoningInterval);
+        this.reasoningInterval = null;
       }
       if (el.btnGenerate) {
         el.btnGenerate.disabled = false;
@@ -1930,8 +2238,25 @@ const AudioStudioView = {
         voxtral_voice_speaker_b: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral',
         voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral',
         voxtral_modulate: el.checkVoxtralModulate ? el.checkVoxtralModulate.checked : true,
-        pause_ms: parseInt(el.inputPauseMs?.value, 10) || 350
+        pause_ms: parseInt(el.inputPauseMs?.value, 10) || 350,
+        mastering_enabled: el.checkMastering ? el.checkMastering.checked : true,
+        calm_prosody: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
+        rate: el.checkCalmProsody?.checked ? '-6%' : '+0%',
+        pitch: el.checkCalmProsody?.checked ? '-3Hz' : '+0Hz',
+        inject_breaks: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
+        bg_music: el.selectBgMusic ? el.selectBgMusic.value : (this.config?.bg_music || 'bed_cozy_jazz_study'),
+        jingle_intro: el.selectJingleIntro ? el.selectJingleIntro.value : (this.config?.jingle_intro || 'jingle_piano_solemn'),
+        ducking_enabled: el.checkDucking ? el.checkDucking.checked : true,
+        ducking_db: this.config?.ducking_db || -16.0
       };
+
+      if (this.previewAudio && !this.previewAudio.paused) {
+        this.previewAudio.pause();
+        if (this.currentPreviewBtn) {
+          this.currentPreviewBtn.classList.remove('active');
+        }
+      }
+
       const res = await API.call('audio_studio_synthesize', this.currentPodcast.id, script, activeEngine, customOptions);
 
       if (res && res.success && res.podcast) {

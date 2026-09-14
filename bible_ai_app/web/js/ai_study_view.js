@@ -170,14 +170,20 @@ const AIStudyView = {
     const modelSelectEl = document.getElementById('ai-opt-model');
     modelSelectEl?.addEventListener('change', (e) => {
       const selectedModel = e.target.value;
-      if (selectedModel && typeof SettingsView !== 'undefined') {
-        SettingsView.config.chat_model = selectedModel;
-        const cfgChat = document.getElementById('cfg-chat-model');
-        if (cfgChat) {
-          cfgChat.value = selectedModel;
-          SettingsView.syncModelPair('cfg-chat-model', 'cfg-chat-fallback-model', 'Chat', false);
+      if (selectedModel) {
+        if (typeof SettingsView !== 'undefined') {
+          SettingsView.setSelectedModel('chat_model', selectedModel);
+          if (!SettingsView.config) SettingsView.config = {};
+          SettingsView.config.chat_model = selectedModel;
+          const cfgChat = document.getElementById('cfg-chat-model');
+          if (cfgChat) {
+            cfgChat.value = selectedModel;
+            SettingsView.syncModelPair('cfg-chat-model', 'cfg-chat-fallback-model', 'Chat', false);
+          }
+          SettingsView.save();
+        } else {
+          try { localStorage.setItem('open_shema_selected_model_chat_model', selectedModel); } catch (_) {}
         }
-        SettingsView.save();
       }
     });
 
@@ -382,17 +388,26 @@ const AIStudyView = {
 
   async loadDefaultModelFromConfig() {
     try {
+      const savedChat = (typeof SettingsView !== 'undefined' && SettingsView.getSelectedModel)
+        ? SettingsView.getSelectedModel('chat_model')
+        : localStorage.getItem('open_shema_selected_model_chat_model');
+
       const cfg = (typeof SettingsView !== 'undefined' && SettingsView.config && SettingsView.config.chat_model)
         ? SettingsView.config
         : await API.call('get_settings');
       if (cfg) {
+        if (savedChat) {
+          cfg.chat_model = savedChat;
+        }
         if (typeof SettingsView !== 'undefined') {
+          if (!SettingsView.config) SettingsView.config = {};
           SettingsView.config = { ...SettingsView.config, ...cfg };
+          if (savedChat) SettingsView.config.chat_model = savedChat;
           if (SettingsView.renderAllModelSelects) {
             SettingsView.renderAllModelSelects();
           }
         }
-        const targetModel = cfg.chat_model || (typeof SettingsView !== 'undefined' && SettingsView.config?.chat_model);
+        const targetModel = savedChat || cfg.chat_model || (typeof SettingsView !== 'undefined' && SettingsView.config?.chat_model);
         if (targetModel) {
           const modelSelect = document.getElementById('ai-opt-model');
           if (modelSelect) {

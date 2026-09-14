@@ -21,11 +21,11 @@ import uuid
 import asyncio
 import logging
 import datetime
-from typing import Dict, List, Any, Optional, Callable
+from typing import Dict, List, Any, Optional, Callable, Tuple
 
 logger = logging.getLogger("podcast_manager")
 
-from core.paths import get_user_data_path
+from core.paths import get_user_data_path, resolve_data_path
 from core.config import (
     load_config,
     save_config,
@@ -1259,15 +1259,14 @@ class PodcastEngine:
     @classmethod
     def _clean_biblical_transliterations_for_speech(cls, text: str) -> str:
         """Adapte les termes translittérés grecs et hébreux pour la voix neuronale française."""
-        # 1. Termes avec suffixes verbaux en -eô (kataphroneô, phroneô, dikaioô...)
-        text = re.sub(r'\b([A-Za-zÀ-ÿ]+)phrone[ôo]\b', r'\1fronéo', text, flags=re.I)
-        text = re.sub(r'\bphrone[ôo]\b', 'fronéo', text, flags=re.I)
-        text = re.sub(r'\b([A-Za-zÀ-ÿ]+)e[ôo]\b', r'\1éo', text, flags=re.I)
-        text = re.sub(r'\b([A-Za-zÀ-ÿ]+)o[ôo]\b', r'\1o-o', text, flags=re.I)
+        # 1. Termes avec suffixes verbaux en -eô / -oô grecs spécifiques
+        text = re.sub(r'\bkataphrone[oô]\b', 'katafronéo', text, flags=re.I)
+        text = re.sub(r'\bphrone[oô]\b', 'fronéo', text, flags=re.I)
+        text = re.sub(r'\bdikaio[oô]\b', 'dikaïo-o', text, flags=re.I)
 
         # 2. Termes avec kh grec (anokhê, anekhô)
         text = re.sub(r'\banokh[êe]\b', 'anoké', text, flags=re.I)
-        text = re.sub(r'\banekh[ôo]\b', 'anéko', text, flags=re.I)
+        text = re.sub(r'\banekh[oô]\b', 'anéko', text, flags=re.I)
 
         # 3. Termes grecs avec chr- / char- (chrêstotês, christos, charis...)
         text = re.sub(r'\bchr[êe]stot[êe]s\b', 'kréstotèss', text, flags=re.I)
@@ -1277,19 +1276,17 @@ class PodcastEngine:
         text = re.sub(r'\bchiasme\b', 'kiasme', text, flags=re.I)
         text = re.sub(r'\bchara\b', 'kara', text, flags=re.I)
 
-        # 4. Suffixes grecs en -ês (chrêstotês, makrothumia -> makrothumia)
-        text = re.sub(r'([A-Za-zÀ-ÿ]{3,})[êe]s\b', r'\1èss', text)
-        # Suffixes en -os ou -is (pistis -> pistiss, nomos -> nomoss, logos -> logoss)
+        # 4. Termes grecs usuels en étude biblique (prononciation du -s final grec)
         text = re.sub(r'\bpistis\b', 'pistiss', text, flags=re.I)
         text = re.sub(r'\bnomos\b', 'nomoss', text, flags=re.I)
         text = re.sub(r'\blogos\b', 'logoss', text, flags=re.I)
         text = re.sub(r'\bkosmos\b', 'kosmoss', text, flags=re.I)
-        text = re.sub(r'\bagape\b', 'agapé', text, flags=re.I)
         text = re.sub(r'\bagap[êe]\b', 'agapé', text, flags=re.I)
+        text = re.sub(r'\bagape\b', 'agapé', text, flags=re.I)
         text = re.sub(r'\bmetanoia\b', 'métanoïa', text, flags=re.I)
         text = re.sub(r'\bkoinonia\b', 'koïnonia', text, flags=re.I)
         text = re.sub(r'\bploutos\b', 'ploutoss', text, flags=re.I)
-        text = re.sub(r'\bkataphroneo\b', 'katafronéo', text, flags=re.I)
+        text = re.sub(r'\bgenesis\b', 'génèssiss', text, flags=re.I)
 
         # 5. Termes hébreux classiques
         text = re.sub(r'\b(h|ch)esed\b', 'khèssèd', text, flags=re.I)
@@ -1313,10 +1310,16 @@ class PodcastEngine:
         Normalise phonétiquement le texte pour éviter les bévues de lecture des moteurs TTS.
         Ex: 'Romains 2:1-5' -> 'Romains chapitre 2, versets 1 à 5' (au lieu de '2 heures 1 à 5')
         Ex: 'Jean 3:16' -> 'Jean chapitre 3, verset 16' (au lieu de '3 heures 16')
+        Ex: 'redéfinit-elle' -> 'redéfinit telle' (liaison en [t] audible)
+        Ex: 'terme grec utilisé ici est genesis' -> 'terme grec utilisé ici est : « genesis »,' (pause d'emphase)
         Ex: 'kataphroneô' -> 'katafronéo', 'chrêstotês' -> 'kréstotèss', 'anokhê' -> 'anoké'
         """
         if not text:
             return ""
+
+        # 0. Supprimer impérativement toute balise XML / SSML / HTML résiduelle (ex: <break time="..."/>)
+        # pour éviter qu'Edge-TTS ne les lise mot à mot à voix haute.
+        text = re.sub(r'<[^>]+>', ' ', text)
 
         # 1. Remplacer 'Livre Chapitre:Verset-Fin' (ex: Romains 2:1-5)
         text = re.sub(
@@ -1350,9 +1353,39 @@ class PodcastEngine:
         text = re.sub(r'\b1ère\b', 'première', text)
         text = re.sub(r'\b[Aa]v\.\s*J\.-?C\.\b', 'avant Jésus-Christ', text)
         text = re.sub(r'\b[Aa]pr\.\s*J\.-?C\.\b', 'après Jésus-Christ', text)
-        text = re.sub(r'\bA\.T\.\b', 'Ancien Testament', text)
-        text = re.sub(r'\bN\.T\.\b', 'Nouveau Testament', text)
+        # Sécurisation des sigles A.T. et N.T. pour ne pas corrompre les initiales d'auteurs (ex: A.T. Robertson)
+        text = re.sub(r'\bA\.T\.(?!\s+[A-Z][a-z])\b', 'Ancien Testament', text)
+        text = re.sub(r'\bN\.T\.(?!\s+[A-Z][a-z])\b', 'Nouveau Testament', text)
         text = re.sub(r'\bLXX\b', 'la Septante', text)
+
+        # 4bis. Correction phonétique des liaisons verbales interrogatives / euphoniques
+        # Empêche Edge-TTS d'avaler la consonne de liaison [t] (ex: 'redéfinit-elle' lu sans 't')
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-elle\b', r'\1 telle', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-il\b', r'\1 til', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-on\b', r'\1 ton', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-ils\b', r'\1 tils', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-elles\b', r'\1 telles', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-elle\b', r'\1 telle', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-il\b', r'\1 til', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-on\b', r'\1 ton', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-ils\b', r'\1 tils', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-elles\b', r'\1 telles', text)
+
+        # 4ter. Emphase et pauses prosodiques sur les termes originaux ou mots-clés cités
+        # Ex: "le terme grec utilisé ici est genesis, le mot même" -> "le terme grec utilisé ici est : « genesis », le mot même"
+        text = re.sub(
+            r'\b((?:le|ce|au|du)\s+(?:terme|mot|nom|concept|verbe|vocable|titre)\s+(?:grec|hébreu|araméen|latin|biblique)?\s*(?:utilisé ici|employé ici|ici)?\s*(?:est|c\'est))\s+([a-zA-ZÀ-ÿ\-]+)(?=[\s,\.;:—\-]|$)',
+            r'\1 : « \2 »,',
+            text,
+            flags=re.IGNORECASE
+        )
+        # Convertir les mots isolés en markdown *mot* ou "mot" en incise avec guillemets français
+        text = re.sub(r'(?<=\s)[\*\_"]([A-Za-zÀ-ÿ\-]{2,30})[\*\_"](?=[\s,\.;:—\-]|$)', r'« \1 »', text)
+        # Nettoyage des doubles ponctuations induites
+        text = re.sub(r':\s*:\s*', ': ', text)
+        text = re.sub(r',\s*,', ',', text)
+        text = re.sub(r'«\s*«', '«', text)
+        text = re.sub(r'»\s*»', '»', text)
 
         # 5. Translittération du grec et de l'hébreu en caractères originaux
         text = cls._transliterate_greek_for_speech(text)
@@ -1361,7 +1394,314 @@ class PodcastEngine:
         # 6. Adaptation phonétique des termes translittérés grecs et hébreux
         text = cls._clean_biblical_transliterations_for_speech(text)
 
+        # 7. Nettoyage des espaces multiples
+        text = re.sub(r'\s{2,}', ' ', text).strip()
         return text
+
+    @classmethod
+    def _inject_speech_prosody_breaks(cls, text: str) -> str:
+        """
+        Aère naturellement le texte pour les moteurs vocaux sans injecter de balises XML.
+        Utilise la ponctuation naturelle (points, tirets cadratins, points de suspension)
+        pour induire les respirations humaines de la synthèse neuronale.
+        """
+        if not text:
+            return ""
+
+        # Supprimer toute balise résiduelle
+        text = re.sub(r'<[^>]+>', ' ', text)
+
+        # Normaliser les sauts de paragraphe en ponctuation de respiration douce
+        text = re.sub(r'(\r?\n)+', ' — ', text)
+
+        # Nettoyage des espaces résiduels
+        text = re.sub(r'\s{2,}', ' ', text).strip()
+        return text
+
+    @classmethod
+    def apply_audio_mastering(
+        cls,
+        mp3_bytes: bytes,
+        options: Optional[Dict[str, Any]] = None
+    ) -> bytes:
+        """
+        Chaîne de mastering audio studio / radio (DSP FFmpeg via PyAV) :
+        1. Filtre passe-haut à 80 Hz : suppression des résonances graves et bruits de micro.
+        2. Égalisation chaleur (+2 dB à 250 Hz) : rondeur et présence de la voix.
+        3. Adoucissement anti-sibilance (-1.5 dB à 3500 Hz) : atténuation des harmoniques aiguës synthétiques.
+        4. Compression dynamique douce (seuil -18 dB, ratio 2.5) : niveau sonore régulier et feutré.
+        5. Micro-acoustique (reverb courte 25ms decay, wet 4%) : élimine l'effet de voix brute plaquée.
+        """
+        if not mp3_bytes or len(mp3_bytes) < 1000:
+            return mp3_bytes
+
+        opts = options or {}
+        if not opts.get("mastering_enabled", True):
+            return mp3_bytes
+
+        try:
+            import io
+            import av
+            import av.filter
+
+            in_buf = io.BytesIO(mp3_bytes)
+            in_container = av.open(in_buf)
+            if not in_container.streams.audio:
+                in_container.close()
+                return mp3_bytes
+
+            in_stream = in_container.streams.audio[0]
+            sample_rate = in_stream.rate or 24000
+
+            graph = av.filter.Graph()
+            src = graph.add_abuffer(template=in_stream)
+
+            hp = graph.add("highpass", "f=80")
+            eq_warm = graph.add("equalizer", "f=250:width_type=o:width=1:g=2")
+            eq_sooth = graph.add("equalizer", "f=3500:width_type=o:width=1:g=-1.5")
+            comp = graph.add("acompressor", "threshold=0.12:ratio=2.5:attack=20:release=250")
+            reverb = graph.add("aecho", "0.8:0.88:25:0.04")
+            sink = graph.add("abuffersink")
+
+            src.link_to(hp)
+            hp.link_to(eq_warm)
+            eq_warm.link_to(eq_sooth)
+            eq_sooth.link_to(comp)
+            comp.link_to(reverb)
+            reverb.link_to(sink)
+            graph.configure()
+
+            out_buf = io.BytesIO()
+            out_container = av.open(out_buf, mode="w", format="mp3")
+            out_stream = out_container.add_stream("mp3", rate=sample_rate)
+
+            for frame in in_container.decode(in_stream):
+                graph.push(frame)
+                while True:
+                    try:
+                        filtered_frame = graph.pull()
+                        for packet in out_stream.encode(filtered_frame):
+                            out_container.mux(packet)
+                    except (av.BlockingIOError, av.EOFError, StopIteration):
+                        break
+
+            graph.push(None)
+            while True:
+                try:
+                    filtered_frame = graph.pull()
+                    for packet in out_stream.encode(filtered_frame):
+                        out_container.mux(packet)
+                except (av.BlockingIOError, av.EOFError, StopIteration):
+                    break
+
+            for packet in out_stream.encode():
+                out_container.mux(packet)
+
+            out_container.close()
+            in_container.close()
+
+            mastered_data = out_buf.getvalue()
+            if len(mastered_data) > 1000:
+                logger.info("[PodcastEngine] Mastering audio PyAV appliqué avec succès (%d -> %d octets)", len(mp3_bytes), len(mastered_data))
+                return mastered_data
+            return mp3_bytes
+
+        except Exception as e:
+            logger.warning("[PodcastEngine] Échec du mastering audio DSP (fallback audio brut) : %s", e)
+            return mp3_bytes
+
+    @classmethod
+    def load_soundpack_manifest(cls) -> Dict[str, Any]:
+        """Charge le catalogue soundpack.json des musiques, jingles et ambiances."""
+        try:
+            manifest_path = resolve_data_path("audio", "soundpack.json")
+            if os.path.exists(manifest_path):
+                with open(manifest_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+        except Exception as e:
+            logger.error("[PodcastEngine] Erreur lecture soundpack.json : %s", e)
+        return {"tracks": []}
+
+    @classmethod
+    def resolve_soundpack_track_path(cls, track_id: Optional[str]) -> Optional[str]:
+        """Résout le chemin absolu du fichier audio pour une piste du soundpack."""
+        if not track_id or track_id in ("none", "null", "false", ""):
+            return None
+        manifest = cls.load_soundpack_manifest()
+        for tr in manifest.get("tracks", []):
+            if tr.get("id") == track_id:
+                rel_file = tr.get("file", "")
+                full_path = resolve_data_path("audio", rel_file)
+                if os.path.exists(full_path):
+                    return full_path
+                logger.warning("[PodcastEngine] Fichier audio soundpack manquant pour %s : %s", track_id, full_path)
+                return None
+        return None
+
+    @classmethod
+    def mix_voice_with_soundpack(
+        cls,
+        speech_mp3_bytes: bytes,
+        dialogue_timestamps: List[Dict[str, Any]],
+        bg_music_path: Optional[str] = None,
+        jingle_intro_path: Optional[str] = None,
+        options: Optional[Dict[str, Any]] = None,
+        sample_rate: int = 24000
+    ) -> Tuple[bytes, List[Dict[str, Any]], float]:
+        """
+        Mixe la voix principale avec le jingle d'introduction et la nappe musicale d'ambiance
+        en appliquant un Ducking professionnel (sidechain) :
+        - Jingle : démarre à 0s, joue seul en amorce (lead-in), puis s'estompe sous l'entrée de la voix.
+        - Voix : commence précisément après lead_in_sec (mise à jour absolue des timestamps karaoké).
+        - Musique de fond : atténuée à ducking_db (-16 dB) sous la parole, remonte doucement (+6 dB)
+          lors des pauses et respirations, puis crescendo final et fondu de sortie lors de l'outro.
+        """
+        if not bg_music_path and not jingle_intro_path:
+            return speech_mp3_bytes, dialogue_timestamps, 0.0
+
+        try:
+            import io
+            import av
+            import numpy as np
+
+            opts = options or {}
+            ducking_db = float(opts.get("ducking_db", -16.0))
+            duck_gain = 10.0 ** (ducking_db / 20.0)
+            swell_gain = 10.0 ** ((ducking_db + 6.0) / 20.0)
+            intro_gain = 10.0 ** (float(opts.get("intro_gain_db", -2.0)) / 20.0)
+
+            def _load_stereo(audio_input):
+                if isinstance(audio_input, (bytes, bytearray)):
+                    container = av.open(io.BytesIO(audio_input))
+                else:
+                    container = av.open(audio_input)
+                resampler = av.AudioResampler(format='fltp', layout='stereo', rate=sample_rate)
+                frames = []
+                for frame in container.decode(audio=0):
+                    frame.pts = None
+                    for resampled in resampler.resample(frame):
+                        frames.append(resampled.to_ndarray())
+                container.close()
+                if not frames:
+                    return np.zeros((2, 0), dtype=np.float32)
+                return np.concatenate(frames, axis=1)
+
+            speech = _load_stereo(speech_mp3_bytes)
+            speech_len = speech.shape[1]
+            if speech_len == 0:
+                return speech_mp3_bytes, dialogue_timestamps, 0.0
+
+            has_jingle = bool(jingle_intro_path and os.path.exists(jingle_intro_path))
+            lead_in_sec = 2.0 if has_jingle else 0.5
+            lead_in_samples = int(lead_in_sec * sample_rate)
+            outro_tail_sec = 3.5 if (bg_music_path or has_jingle) else 0.5
+            outro_tail_samples = int(outro_tail_sec * sample_rate)
+
+            total_samples = lead_in_samples + speech_len + outro_tail_samples
+            total_dur_sec = total_samples / sample_rate
+
+            # 1. Piste voix décalée
+            voice_track = np.zeros((2, total_samples), dtype=np.float32)
+            voice_track[:, lead_in_samples:lead_in_samples + speech_len] = speech
+
+            # Décalage rigoureux des horodatages pour le suivi karaoké visuel
+            shifted_dialogue = []
+            for it in dialogue_timestamps:
+                d = dict(it)
+                if "start_time" in d:
+                    d["start_time"] = round(float(d["start_time"]) + lead_in_sec, 3)
+                if "end_time" in d:
+                    d["end_time"] = round(float(d["end_time"]) + lead_in_sec, 3)
+                shifted_dialogue.append(d)
+
+            # 2. Piste Jingle
+            jingle_track = np.zeros((2, total_samples), dtype=np.float32)
+            if has_jingle:
+                jingle = _load_stereo(jingle_intro_path)
+                j_len = min(jingle.shape[1], total_samples)
+                fade_down_start = int(lead_in_sec * sample_rate)
+                fade_down_end = min(fade_down_start + int(3.0 * sample_rate), j_len)
+                jingle_env = np.ones(j_len, dtype=np.float32) * intro_gain
+                if fade_down_end > fade_down_start:
+                    fade_len = fade_down_end - fade_down_start
+                    jingle_env[fade_down_start:fade_down_end] = np.linspace(intro_gain, 0.0, fade_len)
+                if j_len > fade_down_end:
+                    jingle_env[fade_down_end:] = 0.0
+                jingle_track[:, :j_len] = jingle[:, :j_len] * jingle_env
+
+            # 3. Piste Musique d'ambiance avec Ducking sidechain continu
+            music_track = np.zeros((2, total_samples), dtype=np.float32)
+            if bg_music_path and os.path.exists(bg_music_path):
+                music = _load_stereo(bg_music_path)
+                m_len = music.shape[1]
+                if m_len > 0:
+                    idx = 0
+                    while idx < total_samples:
+                        take = min(m_len, total_samples - idx)
+                        music_track[:, idx:idx + take] = music[:, :take]
+                        idx += take
+
+                    env = np.full(total_samples, swell_gain, dtype=np.float32)
+
+                    # Fondu d'entrée initial de l'ambiance
+                    ramp_in = int(1.5 * sample_rate)
+                    if ramp_in > 0:
+                        env[:ramp_in] = np.linspace(0.0, duck_gain, ramp_in)
+
+                    # Ducking sous chaque réplique avec attack / release douces
+                    for item in shifted_dialogue:
+                        s_samp = max(0, int(float(item.get("start_time", 0.0)) * sample_rate))
+                        e_samp = min(total_samples, int(float(item.get("end_time", 0.0)) * sample_rate))
+                        att_samp = int(0.15 * sample_rate)
+                        rel_samp = int(0.35 * sample_rate)
+                        s_att = max(0, s_samp - att_samp)
+                        e_rel = min(total_samples, e_samp + rel_samp)
+                        env[s_samp:e_samp] = duck_gain
+                        if s_samp > s_att:
+                            env[s_att:s_samp] = np.linspace(env[s_att], duck_gain, s_samp - s_att)
+                        if e_rel > e_samp:
+                            env[e_samp:e_rel] = np.linspace(duck_gain, swell_gain, e_rel - e_samp)
+
+                    # Outro : remontée de l'ambiance en crescendo puis fondu final vers le silence
+                    speech_end_samp = lead_in_samples + speech_len
+                    outro_start = speech_end_samp
+                    outro_swell_end = min(total_samples, outro_start + int(2.0 * sample_rate))
+                    fade_out_start = outro_swell_end
+                    if outro_swell_end > outro_start:
+                        env[outro_start:outro_swell_end] = np.linspace(duck_gain, swell_gain * 1.5, outro_swell_end - outro_start)
+                    if total_samples > fade_out_start:
+                        env[fade_out_start:] = np.linspace(env[fade_out_start], 0.0, total_samples - fade_out_start)
+
+                    music_track *= env
+
+            # 4. Mixage final stéréo avec soft-clipping et encodage MP3
+            mixed = np.clip(voice_track + jingle_track + music_track, -1.0, 1.0)
+
+            out_buf = io.BytesIO()
+            container = av.open(out_buf, mode='w', format='mp3')
+            stream = container.add_stream('mp3', rate=sample_rate)
+            stream.bit_rate = int(opts.get("bitrate", 96000))
+            stream.layout = 'stereo'
+
+            frame_size = 1152
+            for i in range(0, total_samples, frame_size):
+                chunk = mixed[:, i:min(i + frame_size, total_samples)]
+                if chunk.shape[1] < frame_size:
+                    pad = np.zeros((chunk.shape[0], frame_size - chunk.shape[1]), dtype=np.float32)
+                    chunk = np.concatenate([chunk, pad], axis=1)
+                frame = av.AudioFrame.from_ndarray(chunk, format='fltp', layout='stereo')
+                frame.rate = sample_rate
+                for packet in stream.encode(frame):
+                    container.mux(packet)
+
+            for packet in stream.encode(None):
+                container.mux(packet)
+            container.close()
+
+            return out_buf.getvalue(), shifted_dialogue, round(total_dur_sec, 2)
+        except Exception as e:
+            logger.error("[PodcastEngine] Erreur lors du mixage soundpack & ducking : %s", e)
+            return speech_mp3_bytes, dialogue_timestamps, 0.0
 
     @classmethod
     def synthesize_audio(
@@ -1374,7 +1714,8 @@ class PodcastEngine:
     ) -> Dict[str, Any]:
         """
         Synthétise l'audio pour un script donné (avec support de l'édition manuelle préalable).
-        Calcule les horodatages exacts (karaoké) et écrit le fichier MP3 consolidé.
+        Calcule les horodatages exacts (karaoké), applique le mastering studio DSP,
+        puis mixe les éléments du soundpack (musique d'ambiance, jingle, ducking).
         """
         record = PodcastHistory.get(podcast_id)
         if not record:
@@ -1407,6 +1748,68 @@ class PodcastEngine:
         else:
             res = cls._synthesize_edge_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
 
+        # Mixage soundpack (ambiance musicale et/ou jingle d'introduction avec ducking sidechain)
+        bg_music_id = opts.get("bg_music")
+        if bg_music_id is None:
+            bg_music_id = cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")
+
+        jingle_intro_id = opts.get("jingle_intro")
+        if jingle_intro_id is None:
+            jingle_intro_id = cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")
+
+        # Choix explicite "none"
+        if bg_music_id in ("none", "", "null", False):
+            bg_music_id = None
+        if jingle_intro_id in ("none", "", "null", False):
+            jingle_intro_id = None
+
+        ducking_enabled = opts.get("ducking_enabled", cfg.get("audio_studio_ducking_enabled", True))
+        ducking_db = float(opts.get("ducking_db", cfg.get("audio_studio_ducking_db", -16.0)))
+
+        bg_path = cls.resolve_soundpack_track_path(bg_music_id) if bg_music_id else None
+        jingle_path = cls.resolve_soundpack_track_path(jingle_intro_id) if jingle_intro_id else None
+
+        if bg_path or jingle_path:
+            audio_path = os.path.join(get_podcasts_dir(), res.get("audio_file", f"{podcast_id}.mp3"))
+            if os.path.exists(audio_path):
+                if progress_callback:
+                    total_l = len(res.get("dialogue", []))
+                    progress_callback(total_l, 96, "Mixage sonore de l'émission (ambiance, jingle & ducking)...")
+                try:
+                    with open(audio_path, "rb") as f:
+                        speech_bytes = f.read()
+
+                    mix_opts = {
+                        "ducking_db": ducking_db if ducking_enabled else -6.0,
+                        "bitrate": 96000
+                    }
+                    mixed_bytes, shifted_dialogue, total_dur = cls.mix_voice_with_soundpack(
+                        speech_mp3_bytes=speech_bytes,
+                        dialogue_timestamps=res.get("dialogue", []),
+                        bg_music_path=bg_path,
+                        jingle_intro_path=jingle_path,
+                        options=mix_opts
+                    )
+                    if total_dur > 0 and len(mixed_bytes) > 1000:
+                        with open(audio_path, "wb") as f:
+                            f.write(mixed_bytes)
+                        res["dialogue"] = shifted_dialogue
+                        res["script_dialogue"] = shifted_dialogue
+                        res["duration_seconds"] = total_dur
+                        res["bg_music"] = bg_music_id or "none"
+                        res["jingle_intro"] = jingle_intro_id or "none"
+                        res["ducking_enabled"] = ducking_enabled
+                        PodcastHistory.upsert(res)
+                        if progress_callback:
+                            total_l = len(shifted_dialogue)
+                            progress_callback(total_l, 100, f"Épisode finalisé avec soundpack ({cls.format_duration(total_dur)})")
+                except Exception as e_mix:
+                    logger.warning("[PodcastEngine] Erreur mixage soundpack : %s", e_mix)
+        else:
+            res["bg_music"] = "none"
+            res["jingle_intro"] = "none"
+            PodcastHistory.upsert(res)
+
         return res
 
     @classmethod
@@ -1419,12 +1822,19 @@ class PodcastEngine:
         cfg: Dict[str, Any],
         progress_callback: Optional[Callable[[int, int, str], None]] = None
     ) -> Dict[str, Any]:
-        """Synthèse asynchrone via Microsoft Edge-TTS avec calcul d'horodatage exact."""
+        """Synthèse asynchrone via Microsoft Edge-TTS avec prosodie maîtrisée et mastering audio studio."""
         import edge_tts
 
         voice_a = opts.get("voice_speaker_a") or cfg.get("audio_studio_voice_speaker_a", "fr-FR-DeniseNeural")
         voice_b = opts.get("voice_speaker_b") or cfg.get("audio_studio_voice_speaker_b", "fr-FR-HenriNeural")
         voice_solo = opts.get("voice_solo") or cfg.get("audio_studio_voice_solo", "fr-FR-HenriNeural")
+
+        # Options de prosodie (débit, hauteur, respirations)
+        calm_prosody = opts.get("calm_prosody", cfg.get("audio_studio_calm_prosody", True))
+        rate_val = opts.get("rate") or (cfg.get("audio_studio_rate", "-6%") if calm_prosody else "+0%")
+        pitch_val = opts.get("pitch") or (cfg.get("audio_studio_pitch", "-3Hz") if calm_prosody else "+0Hz")
+        inject_breaks = opts.get("inject_breaks", cfg.get("audio_studio_inject_breaks", True)) if calm_prosody else False
+        mastering_enabled = opts.get("mastering_enabled", cfg.get("audio_studio_mastering_enabled", True))
 
         total_lines = len(dialogue)
         accumulated_audio = bytearray()
@@ -1436,7 +1846,7 @@ class PodcastEngine:
 
             for idx, item in enumerate(dialogue):
                 if progress_callback:
-                    pct = int(8 + (idx / max(total_lines, 1)) * 84)
+                    pct = int(8 + (idx / max(total_lines, 1)) * 80)
                     speaker_label = item.get("speaker_name", f"Locuteur {item.get('voice_role', 'A')}")
                     progress_callback(idx + 1, pct, f"Synthèse réplique {idx + 1}/{total_lines} ({speaker_label})...")
 
@@ -1462,7 +1872,16 @@ class PodcastEngine:
                 # Nettoyage phonétique (ex: Romains 2:1 -> Romains chapitre 2, verset 1)
                 clean_speech_text = cls._clean_text_for_speech(text)
 
-                communicate = edge_tts.Communicate(clean_speech_text, chosen_voice)
+                # Injection de micro-pauses SSML de respiration si activé
+                if inject_breaks:
+                    clean_speech_text = cls._inject_speech_prosody_breaks(clean_speech_text)
+
+                communicate = edge_tts.Communicate(
+                    clean_speech_text,
+                    chosen_voice,
+                    rate=rate_val,
+                    pitch=pitch_val
+                )
                 line_audio = bytearray()
                 line_duration = 0.0
 
@@ -1507,13 +1926,22 @@ class PodcastEngine:
             raise Exception(f"Erreur lors de la synthèse vocale Edge-TTS : {str(e)}")
 
         if progress_callback:
-            progress_callback(total_lines, 95, "Consolidation du fichier MP3 et calcul des temps...")
+            progress_callback(total_lines, 90, "Consolidation et mastering du fichier audio...")
+
+        final_audio = bytes(accumulated_audio)
+        if mastering_enabled and len(accumulated_audio) > 1000:
+            if progress_callback:
+                progress_callback(total_lines, 94, "Application du mastering studio (égalisation, compression & micro-acoustique)...")
+            final_audio = cls.apply_audio_mastering(final_audio, {"mastering_enabled": True})
+
+        if progress_callback:
+            progress_callback(total_lines, 98, "Sauvegarde du podcast...")
 
         # Écriture du fichier MP3 consolidé
         audio_filename = f"{podcast_id}.mp3"
         out_path = os.path.join(get_podcasts_dir(), audio_filename)
         with open(out_path, "wb") as f:
-            f.write(accumulated_audio)
+            f.write(final_audio)
 
         total_duration = round(current_timeline_sec, 2)
 

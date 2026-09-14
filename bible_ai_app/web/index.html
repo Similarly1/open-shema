@@ -4154,6 +4154,29 @@
                   </div>
                 </div>
 
+                <!-- Ambiance Musicale & Jingle par Défaut -->
+                <div class="form-row two-cols" style="margin-bottom: 16px;">
+                  <div class="form-group">
+                    <label for="cfg-audio-studio-bg-music">Ambiance musicale par défaut :</label>
+                    <select id="cfg-audio-studio-bg-music" class="select-field full-w">
+                      <option value="bed_cozy_jazz_study" selected>Étude &amp; Méditation (Nappe Jazz Douce)</option>
+                      <option value="jingle_simplicity_acoustic">Acoustique Épurée (Guitare &amp; Piano)</option>
+                      <option value="stinger_lofi_rain">Pluie &amp; Calme Lo-Fi</option>
+                      <option value="none">Aucune musique par défaut</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="cfg-audio-studio-jingle-intro">Jingle d'introduction par défaut :</label>
+                    <select id="cfg-audio-studio-jingle-intro" class="select-field full-w">
+                      <option value="jingle_piano_solemn" selected>Piano Recueilli (Intro Solennelle)</option>
+                      <option value="jingle_inspiring_clean">Moderne &amp; Lumineux</option>
+                      <option value="jingle_vibe_chronicle">Chronique &amp; Récit</option>
+                      <option value="jingle_upbeat_pop">Dynamique &amp; Entraînant</option>
+                      <option value="none">Aucun jingle par défaut</option>
+                    </select>
+                  </div>
+                </div>
+
                 <!-- Options Avancées Voxtral & Curation RAG -->
                 <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
                   <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
@@ -5336,6 +5359,20 @@
                     </svg>
                     <span>Rédiger le script (Étape 2)</span>
                   </button>
+
+                  <!-- Écran de raisonnement et progression par étapes (identique à l'Assistant IA) -->
+                  <div id="as-step1-reasoning-box" class="ai-reasoning-box active" style="display: none; margin-top: 14px; width: 100%; box-sizing: border-box;">
+                    <div class="ai-reasoning-header">
+                      <div class="ai-reasoning-title">
+                        <span class="ai-reasoning-orb"></span>
+                        <span id="as-reasoning-title-text">Recherche &amp; Rédaction du script en cours</span>
+                        <span class="ai-reasoning-timer" id="as-reasoning-timer">0.0s</span>
+                      </div>
+                    </div>
+                    <div class="ai-reasoning-steps-list" id="as-reasoning-steps-list">
+                      <!-- Étapes dynamiques injectées par audio_studio_view.js -->
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
@@ -5591,6 +5628,73 @@
                         <input type="number" id="as-input-pause-ms" value="350" min="100" max="2500" step="50" style="width: 54px; height: 26px; text-align: center; font-size: 11.5px; border-radius: 4px; background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); color: var(--text-primary);">
                         <span>ms</span>
                       </div>
+                    </div>
+
+                    <!-- Traitement Acoustique Studio & Prosodie -->
+                    <div class="as-acoustic-settings-box" style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
+                      <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                          <span>Mastering &amp; Prosodie Studio</span>
+                        </span>
+                      </div>
+
+                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Applique un filtre passe-haut 80Hz, égalisation 250Hz (+2dB) / 3.5kHz (-1.5dB), compression douce et micro-acoustique">
+                        <input type="checkbox" id="as-check-mastering" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                        <span>Mastering Studio Radio (Égalisation &amp; compression)</span>
+                      </label>
+
+                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Débit ralenti (-6%), hauteur légèrement abaissée (-3Hz) et pauses de respiration automatiques">
+                        <input type="checkbox" id="as-check-calm-prosody" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                        <span>Prosodie posée (Débit -6%, Tonalité -3Hz &amp; respirations)</span>
+                      </label>
+                    </div>
+
+                    <!-- Habillage Sonore, Ambiance & Jingle (Soundpack avec Ducking) -->
+                    <div class="as-soundpack-settings-box" style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
+                      <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                          <span>Habillage Sonore &amp; Musiques (Soundpack)</span>
+                        </span>
+                      </div>
+
+                      <!-- Ambiance musicale de fond -->
+                      <div class="audio-studio-form-row" style="margin-bottom: 0;">
+                        <label class="audio-studio-form-label" for="as-select-bg-music" style="font-size: 11px; display: flex; justify-content: space-between;">
+                          <span>Ambiance musicale de fond</span>
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                          <select id="as-select-bg-music" class="audio-studio-select" style="flex: 1; height: 32px; font-size: 12px;">
+                            <option value="bed_cozy_jazz_study">Étude &amp; Méditation (Nappe Jazz Douce)</option>
+                            <option value="none">Aucune musique (Voix pure)</option>
+                          </select>
+                          <button type="button" class="btn-icon btn-sm as-btn-track-preview" id="btn-as-preview-bg-music" title="Écouter un extrait de l'ambiance" style="width: 32px; height: 32px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Jingle d'intro -->
+                      <div class="audio-studio-form-row" style="margin-bottom: 0;">
+                        <label class="audio-studio-form-label" for="as-select-jingle-intro" style="font-size: 11px; display: flex; justify-content: space-between;">
+                          <span>Jingle d'introduction</span>
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                          <select id="as-select-jingle-intro" class="audio-studio-select" style="flex: 1; height: 32px; font-size: 12px;">
+                            <option value="jingle_piano_solemn">Piano Recueilli (Intro Solennelle)</option>
+                            <option value="none">Aucun jingle (Démarrage direct)</option>
+                          </select>
+                          <button type="button" class="btn-icon btn-sm as-btn-track-preview" id="btn-as-preview-jingle-intro" title="Écouter un extrait du jingle" style="width: 32px; height: 32px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Atténue la musique sous la parole (-16 dB) et la remonte doucement lors des pauses et en fin d'épisode">
+                        <input type="checkbox" id="as-check-ducking" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                        <span>Ducking automatique sidechain (-16 dB sous la voix)</span>
+                      </label>
                     </div>
 
                     <!-- Bouton de lancement de synthèse MP3 -->

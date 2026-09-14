@@ -195,16 +195,22 @@ class SettingsMixin:
                         "outputTokenLimit": output_limit
                     })
             
-            # Trier de façon ergonomique : 2.5 d'abord, puis 2.0, puis 1.5, etc.
+            # Trier de façon ergonomique : 3.7, 3.5, 3.x, 2.5, 2.0, 1.5
             def model_sort_key(item):
                 i_id = item["id"].lower()
-                if "2.5" in i_id:
+                if "3.7" in i_id:
+                    return (0, i_id)
+                elif "3.5" in i_id:
                     return (1, i_id)
-                elif "2.0" in i_id:
+                elif "3." in i_id or "3-" in i_id:
                     return (2, i_id)
-                elif "1.5" in i_id:
+                elif "2.5" in i_id:
                     return (3, i_id)
-                return (4, i_id)
+                elif "2.0" in i_id or "2-" in i_id:
+                    return (4, i_id)
+                elif "1.5" in i_id:
+                    return (5, i_id)
+                return (6, i_id)
             
             valid_models.sort(key=model_sort_key)
             try:

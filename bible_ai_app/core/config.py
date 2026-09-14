@@ -284,9 +284,10 @@ RÈGLES CRITIQUES :
      * Écrivez « versets 1 à 5 » (au lieu de « v. 1-5 » ou « 1-5 »).
      * Écrivez « chapitre 2 » (au lieu de « ch. 2 » ou « chap. 2 »).
      * Écrivez « après Jésus-Christ » ou « avant Jésus-Christ » (au lieu de « apr. J.-C. » ou « av. J.-C. »).
-6. PRONONCIATION DES MOTS ORIGINAUX (GREC ET HÉBREU) :
+6. PRONONCIATION DES MOTS ORIGINAUX (GREC ET HÉBREU) ET TERMES CLÉS :
    - N'insérez JAMAIS de caractères grecs ou hébreux d'origine non translittérés (les moteurs vocaux ne peuvent pas les lire et bégayent).
    - Écrivez les termes en translittération latine avec indication phonétique intuitive francisée (ex: « le terme kataphroneô [prononcé kata-fro-né-o] », « la chrêstotês [prononcée kré-sto-tèss] », « le hesed hébreu [prononcé khè-ssèd] »).
+   - Pour chaque terme cité, mot grec/hébreu ou mot-clé (ex: « genesis », « logos »), isolez-le TOUJOURS entre guillemets français avec ponctuation d'incise (ex: « le terme grec employé ici est : « genesis », le mot même... ») afin que le moteur vocal marque une micro-respiration naturelle avant et après.
 7. PROFONDEUR EXÉGÉTIQUE & LONGUEUR SUBSTANTIELLE :
    - Développez une émission consistante et approfondie, avec la même rigueur et le même niveau d'érudition que l'Assistant d'Étude d'Open Shema.
    - Fournissez au moins 12 à 18 répliques substantielles (chaque intervention de l'exégète doit être un paragraphe développé de 3 à 6 phrases explicatives, analysant le texte et les commentaires).
@@ -337,9 +338,10 @@ RÈGLES CRITIQUES :
      * Écrivez « versets 1 à 5 » (au lieu de « v. 1-5 »).
      * Écrivez « chapitre 2 » (au lieu de « ch. 2 »).
      * Écrivez « après Jésus-Christ » ou « avant Jésus-Christ » (au lieu de « apr. J.-C. »).
-3. PRONONCIATION DES MOTS ORIGINAUX (GREC ET HÉBREU) :
+3. PRONONCIATION DES MOTS ORIGINAUX (GREC ET HÉBREU) ET TERMES CLÉS :
    - N'insérez jamais de caractères grecs ou hébreux bruts non translittérés.
    - Accompagnez les termes d'une graphie phonétique francisée (ex: kataphroneô [kata-fro-né-o], chrêstotês [kré-sto-tèss], hesed [khè-ssèd]).
+   - Pour chaque terme cité ou mot-clé (ex: « genesis », « logos »), isolez-le entre guillemets français avec ponctuation d'incise (ex: « le mot grec est : « genesis », le mot même... ») pour assurer la micro-pause d'emphase à l'écoute.
 4. PROFONDEUR & SUBSTANCE :
    - Développez au moins 8 à 12 sections majeures et substantielles (style masterclass exégétique détaillée).
 5. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
@@ -468,8 +470,8 @@ DEFAULTS = {
     "embedding_provider": "local",
     "chat_model": "gemini-3.7-flash",
     "chat_fallback_model": "gemini-3.5-flash-lite",
-    "theme": "light",
-    "theme_palette": "light-default",
+    "theme": "dark",
+    "theme_palette": "dark-slate",
     "first_run": True,
     "reading_bg": "auto",
     "font_family": "Georgia",
@@ -561,6 +563,14 @@ DEFAULTS = {
     "audio_studio_enable_rerank": True,
     "audio_studio_enable_curator": False,
     "audio_studio_include_profile": True,
+    "audio_studio_mastering_enabled": True,
+    "audio_studio_rate": "-6%",
+    "audio_studio_pitch": "-3Hz",
+    "audio_studio_inject_breaks": True,
+    "audio_studio_bg_music": "bed_cozy_jazz_study",
+    "audio_studio_jingle_intro": "jingle_piano_solemn",
+    "audio_studio_ducking_enabled": True,
+    "audio_studio_ducking_db": -16,
     "vintage_mode": True,
     "vintage_scope": "auto",
     "vintage_intensity": "subtle",

@@ -41,6 +41,31 @@ class AudioStudioMixin:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_voices : %s", e)
             return {"success": False, "voices": [], "edge_tts": [], "voxtral": []}
 
+    def audio_studio_get_soundpack(self) -> Dict[str, Any]:
+        """Retourne le catalogue soundpack (musiques d'ambiance, jingles, etc.)."""
+        try:
+            data = PodcastEngine.load_soundpack_manifest()
+            return {"success": True, "soundpack": data}
+        except Exception as e:
+            logger.error("[AudioStudioMixin] Erreur audio_studio_get_soundpack : %s", e)
+            return {"success": False, "error": str(e), "soundpack": {"tracks": []}}
+
+    def audio_studio_get_soundpack_track_url(self, track_id: Any) -> Dict[str, Any]:
+        """Retourne le flux audio MP3 d'une piste sous forme de Data URL base64 pour préécoute immédiate."""
+        try:
+            if isinstance(track_id, dict):
+                track_id = track_id.get("track_id", "")
+            track_id = str(track_id)
+            p = PodcastEngine.resolve_soundpack_track_path(track_id)
+            if p and os.path.exists(p):
+                with open(p, "rb") as f:
+                    b64 = base64.b64encode(f.read()).decode("ascii")
+                    return {"success": True, "audio_url": f"data:audio/mp3;base64,{b64}"}
+            return {"success": False, "error": f"Piste introuvable : {track_id}"}
+        except Exception as e:
+            logger.error("[AudioStudioMixin] Erreur audio_studio_get_soundpack_track_url : %s", e)
+            return {"success": False, "error": str(e)}
+
     def audio_studio_get_config(self) -> Dict[str, Any]:
         """Retourne les paramètres actuels du Studio Audio."""
         try:
@@ -77,6 +102,15 @@ class AudioStudioMixin:
                 "enable_rerank": cfg.get("audio_studio_enable_rerank", True),
                 "enable_curator": cfg.get("audio_studio_enable_curator", False),
                 "include_profile": cfg.get("audio_studio_include_profile", True),
+                "mastering_enabled": bool(cfg.get("audio_studio_mastering_enabled", True)),
+                "calm_prosody": bool(cfg.get("audio_studio_calm_prosody", True)),
+                "rate": str(cfg.get("audio_studio_rate", "-6%")),
+                "pitch": str(cfg.get("audio_studio_pitch", "-3Hz")),
+                "inject_breaks": bool(cfg.get("audio_studio_inject_breaks", True)),
+                "bg_music": str(cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")),
+                "jingle_intro": str(cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")),
+                "ducking_enabled": bool(cfg.get("audio_studio_ducking_enabled", True)),
+                "ducking_db": float(cfg.get("audio_studio_ducking_db", -16.0)),
                 "has_mistral_key": bool(cfg.get("mistral_api_key")),
             }
         except Exception as e:
@@ -122,6 +156,24 @@ class AudioStudioMixin:
                 cfg["audio_studio_enable_curator"] = bool(new_settings["enable_curator"])
             if "include_profile" in new_settings:
                 cfg["audio_studio_include_profile"] = bool(new_settings["include_profile"])
+            if "mastering_enabled" in new_settings:
+                cfg["audio_studio_mastering_enabled"] = bool(new_settings["mastering_enabled"])
+            if "calm_prosody" in new_settings:
+                cfg["audio_studio_calm_prosody"] = bool(new_settings["calm_prosody"])
+            if "rate" in new_settings:
+                cfg["audio_studio_rate"] = str(new_settings["rate"])
+            if "pitch" in new_settings:
+                cfg["audio_studio_pitch"] = str(new_settings["pitch"])
+            if "inject_breaks" in new_settings:
+                cfg["audio_studio_inject_breaks"] = bool(new_settings["inject_breaks"])
+            if "bg_music" in new_settings:
+                cfg["audio_studio_bg_music"] = str(new_settings["bg_music"])
+            if "jingle_intro" in new_settings:
+                cfg["audio_studio_jingle_intro"] = str(new_settings["jingle_intro"])
+            if "ducking_enabled" in new_settings:
+                cfg["audio_studio_ducking_enabled"] = bool(new_settings["ducking_enabled"])
+            if "ducking_db" in new_settings:
+                cfg["audio_studio_ducking_db"] = float(new_settings["ducking_db"])
 
             save_config(cfg)
             return {"success": True}
@@ -227,7 +279,13 @@ class AudioStudioMixin:
                 podcast_id = opts.get("podcast_id", "")
                 script_dialogue = opts.get("script_dialogue", script_dialogue)
                 engine = opts.get("engine", engine)
-                custom_options = opts.get("custom_options", custom_options)
+                custom_opts = opts.get("custom_options") or {}
+                for k in ("bg_music", "jingle_intro", "ducking_enabled", "ducking_db", "mastering_enabled"):
+                    if k in opts and k not in custom_opts:
+                        custom_opts[k] = opts[k]
+                custom_options = custom_opts
+            elif custom_options is None:
+                custom_options = {}
 
             podcast_id = str(podcast_id)
 

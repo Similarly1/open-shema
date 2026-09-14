@@ -1240,8 +1240,15 @@
 
 .as-step1-cta-wrap {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-top: 8px;
+  width: 100%;
+}
+
+#as-step1-reasoning-box {
+  max-width: 620px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
 }
 
 .as-btn-generate-main {
@@ -1505,6 +1512,47 @@
   overflow-y: auto;
   padding: 16px;
 }
+
+/* Soundpack & Préécoute de Pistes */
+.as-soundpack-settings-box {
+  background: var(--bg-surface-alt, rgba(255, 255, 255, 0.02));
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.as-btn-track-preview {
+  background: var(--bg-surface, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  color: var(--text-secondary, #94a3b8);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.as-btn-track-preview:hover {
+  background: var(--bg-surface-hover, rgba(255, 255, 255, 0.12));
+  color: var(--accent-orange, #ea580c);
+  border-color: var(--accent-orange, #ea580c);
+}
+
+.as-btn-track-preview.active {
+  background: var(--accent-orange, #ea580c) !important;
+  color: #fff !important;
+  border-color: var(--accent-orange, #ea580c) !important;
+  box-shadow: 0 0 10px rgba(234, 88, 12, 0.4);
+  animation: as-preview-pulse 1.8s infinite;
+}
+
+.as-btn-track-preview.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@keyframes as-preview-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
 
 
 
