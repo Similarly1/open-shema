@@ -582,11 +582,16 @@ RÈGLES CRITIQUES :
      * Écrivez « versets 1 à 5 » (au lieu de « v. 1-5 » ou « 1-5 »).
      * Écrivez « chapitre 2 » (au lieu de « ch. 2 » ou « chap. 2 »).
      * Écrivez « après Jésus-Christ » ou « avant Jésus-Christ » (au lieu de « apr. J.-C. » ou « av. J.-C. »).
-6. PROFONDEUR EXÉGÉTIQUE & LONGUEUR SUBSTANTIELLE :
+6. PRONONCIATION DES MOTS ORIGINAUX (GREC ET HÉBREU) ET PHONÉTIQUE DIRECTE :
+   - N'insérez JAMAIS de caractères grecs ou hébreux d'origine non translittérés (les moteurs vocaux ne peuvent pas les lire et bégayent).
+   - Écrivez DIRECTEMENT et UNIQUEMENT le mot en graphie phonétique française intuitive et simplifiée, directement entre guillemets français (ex: écrivez directement « kata-fro-né-o », « kré-sto-tèss », « khè-ssèd », « a-na-baï-no », « apo-ka-lup-sin »).
+   - INTERDICTION FORMELLE DE DOUBLER LE MOT OU D'AJOUTER DES CROCHETS (ex: Ne JAMAIS écrire « anabaïnô [prononcé a-na-baï-no] » ni « kataphroneô [kata-fro-né-o] », car la voix de synthèse lirait le mot deux fois à haute voix ! Écrivez directement « le mot grec est : « a-na-baï-no » »).
+   - Pour chaque terme cité ou mot-clé, isolez-le TOUJOURS entre guillemets français précédé d'une ponctuation d'incise (ex: « le terme grec employé ici est : « a-na-baï-no », le mot même... ») afin que le moteur vocal marque une micro-respiration naturelle avant et après.
+7. PROFONDEUR EXÉGÉTIQUE & LONGUEUR SUBSTANTIELLE :
    - Développez une émission consistante et approfondie, avec la même rigueur et le même niveau d'érudition que l'Assistant d'Étude d'Open Shema.
    - Fournissez au moins 12 à 18 répliques substantielles (chaque intervention de l'exégète doit être un paragraphe développé de 3 à 6 phrases explicatives, analysant le texte et les commentaires).
    - Structurez la discussion : 1) Introduction & accroche du passage, 2) Contexte littéraire & historique, 3) Analyse détaillée des versets pivots et mots originaux, 4) Apports et divergences des commentateurs, 5) Portée théologique et application.
-7. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
+8. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
    - Vous devez renvoyer UNIQUEMENT un objet JSON valide, sans aucun texte avant ni après, sans balises markdown \`\`\`json autour.
    - Schéma JSON attendu :
 {
@@ -632,9 +637,14 @@ RÈGLES CRITIQUES :
      * Écrivez « versets 1 à 5 » (au lieu de « v. 1-5 »).
      * Écrivez « chapitre 2 » (au lieu de « ch. 2 »).
      * Écrivez « après Jésus-Christ » ou « avant Jésus-Christ » (au lieu de « apr. J.-C. »).
-3. PROFONDEUR & SUBSTANCE :
+3. PRONONCIATION DES MOTS ORIGINAUX (GREC ET HÉBREU) ET PHONÉTIQUE DIRECTE :
+   - N'insérez jamais de caractères grecs ou hébreux bruts non translittérés.
+   - Écrivez DIRECTEMENT et UNIQUEMENT le mot en phonétique française intuitive entre guillemets français (ex: « kata-fro-né-o », « kré-sto-tèss », « khè-ssèd », « a-na-baï-no »).
+   - Ne JAMAIS doubler le terme ni insérer de crochets comme [prononcé ...] (la voix lirait les deux fois). Écrivez directement la graphie phonétique.
+   - Pour chaque terme cité ou mot-clé, isolez-le entre guillemets français avec ponctuation d'incise (ex: « le mot grec est : « a-na-baï-no », le mot même... ») pour assurer la micro-pause d'emphase à l'écoute.
+4. PROFONDEUR & SUBSTANCE :
    - Développez au moins 8 à 12 sections majeures et substantielles (style masterclass exégétique détaillée).
-4. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
+5. FORMAT DE SORTIE IMPÉRATIF (JSON STRICT) :
    - Vous devez renvoyer UNIQUEMENT un objet JSON valide, sans aucun texte avant ni après, sans balises markdown \`\`\`json autour.
    - Schéma JSON attendu :
 {

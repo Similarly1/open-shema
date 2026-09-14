@@ -2595,8 +2595,8 @@ const AudioStudioView = {
         rate: el.checkCalmProsody?.checked ? '-6%' : '+0%',
         pitch: el.checkCalmProsody?.checked ? '-3Hz' : '+0Hz',
         inject_breaks: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
-        bg_music: el.selectBgMusic ? el.selectBgMusic.value : (this.config?.bg_music || 'bed_cozy_jazz_study'),
-        jingle_intro: el.selectJingleIntro ? el.selectJingleIntro.value : (this.config?.jingle_intro || 'jingle_piano_solemn'),
+        bg_music: (el.selectBgMusic && el.selectBgMusic.value) ? el.selectBgMusic.value : (this.config?.bg_music || 'bed_cozy_jazz_study'),
+        jingle_intro: (el.selectJingleIntro && el.selectJingleIntro.value) ? el.selectJingleIntro.value : (this.config?.jingle_intro || 'jingle_piano_solemn'),
         ducking_enabled: el.checkDucking ? el.checkDucking.checked : true,
         ducking_db: this.config?.ducking_db || -16.0
       };

@@ -1588,6 +1588,11 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
   background: var(--bg-surface-alt, rgba(255, 255, 255, 0.02));
   border-radius: 8px;
   padding: 8px 10px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .as-btn-track-preview {
@@ -1630,6 +1635,9 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
 .as-custom-select {
   position: relative;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   user-select: none;
   font-family: inherit;
 }
@@ -1638,6 +1646,11 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
   height: 36px;
   background: var(--bg-surface, rgba(0, 0, 0, 0.25));
   border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
@@ -1661,7 +1674,8 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
 }
 
 .as-custom-trigger-label {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

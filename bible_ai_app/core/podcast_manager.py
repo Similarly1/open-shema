@@ -933,14 +933,19 @@ class PodcastEngine:
         )
 
         phonetic_rule = (
-            "EXIGENCE IMPÉRATIVE DE PRONONCIATION AUDIO DES RÉFÉRENCES BIBLIQUES :\n"
-            "- Ne JAMAIS écrire les références sous la forme chiffrée avec deux-points (ex: 'Romains 2:1', 'Jean 3:16' ou '2:4'), car les moteurs de synthèse vocale les lisent comme des heures ('2 heures 1', '3 heures 16', '2 heures 4') !\n"
-            "- Écrivez TOUJOURS les références bibliques intégralement en toutes lettres :\n"
-            "  * 'Romains chapitre 2, verset 1' au lieu de 'Romains 2:1'\n"
-            "  * 'Jean chapitre 3, verset 16' au lieu de 'Jean 3:16'\n"
-            "  * 'versets 1 à 5' au lieu de 'v. 1-5' ou '1-5'\n"
-            "  * 'chapitre 2' au lieu de 'ch. 2' ou 'chap. 2'\n"
-            "  * 'après Jésus-Christ' / 'avant Jésus-Christ' au lieu de 'apr. J.-C.' / 'av. J.-C.'\n\n"
+            "EXIGENCE IMPÉRATIVE DE PRONONCIATION AUDIO :\n"
+            "1. RÉFÉRENCES BIBLIQUES (RÈGLE ABSOLUE) :\n"
+            "   - Ne JAMAIS écrire les références sous la forme chiffrée avec deux-points (ex: 'Romains 2:1', 'Jean 3:16' ou '2:4'), car les moteurs de synthèse vocale les lisent comme des heures ('2 heures 1', '3 heures 16', '2 heures 4') !\n"
+            "   - Écrivez TOUJOURS les références bibliques intégralement en toutes lettres :\n"
+            "     * 'Romains chapitre 2, verset 1' au lieu de 'Romains 2:1'\n"
+            "     * 'Jean chapitre 3, verset 16' au lieu de 'Jean 3:16'\n"
+            "     * 'versets 1 à 5' au lieu de 'v. 1-5' ou '1-5'\n"
+            "     * 'chapitre 2' au lieu de 'ch. 2' ou 'chap. 2'\n"
+            "     * 'après Jésus-Christ' / 'avant Jésus-Christ' au lieu de 'apr. J.-C.' / 'av. J.-C.'\n"
+            "2. PRONONCIATION DIRECTE DES TERMES GRECS ET HÉBREUX (ZÉRO CROCHET, ZÉRO DOUBLON) :\n"
+            "   - N'insérez jamais de caractères grecs ou hébreux d'origine non translittérés.\n"
+            "   - Écrivez DIRECTEMENT et UNIQUEMENT le mot en graphie phonétique française intuitive entre guillemets français (ex: écrivez directement « a-na-baï-no », « kata apo-ka-lup-sin », « kata-fro-né-o », « kré-sto-tèss », « khè-ssèd »).\n"
+            "   - INTERDICTION FORMELLE DE DOUBLER LE TERME AVEC DES CROCHETS COMME [prononcé ...] (la voix neuronale lirait les deux versions à haute voix ! Écrivez directement la graphie phonétique).\n\n"
         )
 
         user_prompt = (
@@ -1320,6 +1325,26 @@ class PodcastEngine:
         # 0. Supprimer impérativement toute balise XML / SSML / HTML résiduelle (ex: <break time="..."/>)
         # pour éviter qu'Edge-TTS ne les lise mot à mot à voix haute.
         text = re.sub(r'<[^>]+>', ' ', text)
+
+        # 0bis. Déduplication et nettoyage des phonétiques entre crochets
+        # Ex: "anabaïnô [prononcé a-na-baï-no]" -> "« a-na-baï-no »"
+        # Ex: "kata apokalupsin [prononcé kata apo-ka-lup-sin]" -> "« kata apo-ka-lup-sin »"
+        # Ex: "kataphroneô [kata-fro-né-o]" -> "« kata-fro-né-o »"
+        text = re.sub(
+            r'«?\s*[A-Za-zÀ-ÿ\s\-]+\s*»?\s*\[(?:prononcé|prononcée|prononcer|pron\.)\s*([^\]]+)\]',
+            r'« \1 »',
+            text,
+            flags=re.IGNORECASE
+        )
+        text = re.sub(
+            r'«?\s*[A-Za-zÀ-ÿ]+\s*»?\s*\[([a-zA-ZÀ-ÿ]+(?:-[a-zA-ZÀ-ÿ]+)+)\]',
+            r'« \1 »',
+            text
+        )
+        # Supprimer les crochets résiduels
+        text = text.replace('[', '').replace(']', '')
+        text = re.sub(r'«\s*«', '« ', text)
+        text = re.sub(r'»\s*»', ' »', text)
 
         # 1. Remplacer 'Livre Chapitre:Verset-Fin' (ex: Romains 2:1-5)
         text = re.sub(
@@ -1769,6 +1794,9 @@ class PodcastEngine:
         bg_path = cls.resolve_soundpack_track_path(bg_music_id) if bg_music_id else None
         jingle_path = cls.resolve_soundpack_track_path(jingle_intro_id) if jingle_intro_id else None
 
+        logger.info("[PodcastEngine] Préparation mixage audio : bg=%s (%s), jingle=%s (%s), ducking=%s (-%.1f dB)",
+                    bg_music_id, bg_path, jingle_intro_id, jingle_path, ducking_enabled, ducking_db)
+
         if bg_path or jingle_path:
             audio_path = os.path.join(get_podcasts_dir(), res.get("audio_file", f"{podcast_id}.mp3"))
             if os.path.exists(audio_path):
@@ -1800,11 +1828,17 @@ class PodcastEngine:
                         res["jingle_intro"] = jingle_intro_id or "none"
                         res["ducking_enabled"] = ducking_enabled
                         PodcastHistory.upsert(res)
+                        logger.info("[PodcastEngine] Mixage soundpack réussi pour %s (durée: %.2fs, taille: %d octets)",
+                                    podcast_id, total_dur, len(mixed_bytes))
                         if progress_callback:
                             total_l = len(shifted_dialogue)
                             progress_callback(total_l, 100, f"Épisode finalisé avec soundpack ({cls.format_duration(total_dur)})")
+                    else:
+                        logger.warning("[PodcastEngine] Mixage soundpack a renvoyé un flux vide, voix d'origine conservée")
                 except Exception as e_mix:
-                    logger.warning("[PodcastEngine] Erreur mixage soundpack : %s", e_mix)
+                    logger.error("[PodcastEngine] Erreur mixage soundpack : %s", e_mix, exc_info=True)
+            else:
+                logger.warning("[PodcastEngine] Fichier audio introuvable pour mixage : %s", audio_path)
         else:
             res["bg_music"] = "none"
             res["jingle_intro"] = "none"
