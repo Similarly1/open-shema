@@ -754,13 +754,13 @@
   line-height: 1.45;
 }
 
-/* Spinner sobre et fluide dédié au Studio Audio */
+/* Spinner sobre et fluide dédié au Studio Audio (compatible mode sombre & clair) */
 .audio-studio-spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #ffffff;
+  width: 13px;
+  height: 13px;
+  border: 2px solid currentColor;
+  border-right-color: transparent !important;
   border-radius: 50%;
   animation: audioStudioSpin 0.75s linear infinite;
   -webkit-animation: audioStudioSpin 0.75s linear infinite;
@@ -769,6 +769,21 @@
   box-sizing: border-box;
   will-change: transform;
   transform: translateZ(0);
+}
+
+.as-btn-suggest-axes .audio-studio-spinner {
+  border-color: var(--accent-orange, #ea580c);
+  border-right-color: transparent !important;
+}
+
+body.theme-light .audio-studio-spinner {
+  border-color: currentColor;
+  border-right-color: transparent !important;
+}
+
+body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
+  border-color: var(--accent-orange, #ea580c);
+  border-right-color: transparent !important;
 }
 
 @keyframes audioStudioSpin {
