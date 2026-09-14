@@ -64,6 +64,146 @@
       "duration": 19.59,
       "description": "Générique court et positif pour les formats rapides et questions-réponses.",
       "recommended_ducking_db": -14.0
+    },
+    {
+      "id": "sfx_rooster_crow",
+      "file": "sfx/sfx_rooster_crow.mp3",
+      "name": "Chant du Coq",
+      "category": "sfx",
+      "description": "Chant clair et matinal (Renvoi au reniement de Pierre, aube à Jérusalem).",
+      "tags": [
+        "coq",
+        "matin",
+        "pierre",
+        "évangile"
+      ],
+      "duration_sec": 4.5
+    },
+    {
+      "id": "sfx_campfire_crackle",
+      "file": "sfx/sfx_campfire_crackle.mp3",
+      "name": "Feu de Camp & Crépitements",
+      "category": "sfx",
+      "description": "Brasier chaleureux et crépitement de bois (Feu dans la cour, campement nomade).",
+      "tags": [
+        "feu",
+        "crépitement",
+        "camp",
+        "braise"
+      ],
+      "duration_sec": 8.1
+    },
+    {
+      "id": "sfx_footsteps_trail",
+      "file": "sfx/sfx_footsteps_trail.mp3",
+      "name": "Pas sur Sentier de Terre",
+      "category": "sfx",
+      "description": "Marche rythmée sur chemin poussiéreux (Chemin d'Emmaüs, pèlerinage).",
+      "tags": [
+        "pas",
+        "marche",
+        "sentier",
+        "chemin"
+      ],
+      "duration_sec": 6.9
+    },
+    {
+      "id": "sfx_ocean_shore_waves",
+      "file": "sfx/sfx_ocean_shore_waves.mp3",
+      "name": "Ressac & Vagues Douces",
+      "category": "sfx",
+      "description": "Clapotis et vagues régulières (Mer de Galilée, rivage de Tibériade).",
+      "tags": [
+        "mer",
+        "vagues",
+        "galilée",
+        "eau"
+      ],
+      "duration_sec": 61.5
+    },
+    {
+      "id": "sfx_angry_crowd",
+      "file": "sfx/sfx_angry_crowd.mp3",
+      "name": "Clameur & Foule Hostile",
+      "category": "sfx",
+      "description": "Rumeur et cris de foule révoltée (Procès devant Pilate, tumulte au temple).",
+      "tags": [
+        "foule",
+        "clameur",
+        "émeute",
+        "procès"
+      ],
+      "duration_sec": 40.4
+    },
+    {
+      "id": "sfx_crowd_murmur",
+      "file": "sfx/sfx_crowd_murmur.mp3",
+      "name": "Brouhaha de Foule Réunie",
+      "category": "sfx",
+      "description": "Murmure paisible d'une multitude rassemblée (Sermon sur la montagne, foules d'écoute).",
+      "tags": [
+        "foule",
+        "murmure",
+        "assemblée",
+        "multitude"
+      ],
+      "duration_sec": 34.3
+    },
+    {
+      "id": "sfx_ancient_marketplace",
+      "file": "sfx/sfx_ancient_marketplace.mp3",
+      "name": "Marché & Cité Antique",
+      "category": "sfx",
+      "description": "Ambiance vivante de souk oriental et de carrefour commercial (Jérusalem, Agora).",
+      "tags": [
+        "marché",
+        "cité",
+        "oriental",
+        "jérusalem"
+      ],
+      "duration_sec": 1326.9
+    },
+    {
+      "id": "sfx_sheep_flock_bells",
+      "file": "sfx/sfx_sheep_flock_bells.mp3",
+      "name": "Troupeau de Brebis & Clochettes",
+      "category": "sfx",
+      "description": "Bêlements doux et tintements pastoraux (Le Bon Berger, collines de Judée).",
+      "tags": [
+        "brebis",
+        "berger",
+        "clochettes",
+        "pastoral"
+      ],
+      "duration_sec": 10.4
+    },
+    {
+      "id": "sfx_night_crickets",
+      "file": "sfx/sfx_night_crickets.mp3",
+      "name": "Nuit Paisible & Grillons",
+      "category": "sfx",
+      "description": "Atmosphère nocturne méditative et sereine (Jardin de Gethsémané, veillée).",
+      "tags": [
+        "nuit",
+        "grillons",
+        "gethsémané",
+        "calme"
+      ],
+      "duration_sec": 120.6
+    },
+    {
+      "id": "sfx_desert_wind",
+      "file": "sfx/sfx_desert_wind.mp3",
+      "name": "Vent du Désert & Souffle",
+      "category": "sfx",
+      "description": "Souffle continu et majestueux du vent des plaines arides (Désert du Néguev, Sinaï).",
+      "tags": [
+        "vent",
+        "désert",
+        "souffle",
+        "néguev"
+      ],
+      "duration_sec": 32.4
     }
   ]
 }
