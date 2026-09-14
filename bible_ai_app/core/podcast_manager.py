@@ -1584,10 +1584,11 @@ class PodcastEngine:
             dialogue_sample = " ".join([d.get("text", "") for d in dialogue[:8]]).lower()
             corpus += " " + dialogue_sample
 
-        # Règles sémantiques contextuelles précises
-        if any(w in corpus for w in ["coq", "renie", "pierre", "aurore", "chant du coq", "veille"]):
+        # 1. Reniement de Pierre / Chant du coq (expressions explicites uniquement pour éviter toute fausse détection sur "pierre/rocher")
+        if any(w in corpus for w in ["chant du coq", "le coq", "coq chanta", "avant que le coq", "renie trois fois", "reniement de pierre"]):
             return "sfx_rooster_crow"
-        if any(w in corpus for w in ["désert", "desert", "aride", "jean-baptiste", "jean baptiste", "voix au désert", "sauvage", "solitude"]):
+        # 2. Jean-Baptiste / Désert / Jourdain / Baptême (Luc 3, Matthieu 3, Marc 1...)
+        if any(w in corpus for w in ["jean-baptiste", "jean baptiste", "luc 3", "luc 1", "matthieu 3", "marc 1", "désert", "desert", "aride", "voix au désert", "sauvage", "solitude", "jourdain", "baptême"]):
             return "sfx_desert_wind"
         if any(w in corpus for w in ["mer", "barque", "pêche", "galilée", "tempête", "ressac", "rivage", "lac", "tibériade", "poisson"]):
             return "sfx_ocean_shore_waves"
@@ -1638,10 +1639,12 @@ class PodcastEngine:
             import numpy as np
 
             opts = options or {}
-            ducking_db = float(opts.get("ducking_db", -16.0))
+            ducking_db = float(opts.get("ducking_db", -24.0))
             duck_gain = 10.0 ** (ducking_db / 20.0)
-            swell_gain = 10.0 ** ((ducking_db + 6.0) / 20.0)
-            intro_gain = 10.0 ** (float(opts.get("intro_gain_db", -2.0)) / 20.0)
+            swell_gain = 10.0 ** ((ducking_db + 8.0) / 20.0)
+            intro_gain = 10.0 ** (float(opts.get("intro_gain_db", -4.0)) / 20.0)
+            music_timing = str(opts.get("music_timing", "intro_outro")).strip().lower()
+            music_intro_sec = float(opts.get("music_intro_sec", 8.0))
 
             def _load_stereo(audio_input):
                 if isinstance(audio_input, (bytes, bytearray)):
@@ -1702,7 +1705,7 @@ class PodcastEngine:
                     jingle_env[fade_down_end:] = 0.0
                 jingle_track[:, :j_len] = jingle[:, :j_len] * jingle_env
 
-            # 3. Piste Musique d'ambiance avec Ducking sidechain continu
+            # 3. Piste Musique d'ambiance avec Ducking sidechain et fondu d'extinction
             music_track = np.zeros((2, total_samples), dtype=np.float32)
             if bg_music_path and os.path.exists(bg_music_path):
                 music = _load_stereo(bg_music_path)
@@ -1714,36 +1717,77 @@ class PodcastEngine:
                         music_track[:, idx:idx + take] = music[:, :take]
                         idx += take
 
-                    env = np.full(total_samples, swell_gain, dtype=np.float32)
-
-                    # Fondu d'entrée initial de l'ambiance
-                    ramp_in = int(1.5 * sample_rate)
-                    if ramp_in > 0:
-                        env[:ramp_in] = np.linspace(0.0, duck_gain, ramp_in)
-
-                    # Ducking sous chaque réplique avec attack / release douces
-                    for item in shifted_dialogue:
-                        s_samp = max(0, int(float(item.get("start_time", 0.0)) * sample_rate))
-                        e_samp = min(total_samples, int(float(item.get("end_time", 0.0)) * sample_rate))
-                        att_samp = int(0.15 * sample_rate)
-                        rel_samp = int(0.35 * sample_rate)
-                        s_att = max(0, s_samp - att_samp)
-                        e_rel = min(total_samples, e_samp + rel_samp)
-                        env[s_samp:e_samp] = duck_gain
-                        if s_samp > s_att:
-                            env[s_att:s_samp] = np.linspace(env[s_att], duck_gain, s_samp - s_att)
-                        if e_rel > e_samp:
-                            env[e_samp:e_rel] = np.linspace(duck_gain, swell_gain, e_rel - e_samp)
-
-                    # Outro : remontée de l'ambiance en crescendo puis fondu final vers le silence
                     speech_end_samp = lead_in_samples + speech_len
-                    outro_start = speech_end_samp
-                    outro_swell_end = min(total_samples, outro_start + int(2.0 * sample_rate))
-                    fade_out_start = outro_swell_end
-                    if outro_swell_end > outro_start:
-                        env[outro_start:outro_swell_end] = np.linspace(duck_gain, swell_gain * 1.5, outro_swell_end - outro_start)
-                    if total_samples > fade_out_start:
-                        env[fade_out_start:] = np.linspace(env[fade_out_start], 0.0, total_samples - fade_out_start)
+                    fade_out_start = lead_in_samples + int(music_intro_sec * sample_rate)
+                    fade_out_end = min(total_samples, fade_out_start + int(4.0 * sample_rate))
+                    outro_in_start = max(fade_out_end, speech_end_samp - int(3.5 * sample_rate))
+
+                    if music_timing == "intro_outro" and outro_in_start > fade_out_end:
+                        # Mode Recommandé : La musique accompagne l'amorce et les premières secondes (8s),
+                        # puis s'éteint en fondu (fade-out) pour laisser la parole 100% pure pendant l'exégèse.
+                        # Elle revient en fondu doux uniquement pour la conclusion (outro).
+                        env = np.zeros(total_samples, dtype=np.float32)
+
+                        # Amorçage intro
+                        intro_ramp = min(lead_in_samples, int(1.5 * sample_rate))
+                        if intro_ramp > 0:
+                            env[:intro_ramp] = np.linspace(0.0, swell_gain, intro_ramp)
+                            env[intro_ramp:lead_in_samples] = swell_gain
+                        else:
+                            env[:lead_in_samples] = swell_gain
+
+                        # Début de parole : ducking discret sous les premières phrases (-24 dB)
+                        env[lead_in_samples:fade_out_start] = duck_gain
+
+                        # Fondu d'extinction progressif (fade-out après 8s)
+                        if fade_out_end > fade_out_start:
+                            env[fade_out_start:fade_out_end] = np.linspace(duck_gain, 0.0, fade_out_end - fade_out_start)
+
+                        # Le corps central reste à 0.0 (Silence musical pour la clarté absolue de l'exégèse)
+
+                        # Outro : remontée en douceur sous les dernières paroles puis swell final
+                        if speech_end_samp > outro_in_start:
+                            env[outro_in_start:speech_end_samp] = np.linspace(0.0, duck_gain, speech_end_samp - outro_in_start)
+
+                        outro_swell_end = min(total_samples, speech_end_samp + int(2.0 * sample_rate))
+                        if outro_swell_end > speech_end_samp:
+                            env[speech_end_samp:outro_swell_end] = np.linspace(duck_gain, swell_gain, outro_swell_end - speech_end_samp)
+
+                        if total_samples > outro_swell_end:
+                            env[outro_swell_end:] = np.linspace(swell_gain, 0.0, total_samples - outro_swell_end)
+
+                    else:
+                        # Mode continu : ambiance en nappe sur tout l'épisode avec ducking discret sous chaque parole
+                        env = np.full(total_samples, swell_gain, dtype=np.float32)
+
+                        # Fondu d'entrée initial de l'ambiance
+                        ramp_in = int(1.5 * sample_rate)
+                        if ramp_in > 0:
+                            env[:ramp_in] = np.linspace(0.0, duck_gain, ramp_in)
+
+                        # Ducking sous chaque réplique avec attack / release douces
+                        for item in shifted_dialogue:
+                            s_samp = max(0, int(float(item.get("start_time", 0.0)) * sample_rate))
+                            e_samp = min(total_samples, int(float(item.get("end_time", 0.0)) * sample_rate))
+                            att_samp = int(0.15 * sample_rate)
+                            rel_samp = int(0.35 * sample_rate)
+                            s_att = max(0, s_samp - att_samp)
+                            e_rel = min(total_samples, e_samp + rel_samp)
+                            env[s_samp:e_samp] = duck_gain
+                            if s_samp > s_att:
+                                env[s_att:s_samp] = np.linspace(env[s_att], duck_gain, s_samp - s_att)
+                            if e_rel > e_samp:
+                                env[e_samp:e_rel] = np.linspace(duck_gain, swell_gain, e_rel - e_samp)
+
+                        # Outro final
+                        speech_end_samp = lead_in_samples + speech_len
+                        outro_start = speech_end_samp
+                        outro_swell_end = min(total_samples, outro_start + int(2.0 * sample_rate))
+                        fade_out_start = outro_swell_end
+                        if outro_swell_end > outro_start:
+                            env[outro_start:outro_swell_end] = np.linspace(duck_gain, swell_gain * 1.5, outro_swell_end - outro_start)
+                        if total_samples > fade_out_start:
+                            env[fade_out_start:] = np.linspace(env[fade_out_start], 0.0, total_samples - fade_out_start)
 
                     music_track *= env
 
@@ -1753,18 +1797,52 @@ class PodcastEngine:
                 sfx_audio = _load_stereo(sfx_path)
                 s_len = sfx_audio.shape[1]
                 if s_len > 0:
-                    s_idx = 0
-                    while s_idx < total_samples:
-                        take = min(s_len, total_samples - s_idx)
-                        sfx_track[:, s_idx:s_idx + take] = sfx_audio[:, :take]
-                        s_idx += take
-                    # Niveau sonore naturel subtil (-18 dB sous la voix) avec fondu
-                    sfx_gain = 10.0 ** (-18.0 / 20.0)
-                    sfx_track *= sfx_gain
-                    sfx_fade = min(total_samples, int(1.2 * sample_rate))
-                    if sfx_fade > 0:
-                        sfx_track[:, :sfx_fade] *= np.linspace(0.0, 1.0, sfx_fade)
-                        sfx_track[:, -sfx_fade:] *= np.linspace(1.0, 0.0, sfx_fade)
+                    s_dur = s_len / sample_rate
+                    # Vérifier s'il s'agit d'un effet ponctuel (Spot SFX, durée <= 15s) ou d'une nappe continue
+                    is_spot_sfx = (s_dur <= 15.0)
+
+                    if is_spot_sfx:
+                        # Effet ponctuel (ex: coq, feu de camp, pas, brebis) :
+                        # NE DOIT JAMAIS ÊTRE BOUCLÉ ! Joué UNE SEULE FOIS en illustration au démarrage
+                        spot_start = int(0.5 * sample_rate)
+                        spot_end = min(total_samples, spot_start + s_len)
+                        spot_len = spot_end - spot_start
+                        if spot_len > 0:
+                            sfx_gain = 10.0 ** (-20.0 / 20.0)
+                            spot_env = np.ones(spot_len, dtype=np.float32) * sfx_gain
+                            fade_s = min(spot_len // 4, int(0.4 * sample_rate))
+                            if fade_s > 0:
+                                spot_env[:fade_s] = np.linspace(0.0, sfx_gain, fade_s)
+                                spot_env[-fade_s:] = np.linspace(sfx_gain, 0.0, fade_s)
+                            sfx_track[:, spot_start:spot_end] = sfx_audio[:, :spot_len] * spot_env
+                    else:
+                        # Nappe d'ambiance continue (vent, ressac marin, grillons...)
+                        s_idx = 0
+                        while s_idx < total_samples:
+                            take = min(s_len, total_samples - s_idx)
+                            sfx_track[:, s_idx:s_idx + take] = sfx_audio[:, :take]
+                            s_idx += take
+
+                        sfx_gain = 10.0 ** (-26.0 / 20.0)
+                        if music_timing == "intro_outro":
+                            # S'estompe après l'introduction pour ne pas encombrer l'exégèse
+                            fade_start = lead_in_samples + int(music_intro_sec * sample_rate)
+                            fade_end = min(total_samples, fade_start + int(4.0 * sample_rate))
+                            sfx_env = np.zeros(total_samples, dtype=np.float32)
+                            sfx_env[:fade_start] = sfx_gain
+                            if fade_end > fade_start:
+                                sfx_env[fade_start:fade_end] = np.linspace(sfx_gain, 0.0, fade_end - fade_start)
+                            # Fondu d'entrée doux
+                            in_ramp = min(fade_start, int(1.5 * sample_rate))
+                            if in_ramp > 0:
+                                sfx_env[:in_ramp] = np.linspace(0.0, sfx_gain, in_ramp)
+                            sfx_track *= sfx_env
+                        else:
+                            sfx_track *= sfx_gain
+                            sfx_fade = min(total_samples, int(1.5 * sample_rate))
+                            if sfx_fade > 0:
+                                sfx_track[:, :sfx_fade] *= np.linspace(0.0, 1.0, sfx_fade)
+                                sfx_track[:, -sfx_fade:] *= np.linspace(1.0, 0.0, sfx_fade)
 
             # 4. Mixage final stéréo avec soft-clipping et encodage MP3
             mixed = np.clip(voice_track + jingle_track + music_track + sfx_track, -1.0, 1.0)
@@ -1891,7 +1969,7 @@ class PodcastEngine:
             sfx_ambient_id = None
 
         ducking_enabled = opts.get("ducking_enabled", cfg.get("audio_studio_ducking_enabled", True))
-        ducking_db = float(opts.get("ducking_db", cfg.get("audio_studio_ducking_db", -16.0)))
+        ducking_db = float(opts.get("ducking_db", cfg.get("audio_studio_ducking_db", -24.0)))
 
         bg_path = cls.resolve_soundpack_track_path(bg_music_id) if bg_music_id else None
         jingle_path = cls.resolve_soundpack_track_path(jingle_intro_id) if jingle_intro_id else None
@@ -1914,7 +1992,9 @@ class PodcastEngine:
                     _audit_log(f"VOICE: Lu {len(speech_bytes)} octets de voix brute depuis {audio_path}")
 
                     mix_opts = {
-                        "ducking_db": ducking_db if ducking_enabled else -6.0,
+                        "ducking_db": ducking_db if ducking_enabled else -10.0,
+                        "music_timing": opts.get("music_timing", cfg.get("audio_studio_music_timing", "intro_outro")),
+                        "music_intro_sec": float(opts.get("music_intro_sec", cfg.get("audio_studio_music_intro_sec", 8.0))),
                         "bitrate": 96000
                     }
                     mixed_bytes, shifted_dialogue, total_dur = cls.mix_voice_with_soundpack(

@@ -5710,9 +5710,20 @@
                         <span>Bruitages sonores d'ambiance contextuels (Auto-détectés)</span>
                       </label>
 
-                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Atténue la musique sous la parole (-16 dB) et la remonte doucement lors des pauses et en fin d'épisode">
+                      <!-- Mode de présence musicale : Intro & Outro vs Continu -->
+                      <div class="audio-studio-form-row" style="margin-top: 2px; margin-bottom: 2px;">
+                        <label class="audio-studio-form-label" for="as-select-music-timing" style="font-size: 11px; display: flex; justify-content: space-between;">
+                          <span>Diffusion de l'ambiance musicale</span>
+                        </label>
+                        <select id="as-select-music-timing" class="audio-studio-select" style="width: 100%; height: 32px; font-size: 12px;">
+                          <option value="intro_outro" selected>Intro &amp; Outro (Fondu après 8s — Recommandé)</option>
+                          <option value="continuous">Ambiance continue tout le long</option>
+                        </select>
+                      </div>
+
+                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Atténue très discrètement la musique sous la parole (-24 dB) pour laisser la voix parfaitement claire">
                         <input type="checkbox" id="as-check-ducking" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
-                        <span>Ducking automatique sidechain (-16 dB sous la voix)</span>
+                        <span>Ducking discret sidechain (-24 dB sous la voix)</span>
                       </label>
                     </div>
                   </div>

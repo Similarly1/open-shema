@@ -159,6 +159,7 @@ const AudioStudioView = {
       checkCalmProsody: document.getElementById('as-check-calm-prosody'),
       selectRate: document.getElementById('as-select-rate'),
       checkMusicJingle: document.getElementById('as-check-music-jingle'),
+      selectMusicTiming: document.getElementById('as-select-music-timing'),
       checkSfxAuto: document.getElementById('as-check-sfx-auto'),
       checkDucking: document.getElementById('as-check-ducking'),
       step2CardTitle: document.getElementById('as-step2-card-title'),
@@ -2678,7 +2679,11 @@ const AudioStudioView = {
       } else if (el.checkCalmProsody?.checked) {
         dspPills.push('Cadence -14%');
       }
-      if (hasMusic && el.checkDucking?.checked) dspPills.push('Ducking -16 dB');
+      if (hasMusic && el.checkDucking?.checked) dspPills.push('Ducking -24 dB');
+      if (hasMusic) {
+        const isIntro = (!el.selectMusicTiming || el.selectMusicTiming.value === 'intro_outro');
+        dspPills.push(isIntro ? 'Intro/Outro (Fondu 8s)' : 'Ambiance continue');
+      }
       const pauseMs = parseInt(el.inputPauseMs?.value, 10) || 350;
       if (pauseMs !== 350) dspPills.push(`Pause ${pauseMs}ms`);
 
@@ -2765,7 +2770,7 @@ const AudioStudioView = {
         spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral';
       } else {
         spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
-        spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-CH-FabriceNeural';
+        spkB = el.selectVoiceScholar?.value || this.config?.voice_scholar || 'fr-CH-FabriceNeural';
         spkSolo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-CH-FabriceNeural';
       }
 
@@ -2777,7 +2782,7 @@ const AudioStudioView = {
         voice_speaker_b: spkB,
         voice_solo: spkSolo,
         voxtral_voice_speaker_a: el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy',
-        voxtral_voice_speaker_b: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral',
+        voxtral_voice_scholar: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral',
         voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral',
         voxtral_modulate: el.checkVoxtralModulate ? el.checkVoxtralModulate.checked : true,
         pause_ms: parseInt(el.inputPauseMs?.value, 10) || 350,
@@ -2793,7 +2798,9 @@ const AudioStudioView = {
         jingle_intro: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) ? 'jingle_piano_solemn' : 'none',
         sfx_ambient: (el.checkSfxAuto ? el.checkSfxAuto.checked : true) ? 'auto' : 'none',
         ducking_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) && (el.checkDucking ? el.checkDucking.checked : true),
-        ducking_db: this.config?.ducking_db || -16.0
+        ducking_db: this.config?.ducking_db || -24.0,
+        music_timing: el.selectMusicTiming?.value || 'intro_outro',
+        music_intro_sec: 8.0
       };
 
       if (this.previewAudio && !this.previewAudio.paused) {
