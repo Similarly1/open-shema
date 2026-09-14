@@ -18,6 +18,7 @@ const AudioStudioView = {
   playbackRates: [1.0, 1.25, 1.5, 1.75, 2.0],
   currentRateIdx: 0,
   activeKaraokeTurnIndex: -1,
+  textMode: 'literary', // 'literary' (texte soigné & grec original) ou 'phonetic' (script vocal TTS)
 
   // Éléments DOM
   elements: {},
@@ -156,6 +157,7 @@ const AudioStudioView = {
       inputPauseMs: document.getElementById('as-input-pause-ms'),
       checkMastering: document.getElementById('as-check-mastering'),
       checkCalmProsody: document.getElementById('as-check-calm-prosody'),
+      selectRate: document.getElementById('as-select-rate'),
       checkMusicJingle: document.getElementById('as-check-music-jingle'),
       checkSfxAuto: document.getElementById('as-check-sfx-auto'),
       checkDucking: document.getElementById('as-check-ducking'),
@@ -168,6 +170,13 @@ const AudioStudioView = {
       progressPct: document.getElementById('audio-studio-progress-pct'),
       progressBarFill: document.getElementById('audio-studio-progress-bar-fill'),
       progressMsg: document.getElementById('audio-studio-progress-msg'),
+
+      // Switch de vue de texte (Littéraire vs Phonétique TTS)
+      btnModeLiterary: document.getElementById('as-btn-mode-literary'),
+      btnModePhonetic: document.getElementById('as-btn-mode-phonetic'),
+      textModeHint: document.getElementById('as-text-mode-hint'),
+      karaokeBtnModeLiterary: document.getElementById('as-karaoke-btn-mode-literary'),
+      karaokeBtnModePhonetic: document.getElementById('as-karaoke-btn-mode-phonetic'),
 
       // Étape 3 : Karaoké & Lecteur
       karaokeEpisodeTitle: document.getElementById('as-karaoke-episode-title'),
@@ -381,6 +390,12 @@ const AudioStudioView = {
 
     // 8. Ajouter une réplique manuelle
     el.btnAddTurn?.addEventListener('click', () => this.addManualTurn());
+
+    // Switch de mode de texte (Littéraire vs Phonétique TTS)
+    el.btnModeLiterary?.addEventListener('click', () => this.setTextMode('literary'));
+    el.btnModePhonetic?.addEventListener('click', () => this.setTextMode('phonetic'));
+    el.karaokeBtnModeLiterary?.addEventListener('click', () => this.setTextMode('literary'));
+    el.karaokeBtnModePhonetic?.addEventListener('click', () => this.setTextMode('phonetic'));
 
     // 9. Synthèse audio & Habillage sonore (Soundpack)
     el.btnSynthesize?.addEventListener('click', () => this.startSynthesis());
@@ -2162,6 +2177,80 @@ const AudioStudioView = {
   },
 
   // =========================================================================
+  // GESTION DU MODE DE TEXTE (LITTÉRAIRE VS PHONÉTIQUE TTS)
+  // =========================================================================
+
+  setTextMode(mode) {
+    this.textMode = (mode === 'phonetic') ? 'phonetic' : 'literary';
+    const isLit = (this.textMode === 'literary');
+    const el = this.elements;
+
+    // Mise à jour visuelle des boutons en Étape 2
+    if (el.btnModeLiterary) {
+      el.btnModeLiterary.style.background = isLit ? 'var(--accent-orange)' : 'transparent';
+      el.btnModeLiterary.style.color = isLit ? '#fff' : 'var(--text-muted)';
+      el.btnModeLiterary.classList.toggle('is-active', isLit);
+    }
+    if (el.btnModePhonetic) {
+      el.btnModePhonetic.style.background = !isLit ? 'var(--accent-orange)' : 'transparent';
+      el.btnModePhonetic.style.color = !isLit ? '#fff' : 'var(--text-muted)';
+      el.btnModePhonetic.classList.toggle('is-active', !isLit);
+    }
+    if (el.textModeHint) {
+      el.textModeHint.textContent = isLit
+        ? 'Orthographe soignée & grec intact'
+        : 'Script vocal optimisé pour le moteur TTS';
+    }
+
+    // Mise à jour visuelle des boutons en Étape 3 (Karaoké)
+    if (el.karaokeBtnModeLiterary) {
+      el.karaokeBtnModeLiterary.style.background = isLit ? 'var(--accent-orange)' : 'transparent';
+      el.karaokeBtnModeLiterary.style.color = isLit ? '#fff' : 'var(--text-muted)';
+      el.karaokeBtnModeLiterary.classList.toggle('is-active', isLit);
+    }
+    if (el.karaokeBtnModePhonetic) {
+      el.karaokeBtnModePhonetic.style.background = !isLit ? 'var(--accent-orange)' : 'transparent';
+      el.karaokeBtnModePhonetic.style.color = !isLit ? '#fff' : 'var(--text-muted)';
+      el.karaokeBtnModePhonetic.classList.toggle('is-active', !isLit);
+    }
+
+    // Basculer les textes affichés dans les cartes du script (Étape 2)
+    const script = (Array.isArray(this.currentPodcast?.script_dialogue) && this.currentPodcast.script_dialogue.length > 0)
+      ? this.currentPodcast.script_dialogue
+      : (Array.isArray(this.currentPodcast?.dialogue) ? this.currentPodcast.dialogue : []);
+
+    const turnCards = el.scriptList?.querySelectorAll('.audio-studio-turn-card') || [];
+    turnCards.forEach(card => {
+      const idx = parseInt(card.dataset.turnIndex, 10);
+      const turn = script[idx];
+      if (!turn) return;
+      const ta = card.querySelector('.audio-studio-turn-textarea');
+      if (ta) {
+        if (isLit) {
+          ta.value = turn.text || '';
+          ta.placeholder = "Texte littéraire (orthographe soignée, grec intact)...";
+        } else {
+          ta.value = turn.speech_text || turn.text || '';
+          ta.placeholder = "Script vocal phonétique (lu par le moteur vocal TTS)...";
+        }
+        this.autoResizeTextarea(ta);
+      }
+    });
+
+    // Basculer les textes affichés dans le Karaoké (Étape 3)
+    const karaokeCards = el.karaokeScriptFlow?.querySelectorAll('.as-karaoke-card') || [];
+    karaokeCards.forEach(card => {
+      const idx = parseInt(card.dataset.turnIndex, 10);
+      const turn = script[idx];
+      if (!turn) return;
+      const textEl = card.querySelector('.as-karaoke-text');
+      if (textEl) {
+        textEl.textContent = isLit ? (turn.text || '') : (turn.speech_text || turn.text || '');
+      }
+    });
+  },
+
+  // =========================================================================
   // RENDU DU SCRIPT DANS LA COLONNE GAUCHE
   // =========================================================================
 
@@ -2297,6 +2386,12 @@ const AudioStudioView = {
 
     const pauseMs = turn.pause_after_ms || 350;
 
+    const isPhonetic = (this.textMode === 'phonetic');
+    const displayVal = isPhonetic ? (turn.speech_text || turn.text || '') : (turn.text || '');
+    const placeholderVal = isPhonetic
+      ? "Script vocal phonétique (lu par le moteur vocal TTS)..."
+      : "Texte littéraire (orthographe soignée, grec intact)...";
+
     card.innerHTML = `
       <div class="audio-studio-turn-header">
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -2316,7 +2411,7 @@ const AudioStudioView = {
           </button>
         </div>
       </div>
-      <textarea class="audio-studio-turn-textarea" placeholder="Texte de la réplique...">${this.escapeHtml(turn.text || '')}</textarea>
+      <textarea class="audio-studio-turn-textarea" placeholder="${placeholderVal}">${this.escapeHtml(displayVal)}</textarea>
     `;
 
     // Événement auto-resize & synchronisation
@@ -2326,7 +2421,12 @@ const AudioStudioView = {
       textarea.addEventListener('input', () => {
         this.autoResizeTextarea(textarea);
         if (this.currentPodcast?.script_dialogue?.[idx]) {
-          this.currentPodcast.script_dialogue[idx].text = textarea.value;
+          if (this.textMode === 'phonetic') {
+            this.currentPodcast.script_dialogue[idx].speech_text = textarea.value;
+          } else {
+            this.currentPodcast.script_dialogue[idx].text = textarea.value;
+            this.currentPodcast.script_dialogue[idx].speech_text = '';
+          }
         }
       });
     }
@@ -2573,6 +2673,11 @@ const AudioStudioView = {
       const dspPills = [];
       if (el.checkMastering?.checked) dspPills.push('Mastering Studio');
       if (el.checkCalmProsody?.checked) dspPills.push('Prosodie posée');
+      if (el.selectRate?.value) {
+        dspPills.push(`Cadence ${el.selectRate.value}`);
+      } else if (el.checkCalmProsody?.checked) {
+        dspPills.push('Cadence -14%');
+      }
       if (hasMusic && el.checkDucking?.checked) dspPills.push('Ducking -16 dB');
       const pauseMs = parseInt(el.inputPauseMs?.value, 10) || 350;
       if (pauseMs !== 350) dspPills.push(`Pause ${pauseMs}ms`);
@@ -2678,7 +2783,7 @@ const AudioStudioView = {
         pause_ms: parseInt(el.inputPauseMs?.value, 10) || 350,
         mastering_enabled: el.checkMastering ? el.checkMastering.checked : true,
         calm_prosody: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
-        rate: el.checkCalmProsody?.checked ? '-6%' : '+0%',
+        rate: el.selectRate?.value || (el.checkCalmProsody?.checked ? '-14%' : '+0%'),
         pitch: el.checkCalmProsody?.checked ? '-3Hz' : '+0Hz',
         inject_breaks: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
         music_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true),
@@ -2927,12 +3032,15 @@ const AudioStudioView = {
         ? `${this.formatTime(turn.start_time)} – ${this.formatTime(turn.end_time || turn.start_time)}`
         : `#${idx + 1}`;
 
+      const isPhonetic = (this.textMode === 'phonetic');
+      const textDisplay = isPhonetic ? (turn.speech_text || turn.text || '') : (turn.text || '');
+
       card.innerHTML = `
         <div class="as-karaoke-speaker" style="color: ${roleColor};">
           ${this.escapeHtml(speaker)}
           <span style="font-weight: normal; opacity: 0.7; margin-left: 8px;">${timeLabel}</span>
         </div>
-        <div class="as-karaoke-text">${this.escapeHtml(turn.text || '')}</div>
+        <div class="as-karaoke-text">${this.escapeHtml(textDisplay)}</div>
       `;
 
       // Clic interactif pour sauter immédiatement à ce passage dans l'audio

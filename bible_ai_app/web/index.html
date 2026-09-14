@@ -5413,6 +5413,21 @@
                     </div>
                   </div>
 
+                  <!-- Switch de mode de texte : Texte littéraire vs Script vocal phonétique -->
+                  <div class="as-text-mode-bar" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 5px 8px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: inline-flex; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; padding: 2px; gap: 2px;">
+                      <button type="button" class="as-text-mode-btn is-active" id="as-btn-mode-literary" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 5px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none; background: var(--accent-orange); color: #fff;" title="Afficher l'orthographe française littéraire soignée avec citations et termes grecs/hébreux originaux">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        <span>Texte littéraire</span>
+                      </button>
+                      <button type="button" class="as-text-mode-btn" id="as-btn-mode-phonetic" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 5px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-muted);" title="Afficher le script vocal avec les ajustements phonétiques et respirations pour le moteur TTS">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                        <span>Script vocal TTS</span>
+                      </button>
+                    </div>
+                    <span id="as-text-mode-hint" style="font-size: 11px; color: var(--text-muted);">Orthographe soignée &amp; grec intact</span>
+                  </div>
+
                   <!-- Liste des répliques -->
                   <div class="audio-studio-script-list" id="audio-studio-script-list">
                     <!-- Injecté dynamiquement par audio_studio_view.js -->
@@ -5655,10 +5670,23 @@
                         <span>Mastering Studio Radio (Égalisation &amp; compression)</span>
                       </label>
 
-                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Débit ralenti (-6%), hauteur légèrement abaissée (-3Hz) et pauses de respiration automatiques">
+                      <label style="font-size: 11.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Débit ralenti, hauteur légèrement abaissée (-3Hz) et pauses de respiration automatiques">
                         <input type="checkbox" id="as-check-calm-prosody" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
-                        <span>Prosodie posée (Débit -6%, Tonalité -3Hz &amp; respirations)</span>
+                        <span>Prosodie posée (Tonalité -3Hz &amp; respirations)</span>
                       </label>
+
+                      <!-- Sélecteur de cadence / vitesse vocale -->
+                      <div class="audio-studio-form-row" style="margin-top: 4px; margin-bottom: 0;">
+                        <label class="audio-studio-form-label" for="as-select-rate" style="font-size: 11px; display: flex; justify-content: space-between;">
+                          <span>Cadence vocale (Débit de parole)</span>
+                        </label>
+                        <select id="as-select-rate" class="audio-studio-select" style="width: 100%; height: 32px; font-size: 12px;">
+                          <option value="-14%" selected>Posée &amp; Solennelle (-14% — Idéal exégèse)</option>
+                          <option value="-10%">Modérée &amp; Réfléchie (-10%)</option>
+                          <option value="-6%">Légèrement ralentie (-6%)</option>
+                          <option value="+0%">Standard / Dynamique (+0%)</option>
+                        </select>
+                      </div>
                     </div>
 
                     <!-- Habillage Sonore, Ambiance & Jingle (Soundpack avec Ducking) -->
@@ -5737,7 +5765,16 @@
                       <h3 class="as-karaoke-title" id="as-karaoke-episode-title">Titre de l'épisode</h3>
                       <p class="as-karaoke-subtitle" id="as-karaoke-episode-summary">Résumé de l'épisode audio</p>
                     </div>
-                    <div style="display: flex; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <!-- Sélecteur Texte littéraire / Script phonétique en Karaoké -->
+                      <div style="display: inline-flex; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; padding: 2px; gap: 2px;">
+                        <button type="button" class="as-text-mode-btn is-active" id="as-karaoke-btn-mode-literary" style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; background: var(--accent-orange); color: #fff;" title="Afficher le texte littéraire original">
+                          <span>Littéraire</span>
+                        </button>
+                        <button type="button" class="as-text-mode-btn" id="as-karaoke-btn-mode-phonetic" style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-muted);" title="Afficher le script vocal avec les ajustements phonétiques">
+                          <span>Phonétique</span>
+                        </button>
+                      </div>
                       <button type="button" class="btn-secondary btn-sm" id="btn-as-step3-back-to-step2">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         <span>Éditer le script</span>

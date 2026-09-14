@@ -1036,15 +1036,21 @@ class PodcastEngine:
                     speaker_name = "Denise" if speaker_role == "A" else "Henri"
                     speaker_val = "host" if speaker_role == "A" else "scholar"
 
-            # Nettoyer et normaliser le texte (notamment les références bibliques)
-            norm_text = cls._clean_text_for_speech(str(item.get("text", "")).strip())
+            # Texte littéraire soigné (orthographe française, termes grecs/hébreux et citations intactes)
+            raw_text = str(item.get("text", "")).strip()
+            literary_text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+til\b', r'\1-il', raw_text)
+            literary_text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+telle\b', r'\1-elle', literary_text)
+
+            # Script vocal / phonétique optimisé pour la synthèse TTS (références développées, énumérations posées)
+            speech_text = cls._clean_text_for_speech(literary_text)
 
             clean_dialogue.append({
                 "index": idx,
                 "speaker": speaker_val,
                 "speaker_name": speaker_name,
                 "voice_role": speaker_role,
-                "text": norm_text,
+                "text": literary_text,
+                "speech_text": speech_text,
                 "pause_after_ms": int(item.get("pause_after_ms", default_pause)),
                 "start_time": 0.0,
                 "end_time": 0.0
@@ -1383,18 +1389,18 @@ class PodcastEngine:
         text = re.sub(r'\bN\.T\.(?!\s+[A-Z][a-z])\b', 'Nouveau Testament', text)
         text = re.sub(r'\bLXX\b', 'la Septante', text)
 
-        # 4bis. Correction phonétique des liaisons verbales interrogatives / euphoniques
-        # Empêche Edge-TTS d'avaler la consonne de liaison [t] (ex: 'redéfinit-elle' lu sans 't')
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-elle\b', r'\1 telle', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-il\b', r'\1 til', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-on\b', r'\1 ton', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-ils\b', r'\1 tils', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+[td])-elles\b', r'\1 telles', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-elle\b', r'\1 telle', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-il\b', r'\1 til', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-on\b', r'\1 ton', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-ils\b', r'\1 tils', text)
-        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)-t-elles\b', r'\1 telles', text)
+        # 4bis. Rétablissement des formes correctes d'inversion interrogative (évite toute scorie 'til'/'telle')
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+til\b', r'\1-il', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+telle\b', r'\1-elle', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+ton\b', r'\1-on', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+tils\b', r'\1-ils', text)
+        text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+telles\b', r'\1-elles', text)
+
+        # 4ter. Équilibrage prosodique des énumérations de versets ou chiffres
+        # Ex: "Aux versets 10, 12 et 14" -> "Aux versets 10, 12, et 14"
+        # Permet à chaque élément énuméré d'avoir la même respiration naturelle posée
+        text = re.sub(r'(versets?\s+\d+(?:,\s*\d+)*)\s+et\s+(\d+)', r'\1, et \2', text, flags=re.IGNORECASE)
+        text = re.sub(r'(chapitres?\s+\d+(?:,\s*\d+)*)\s+et\s+(\d+)', r'\1, et \2', text, flags=re.IGNORECASE)
 
         # 4ter. Emphase et pauses prosodiques sur les termes originaux ou mots-clés cités
         # Ex: "le terme grec utilisé ici est genesis, le mot même" -> "le terme grec utilisé ici est : « genesis », le mot même"
@@ -1975,7 +1981,7 @@ class PodcastEngine:
 
         # Options de prosodie (débit, hauteur, respirations)
         calm_prosody = opts.get("calm_prosody", cfg.get("audio_studio_calm_prosody", True))
-        rate_val = opts.get("rate") or (cfg.get("audio_studio_rate", "-6%") if calm_prosody else "+0%")
+        rate_val = opts.get("rate") or (cfg.get("audio_studio_rate", "-14%") if calm_prosody else "+0%")
         pitch_val = opts.get("pitch") or (cfg.get("audio_studio_pitch", "-3Hz") if calm_prosody else "+0Hz")
         inject_breaks = opts.get("inject_breaks", cfg.get("audio_studio_inject_breaks", True)) if calm_prosody else False
         mastering_enabled = opts.get("mastering_enabled", cfg.get("audio_studio_mastering_enabled", True))
@@ -1995,7 +2001,8 @@ class PodcastEngine:
                     progress_callback(idx + 1, pct, f"Synthèse réplique {idx + 1}/{total_lines} ({speaker_label})...")
 
                 text = item.get("text", "").strip()
-                if not text:
+                speech_text = (item.get("speech_text") or "").strip()
+                if not text and not speech_text:
                     continue
 
                 v_role = str(item.get("voice_role", "")).upper()
@@ -2013,8 +2020,8 @@ class PodcastEngine:
                     # En dernier recours : alternance A/B selon la position de la réplique
                     chosen_voice = voice_a if (idx % 2 == 0) else voice_b
 
-                # Nettoyage phonétique (ex: Romains 2:1 -> Romains chapitre 2, verset 1)
-                clean_speech_text = cls._clean_text_for_speech(text)
+                # Nettoyage phonétique basé sur speech_text prioritaire si édité manuellement, sinon text
+                clean_speech_text = cls._clean_text_for_speech(speech_text if speech_text else text)
 
                 # Injection de micro-pauses SSML de respiration si activé
                 if inject_breaks:
@@ -2060,6 +2067,8 @@ class PodcastEngine:
                 new_item = dict(item)
                 new_item["start_time"] = start_t
                 new_item["end_time"] = end_t
+                new_item["text"] = text
+                new_item["speech_text"] = speech_text if speech_text else clean_speech_text
                 updated_dialogue.append(new_item)
 
         # Exécuter la coroutine asynchrone
