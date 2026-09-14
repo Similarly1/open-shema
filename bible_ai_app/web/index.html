@@ -5150,8 +5150,10 @@
                   <p class="as-step1-subheading">Sélectionnez votre passage ou thème, choisissez l'angle herméneutique et configurez votre émission.</p>
                 </div>
 
-                <!-- 1. Saisie du Sujet ou Passage -->
-                <div class="as-card as-card-primary">
+                <!-- Conteneur des cartes de configuration (masqué pendant la rédaction du script) -->
+                <div class="as-step1-cards" id="as-step1-cards">
+                  <!-- 1. Saisie du Sujet ou Passage -->
+                  <div class="as-card as-card-primary">
                   <div class="as-card-header">
                     <span class="as-card-title">1. Passage ou Sujet d'Étude</span>
                     <div style="display: flex; gap: 8px;">
@@ -5350,10 +5352,14 @@
                     </div>
                   </details>
                 </div>
+              </div><!-- fin as-step1-cards -->
 
-                <!-- Bouton d'action principal Étape 1 -->
-                <div class="as-step1-cta-wrap">
-                  <button type="button" class="btn-primary as-btn-generate-main" id="btn-audio-studio-generate">
+              <!-- Bouton d'action principal Étape 1 & Suivi du raisonnement IA -->
+              <div class="as-step1-cta-wrap">
+                <!-- Bandeau récapitulatif compact affiché pendant la génération -->
+                <div class="as-step1-active-summary" id="as-step1-active-summary" style="display: none;"></div>
+
+                <button type="button" class="btn-primary as-btn-generate-main" id="btn-audio-studio-generate">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
                     </svg>

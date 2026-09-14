@@ -91,6 +91,10 @@ const AudioStudioView = {
       btnFormatStep2Dialogue: document.getElementById('btn-audio-step2-format-dialogue'),
       btnFormatStep2Solo: document.getElementById('btn-audio-step2-format-solo'),
       btnGenerate: document.getElementById('btn-audio-studio-generate'),
+      step1Cards: document.getElementById('as-step1-cards'),
+      step1ActiveSummary: document.getElementById('as-step1-active-summary'),
+      step1Heading: document.querySelector('#as-step-1-pane .as-step1-heading'),
+      step1Subheading: document.querySelector('#as-step-1-pane .as-step1-subheading'),
       step1ReasoningBox: document.getElementById('as-step1-reasoning-box'),
       reasoningTimer: document.getElementById('as-reasoning-timer'),
       reasoningStepsList: document.getElementById('as-reasoning-steps-list'),
@@ -1682,7 +1686,9 @@ const AudioStudioView = {
     if (el.step2Pane) el.step2Pane.classList.toggle('is-active', step === 2);
     if (el.step3Pane) el.step3Pane.classList.toggle('is-active', step === 3);
 
-    if (step !== 1 && el.step1ReasoningBox) {
+    if (step === 1) {
+      this.resetStep1InputState();
+    } else if (el.step1ReasoningBox) {
       el.step1ReasoningBox.style.display = 'none';
     }
 
@@ -1694,6 +1700,15 @@ const AudioStudioView = {
     } else if (step === 3) {
       this.renderKaraokeView();
     }
+  },
+
+  resetStep1InputState() {
+    const el = this.elements;
+    el.step1Pane?.classList.remove('is-generating');
+    if (el.step1Cards) el.step1Cards.style.display = '';
+    if (el.step1ActiveSummary) el.step1ActiveSummary.style.display = 'none';
+    if (el.step1Heading) el.step1Heading.textContent = 'Créer un nouvel épisode audio';
+    if (el.step1Subheading) el.step1Subheading.textContent = 'Sélectionnez votre passage ou thème, choisissez l\'angle herméneutique et configurez votre émission.';
   },
 
   // =========================================================================
@@ -2046,6 +2061,34 @@ const AudioStudioView = {
     if (this.isGenerating) return;
     this.isGenerating = true;
 
+    // Masquer les éléments de saisie du haut pour focaliser sur l'avancement et empêcher toute modification
+    el.step1Pane?.classList.add('is-generating');
+    if (el.step1Cards) el.step1Cards.style.display = 'none';
+
+    // Afficher le bandeau récapitulatif compact
+    if (el.step1ActiveSummary) {
+      const modeLabels = {
+        auto: 'Auto',
+        exegesis: 'Exégèse',
+        historical: 'Histoire',
+        sermon: 'Prédication',
+        theology: 'Théologie',
+        lexical: 'Lexique'
+      };
+      const modeName = modeLabels[this.studyMode] || this.studyMode || 'Auto';
+      const fmtName = this.format === 'dialogue' ? 'Dialogue (2 voix)' : 'Chronique Solo';
+
+      el.step1ActiveSummary.innerHTML = `
+        <span class="as-step1-summary-pill">Sujet : <strong>${this.escapeHtml(query)}</strong></span>
+        <span class="as-step1-summary-pill">Format : <strong>${fmtName}</strong></span>
+        <span class="as-step1-summary-pill">Mode : <strong>${modeName}</strong></span>
+      `;
+      el.step1ActiveSummary.style.display = 'flex';
+    }
+
+    if (el.step1Heading) el.step1Heading.textContent = 'Génération du script en cours...';
+    if (el.step1Subheading) el.step1Subheading.textContent = 'L\'IA analyse vos corpus documentaires et structure les répliques.';
+
     // Bouton en état de chargement sobre, sans mention de pourcentage
     if (el.btnGenerate) {
       el.btnGenerate.disabled = true;
@@ -2117,10 +2160,14 @@ const AudioStudioView = {
         el.btnGenerate.disabled = false;
         el.btnGenerate.innerHTML = `
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3Z"></path>
           </svg>
           <span>Rédiger le script (Étape 2)</span>
         `;
+      }
+      // Si une erreur s'est produite et qu'on reste sur l'étape 1, réafficher les éléments de configuration
+      if (this.currentStep === 1) {
+        this.resetStep1InputState();
       }
       if (typeof NotificationManager !== 'undefined') {
         NotificationManager.setWorkingState('audio-studio', false);
