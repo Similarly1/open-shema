@@ -5430,18 +5430,23 @@
                 <!-- Volet Droit (1/3) : Synthèse Vocale & Voix -->
                 <div class="as-step2-side-pane">
                   <div class="audio-studio-player-card" id="audio-studio-synthesis-card">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;" id="as-step2-card-header">
                       <span style="font-size: 13px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                        <span>Moteur &amp; Voix Neuronales</span>
+                        <span id="as-step2-card-title">Moteur &amp; Voix Neuronales</span>
                       </span>
                       <span id="audio-studio-engine-badge" class="audio-studio-source-pill" style="font-size: 11px;">
                         Edge-TTS
                       </span>
                     </div>
 
-                    <!-- Sélecteur de Moteur Vocal Interactif (Edge-TTS vs Mistral Voxtral) -->
-                    <div class="audio-studio-engine-toggle" id="as-engine-toggle" style="margin-top: 10px;">
+                    <!-- Récapitulatif compact affiché pendant la synthèse audio (remplace les formulaires du haut) -->
+                    <div id="as-step2-active-summary" class="as-step2-active-summary" style="display: none;"></div>
+
+                    <!-- Conteneur de tous les contrôles de réglage (masqué pendant la synthèse) -->
+                    <div id="as-step2-config-controls" style="display: flex; flex-direction: column; gap: 8px;">
+                      <!-- Sélecteur de Moteur Vocal Interactif (Edge-TTS vs Mistral Voxtral) -->
+                      <div class="audio-studio-engine-toggle" id="as-engine-toggle" style="margin-top: 10px;">
                       <button type="button" class="engine-toggle-btn active" id="as-engine-btn-edge" data-engine="edge_tts">
                         <span>Edge-TTS (Gratuit)</span>
                       </button>
@@ -5692,9 +5697,10 @@
                         <span>Ducking automatique sidechain (-16 dB sous la voix)</span>
                       </label>
                     </div>
+                  </div>
 
-                    <!-- Bouton de lancement de synthèse MP3 -->
-                    <button type="button" class="btn-primary" id="btn-audio-studio-synthesize" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 13.5px; font-weight: 600; width: 100%;">
+                  <!-- Bouton de lancement de synthèse MP3 -->
+                  <button type="button" class="btn-primary" id="btn-audio-studio-synthesize" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 13.5px; font-weight: 600; width: 100%;">
                       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                       <span>Générer l'audio MP3 (Étape 3)</span>
                     </button>

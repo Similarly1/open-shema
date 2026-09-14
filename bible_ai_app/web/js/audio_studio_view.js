@@ -159,6 +159,9 @@ const AudioStudioView = {
       selectBgMusic: document.getElementById('as-select-bg-music'),
       selectJingleIntro: document.getElementById('as-select-jingle-intro'),
       checkDucking: document.getElementById('as-check-ducking'),
+      step2CardTitle: document.getElementById('as-step2-card-title'),
+      step2ActiveSummary: document.getElementById('as-step2-active-summary'),
+      step2ConfigControls: document.getElementById('as-step2-config-controls'),
       btnSynthesize: document.getElementById('btn-audio-studio-synthesize'),
       progressBox: document.getElementById('audio-studio-progress-box'),
       progressTitle: document.getElementById('audio-studio-progress-title'),
@@ -1694,10 +1697,14 @@ const AudioStudioView = {
 
     // Ajustements d'étape
     if (step === 2) {
+      if (!this.isSynthesizing) {
+        this.resetStep2InputState();
+      }
       if (el.btnNavToStep3) {
         el.btnNavToStep3.style.display = (this.currentPodcast?.audio_file || this.currentPodcast?.audio_data_url) ? 'inline-flex' : 'none';
       }
     } else if (step === 3) {
+      this.resetStep2InputState();
       this.renderKaraokeView();
     }
   },
@@ -1709,6 +1716,21 @@ const AudioStudioView = {
     if (el.step1ActiveSummary) el.step1ActiveSummary.style.display = 'none';
     if (el.step1Heading) el.step1Heading.textContent = 'Créer un nouvel épisode audio';
     if (el.step1Subheading) el.step1Subheading.textContent = 'Sélectionnez votre passage ou thème, choisissez l\'angle herméneutique et configurez votre émission.';
+  },
+
+  resetStep2InputState() {
+    const el = this.elements;
+    if (el.step2ConfigControls) el.step2ConfigControls.style.display = '';
+    if (el.step2ActiveSummary) el.step2ActiveSummary.style.display = 'none';
+    if (el.step2CardTitle) el.step2CardTitle.innerHTML = 'Moteur &amp; Voix Neuronales';
+    if (el.btnSynthesize) {
+      el.btnSynthesize.style.display = '';
+      el.btnSynthesize.disabled = false;
+      el.btnSynthesize.innerHTML = `
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span>Générer l'audio MP3 (Étape 3)</span>
+      `;
+    }
   },
 
   // =========================================================================
@@ -2527,6 +2549,102 @@ const AudioStudioView = {
       }
     }
 
+    // Cacher les éléments de configuration et afficher le récapitulatif compact
+    if (el.step2ConfigControls) el.step2ConfigControls.style.display = 'none';
+    if (el.btnSynthesize) el.btnSynthesize.style.display = 'none';
+    if (el.step2CardTitle) {
+      el.step2CardTitle.innerHTML = '<span class="as-pulse-dot"></span> Synthèse audio en cours...';
+    }
+
+    if (el.step2ActiveSummary) {
+      const isDialogue = (this.format === 'dialogue');
+      const fmtName = isDialogue ? 'Dialogue (2 voix)' : 'Chronique Solo';
+      const engineLabel = isVoxtral ? 'Mistral Voxtral' : 'Edge-TTS';
+
+      const extractVoiceName = (sel, fallback) => {
+        if (!sel) return fallback || '';
+        const opt = sel.selectedOptions?.[0];
+        if (!opt) return sel.value || fallback || '';
+        const text = opt.text.trim();
+        const parenIdx = text.indexOf('(');
+        if (parenIdx > 0) return text.substring(0, parenIdx).trim();
+        const dashIdx = text.indexOf(' - ');
+        if (dashIdx > 0) return text.substring(0, dashIdx).trim();
+        return text;
+      };
+
+      let voiceSummaryHtml = '';
+      if (isDialogue) {
+        let vA, vB;
+        if (isVoxtral) {
+          vA = extractVoiceName(el.selectVoxtralHost, 'Marie');
+          vB = extractVoiceName(el.selectVoxtralScholar, 'Jacques');
+        } else {
+          vA = extractVoiceName(el.selectVoiceHost, 'Vivienne');
+          vB = extractVoiceName(el.selectVoiceScholar, 'Antoine');
+        }
+        voiceSummaryHtml = `<strong>${this.escapeHtml(vA)}</strong> (Animatrice) &amp; <strong>${this.escapeHtml(vB)}</strong> (Exégète)`;
+      } else {
+        let vSolo;
+        if (isVoxtral) {
+          vSolo = extractVoiceName(el.selectVoxtralSolo, 'Marie');
+        } else {
+          vSolo = extractVoiceName(el.selectVoiceSolo, 'Henri');
+        }
+        voiceSummaryHtml = `<strong>${this.escapeHtml(vSolo)}</strong> (Chroniqueur)`;
+      }
+
+      const bgMusicVal = el.selectBgMusic ? el.selectBgMusic.value : 'none';
+      const hasBgMusic = (bgMusicVal && bgMusicVal !== 'none');
+      const musicTitle = hasBgMusic ? extractVoiceName(el.selectBgMusic, 'Ambiance') : 'Aucune musique';
+
+      const jingleVal = el.selectJingleIntro ? el.selectJingleIntro.value : 'none';
+      const hasJingle = (jingleVal && jingleVal !== 'none');
+      const jingleTitle = hasJingle ? extractVoiceName(el.selectJingleIntro, 'Jingle') : 'Aucun jingle';
+
+      const dspPills = [];
+      if (el.checkMastering?.checked) dspPills.push('Mastering Studio');
+      if (el.checkCalmProsody?.checked) dspPills.push('Prosodie posée');
+      if (hasBgMusic && el.checkDucking?.checked) dspPills.push('Ducking -16 dB');
+      const pauseMs = parseInt(el.inputPauseMs?.value, 10) || 350;
+      if (pauseMs !== 350) dspPills.push(`Pause ${pauseMs}ms`);
+
+      el.step2ActiveSummary.innerHTML = `
+        <div class="as-step2-summary-row">
+          <span class="as-step2-summary-label">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+            Voix
+          </span>
+          <span class="as-step2-summary-val">${voiceSummaryHtml}</span>
+        </div>
+        <div class="as-step2-summary-row">
+          <span class="as-step2-summary-label">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
+            Format
+          </span>
+          <span class="as-step2-summary-val">${fmtName} &bull; <span style="color: var(--accent-orange); font-weight: 700;">${engineLabel}</span></span>
+        </div>
+        <div class="as-step2-summary-row">
+          <span class="as-step2-summary-label">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            Habillage
+          </span>
+          <span class="as-step2-summary-val">${hasBgMusic ? `<strong>${this.escapeHtml(musicTitle)}</strong>` : '<span style="color: var(--text-muted);">Voix pure</span>'}${hasJingle ? ` + ${this.escapeHtml(jingleTitle)}` : ''}</span>
+        </div>
+        ${dspPills.length > 0 ? `
+        <div class="as-step2-summary-row" style="margin-top: 2px;">
+          <span class="as-step2-summary-label">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            Audio
+          </span>
+          <span class="as-step2-summary-tags">
+            ${dspPills.map(p => `<span class="as-step2-summary-tag">${p}</span>`).join('')}
+          </span>
+        </div>` : ''}
+      `;
+      el.step2ActiveSummary.style.display = 'flex';
+    }
+
     if (el.btnSynthesize) {
       el.btnSynthesize.disabled = true;
       el.btnSynthesize.innerHTML = `
@@ -2649,6 +2767,7 @@ const AudioStudioView = {
           clearInterval(this.synthesisAnimInterval);
           this.synthesisAnimInterval = null;
         }
+        this.resetStep2InputState();
         const errMsg = res?.error || 'Erreur lors de la synthèse vocale';
         this.showErrorToast(`Erreur de synthèse : ${errMsg}`);
         if (el.progressBox) el.progressBox.style.display = 'none';
@@ -2658,6 +2777,7 @@ const AudioStudioView = {
         clearInterval(this.synthesisAnimInterval);
         this.synthesisAnimInterval = null;
       }
+      this.resetStep2InputState();
       console.error('[AudioStudioView] Erreur startSynthesis:', err);
       this.showErrorToast(`Erreur de synthèse vocale : ${err.message || err}`);
       if (el.progressBox) el.progressBox.style.display = 'none';
@@ -2667,13 +2787,6 @@ const AudioStudioView = {
         this.synthesisAnimInterval = null;
       }
       this.isSynthesizing = false;
-      if (el.btnSynthesize) {
-        el.btnSynthesize.disabled = false;
-        el.btnSynthesize.innerHTML = `
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Générer l'audio MP3</span>
-        `;
-      }
       if (typeof NotificationManager !== 'undefined') {
         NotificationManager.setWorkingState('audio-studio', false);
       }
