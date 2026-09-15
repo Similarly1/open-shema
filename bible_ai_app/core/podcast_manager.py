@@ -2981,6 +2981,28 @@ class PodcastEngine:
             return b""
 
     @classmethod
+    def _decode_to_pcm_mono_24k(cls, audio_bytes: bytes) -> bytes:
+        """Décode et rééchantillonne n'importe quel flux audio (MP3, WAV, etc.) en PCM 16-bit mono 24000 Hz."""
+        if not audio_bytes:
+            return b""
+        try:
+            import av
+            import io
+            in_c = av.open(io.BytesIO(audio_bytes))
+            resampler = av.AudioResampler(format="s16", layout="mono", rate=24000)
+            pcm_chunks = []
+            for frame in in_c.decode(audio=0):
+                rf_list = resampler.resample(frame)
+                if rf_list:
+                    for rf in rf_list:
+                        pcm_chunks.append(rf.to_ndarray().tobytes())
+            in_c.close()
+            return b"".join(pcm_chunks)
+        except Exception as e:
+            logger.warning("[PodcastEngine] Erreur décodage audio vers PCM 24k: %s", e)
+            return b""
+
+    @classmethod
     def _call_gemini_tts_api(
         cls,
         prompt: str,
@@ -3272,7 +3294,7 @@ class PodcastEngine:
         tpm_limit = int(cfg.get("gemini_tts_tpm_limit", 10000))
 
         total_lines = len(dialogue)
-        accumulated_audio = bytearray()
+        accumulated_pcm = bytearray()
         current_timeline_sec = 0.0
         updated_dialogue = []
 
@@ -3312,7 +3334,7 @@ class PodcastEngine:
             if progress_callback:
                 progress_callback(idx + 1, pct, f"Synthèse {idx + 1}/{total_lines} ({role_label} — {chosen_eng})...")
 
-            line_mp3 = b""
+            line_pcm = b""
 
             # 1. Synthèse Gemini Flash TTS
             if chosen_eng == "gemini_tts":
@@ -3331,13 +3353,14 @@ class PodcastEngine:
                         model_id=gemini_model,
                         cfg=cfg
                     )
-                    line_mp3 = cls._pcm_to_mp3(pcm, 24000)
+                    if pcm:
+                        line_pcm = pcm
                 except Exception as e_gem:
                     logger.warning("[PodcastEngine] Erreur Gemini réplique %d : %s. Repli Edge-TTS.", idx + 1, e_gem)
                     chosen_eng = "edge_tts"
 
             # 2. Synthèse Mistral Voxtral
-            if chosen_eng == "voxtral" and not line_mp3:
+            if chosen_eng == "voxtral" and not line_pcm:
                 mistral_key = cfg.get("mistral_api_key")
                 if mistral_key:
                     try:
@@ -3350,7 +3373,15 @@ class PodcastEngine:
                             timeout=60.0
                         )
                         if resp.status_code == 200:
-                            line_mp3 = resp.content
+                            ct = resp.headers.get("content-type", "")
+                            if "application/json" in ct:
+                                res_json = resp.json()
+                                b64 = res_json.get("audio_data") or res_json.get("audio")
+                                raw_mp3 = base64.b64decode(b64) if b64 else b""
+                            else:
+                                raw_mp3 = resp.content
+                            if raw_mp3:
+                                line_pcm = cls._decode_to_pcm_mono_24k(raw_mp3)
                         else:
                             logger.warning("[PodcastEngine] Voxtral status %d réplique %d: %s. Repli Edge-TTS.", resp.status_code, idx + 1, resp.text[:120])
                             chosen_eng = "edge_tts"
@@ -3361,24 +3392,29 @@ class PodcastEngine:
                     chosen_eng = "edge_tts"
 
             # 3. Synthèse Edge-TTS (ou repli)
-            if not line_mp3:
+            if not line_pcm:
                 fallback_voice = chosen_voice if (chosen_voice and str(chosen_voice).startswith("fr-")) else cls.VOXTRAL_EMOTION_EDGE_MAP.get(chosen_voice, default_edge_fallback)
-                line_mp3 = cls._single_edge_tts_call(clean_text, fallback_voice)
-                if not line_mp3 and fallback_voice != default_edge_fallback:
-                    line_mp3 = cls._single_edge_tts_call(clean_text, default_edge_fallback)
+                edge_mp3 = cls._single_edge_tts_call(clean_text, fallback_voice)
+                if not edge_mp3 and fallback_voice != default_edge_fallback:
+                    edge_mp3 = cls._single_edge_tts_call(clean_text, default_edge_fallback)
+                if edge_mp3:
+                    line_pcm = cls._decode_to_pcm_mono_24k(edge_mp3)
 
-            line_duration = max(0.5, len(line_mp3) / 6000.0) if line_mp3 else 1.0
+            # 24000 Hz, 16-bit mono = 48000 octets par seconde
+            line_duration = max(0.5, len(line_pcm) / 48000.0) if line_pcm else 1.0
             start_t = round(current_timeline_sec, 3)
             end_t = round(start_t + line_duration, 3)
 
-            if line_mp3:
-                accumulated_audio.extend(line_mp3)
+            if line_pcm:
+                accumulated_pcm.extend(line_pcm)
 
             pause_ms = int(item.get("pause_after_ms", cfg.get("audio_studio_pause_ms", 350)))
-            current_timeline_sec = end_t + (pause_ms / 1000.0)
+            pause_sec = pause_ms / 1000.0
+            current_timeline_sec = end_t + pause_sec
 
             if pause_ms >= 100:
-                accumulated_audio.extend(cls._generate_mp3_silence(pause_ms))
+                pause_samples = int(pause_sec * 24000)
+                accumulated_pcm.extend(b"\x00" * (pause_samples * 2))
 
             new_item = dict(item)
             new_item["start_time"] = start_t
@@ -3386,17 +3422,39 @@ class PodcastEngine:
             new_item["engine_used"] = chosen_eng
             updated_dialogue.append(new_item)
 
+        if progress_callback:
+            progress_callback(total_lines, 90, "Encodage final de l'épisode multi-moteurs...")
+
+        final_mp3 = cls._pcm_to_mp3(bytes(accumulated_pcm), 24000)
+        total_duration = round(current_timeline_sec, 2)
+
+        mastering_enabled = opts.get("mastering_enabled", cfg.get("audio_studio_mastering_enabled", True))
+        if mastering_enabled and len(final_mp3) > 1000:
+            if progress_callback:
+                progress_callback(total_lines, 94, "Application du mastering studio DSP...")
+            final_mp3 = cls.apply_audio_mastering(final_mp3, {"mastering_enabled": True})
+
         audio_filename = f"{podcast_id}.mp3"
         out_path = os.path.join(get_podcasts_dir(), audio_filename)
         with open(out_path, "wb") as f:
-            f.write(accumulated_audio)
+            f.write(final_mp3)
 
-        total_duration = round(current_timeline_sec, 2)
         record["dialogue"] = updated_dialogue
         record["script_dialogue"] = updated_dialogue
         record["audio_file"] = audio_filename
+        record["mp3_path"] = out_path
         record["duration_seconds"] = total_duration
+        record["duration_sec"] = total_duration
         record["engine"] = "mixed"
+        record["speaker_a_engine"] = spk_a_engine
+        record["speaker_b_engine"] = spk_b_engine
+        record["solo_engine"] = solo_engine
+        record["speaker_a_voice"] = voice_a_target
+        record["speaker_b_voice"] = voice_b_target
+        record["solo_voice"] = voice_solo_target
+        record["voice_speaker_a"] = voice_a_target
+        record["voice_speaker_b"] = voice_b_target
+        record["voice_solo"] = voice_solo_target
         record["status"] = "ready"
         record["updated_at"] = datetime.datetime.now().isoformat()
 
