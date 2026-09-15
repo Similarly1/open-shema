@@ -35,11 +35,14 @@ class AudioStudioMixin:
                 "success": True,
                 "voices": data.get("voices", data.get("edge_tts", [])),
                 "edge_tts": data.get("edge_tts", []),
-                "voxtral": data.get("voxtral", [])
+                "voxtral": data.get("voxtral", []),
+                "gemini_tts": data.get("gemini_tts", []),
+                "gemini_models": data.get("gemini_models", []),
+                "gemini_quota": data.get("gemini_quota", {})
             }
         except Exception as e:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_voices : %s", e)
-            return {"success": False, "voices": [], "edge_tts": [], "voxtral": []}
+            return {"success": False, "voices": [], "edge_tts": [], "voxtral": [], "gemini_tts": [], "gemini_models": [], "gemini_quota": {}}
 
     def audio_studio_get_soundpack(self) -> Dict[str, Any]:
         """Retourne le catalogue soundpack (musiques d'ambiance, jingles, etc.)."""
@@ -133,6 +136,19 @@ class AudioStudioMixin:
                 "ducking_enabled": bool(cfg.get("audio_studio_ducking_enabled", True)),
                 "ducking_db": float(cfg.get("audio_studio_ducking_db", -16.0)),
                 "has_mistral_key": bool(cfg.get("mistral_api_key")),
+                "has_google_key": bool(cfg.get("google_api_key") or cfg.get("gemini_api_key") or os.getenv("GEMINI_API_KEY")),
+                "engine_mode": cfg.get("audio_studio_engine_mode", "single"),
+                "gemini_model": cfg.get("audio_studio_gemini_model", "gemini-3.1-flash-tts-preview"),
+                "gemini_voice_speaker_a": cfg.get("audio_studio_gemini_voice_speaker_a", "Puck"),
+                "gemini_voice_speaker_b": cfg.get("audio_studio_gemini_voice_speaker_b", "Charon"),
+                "gemini_voice_solo": cfg.get("audio_studio_gemini_voice_solo", "Puck"),
+                "speaker_a_engine": cfg.get("audio_studio_speaker_a_engine", "gemini_tts"),
+                "speaker_b_engine": cfg.get("audio_studio_speaker_b_engine", "edge_tts"),
+                "solo_engine": cfg.get("audio_studio_solo_engine", "gemini_tts"),
+                "gemini_tts_rpm_limit": int(cfg.get("gemini_tts_rpm_limit", 3)),
+                "gemini_tts_rpd_limit": int(cfg.get("gemini_tts_rpd_limit", 10)),
+                "gemini_tts_tpm_limit": int(cfg.get("gemini_tts_tpm_limit", 10000)),
+                "gemini_tts_batch_mode": cfg.get("gemini_tts_batch_mode", "dialogue_batch"),
             }
         except Exception as e:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_config : %s", e)
@@ -144,12 +160,36 @@ class AudioStudioMixin:
             cfg = load_config()
             if "engine" in new_settings:
                 cfg["audio_studio_engine"] = new_settings["engine"]
+            if "engine_mode" in new_settings:
+                cfg["audio_studio_engine_mode"] = new_settings["engine_mode"]
             if "voice_speaker_a" in new_settings:
                 cfg["audio_studio_voice_speaker_a"] = new_settings["voice_speaker_a"]
             if "voice_speaker_b" in new_settings:
                 cfg["audio_studio_voice_speaker_b"] = new_settings["voice_speaker_b"]
             if "voice_solo" in new_settings:
                 cfg["audio_studio_voice_solo"] = new_settings["voice_solo"]
+            if "gemini_model" in new_settings:
+                cfg["audio_studio_gemini_model"] = new_settings["gemini_model"]
+            if "gemini_voice_speaker_a" in new_settings:
+                cfg["audio_studio_gemini_voice_speaker_a"] = new_settings["gemini_voice_speaker_a"]
+            if "gemini_voice_speaker_b" in new_settings:
+                cfg["audio_studio_gemini_voice_speaker_b"] = new_settings["gemini_voice_speaker_b"]
+            if "gemini_voice_solo" in new_settings:
+                cfg["audio_studio_gemini_voice_solo"] = new_settings["gemini_voice_solo"]
+            if "speaker_a_engine" in new_settings:
+                cfg["audio_studio_speaker_a_engine"] = new_settings["speaker_a_engine"]
+            if "speaker_b_engine" in new_settings:
+                cfg["audio_studio_speaker_b_engine"] = new_settings["speaker_b_engine"]
+            if "solo_engine" in new_settings:
+                cfg["audio_studio_solo_engine"] = new_settings["solo_engine"]
+            if "gemini_tts_rpm_limit" in new_settings:
+                cfg["gemini_tts_rpm_limit"] = int(new_settings["gemini_tts_rpm_limit"])
+            if "gemini_tts_rpd_limit" in new_settings:
+                cfg["gemini_tts_rpd_limit"] = int(new_settings["gemini_tts_rpd_limit"])
+            if "gemini_tts_tpm_limit" in new_settings:
+                cfg["gemini_tts_tpm_limit"] = int(new_settings["gemini_tts_tpm_limit"])
+            if "gemini_tts_batch_mode" in new_settings:
+                cfg["gemini_tts_batch_mode"] = new_settings["gemini_tts_batch_mode"]
             if "voxtral_voice_speaker_a" in new_settings:
                 cfg["audio_studio_voxtral_voice_speaker_a"] = new_settings["voxtral_voice_speaker_a"]
             if "voxtral_voice_speaker_b" in new_settings:
@@ -202,6 +242,28 @@ class AudioStudioMixin:
             return {"success": True}
         except Exception as e:
             logger.error("[AudioStudioMixin] Erreur audio_studio_save_config : %s", e)
+            return {"success": False, "error": str(e)}
+
+    def audio_studio_save_gemini_quotas(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Sauvegarde les limites de quotas configurables de Gemini Flash TTS (RPM, RPD, TPM)."""
+        try:
+            cfg = load_config()
+            if "rpm" in params:
+                cfg["gemini_tts_rpm_limit"] = int(params["rpm"])
+            if "rpd" in params:
+                cfg["gemini_tts_rpd_limit"] = int(params["rpd"])
+            if "tpm" in params:
+                cfg["gemini_tts_tpm_limit"] = int(params["tpm"])
+            save_config(cfg)
+            from core.podcast_manager import GeminiQuotaTracker
+            updated_quota = GeminiQuotaTracker.get_status(
+                rpm_limit=int(cfg.get("gemini_tts_rpm_limit", 3)),
+                rpd_limit=int(cfg.get("gemini_tts_rpd_limit", 10)),
+                tpm_limit=int(cfg.get("gemini_tts_tpm_limit", 10000))
+            )
+            return {"success": True, "quota": updated_quota}
+        except Exception as e:
+            logger.error("[AudioStudioMixin] Erreur audio_studio_save_gemini_quotas : %s", e)
             return {"success": False, "error": str(e)}
 
     def audio_studio_suggest_axes(
@@ -303,7 +365,13 @@ class AudioStudioMixin:
                 script_dialogue = opts.get("script_dialogue", script_dialogue)
                 engine = opts.get("engine", engine)
                 custom_opts = opts.get("custom_options") or {}
-                for k in ("bg_music", "jingle_intro", "sfx_ambient", "sfx", "music_enabled", "jingle_enabled", "sfx_enabled", "ducking_enabled", "ducking_db", "mastering_enabled", "voice_speaker_a", "voice_speaker_b", "voice_solo", "calm_prosody", "rate", "pitch", "inject_breaks"):
+                for k in (
+                    "bg_music", "jingle_intro", "sfx_ambient", "sfx", "music_enabled", "jingle_enabled", "sfx_enabled",
+                    "ducking_enabled", "ducking_db", "mastering_enabled", "voice_speaker_a", "voice_speaker_b", "voice_solo",
+                    "calm_prosody", "rate", "pitch", "inject_breaks", "gemini_model", "gemini_voice_speaker_a",
+                    "gemini_voice_speaker_b", "gemini_voice_solo", "speaker_a_engine", "speaker_b_engine", "solo_engine",
+                    "engine_mode", "voxtral_voice_speaker_a", "voxtral_voice_speaker_b", "voxtral_voice_solo", "voxtral_modulate"
+                ):
                     if k in opts and k not in custom_opts:
                         custom_opts[k] = opts[k]
                 custom_options = custom_opts

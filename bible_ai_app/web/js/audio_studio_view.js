@@ -136,9 +136,34 @@ const AudioStudioView = {
       // Synthèse & Voix
       engineBadge: document.getElementById('audio-studio-engine-badge'),
       engineBtnEdge: document.getElementById('as-engine-btn-edge'),
+      engineBtnGemini: document.getElementById('as-engine-btn-gemini'),
       engineBtnVoxtral: document.getElementById('as-engine-btn-voxtral'),
+      engineBtnMixed: document.getElementById('as-engine-btn-mixed'),
       voicesEdgeContainer: document.getElementById('as-voices-edge-container'),
+      voicesGeminiContainer: document.getElementById('as-voices-gemini-container'),
       voicesVoxtralContainer: document.getElementById('as-voices-voxtral-container'),
+      voicesMixedContainer: document.getElementById('as-voices-mixed-container'),
+      selectGeminiModel: document.getElementById('as-select-gemini-model'),
+      geminiDialogueVoices: document.getElementById('as-gemini-dialogue-voices'),
+      geminiSoloVoices: document.getElementById('as-gemini-solo-voices'),
+      selectGeminiHost: document.getElementById('as-select-gemini-host'),
+      selectGeminiScholar: document.getElementById('as-select-gemini-scholar'),
+      selectGeminiSolo: document.getElementById('as-select-gemini-solo'),
+      geminiDuplicateAlert: document.getElementById('as-gemini-duplicate-alert'),
+      btnAutoFixGeminiVoices: document.getElementById('btn-as-auto-fix-gemini-voices'),
+      geminiWarning: document.getElementById('as-gemini-warning'),
+      linkSettingsGemini: document.getElementById('as-link-settings-gemini'),
+      geminiQuotaBadge: document.getElementById('as-gemini-quota-badge'),
+      inputGeminiRpd: document.getElementById('as-input-gemini-rpd'),
+      inputGeminiRpm: document.getElementById('as-input-gemini-rpm'),
+      inputGeminiTpm: document.getElementById('as-input-gemini-tpm'),
+      selectMixedEngineHost: document.getElementById('as-select-mixed-engine-host'),
+      selectMixedVoiceHost: document.getElementById('as-select-mixed-voice-host'),
+      selectMixedEngineScholar: document.getElementById('as-select-mixed-engine-scholar'),
+      selectMixedVoiceScholar: document.getElementById('as-select-mixed-voice-scholar'),
+      mixedSoloRow: document.getElementById('as-mixed-solo-row'),
+      selectMixedEngineSolo: document.getElementById('as-select-mixed-engine-solo'),
+      selectMixedVoiceSolo: document.getElementById('as-select-mixed-voice-solo'),
       edgeDialogueVoices: document.getElementById('as-edge-dialogue-voices'),
       edgeSoloVoices: document.getElementById('as-edge-solo-voices'),
       selectVoiceHost: document.getElementById('as-select-voice-host'),
@@ -287,9 +312,11 @@ const AudioStudioView = {
       API.call('audio_studio_save_config', { include_profile: el.optProfile.checked });
     });
 
-    // 1b. Sélecteur de moteur audio interactif (Edge-TTS vs Voxtral)
+    // 1b. Sélecteur de moteur audio interactif (Edge-TTS, Gemini, Voxtral, Mixed)
     el.engineBtnEdge?.addEventListener('click', () => this.setEngine('edge_tts'));
+    el.engineBtnGemini?.addEventListener('click', () => this.setEngine('gemini_tts'));
     el.engineBtnVoxtral?.addEventListener('click', () => this.setEngine('voxtral'));
+    el.engineBtnMixed?.addEventListener('click', () => this.setEngine('mixed'));
 
     // 1c. Changement direct des voix et synchronisation intelligente de la paire (Edge-TTS)
     el.selectVoiceHost?.addEventListener('change', () => {
@@ -324,6 +351,78 @@ const AudioStudioView = {
     });
     el.checkVoxtralModulate?.addEventListener('change', (e) => {
       this.saveVoiceOption({ voxtral_modulate: e.target.checked });
+    });
+
+    // 1c ter. Voix Google Gemini Flash TTS
+    el.selectGeminiModel?.addEventListener('change', (e) => {
+      this.saveVoiceOption({ gemini_model: e.target.value });
+    });
+    el.selectGeminiHost?.addEventListener('change', () => {
+      this.syncGeminiVoicePair(true, 'host');
+    });
+    el.selectGeminiScholar?.addEventListener('change', () => {
+      this.syncGeminiVoicePair(true, 'scholar');
+    });
+    el.btnAutoFixGeminiVoices?.addEventListener('click', () => {
+      this.syncGeminiVoicePair(true, 'host', true);
+    });
+    el.selectGeminiSolo?.addEventListener('change', (e) => {
+      this.saveVoiceOption({ gemini_voice_solo: e.target.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
+    });
+    el.inputGeminiRpd?.addEventListener('change', (e) => {
+      const val = Math.max(0, parseInt(e.target.value, 10) || 0);
+      e.target.value = val;
+      API.call('audio_studio_save_gemini_quotas', { rpd: val });
+    });
+    el.inputGeminiRpm?.addEventListener('change', (e) => {
+      const val = Math.max(0, parseInt(e.target.value, 10) || 0);
+      e.target.value = val;
+      API.call('audio_studio_save_gemini_quotas', { rpm: val });
+    });
+    el.inputGeminiTpm?.addEventListener('change', (e) => {
+      const val = Math.max(0, parseInt(e.target.value, 10) || 0);
+      e.target.value = val;
+      API.call('audio_studio_save_gemini_quotas', { tpm: val });
+    });
+
+    // 1c quater. Voix en Mode Mix Multi-Moteurs
+    el.selectMixedEngineHost?.addEventListener('change', (e) => {
+      this.updateMixedEngineVoices('host', e.target.value);
+      this.saveVoiceOption({ speaker_a_engine: e.target.value });
+    });
+    el.selectMixedVoiceHost?.addEventListener('change', (e) => {
+      this.saveVoiceOption({ speaker_a_voice: e.target.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
+    });
+    el.selectMixedEngineScholar?.addEventListener('change', (e) => {
+      this.updateMixedEngineVoices('scholar', e.target.value);
+      this.saveVoiceOption({ speaker_b_engine: e.target.value });
+    });
+    el.selectMixedVoiceScholar?.addEventListener('change', (e) => {
+      this.saveVoiceOption({ speaker_b_voice: e.target.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
+    });
+    el.selectMixedEngineSolo?.addEventListener('change', (e) => {
+      this.updateMixedEngineVoices('solo', e.target.value);
+      this.saveVoiceOption({ solo_engine: e.target.value });
+    });
+    el.selectMixedVoiceSolo?.addEventListener('change', (e) => {
+      this.saveVoiceOption({ solo_voice: e.target.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
+    });
+
+    // Liens vers paramètres
+    el.linkSettingsGemini?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof App !== 'undefined' && typeof SettingsView !== 'undefined') {
+        App.showView('settings');
+        SettingsView.openTab('ai');
+      }
     });
     el.inputPauseMs?.addEventListener('change', (e) => {
       const ms = Math.max(100, Math.min(3000, parseInt(e.target.value, 10) || 350));
@@ -480,7 +579,7 @@ const AudioStudioView = {
   setFormat(newFormat) {
     this.format = newFormat;
     const el = this.elements;
-    const isVoxtral = (this.config?.engine === 'voxtral');
+    const curEngine = this.config?.engine || 'edge_tts';
 
     if (newFormat === 'dialogue') {
       el.btnFormatDialogue?.classList.add('active');
@@ -493,17 +592,28 @@ const AudioStudioView = {
       if (el.edgeDialogueVoices) el.edgeDialogueVoices.style.display = 'flex';
       if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'none';
       if (el.voiceDuplicateAlert) {
-        el.voiceDuplicateAlert.style.display = (!isVoxtral && el.selectVoiceHost?.value === el.selectVoiceScholar?.value) ? 'block' : 'none';
+        el.voiceDuplicateAlert.style.display = (curEngine === 'edge_tts' && el.selectVoiceHost?.value === el.selectVoiceScholar?.value) ? 'block' : 'none';
       }
       this.syncVoicePair(false, 'host');
+
+      // Gemini
+      if (el.geminiDialogueVoices) el.geminiDialogueVoices.style.display = 'flex';
+      if (el.geminiSoloVoices) el.geminiSoloVoices.style.display = 'none';
+      if (el.geminiDuplicateAlert) {
+        el.geminiDuplicateAlert.style.display = (curEngine === 'gemini_tts' && el.selectGeminiHost?.value === el.selectGeminiScholar?.value) ? 'block' : 'none';
+      }
+      this.syncGeminiVoicePair(false, 'host');
 
       // Voxtral
       if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'flex';
       if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'none';
       if (el.voxtralDuplicateAlert) {
-        el.voxtralDuplicateAlert.style.display = (isVoxtral && el.selectVoxtralHost?.value === el.selectVoxtralScholar?.value) ? 'block' : 'none';
+        el.voxtralDuplicateAlert.style.display = (curEngine === 'voxtral' && el.selectVoxtralHost?.value === el.selectVoxtralScholar?.value) ? 'block' : 'none';
       }
       this.syncVoxtralVoicePair(false, 'host');
+
+      // Mixed
+      if (el.mixedSoloRow) el.mixedSoloRow.style.display = 'none';
     } else {
       el.btnFormatSolo?.classList.add('active');
       el.btnFormatDialogue?.classList.remove('active');
@@ -516,10 +626,18 @@ const AudioStudioView = {
       if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'flex';
       if (el.voiceDuplicateAlert) el.voiceDuplicateAlert.style.display = 'none';
 
+      // Gemini
+      if (el.geminiDialogueVoices) el.geminiDialogueVoices.style.display = 'none';
+      if (el.geminiSoloVoices) el.geminiSoloVoices.style.display = 'flex';
+      if (el.geminiDuplicateAlert) el.geminiDuplicateAlert.style.display = 'none';
+
       // Voxtral
       if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'none';
       if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'flex';
       if (el.voxtralDuplicateAlert) el.voxtralDuplicateAlert.style.display = 'none';
+
+      // Mixed
+      if (el.mixedSoloRow) el.mixedSoloRow.style.display = 'flex';
     }
     this.updateVoiceSummary();
     this.updateTurnCardsVoiceLabels();
@@ -530,23 +648,42 @@ const AudioStudioView = {
     this.config.engine = engine;
     const el = this.elements;
 
-    if (engine === 'voxtral') {
-      el.engineBtnVoxtral?.classList.add('active');
-      el.engineBtnEdge?.classList.remove('active');
-      if (el.voicesVoxtralContainer) el.voicesVoxtralContainer.style.display = 'flex';
-      if (el.voicesEdgeContainer) el.voicesEdgeContainer.style.display = 'none';
-      if (el.engineBadge) el.engineBadge.textContent = 'Mistral Voxtral';
-      if (el.voxtralWarning) {
-        el.voxtralWarning.style.display = this.config.has_mistral_key ? 'none' : 'block';
-      }
+    // Mise à jour visuelle des 4 boutons
+    el.engineBtnEdge?.classList.toggle('active', engine === 'edge_tts');
+    el.engineBtnGemini?.classList.toggle('active', engine === 'gemini_tts');
+    el.engineBtnVoxtral?.classList.toggle('active', engine === 'voxtral');
+    el.engineBtnMixed?.classList.toggle('active', engine === 'mixed');
+
+    // Affichage du conteneur adéquat
+    if (el.voicesEdgeContainer) el.voicesEdgeContainer.style.display = (engine === 'edge_tts') ? 'flex' : 'none';
+    if (el.voicesGeminiContainer) el.voicesGeminiContainer.style.display = (engine === 'gemini_tts') ? 'flex' : 'none';
+    if (el.voicesVoxtralContainer) el.voicesVoxtralContainer.style.display = (engine === 'voxtral') ? 'flex' : 'none';
+    if (el.voicesMixedContainer) el.voicesMixedContainer.style.display = (engine === 'mixed') ? 'flex' : 'none';
+
+    // Badge moteur
+    if (el.engineBadge) {
+      if (engine === 'gemini_tts') el.engineBadge.textContent = 'Google Gemini Flash';
+      else if (engine === 'voxtral') el.engineBadge.textContent = 'Mistral Voxtral';
+      else if (engine === 'mixed') el.engineBadge.textContent = 'Mix Multi-Moteurs';
+      else el.engineBadge.textContent = 'Edge-TTS (Gratuit)';
+    }
+
+    // Avertissements clés API
+    if (el.geminiWarning) {
+      el.geminiWarning.style.display = (engine === 'gemini_tts' && !this.config.has_google_key) ? 'block' : 'none';
+    }
+    if (el.voxtralWarning) {
+      el.voxtralWarning.style.display = (engine === 'voxtral' && !this.config.has_mistral_key) ? 'block' : 'none';
+    }
+
+    // Synchronisation de la paire selon le moteur actif
+    if (engine === 'gemini_tts') {
+      this.syncGeminiVoicePair(false, 'host');
+    } else if (engine === 'voxtral') {
       this.syncVoxtralVoicePair(false, 'host');
+    } else if (engine === 'mixed') {
+      this.refreshMixedEngineViews();
     } else {
-      el.engineBtnEdge?.classList.add('active');
-      el.engineBtnVoxtral?.classList.remove('active');
-      if (el.voicesEdgeContainer) el.voicesEdgeContainer.style.display = 'flex';
-      if (el.voicesVoxtralContainer) el.voicesVoxtralContainer.style.display = 'none';
-      if (el.engineBadge) el.engineBadge.textContent = 'Edge-TTS (Gratuit)';
-      if (el.voxtralWarning) el.voxtralWarning.style.display = 'none';
       this.syncVoicePair(false, 'host');
     }
 
@@ -554,13 +691,19 @@ const AudioStudioView = {
     if (this.format === 'solo') {
       if (el.edgeDialogueVoices) el.edgeDialogueVoices.style.display = 'none';
       if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'flex';
+      if (el.geminiDialogueVoices) el.geminiDialogueVoices.style.display = 'none';
+      if (el.geminiSoloVoices) el.geminiSoloVoices.style.display = 'flex';
       if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'none';
       if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'flex';
+      if (el.mixedSoloRow) el.mixedSoloRow.style.display = 'flex';
     } else {
       if (el.edgeDialogueVoices) el.edgeDialogueVoices.style.display = 'flex';
       if (el.edgeSoloVoices) el.edgeSoloVoices.style.display = 'none';
+      if (el.geminiDialogueVoices) el.geminiDialogueVoices.style.display = 'flex';
+      if (el.geminiSoloVoices) el.geminiSoloVoices.style.display = 'none';
       if (el.voxtralDialogueVoices) el.voxtralDialogueVoices.style.display = 'flex';
       if (el.voxtralSoloVoices) el.voxtralSoloVoices.style.display = 'none';
+      if (el.mixedSoloRow) el.mixedSoloRow.style.display = 'none';
     }
 
     this.updateVoiceSummary();
@@ -857,9 +1000,205 @@ const AudioStudioView = {
       this.syncVoxtralVoicePair(false, 'host');
     }
 
+    // Google Gemini Flash TTS
+    const geminiVoices = voicesData.gemini_tts || [];
+    if (geminiVoices && geminiVoices.length > 0) {
+      this.geminiVoices = geminiVoices;
+      const gGrouped = {};
+      const gCatOrder = [];
+      geminiVoices.forEach(v => {
+        const cat = v.category || 'Catalogue Google Flash';
+        if (!gGrouped[cat]) {
+          gGrouped[cat] = [];
+          gCatOrder.push(cat);
+        }
+        gGrouped[cat].push(v);
+      });
+      let geminiOptHtml = '';
+      gCatOrder.forEach(cat => {
+        const list = gGrouped[cat] || [];
+        if (list.length > 0) {
+          geminiOptHtml += `<optgroup label="${this.escapeHtml(cat)}">`;
+          list.forEach(v => {
+            geminiOptHtml += `<option value="${this.escapeHtml(v.id)}">${this.escapeHtml(v.name)}</option>`;
+          });
+          geminiOptHtml += `</optgroup>`;
+        }
+      });
+
+      const defaultGeminiA = this.config?.gemini_voice_speaker_a || 'Puck';
+      const defaultGeminiB = this.config?.gemini_voice_speaker_b || 'Charon';
+      const defaultGeminiSolo = this.config?.gemini_voice_solo || 'Puck';
+
+      if (el.selectGeminiHost) {
+        el.selectGeminiHost.innerHTML = geminiOptHtml;
+        el.selectGeminiHost.value = defaultGeminiA;
+      }
+      if (el.selectGeminiScholar) {
+        el.selectGeminiScholar.innerHTML = geminiOptHtml;
+        el.selectGeminiScholar.value = defaultGeminiB;
+      }
+      if (el.selectGeminiSolo) {
+        el.selectGeminiSolo.innerHTML = geminiOptHtml;
+        el.selectGeminiSolo.value = defaultGeminiSolo;
+      }
+      this.syncGeminiVoicePair(false, 'host');
+    }
+
+    // Modèles Gemini TTS
+    const geminiModels = voicesData.gemini_models || [];
+    if (geminiModels.length > 0 && el.selectGeminiModel) {
+      let mHtml = '';
+      geminiModels.forEach(m => {
+        mHtml += `<option value="${this.escapeHtml(m.id)}">${this.escapeHtml(m.name)}</option>`;
+      });
+      el.selectGeminiModel.innerHTML = mHtml;
+      el.selectGeminiModel.value = this.config?.gemini_model || 'gemini-3.1-flash-tts-preview';
+    }
+
+    // Quotas Gemini Flash TTS
+    if (voicesData.gemini_quota) {
+      const q = voicesData.gemini_quota;
+      if (el.geminiQuotaBadge) {
+        const rpdStr = (q.rpd_limit > 0) ? `${q.rpd_limit}` : '∞';
+        el.geminiQuotaBadge.textContent = `${q.requests_today} / ${rpdStr} requêtes ajd`;
+      }
+      if (el.inputGeminiRpd && typeof q.rpd_limit !== 'undefined') el.inputGeminiRpd.value = q.rpd_limit;
+      if (el.inputGeminiRpm && typeof q.rpm_limit !== 'undefined') el.inputGeminiRpm.value = q.rpm_limit;
+      if (el.inputGeminiTpm && typeof q.tpm_limit !== 'undefined') el.inputGeminiTpm.value = q.tpm_limit;
+    }
+
+    // Mode Mix Multi-Moteurs
+    this.refreshMixedEngineViews();
+
     this.refreshAllCustomDropdowns();
     this.updateVoiceSummary();
     this.updateTurnCardsVoiceLabels();
+  },
+
+  syncGeminiVoicePair(isUserChange = false, changedSource = 'host', forceAutoFix = false) {
+    const el = this.elements;
+    const v1El = el.selectGeminiHost;
+    const v2El = el.selectGeminiScholar;
+    if (!v1El || !v2El) return;
+
+    let v1Val = v1El.value;
+    let v2Val = v2El.value;
+    const alertEl = el.geminiDuplicateAlert;
+
+    Array.from(v2El.options).forEach(opt => {
+      opt.disabled = (opt.value === v1Val);
+    });
+    Array.from(v1El.options).forEach(opt => {
+      opt.disabled = (opt.value === v2Val);
+    });
+
+    const isDuplicate = (v1Val === v2Val);
+    if (isDuplicate || forceAutoFix) {
+      if (changedSource === 'host' || forceAutoFix) {
+        const alt = this.getSmartAlternateGeminiVoice(v1Val, 'scholar');
+        if (alt) {
+          v2El.value = alt;
+          v2Val = alt;
+          if (isUserChange || forceAutoFix) {
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast('Voix 2 Gemini ajustée : distincte de la Voix 1 pour le dialogue.');
+            }
+          }
+        }
+      } else {
+        const alt = this.getSmartAlternateGeminiVoice(v2Val, 'host');
+        if (alt) {
+          v1El.value = alt;
+          v1Val = alt;
+          if (isUserChange) {
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast('Voix 1 Gemini ajustée : distincte de la Voix 2 pour le dialogue.');
+            }
+          }
+        }
+      }
+    }
+
+    const stillDuplicate = (v1El.value === v2El.value);
+    if (alertEl) {
+      alertEl.style.display = (this.config?.engine === 'gemini_tts' && stillDuplicate) ? 'block' : 'none';
+    }
+
+    if (isUserChange || forceAutoFix) {
+      this.saveVoiceOption({
+        gemini_voice_speaker_a: v1El.value,
+        gemini_voice_speaker_b: v2El.value
+      });
+    }
+    this.updateVoiceSummary();
+    this.updateTurnCardsVoiceLabels();
+  },
+
+  getSmartAlternateGeminiVoice(currentVal, targetRole) {
+    if (targetRole === 'scholar') {
+      if (currentVal !== 'Charon') return 'Charon';
+      if (currentVal !== 'Fenrir') return 'Fenrir';
+      return 'Orpheus';
+    } else {
+      if (currentVal !== 'Aoede') return 'Aoede';
+      if (currentVal !== 'Kore') return 'Kore';
+      return 'Puck';
+    }
+  },
+
+  updateMixedEngineVoices(targetRole, engineVal) {
+    const el = this.elements;
+    let selectEl = null;
+    let curVal = '';
+    if (targetRole === 'host') {
+      selectEl = el.selectMixedVoiceHost;
+      curVal = this.config?.speaker_a_voice || '';
+    } else if (targetRole === 'scholar') {
+      selectEl = el.selectMixedVoiceScholar;
+      curVal = this.config?.speaker_b_voice || '';
+    } else {
+      selectEl = el.selectMixedVoiceSolo;
+      curVal = this.config?.solo_voice || '';
+    }
+    if (!selectEl) return;
+
+    let voicesList = [];
+    if (engineVal === 'gemini_tts') {
+      voicesList = this.geminiVoices || [];
+    } else if (engineVal === 'voxtral') {
+      voicesList = this.voxtralVoices || [];
+    } else {
+      voicesList = this.voices || [];
+    }
+
+    let html = '';
+    voicesList.forEach(v => {
+      const id = v.id || v.name;
+      const name = v.name || v.id;
+      html += `<option value="${this.escapeHtml(id)}">${this.escapeHtml(name)}</option>`;
+    });
+    selectEl.innerHTML = html;
+    if (curVal && voicesList.some(v => (v.id || v.name) === curVal)) {
+      selectEl.value = curVal;
+    } else if (voicesList.length > 0) {
+      selectEl.value = voicesList[0].id || voicesList[0].name;
+    }
+  },
+
+  refreshMixedEngineViews() {
+    const el = this.elements;
+    const engA = this.config?.speaker_a_engine || el.selectMixedEngineHost?.value || 'gemini_tts';
+    const engB = this.config?.speaker_b_engine || el.selectMixedEngineScholar?.value || 'edge_tts';
+    const engSolo = this.config?.solo_engine || el.selectMixedEngineSolo?.value || 'gemini_tts';
+
+    if (el.selectMixedEngineHost) el.selectMixedEngineHost.value = engA;
+    if (el.selectMixedEngineScholar) el.selectMixedEngineScholar.value = engB;
+    if (el.selectMixedEngineSolo) el.selectMixedEngineSolo.value = engSolo;
+
+    this.updateMixedEngineVoices('host', engA);
+    this.updateMixedEngineVoices('scholar', engB);
+    this.updateMixedEngineVoices('solo', engSolo);
   },
 
   syncVoicePair(isUserChange = false, changedSource = 'host', forceAutoFix = false) {
@@ -3252,14 +3591,21 @@ const AudioStudioView = {
     const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
 
     // Contrôle et ajustement automatique en cas de doublon en mode dialogue
+    const activeEng = this.config?.engine || 'edge_tts';
     if (this.format === 'dialogue') {
-      if (isVoxtral) {
+      if (activeEng === 'gemini_tts') {
+        const v1 = el.selectGeminiHost?.value;
+        const v2 = el.selectGeminiScholar?.value;
+        if (v1 && v2 && v1 === v2) {
+          this.syncGeminiVoicePair(true, 'host', true);
+        }
+      } else if (activeEng === 'voxtral') {
         const v1 = el.selectVoxtralHost?.value;
         const v2 = el.selectVoxtralScholar?.value;
         if (v1 && v2 && v1 === v2) {
           this.syncVoxtralVoicePair(true, 'host', true);
         }
-      } else {
+      } else if (activeEng === 'edge_tts') {
         const v1 = el.selectVoiceHost?.value;
         const v2 = el.selectVoiceScholar?.value;
         if (v1 && v2 && v1 === v2) {
@@ -3278,7 +3624,10 @@ const AudioStudioView = {
     if (el.step2ActiveSummary) {
       const isDialogue = (this.format === 'dialogue');
       const fmtName = isDialogue ? 'Dialogue (2 voix)' : 'Chronique Solo';
-      const engineLabel = isVoxtral ? 'Mistral Voxtral' : 'Edge-TTS';
+      let engineLabel = 'Edge-TTS';
+      if (activeEng === 'gemini_tts') engineLabel = 'Google Gemini Flash';
+      else if (activeEng === 'voxtral') engineLabel = 'Mistral Voxtral';
+      else if (activeEng === 'mixed') engineLabel = 'Mix Multi-Moteurs';
 
       const extractVoiceName = (sel, fallback) => {
         if (!sel) return fallback || '';
@@ -3295,9 +3644,17 @@ const AudioStudioView = {
       let voiceSummaryHtml = '';
       if (isDialogue) {
         let vA, vB;
-        if (isVoxtral) {
+        if (activeEng === 'gemini_tts') {
+          vA = extractVoiceName(el.selectGeminiHost, 'Puck');
+          vB = extractVoiceName(el.selectGeminiScholar, 'Charon');
+        } else if (activeEng === 'voxtral') {
           vA = extractVoiceName(el.selectVoxtralHost, 'Marie');
           vB = extractVoiceName(el.selectVoxtralScholar, 'Jacques');
+        } else if (activeEng === 'mixed') {
+          const engA = el.selectMixedEngineHost?.value || 'gemini_tts';
+          const engB = el.selectMixedEngineScholar?.value || 'edge_tts';
+          vA = `${extractVoiceName(el.selectMixedVoiceHost, 'Puck')} (${engA})`;
+          vB = `${extractVoiceName(el.selectMixedVoiceScholar, 'Henri')} (${engB})`;
         } else {
           vA = extractVoiceName(el.selectVoiceHost, 'Vivienne');
           vB = extractVoiceName(el.selectVoiceScholar, 'Fabrice');
@@ -3305,8 +3662,13 @@ const AudioStudioView = {
         voiceSummaryHtml = `<strong>${this.escapeHtml(vA)}</strong> (Animatrice) &amp; <strong>${this.escapeHtml(vB)}</strong> (Exégète)`;
       } else {
         let vSolo;
-        if (isVoxtral) {
+        if (activeEng === 'gemini_tts') {
+          vSolo = extractVoiceName(el.selectGeminiSolo, 'Puck');
+        } else if (activeEng === 'voxtral') {
           vSolo = extractVoiceName(el.selectVoxtralSolo, 'Marie');
+        } else if (activeEng === 'mixed') {
+          const engSolo = el.selectMixedEngineSolo?.value || 'gemini_tts';
+          vSolo = `${extractVoiceName(el.selectMixedVoiceSolo, 'Puck')} (${engSolo})`;
         } else {
           vSolo = extractVoiceName(el.selectVoiceSolo, 'Fabrice');
         }
@@ -3413,12 +3775,20 @@ const AudioStudioView = {
     }
 
     try {
-      const activeEngine = isVoxtral ? 'voxtral' : 'edge_tts';
+      const activeEngine = this.config?.engine || 'edge_tts';
       let spkA, spkB, spkSolo;
-      if (isVoxtral) {
+      if (activeEngine === 'gemini_tts') {
+        spkA = el.selectGeminiHost?.value || this.config?.gemini_voice_speaker_a || 'Puck';
+        spkB = el.selectGeminiScholar?.value || this.config?.gemini_voice_speaker_b || 'Charon';
+        spkSolo = el.selectGeminiSolo?.value || this.config?.gemini_voice_solo || 'Puck';
+      } else if (activeEngine === 'voxtral') {
         spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy';
         spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral';
         spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral';
+      } else if (activeEngine === 'mixed') {
+        spkA = el.selectMixedVoiceHost?.value || this.config?.speaker_a_voice || 'Puck';
+        spkB = el.selectMixedVoiceScholar?.value || this.config?.speaker_b_voice || 'fr-CH-FabriceNeural';
+        spkSolo = el.selectMixedVoiceSolo?.value || this.config?.solo_voice || 'Puck';
       } else {
         spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
         spkB = el.selectVoiceScholar?.value || this.config?.voice_scholar || 'fr-CH-FabriceNeural';
@@ -3429,9 +3799,17 @@ const AudioStudioView = {
         format_type: this.format,
         format: this.format,
         engine: activeEngine,
+        engine_mode: (activeEngine === 'mixed') ? 'mixed' : 'single',
         voice_speaker_a: spkA,
         voice_speaker_b: spkB,
         voice_solo: spkSolo,
+        gemini_model: el.selectGeminiModel?.value || this.config?.gemini_model || 'gemini-3.1-flash-tts-preview',
+        gemini_voice_speaker_a: el.selectGeminiHost?.value || this.config?.gemini_voice_speaker_a || 'Puck',
+        gemini_voice_speaker_b: el.selectGeminiScholar?.value || this.config?.gemini_voice_speaker_b || 'Charon',
+        gemini_voice_solo: el.selectGeminiSolo?.value || this.config?.gemini_voice_solo || 'Puck',
+        speaker_a_engine: el.selectMixedEngineHost?.value || this.config?.speaker_a_engine || 'gemini_tts',
+        speaker_b_engine: el.selectMixedEngineScholar?.value || this.config?.speaker_b_engine || 'edge_tts',
+        solo_engine: el.selectMixedEngineSolo?.value || this.config?.solo_engine || 'gemini_tts',
         voxtral_voice_speaker_a: el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy',
         voxtral_voice_scholar: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral',
         voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral',

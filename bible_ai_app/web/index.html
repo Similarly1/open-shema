@@ -4112,7 +4112,9 @@
                   <label for="cfg-audio-studio-engine">Moteur de synthèse vocale par défaut :</label>
                   <select id="cfg-audio-studio-engine" class="select-field full-w" style="height: 38px;">
                     <option value="edge_tts" selected>Microsoft Edge-TTS (Neural — 100% Gratuit, illimité, sans clé)</option>
-                    <option value="voxtral">Mistral Voxtral (Voix expressive / Utilise votre clé API Mistral)</option>
+                    <option value="gemini_tts">Google Gemini Flash TTS (Voix Google expressives / Clé Google API)</option>
+                    <option value="voxtral">Mistral Voxtral (Voix expressive / Clé API Mistral)</option>
+                    <option value="mixed">Mix Multi-Moteurs (Personnalisation par locuteur)</option>
                   </select>
                 </div>
 
@@ -5466,13 +5468,19 @@
                     <div id="as-step2-config-controls" style="display: flex; flex-direction: column; gap: 8px;">
                       <!-- Sélecteur de Moteur Vocal Interactif (Edge-TTS vs Mistral Voxtral) -->
                       <div class="audio-studio-engine-toggle" id="as-engine-toggle" style="margin-top: 10px;">
-                      <button type="button" class="engine-toggle-btn active" id="as-engine-btn-edge" data-engine="edge_tts">
-                        <span>Edge-TTS (Gratuit)</span>
-                      </button>
-                      <button type="button" class="engine-toggle-btn" id="as-engine-btn-voxtral" data-engine="voxtral">
-                        <span>Mistral Voxtral</span>
-                      </button>
-                    </div>
+                        <button type="button" class="engine-toggle-btn active" id="as-engine-btn-edge" data-engine="edge_tts">
+                          <span>Edge-TTS (Gratuit)</span>
+                        </button>
+                        <button type="button" class="engine-toggle-btn" id="as-engine-btn-gemini" data-engine="gemini_tts">
+                          <span>Google Gemini Flash</span>
+                        </button>
+                        <button type="button" class="engine-toggle-btn" id="as-engine-btn-voxtral" data-engine="voxtral">
+                          <span>Mistral Voxtral</span>
+                        </button>
+                        <button type="button" class="engine-toggle-btn" id="as-engine-btn-mixed" data-engine="mixed">
+                          <span>Mix Multi-Moteurs</span>
+                        </button>
+                      </div>
 
                     <!-- Sélecteur de Format dans l'Étape 2 (Dialogue / Solo) -->
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
@@ -5648,6 +5656,185 @@
                       </label>
                       <div id="as-voxtral-warning" class="audio-studio-warning-box" style="display: none;">
                         Clé API Mistral non configurée. Cliquez sur <a href="#" id="as-link-settings-mistral" style="color: inherit; text-decoration: underline; font-weight: 600;">Paramètres IA</a> pour la renseigner.
+                      </div>
+                    </div>
+
+                    <!-- Attribution des Voix Neuronales : Bloc Google Gemini Flash TTS -->
+                    <div id="as-voices-gemini-container" style="display: none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                      <!-- Modèle Gemini TTS -->
+                      <div class="audio-studio-form-row">
+                        <label class="audio-studio-form-label" for="as-select-gemini-model">Modèle Google Flash TTS</label>
+                        <select id="as-select-gemini-model" class="audio-studio-select">
+                          <option value="gemini-3.1-flash-tts-preview" selected>Gemini 3.1 Flash TTS (Recommandé, dernière génération)</option>
+                          <option value="gemini-2.5-flash-preview-tts">Gemini 2.5 Flash TTS (Ultra-rapide)</option>
+                        </select>
+                      </div>
+
+                      <!-- Voix Dialogue Gemini -->
+                      <div id="as-gemini-dialogue-voices" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="audio-studio-form-row">
+                          <label class="audio-studio-form-label" for="as-select-gemini-host">Voix 1 Gemini (Animatrice / Rôle A)</label>
+                          <select id="as-select-gemini-host" class="audio-studio-select">
+                            <optgroup label="Voix Recommandées (Français)">
+                              <option value="Aoede">Aoede (Féminine, posée &amp; fluide — Recommandée FR)</option>
+                              <option value="Kore">Kore (Féminine, claire &amp; douce — Recommandée FR)</option>
+                              <option value="Puck" selected>Puck (Masculine, naturelle &amp; engageante — Top FR)</option>
+                            </optgroup>
+                            <optgroup label="Catalogue Complet Google (Multilingue)">
+                              <option value="Charon">Charon (Masculine, grave &amp; érudite)</option>
+                              <option value="Fenrir">Fenrir (Masculine, dynamique &amp; chaleureuse)</option>
+                              <option value="Leda">Leda (Féminine, mélodieuse)</option>
+                              <option value="Callisto">Callisto (Féminine, douce &amp; calme)</option>
+                              <option value="Europa">Europa (Féminine, articulée)</option>
+                              <option value="Zephyr">Zephyr (Masculine, fluide)</option>
+                              <option value="Orpheus">Orpheus (Masculine, solennelle)</option>
+                            </optgroup>
+                          </select>
+                        </div>
+                        <div class="audio-studio-form-row">
+                          <label class="audio-studio-form-label" for="as-select-gemini-scholar">Voix 2 Gemini (Exégète / Rôle B)</label>
+                          <select id="as-select-gemini-scholar" class="audio-studio-select">
+                            <optgroup label="Voix Recommandées (Français)">
+                              <option value="Charon" selected>Charon (Masculine, grave, profonde &amp; érudite — Recommandé FR)</option>
+                              <option value="Fenrir">Fenrir (Masculine, articulée &amp; chaleureuse — FR)</option>
+                              <option value="Puck">Puck (Masculine, engageante &amp; naturelle)</option>
+                            </optgroup>
+                            <optgroup label="Catalogue Complet Google (Multilingue)">
+                              <option value="Aoede">Aoede (Féminine, posée)</option>
+                              <option value="Kore">Kore (Féminine, claire)</option>
+                              <option value="Orpheus">Orpheus (Masculine, résonnante)</option>
+                              <option value="Ganymede">Ganymede (Masculine, posée)</option>
+                              <option value="Titan">Titan (Masculine, affirmée)</option>
+                              <option value="Oberon">Oberon (Masculine, chaleureuse)</option>
+                            </optgroup>
+                          </select>
+                        </div>
+
+                        <!-- Alerte Voix Gemini Identiques -->
+                        <div id="as-gemini-duplicate-alert" class="audio-studio-warning-box" style="display: none; margin-top: 4px; padding: 8px 10px; font-size: 11.5px; border-left: 3px solid var(--accent-orange, #e06c75); background: rgba(224, 108, 117, 0.08); border-radius: 4px;">
+                          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <span>Attention : la Voix 1 et la Voix 2 Gemini sont identiques. Deux voix distinctes sont requises.</span>
+                            <button type="button" id="btn-as-auto-fix-gemini-voices" class="btn-xs btn-secondary" style="align-self: flex-start; height: 24px; font-size: 11px; padding: 0 8px;">
+                              Différencier automatiquement
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Voix Solo Gemini -->
+                      <div id="as-gemini-solo-voices" style="display: none; flex-direction: column; gap: 4px;" class="audio-studio-form-row">
+                        <label class="audio-studio-form-label" for="as-select-gemini-solo">Voix Narrateur Gemini (Chronique Solo)</label>
+                        <select id="as-select-gemini-solo" class="audio-studio-select">
+                          <optgroup label="Voix Recommandées (Français)">
+                            <option value="Puck" selected>Puck (Masculine, engageante &amp; naturelle — Recommandé FR)</option>
+                            <option value="Charon">Charon (Masculine, grave &amp; posée)</option>
+                            <option value="Aoede">Aoede (Féminine, fluide &amp; chaleureuse)</option>
+                            <option value="Kore">Kore (Féminine, claire &amp; douce)</option>
+                            <option value="Fenrir">Fenrir (Masculine, dynamique)</option>
+                          </optgroup>
+                        </select>
+                      </div>
+
+                      <!-- Suivi & Réglages des Quotas Gemini Flash TTS -->
+                      <div class="as-gemini-quota-box" style="margin-top: 6px; padding: 10px 12px; border-radius: 6px; background: var(--bg-surface, rgba(0,0,0,0.25)); border: 1px solid var(--border-color); font-size: 11.5px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                          <span style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <span>Quotas &amp; Cadence Gemini Flash TTS</span>
+                          </span>
+                          <span id="as-gemini-quota-badge" style="font-size: 10.5px; padding: 2px 6px; border-radius: 4px; background: rgba(56, 139, 253, 0.15); color: var(--accent-blue, #58a6ff); font-weight: 600;">
+                            0 / 10 requêtes ajd
+                          </span>
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 8px;">
+                          Proposition C active : 1 épisode = 1 seule requête d'API (multi-locuteurs natif).
+                        </div>
+                        <!-- Inputs personnalisables pour RPM, RPD, TPM -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                          <div>
+                            <label style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">RPD (par jour) :</label>
+                            <input type="number" id="as-input-gemini-rpd" value="10" min="0" max="1000" style="width: 100%; height: 26px; font-size: 11px; text-align: center; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);" title="0 = illimité pour compte payant">
+                          </div>
+                          <div>
+                            <label style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">RPM (par min) :</label>
+                            <input type="number" id="as-input-gemini-rpm" value="3" min="0" max="100" style="width: 100%; height: 26px; font-size: 11px; text-align: center; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);" title="0 = illimité pour compte payant">
+                          </div>
+                          <div>
+                            <label style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">TPM (tokens/min) :</label>
+                            <input type="number" id="as-input-gemini-tpm" value="10000" min="0" step="1000" style="width: 100%; height: 26px; font-size: 11px; text-align: center; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);" title="0 = illimité">
+                          </div>
+                        </div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: right;">
+                          Indiquez 0 pour lever la limite si vous utilisez un forfait payant.
+                        </div>
+                      </div>
+
+                      <div id="as-gemini-warning" class="audio-studio-warning-box" style="display: none;">
+                        Clé API Google non configurée. Cliquez sur <a href="#" id="as-link-settings-gemini" style="color: inherit; text-decoration: underline; font-weight: 600;">Paramètres IA</a> pour la renseigner.
+                      </div>
+                    </div>
+
+                    <!-- Attribution des Voix Neuronales : Bloc Mix Multi-Moteurs -->
+                    <div id="as-voices-mixed-container" style="display: none; flex-direction: column; gap: 12px; margin-top: 10px;">
+                      <div style="font-size: 11px; color: var(--text-secondary); background: rgba(56, 139, 253, 0.08); padding: 8px 10px; border-radius: 4px; border-left: 3px solid var(--accent-blue, #58a6ff);">
+                        <strong>Mode Mix Multi-Moteurs :</strong> Attribuez le moteur et la voix de votre choix indépendamment à chaque locuteur (ex: Animatrice Edge-TTS + Exégète Gemini Flash).
+                      </div>
+
+                      <!-- Locuteur A en Mix -->
+                      <div class="as-mixed-speaker-card" style="padding: 10px; border-radius: 6px; background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px;">
+                        <span style="font-size: 11.5px; font-weight: 600; color: var(--accent-orange, #e06c75);">Locuteur 1 (Animatrice / Rôle A)</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                          <div>
+                            <label class="audio-studio-form-label" for="as-select-mixed-engine-host">Moteur Vocal</label>
+                            <select id="as-select-mixed-engine-host" class="audio-studio-select">
+                              <option value="gemini_tts" selected>Google Gemini Flash</option>
+                              <option value="edge_tts">Microsoft Edge-TTS</option>
+                              <option value="voxtral">Mistral Voxtral</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label class="audio-studio-form-label" for="as-select-mixed-voice-host">Voix</label>
+                            <select id="as-select-mixed-voice-host" class="audio-studio-select"></select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Locuteur B en Mix -->
+                      <div class="as-mixed-speaker-card" style="padding: 10px; border-radius: 6px; background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px;">
+                        <span style="font-size: 11.5px; font-weight: 600; color: var(--accent-blue, #58a6ff);">Locuteur 2 (Exégète / Rôle B)</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                          <div>
+                            <label class="audio-studio-form-label" for="as-select-mixed-engine-scholar">Moteur Vocal</label>
+                            <select id="as-select-mixed-engine-scholar" class="audio-studio-select">
+                              <option value="gemini_tts">Google Gemini Flash</option>
+                              <option value="edge_tts" selected>Microsoft Edge-TTS</option>
+                              <option value="voxtral">Mistral Voxtral</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label class="audio-studio-form-label" for="as-select-mixed-voice-scholar">Voix</label>
+                            <select id="as-select-mixed-voice-scholar" class="audio-studio-select"></select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Solo en Mix -->
+                      <div id="as-mixed-solo-row" class="as-mixed-speaker-card" style="display: none; padding: 10px; border-radius: 6px; background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); flex-direction: column; gap: 6px;">
+                        <span style="font-size: 11.5px; font-weight: 600; color: var(--text-primary);">Chronique Solo (1 Voix)</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                          <div>
+                            <label class="audio-studio-form-label" for="as-select-mixed-engine-solo">Moteur Vocal</label>
+                            <select id="as-select-mixed-engine-solo" class="audio-studio-select">
+                              <option value="gemini_tts" selected>Google Gemini Flash</option>
+                              <option value="edge_tts">Microsoft Edge-TTS</option>
+                              <option value="voxtral">Mistral Voxtral</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label class="audio-studio-form-label" for="as-select-mixed-voice-solo">Voix</label>
+                            <select id="as-select-mixed-voice-solo" class="audio-studio-select"></select>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

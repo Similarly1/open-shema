@@ -2349,3 +2349,143 @@ body.palette-light-clean #audio-studio-player-status,
   color: #64748b !important;
 }
 
+/* Grille pour le selecteur de moteur 4 boutons (Edge-TTS, Voxtral, Gemini, Mix) */
+.audio-studio-engine-toggle {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--bg-surface, rgba(0, 0, 0, 0.25));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+@media (max-width: 680px) {
+  .audio-studio-engine-toggle {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.engine-toggle-btn {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Carte Locuteur en mode Multi-Moteurs */
+.as-mixed-speaker-card {
+  background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.as-mixed-speaker-card:hover {
+  border-color: var(--accent-orange, #ea580c);
+}
+
+.as-mixed-speaker-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-primary, #f8fafc);
+}
+
+.as-mixed-speaker-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(234, 88, 12, 0.15);
+  color: var(--accent-orange, #ea580c);
+}
+
+/* Boîte de quotas Gemini Flash TTS */
+.as-gemini-quota-box {
+  background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+}
+
+.as-gemini-quota-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.as-gemini-quota-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted, #94a3b8);
+}
+
+.as-gemini-quota-status {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-orange, #ea580c);
+}
+
+.as-gemini-quota-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.as-gemini-quota-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.as-gemini-quota-field label {
+  font-size: 10px;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 600;
+}
+
+.as-gemini-quota-field input {
+  height: 28px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--bg-surface, rgba(0, 0, 0, 0.25));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  color: var(--text-primary, #f8fafc);
+}
+
+body.theme-light .as-mixed-speaker-card,
+body.palette-light-clean .as-mixed-speaker-card,
+[data-theme="light"] .as-mixed-speaker-card {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+body.theme-light .as-gemini-quota-box,
+body.palette-light-clean .as-gemini-quota-box,
+[data-theme="light"] .as-gemini-quota-box {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+body.theme-light .as-gemini-quota-field input,
+body.palette-light-clean .as-gemini-quota-field input,
+[data-theme="light"] .as-gemini-quota-field input {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+
