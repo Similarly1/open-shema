@@ -5392,42 +5392,52 @@
               <div class="as-step2-layout">
                 <!-- Volet Gauche (2/3) : Script & Répliques éditables -->
                 <div class="as-step2-script-pane">
-                  <!-- En-tête de l'épisode -->
-                  <div class="audio-studio-script-header" id="audio-studio-script-header">
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                      <input type="text" id="audio-studio-episode-title" class="audio-studio-script-title-input" placeholder="Titre de l'épisode (généré ou personnalisé)..." value="Nouveau script audio">
-                      <div style="display: flex; align-items: center; gap: 6px;">
-                        <button type="button" class="btn-secondary btn-sm" id="btn-audio-studio-clear-script" title="Réinitialiser le script" style="font-size: 11.5px; height: 26px; padding: 0 8px;">
-                          Réinitialiser
-                        </button>
+                  <!-- En-tête de l'épisode / Production Master Card -->
+                  <div class="audio-studio-script-header as-master-header-card" id="audio-studio-script-header">
+                    <!-- Surtitre pro et bouton de réinitialisation -->
+                    <div class="as-header-topline">
+                      <div class="as-header-kicker">
+                        <span class="as-live-dot"></span>
+                        <span>ÉPISODE EN COURS &bull; STUDIO D'ÉDITION</span>
                       </div>
+                      <button type="button" class="btn-secondary btn-sm as-header-reset-btn" id="btn-audio-studio-clear-script" title="Réinitialiser le script">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        <span>Réinitialiser</span>
+                      </button>
                     </div>
+
+                    <!-- Titre principal de l'épisode -->
+                    <div class="as-header-title-row">
+                      <input type="text" id="audio-studio-episode-title" class="audio-studio-script-title-input" placeholder="Titre de l'épisode (généré ou personnalisé)..." value="Nouveau script audio">
+                    </div>
+
+                    <!-- Métadonnées & Puces de production -->
                     <div class="audio-studio-script-meta-row">
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                        <span id="audio-studio-meta-format" class="audio-studio-source-pill" style="font-weight: 600;">Dialogue</span>
-                        <span id="audio-studio-meta-mode" class="audio-studio-source-pill" style="color: var(--accent-orange);">Auto</span>
-                        <span id="audio-studio-meta-turns" style="color: var(--text-muted);">0 réplique</span>
-                        <span id="audio-studio-meta-duration" style="color: var(--text-muted); font-family: monospace;">Durée estimée : ~0 min</span>
+                      <div class="as-meta-badges-cluster">
+                        <span id="audio-studio-meta-format" class="as-meta-chip as-chip-format">Dialogue</span>
+                        <span id="audio-studio-meta-mode" class="as-meta-chip as-chip-mode">Auto</span>
+                        <span id="audio-studio-meta-turns" class="as-meta-chip as-chip-turns">0 réplique</span>
+                        <span id="audio-studio-meta-duration" class="as-meta-chip as-chip-duration">Durée estimée : ~0 min</span>
                       </div>
                       <div class="audio-studio-sources-pills" id="audio-studio-script-sources-pills">
                         <!-- Badges des sources -->
                       </div>
                     </div>
-                  </div>
 
-                  <!-- Switch de mode de texte : Texte littéraire vs Script vocal phonétique -->
-                  <div class="as-text-mode-bar" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 5px 8px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
-                    <div style="display: inline-flex; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; padding: 2px; gap: 2px;">
-                      <button type="button" class="as-text-mode-btn is-active" id="as-btn-mode-literary" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 5px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none; background: var(--accent-orange); color: #fff;" title="Afficher l'orthographe française littéraire soignée avec citations et termes grecs/hébreux originaux">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                        <span>Texte littéraire</span>
-                      </button>
-                      <button type="button" class="as-text-mode-btn" id="as-btn-mode-phonetic" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 5px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-muted);" title="Afficher le script vocal avec les ajustements phonétiques et respirations pour le moteur TTS">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-                        <span>Script vocal TTS</span>
-                      </button>
+                    <!-- Commutateur segmenté intégré : Texte littéraire vs Script vocal phonétique -->
+                    <div class="as-text-mode-bar as-integrated-mode-bar">
+                      <div class="as-segmented-mode-ctrl">
+                        <button type="button" class="as-text-mode-btn is-active" id="as-btn-mode-literary" title="Afficher l'orthographe française littéraire soignée avec citations et termes grecs/hébreux originaux">
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                          <span>Texte littéraire</span>
+                        </button>
+                        <button type="button" class="as-text-mode-btn" id="as-btn-mode-phonetic" title="Afficher le script vocal avec les ajustements phonétiques et respirations pour le moteur TTS">
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                          <span>Script vocal TTS</span>
+                        </button>
+                      </div>
+                      <span id="as-text-mode-hint" class="as-mode-hint-tag">Orthographe soignée &amp; grec intact</span>
                     </div>
-                    <span id="as-text-mode-hint" style="font-size: 11px; color: var(--text-muted);">Orthographe soignée &amp; grec intact</span>
                   </div>
 
                   <!-- Liste des répliques -->
@@ -7373,25 +7383,45 @@
             <!-- Sélecteur de fond de carte -->
             <div class="map-layers-segmented">
               <button type="button" class="map-layer-btn active" data-layer="topo" title="Reliefs & Topographie">Relief</button>
+              <button type="button" class="map-layer-btn" data-layer="parchment" title="Style Parchemin & Carte Historique">Historique</button>
               <button type="button" class="map-layer-btn" data-layer="satellite" title="Vue Satellite Haute Résolution">Satellite</button>
               <button type="button" class="map-layer-btn" data-layer="dark" title="Mode Sombre">Nuit</button>
               <button type="button" class="map-layer-btn" data-layer="osm" title="OpenStreetMap standard">Standard</button>
             </div>
             
-            <button class="btn-secondary" id="btn-map-reset-view" title="Recentrer la carte sur Jérusalem">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <line x1="12" y1="2" x2="12" y2="22"></line>
-              </svg>
-              <span>Recentrer</span>
-            </button>
+            <div class="map-header-divider"></div>
+
+            <div class="map-header-actions">
+              <button type="button" class="map-header-btn" id="btn-map-reset-view" title="Recentrer la carte sur Jérusalem et le Levant">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <line x1="12" y1="2" x2="12" y2="22"></line>
+                </svg>
+                <span>Recentrer</span>
+              </button>
+
+              <button type="button" class="map-header-btn" id="btn-toggle-maps-drawer" title="Afficher / Masquer le volet de détails du lieu">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="15" y1="3" x2="15" y2="21"></line>
+                </svg>
+                <span>Détails</span>
+              </button>
+
+              <button type="button" class="map-header-btn" id="btn-map-immersion" title="Mode Immersion (Carte Plein Écran sans volets)">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+                <span>Immersion</span>
+              </button>
+            </div>
           </div>
         </header>
 
-        <div class="maps-workspace-layout">
+        <div class="maps-workspace-layout" id="maps-workspace-layout">
           <!-- Volet Gauche : Recherche, Filtres & Liste des Lieux / Itinéraires -->
-          <aside class="maps-sidebar-pane">
+          <aside class="maps-sidebar-pane" id="maps-sidebar-pane">
             <div class="maps-sidebar-controls">
               <!-- Recherche -->
               <div class="maps-search-box">
@@ -7401,21 +7431,44 @@
                 <input type="text" id="map-search-input" class="maps-search-field" placeholder="Chercher un lieu biblique...">
               </div>
 
-              <!-- Filtres -->
+              <!-- Filtres : Type & Tri -->
               <div class="maps-filters-row">
-                <select id="map-type-filter" class="select-field" style="flex: 1; font-size: 11.5px; height: 30px;">
+                <select id="map-type-filter" class="select-field" style="flex: 1.2; font-size: 11.5px; height: 30px;">
                   <option value="all">Tous les types</option>
-                  <option value="city">Villes & Cités</option>
+                  <option value="city">Cités & Villes</option>
                   <option value="mountain">Montagnes & Monts</option>
-                  <option value="river">Fleuves, Mers & Lacs</option>
-                  <option value="region">Régions & Déserts</option>
+                  <option value="sea">Mers & Lacs</option>
+                  <option value="river">Fleuves & Torrents</option>
+                  <option value="region">Régions & Pays</option>
                   <option value="island">Îles</option>
+                </select>
+
+                <select id="map-sort-filter" class="select-field" style="flex: 0.8; font-size: 11.5px; height: 30px;">
+                  <option value="mentions">Par mentions</option>
+                  <option value="name_fr">Nom (A-Z)</option>
+                  <option value="type">Par type</option>
+                </select>
+              </div>
+
+              <!-- Filtre Période Biblique -->
+              <div class="maps-filter-period-box">
+                <label class="maps-section-label">Période Biblique :</label>
+                <select id="map-period-filter" class="select-field full-w" style="font-size: 11.5px; height: 30px;">
+                  <option value="all">Toutes les époques</option>
+                  <option value="patriarchs">Patriarches & Exode (Genèse - Deut.)</option>
+                  <option value="conquest">Conquête & Rois (Josué - Chroniques)</option>
+                  <option value="prophets">Exil & Prophètes (Esdras - Malachie)</option>
+                  <option value="gospels">Évangiles (Ministère de Jésus)</option>
+                  <option value="apostolic">Actes & Église primitive</option>
                 </select>
               </div>
 
               <!-- Sélecteur d'Itinéraires -->
               <div class="maps-itinerary-selector-box">
-                <label class="maps-section-label">Grands Itinéraires :</label>
+                <div class="itinerary-selector-header-row">
+                  <label class="maps-section-label">Grands Itinéraires :</label>
+                  <button type="button" id="btn-reset-itinerary" class="itinerary-exit-link hidden" title="Revenir à la vue libre avec tous les lieux">Quitter l'itinéraire</button>
+                </div>
                 <select id="map-itinerary-select" class="select-field full-w" style="font-size: 11.5px; height: 32px;">
                   <option value="none">Vue libre (Tous les lieux)</option>
                 </select>
@@ -7423,6 +7476,7 @@
 
               <div class="maps-count-bar">
                 <span id="map-places-count">Chargement des lieux...</span>
+                <span id="map-cluster-info" class="maps-cluster-hint">Grappes actives</span>
               </div>
             </div>
 
@@ -7436,45 +7490,135 @@
           <section class="maps-canvas-pane">
             <div id="biblical-map-container" class="biblical-map-container"></div>
 
-            <!-- Panneau rétractable de détails du lieu sélectionné -->
-            <div id="map-place-details-card" class="map-place-details-card hidden">
-              <div class="details-card-header">
-                <div class="details-title-group">
-                  <h3 id="details-place-title" class="details-title">Jérusalem</h3>
-                  <span id="details-place-type" class="place-item-type badge-type-city">Ville</span>
-                  <span id="details-place-confidence" class="confidence-badge conf-certain">Certain</span>
+            <!-- Barre Flottante Inférieure de Navigation d'Itinéraire (Piste 2) -->
+            <div id="map-itinerary-bottom-bar" class="map-itinerary-bottom-bar hidden">
+              <button type="button" id="btn-itin-prev" class="itin-nav-btn" title="Étape précédente">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Précédent</span>
+              </button>
+
+              <div id="itin-bottom-step-info" class="itin-bottom-step-info" title="Cliquer pour afficher la fiche détaillée de cette étape">
+                <div class="itin-bottom-step-header">
+                  <span id="itin-bottom-step-badge" class="itin-bottom-badge">Étape 1 / 14</span>
+                  <strong id="itin-bottom-step-name">Bethléem</strong>
                 </div>
-                <button id="btn-close-place-details" class="details-close-btn" title="Fermer ce panneau">✕</button>
+                <div id="itin-bottom-step-desc" class="itin-bottom-desc">Naissance du Messie</div>
               </div>
 
-              <div class="details-card-body">
-                <div class="details-info-grid">
-                  <div class="info-field">
-                    <span class="info-label">Nom antique :</span>
-                    <span id="details-place-ancient" class="info-value">Yerushalayim</span>
+              <button type="button" id="btn-itin-next" class="itin-nav-btn" title="Étape suivante">
+                <span>Suivant</span>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <button type="button" id="btn-itin-open-drawer" class="itin-details-shortcut-btn" title="Ouvrir la fiche d'étude complète à droite">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="15" y1="3" x2="15" y2="21"></line>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Volet Latéral Inspecteur de Lieu (Drawer) -->
+            <aside id="maps-details-drawer" class="maps-details-drawer hidden">
+              <div class="drawer-header">
+                <div class="drawer-title-group">
+                  <div class="drawer-title-row">
+                    <h3 id="details-place-title" class="drawer-title">Jérusalem</h3>
+                    <span id="details-place-type" class="place-item-type badge-type-city">Ville</span>
                   </div>
-                  <div class="info-field">
+                  <div class="drawer-sub-row">
+                    <span id="details-place-ancient" class="drawer-ancient-label">Yerushalayim</span>
+                    <span id="details-place-confidence" class="confidence-badge conf-certain">Identification certaine</span>
+                  </div>
+                </div>
+                <div class="drawer-actions">
+                  <button id="btn-open-in-dictionary" class="drawer-icon-btn" title="Consulter l'article dans les Dictionnaires bibliques">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                  </button>
+                  <button id="btn-close-place-details" class="drawer-icon-btn" title="Fermer ce volet">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="drawer-body">
+                <!-- Grille d'informations géographiques -->
+                <div class="drawer-info-card">
+                  <div class="drawer-info-row">
                     <span class="info-label">Emplacement moderne :</span>
                     <span id="details-place-modern" class="info-value">Al-Quds / Jerusalem</span>
                   </div>
-                  <div class="info-field">
+                  <div class="drawer-info-row">
                     <span class="info-label">Coordonnées GPS :</span>
                     <span id="details-place-coords" class="info-value">31.7683°, 35.2137°</span>
                   </div>
+                  <div class="drawer-info-row" id="details-periods-row">
+                    <span class="info-label">Périodes bibliques :</span>
+                    <div id="details-place-periods-tags" class="periods-tags-container"></div>
+                  </div>
                 </div>
 
-                <div class="details-comment-box">
-                  <p id="details-place-comment" class="details-comment-text">Ville sainte et capitale du royaume d'Israël.</p>
+                <!-- Commentaire historique et contextuel -->
+                <div class="drawer-comment-card">
+                  <p id="details-place-comment" class="drawer-comment-text">Ville sainte et capitale historique.</p>
                 </div>
 
-                <div class="details-verses-section">
-                  <h4 class="details-verses-title">Occurrences dans la Bible (Cliquer pour lire) :</h4>
+                <!-- Section des versets et aperçu in-situ -->
+                <div class="drawer-verses-section">
+                  <div class="verses-header-row">
+                    <h4 class="drawer-section-title">OCCURRENCES DANS LA BIBLE</h4>
+                    <span id="details-verses-total" class="verses-count-pill">0 réf.</span>
+                  </div>
+                  <p class="verses-help-note">Cliquez sur une référence pour lire le passage ci-dessous sans quitter la carte :</p>
+                  
                   <div id="details-place-verses-list" class="details-verses-grid">
                     <!-- Versets cliquables injectés dynamiquement -->
                   </div>
+
+                  <!-- Panneau d'aperçu direct du verset (In-situ Verse Reader) -->
+                  <div id="maps-verse-preview-box" class="maps-verse-preview-box hidden">
+                    <div class="preview-box-header">
+                      <div class="preview-ref-badge">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        <strong id="maps-preview-ref-title">Genèse 12:1</strong>
+                      </div>
+                      <button id="btn-close-verse-preview" class="preview-close-btn" title="Fermer l'aperçu">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
+                    <div id="maps-preview-text" class="preview-verse-text">
+                      Chargement du texte biblique...
+                    </div>
+                    <div class="preview-box-footer">
+                      <button id="btn-jump-to-reader-btn" class="btn-jump-reader">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        <span>Ouvrir dans le Lecteur Biblique</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </aside>
           </section>
         </div>
       </div>

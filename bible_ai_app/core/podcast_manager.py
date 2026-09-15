@@ -3022,53 +3022,62 @@ class PodcastEngine:
         from google import genai
         client = genai.Client(api_key=api_key)
 
+        models_to_try = [model_id]
+        alt_model = "gemini-2.5-flash-preview-tts" if "3.1" in str(model_id) else "gemini-3.1-flash-tts-preview"
+        if alt_model not in models_to_try:
+            models_to_try.append(alt_model)
+
         last_err = None
-        for attempt in range(max_retries):
+        for current_model in models_to_try:
+            for attempt in range(max_retries):
+                try:
+                    response = client.interactions.create(
+                        model=current_model,
+                        input=prompt,
+                        response_format={"type": "audio"},
+                        generation_config={
+                            "speech_config": speech_config
+                        }
+                    )
+                    if response and response.output_audio and response.output_audio.data:
+                        raw_b64 = response.output_audio.data
+                        return base64.b64decode(raw_b64)
+                    else:
+                        raise RuntimeError("L'API Gemini n'a retourné aucune donnée audio.")
+                except Exception as e:
+                    last_err = e
+                    logger.warning(
+                        "[PodcastEngine] Tentative %d/%d échouée pour Gemini TTS (%s): %s",
+                        attempt + 1, max_retries, current_model, e
+                    )
+                    if "429" in str(e) or "quota" in str(e).lower():
+                        # Si quota dépassé sur ce modèle, passer directement au modèle alternatif
+                        break
+                    if attempt < max_retries - 1:
+                        time.sleep(1.5 * (attempt + 1))
+
+            # Tentative REST de secours pour ce modèle
             try:
-                response = client.interactions.create(
-                    model=model_id,
-                    input=prompt,
-                    response_format={"type": "audio"},
-                    generation_config={
+                import httpx
+                url = f"https://generativelanguage.googleapis.com/v1beta/interactions?key={api_key}"
+                payload = {
+                    "model": current_model,
+                    "input": prompt,
+                    "response_format": {"type": "audio"},
+                    "generation_config": {
                         "speech_config": speech_config
                     }
-                )
-                if response and response.output_audio and response.output_audio.data:
-                    raw_b64 = response.output_audio.data
-                    return base64.b64decode(raw_b64)
-                else:
-                    raise RuntimeError("L'API Gemini n'a retourné aucune donnée audio.")
-            except Exception as e:
-                last_err = e
-                logger.warning(
-                    "[PodcastEngine] Tentative %d/%d échouée pour Gemini TTS (%s): %s",
-                    attempt + 1, max_retries, model_id, e
-                )
-                if attempt < max_retries - 1:
-                    time.sleep(2.0 * (attempt + 1))
-
-        # Fallback direct REST via httpx si l'interaction SDK échoue
-        try:
-            import httpx
-            url = f"https://generativelanguage.googleapis.com/v1beta/interactions?key={api_key}"
-            payload = {
-                "model": model_id,
-                "input": prompt,
-                "response_format": {"type": "audio"},
-                "generation_config": {
-                    "speech_config": speech_config
                 }
-            }
-            resp = httpx.post(url, json=payload, timeout=60.0)
-            if resp.status_code == 200:
-                data = resp.json()
-                out_audio = data.get("output_audio", {}).get("data")
-                if out_audio:
-                    return base64.b64decode(out_audio)
-        except Exception as e_rest:
-            logger.warning("[PodcastEngine] Tentative REST de secours échouée: %s", e_rest)
+                resp = httpx.post(url, json=payload, timeout=60.0)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    out_audio = data.get("output_audio", {}).get("data")
+                    if out_audio:
+                        return base64.b64decode(out_audio)
+            except Exception as e_rest:
+                logger.warning("[PodcastEngine] Tentative REST de secours échouée pour %s: %s", current_model, e_rest)
 
-        raise RuntimeError(f"Échec de l'appel Gemini Flash TTS après {max_retries} tentatives : {last_err}")
+        raise RuntimeError(f"Échec de l'appel Gemini Flash TTS après tentatives sur {models_to_try} : {last_err}")
 
     @classmethod
     def _synthesize_gemini_tts(
@@ -3298,6 +3307,18 @@ class PodcastEngine:
         current_timeline_sec = 0.0
         updated_dialogue = []
 
+        uses_gemini = any(e == "gemini_tts" for e in (spk_a_engine, spk_b_engine, solo_engine))
+        if uses_gemini:
+            try:
+                GeminiQuotaTracker.check_and_increment(
+                    estimated_tokens=500,
+                    rpm_limit=rpm_limit,
+                    rpd_limit=rpd_limit,
+                    tpm_limit=tpm_limit
+                )
+            except Exception as e_q:
+                logger.warning("[PodcastEngine] Quota Gemini : %s (poursuite avec tentative sur modèle alternatif)", e_q)
+
         fmt = str(record.get("format_type") or record.get("format") or opts.get("format_type") or "dialogue").lower()
 
         for idx, item in enumerate(dialogue):
@@ -3340,12 +3361,6 @@ class PodcastEngine:
             if chosen_eng == "gemini_tts":
                 gem_voice = chosen_voice if chosen_voice in ("Puck", "Charon", "Kore", "Fenrir", "Aoede") else default_gemini_fallback
                 try:
-                    GeminiQuotaTracker.check_and_increment(
-                        estimated_tokens=max(10, len(clean_text) // 4),
-                        rpm_limit=rpm_limit,
-                        rpd_limit=rpd_limit,
-                        tpm_limit=tpm_limit
-                    )
                     prompt_turn = f"TTS in French with natural expression:\n{clean_text}"
                     pcm = cls._call_gemini_tts_api(
                         prompt=prompt_turn,
