@@ -239,25 +239,30 @@ class PodcastEngine:
     # Ces identifiants sont les "name" retournés par GET /v1/audio/voices.
     # Sur compte gratuit : une seule voix de base (ex: Marie) avec plusieurs intonations.
     # Sur compte payant : l'API retourne des UUIDs supplémentaires (voix personnalisées).
+    # Voix officielles Voxtral (Mistral AI)
     VOXTRAL_DEFAULT_VOICES = [
-        # Intonations disponibles sur compte gratuit (Français)
-        {"id": "Marie - Neutral",  "name": "Marie - Neutre (naturelle, posée)",      "gender": "Female", "role": "both",    "category": "Intonations Marie (Français)", "languages": ["fr"]},
-        {"id": "Marie - Happy",    "name": "Marie - Joyeuse (chaleureuse, vivante)", "gender": "Female", "role": "host",   "category": "Intonations Marie (Français)", "languages": ["fr"]},
-        {"id": "Marie - Excited",  "name": "Marie - Enthousiaste (dynamique)",       "gender": "Female", "role": "host",   "category": "Intonations Marie (Français)", "languages": ["fr"]},
-        {"id": "Marie - Curious",  "name": "Marie - Curieuse (interrogative)",       "gender": "Female", "role": "host",   "category": "Intonations Marie (Français)", "languages": ["fr"]},
-        {"id": "Marie - Sad",      "name": "Marie - Grave (méditative)",             "gender": "Female", "role": "scholar","category": "Intonations Marie (Français)", "languages": ["fr"]},
-        {"id": "Marie - Angry",    "name": "Marie - Ferme (sérieuse)",               "gender": "Female", "role": "scholar","category": "Intonations Marie (Français)", "languages": ["fr"]},
+        {"id": "gb_jane_neutral",   "name": "Jane - Neutre (Féminine, posée & fluide)",       "gender": "Female", "role": "both",    "category": "Voix Voxtral (Mistral)", "languages": ["fr"]},
+        {"id": "gb_jane_curious",   "name": "Jane - Curieuse (Féminine, interrogative & vive)", "gender": "Female", "role": "host",    "category": "Voix Voxtral (Mistral)", "languages": ["fr"]},
+        {"id": "gb_jane_confident", "name": "Jane - Affirmée (Féminine, chaleureuse)",         "gender": "Female", "role": "host",    "category": "Voix Voxtral (Mistral)", "languages": ["fr"]},
+        {"id": "gb_oliver_neutral", "name": "Oliver - Posé (Masculine, érudit & calme)",       "gender": "Male",   "role": "scholar", "category": "Voix Voxtral (Mistral)", "languages": ["fr"]},
+        {"id": "gb_oliver_cheerful","name": "Oliver - Chaleureux (Masculine, engageant)",      "gender": "Male",   "role": "scholar", "category": "Voix Voxtral (Mistral)", "languages": ["fr"]},
+        {"id": "en_paul_neutral",   "name": "Paul - Sobre (Masculine, mesuré & net)",          "gender": "Male",   "role": "scholar", "category": "Voix Voxtral (Mistral)", "languages": ["fr"]},
     ]
 
-    # Correspondance intonation Voxtral -> voix Edge-TTS pour le fallback (sans clé API Mistral)
+    # Correspondance voix Voxtral -> voix Edge-TTS pour le fallback
     VOXTRAL_EMOTION_EDGE_MAP = {
-        "Marie - Neutral":  "fr-FR-DeniseNeural",
-        "Marie - Happy":    "fr-FR-VivienneMultilingualNeural",
-        "Marie - Excited":  "fr-FR-DeniseNeural",
-        "Marie - Curious":  "fr-FR-VivienneMultilingualNeural",
-        "Marie - Sad":      "fr-FR-EloiseNeural",
-        "Marie - Angry":    "fr-FR-HenriNeural",
-        "Marie - Fearful":  "fr-FR-EloiseNeural",
+        "gb_jane_neutral":   "fr-FR-DeniseNeural",
+        "gb_jane_curious":   "fr-FR-VivienneMultilingualNeural",
+        "gb_jane_confident": "fr-FR-DeniseNeural",
+        "gb_oliver_neutral": "fr-FR-HenriNeural",
+        "gb_oliver_cheerful":"fr-FR-RemyMultilingualNeural",
+        "en_paul_neutral":   "fr-FR-HenriNeural",
+        "Marie - Neutral":   "fr-FR-DeniseNeural",
+        "Marie - Happy":     "fr-FR-VivienneMultilingualNeural",
+        "Marie - Excited":   "fr-FR-DeniseNeural",
+        "Marie - Curious":   "fr-FR-VivienneMultilingualNeural",
+        "Marie - Sad":       "fr-FR-HenriNeural",
+        "Marie - Angry":     "fr-FR-HenriNeural",
     }
 
     VOXTRAL_MODEL = "voxtral-mini-tts-2603"
@@ -2780,8 +2785,10 @@ class PodcastEngine:
     def resolve_voxtral_voice_id(cls, v_req: str, voices_list: Optional[list] = None) -> str:
         """Résout l'identifiant exact d'une voix ou intonation Voxtral."""
         if not v_req:
-            return "marie"
+            return "gb_jane_neutral"
         v_clean = str(v_req).strip()
+        if v_clean in ("gb_jane_neutral", "gb_jane_curious", "gb_jane_confident", "gb_oliver_neutral", "gb_oliver_cheerful", "en_paul_neutral"):
+            return v_clean
         if re.match(r'^[0-9a-fA-F-]{32,36}$', v_clean):
             return v_clean
         vl = voices_list or cls.VOXTRAL_DEFAULT_VOICES
@@ -2789,17 +2796,17 @@ class PodcastEngine:
             if v.get("name", "").strip().lower() == v_clean.lower() or v.get("id", "").strip().lower() == v_clean.lower():
                 return v.get("id")
         req_low = v_clean.lower()
-        for v in vl:
-            v_str = (v.get("name", "") + " " + v.get("id", "")).lower()
-            for emo in ["excited", "happy", "joyeuse", "sad", "grave", "curious", "curieuse", "angry", "ferme", "fearful", "douce", "neutral", "neutre"]:
-                if emo in req_low and emo in v_str:
-                    return v.get("id")
-        for v in vl:
-            if "marie" in (v.get("name", "") + " " + v.get("id", "")).lower():
-                return v.get("id")
-        if vl and vl[0].get("id"):
-            return vl[0].get("id")
-        return "marie"
+        if any(w in req_low for w in ("grave", "sad", "homme", "male", "oliver", "henri", "jacques", "exégète", "scholar", "ferme", "angry")):
+            return "gb_oliver_neutral"
+        if any(w in req_low for w in ("curious", "curieuse", "happy", "joyeuse", "excited", "enthousiaste", "vive")):
+            return "gb_jane_curious"
+        if any(w in req_low for w in ("confident", "affirmée", "chaleureuse", "dynamique")):
+            return "gb_jane_confident"
+        if any(w in req_low for w in ("paul", "calme", "sérieux", "sobre")):
+            return "en_paul_neutral"
+        if any(w in req_low for w in ("chaleureux", "engageant")):
+            return "gb_oliver_cheerful"
+        return "gb_jane_neutral"
 
     @classmethod
     def get_voice_sample(cls, voice_id: str, engine: str = "edge_tts", role: str = "host") -> bytes:
@@ -3255,17 +3262,9 @@ class PodcastEngine:
         spk_b_engine = opts.get("speaker_b_engine") or cfg.get("audio_studio_speaker_b_engine", "edge_tts")
         solo_engine = opts.get("solo_engine") or cfg.get("audio_studio_solo_engine", "gemini_tts")
 
-        voice_a_edge = opts.get("voice_speaker_a") or cfg.get("audio_studio_voice_speaker_a", "fr-FR-VivienneMultilingualNeural")
-        voice_b_edge = opts.get("voice_speaker_b") or cfg.get("audio_studio_voice_speaker_b", "fr-CH-FabriceNeural")
-        voice_solo_edge = opts.get("voice_solo") or cfg.get("audio_studio_voice_solo", "fr-CH-FabriceNeural")
-
-        voice_a_gemini = opts.get("gemini_voice_speaker_a") or cfg.get("audio_studio_gemini_voice_speaker_a", "Puck")
-        voice_b_gemini = opts.get("gemini_voice_speaker_b") or cfg.get("audio_studio_gemini_voice_speaker_b", "Charon")
-        voice_solo_gemini = opts.get("gemini_voice_solo") or cfg.get("audio_studio_gemini_voice_solo", "Puck")
-
-        voice_a_voxtral = opts.get("voxtral_voice_speaker_a") or cfg.get("audio_studio_voxtral_voice_speaker_a", "Marie - Happy")
-        voice_b_voxtral = opts.get("voxtral_voice_speaker_b") or cfg.get("audio_studio_voxtral_voice_speaker_b", "Marie - Neutral")
-        voice_solo_voxtral = opts.get("voxtral_voice_solo") or cfg.get("audio_studio_voxtral_voice_solo", "Marie - Neutral")
+        voice_a_target = opts.get("speaker_a_voice") or opts.get("voice_speaker_a") or cfg.get("audio_studio_voice_speaker_a", "fr-FR-DeniseNeural")
+        voice_b_target = opts.get("speaker_b_voice") or opts.get("voice_speaker_b") or cfg.get("audio_studio_voice_speaker_b", "fr-FR-HenriNeural")
+        voice_solo_target = opts.get("solo_voice") or opts.get("voice_solo") or cfg.get("audio_studio_voice_solo", "fr-FR-HenriNeural")
 
         gemini_model = opts.get("gemini_model") or cfg.get("audio_studio_gemini_model", "gemini-3.1-flash-tts-preview")
         rpm_limit = int(cfg.get("gemini_tts_rpm_limit", 3))
@@ -3290,16 +3289,25 @@ class PodcastEngine:
 
             clean_text = cls._clean_text_for_speech(speech_text if speech_text else text)
 
-            # Déterminer rôle et moteur
+            # Déterminer rôle, moteur et voix cible
             if fmt == "solo" and v_role != "B" and not any(k in spk for k in ("scholar", "théolog", "exég")):
                 chosen_eng = solo_engine
+                chosen_voice = voice_solo_target
                 role_label = "Chronique Solo"
-            elif v_role in ("B", "SCHOLAR") or any(k in spk for k in ("scholar", "théologien", "exégète", "henri", "charon")):
+                default_edge_fallback = "fr-FR-HenriNeural"
+                default_gemini_fallback = "Puck"
+            elif v_role in ("B", "SCHOLAR") or any(k in spk for k in ("scholar", "théologien", "exégète", "henri", "charon", "oliver")):
                 chosen_eng = spk_b_engine
+                chosen_voice = voice_b_target
                 role_label = "Exégète"
+                default_edge_fallback = "fr-FR-HenriNeural"
+                default_gemini_fallback = "Charon"
             else:
                 chosen_eng = spk_a_engine
+                chosen_voice = voice_a_target
                 role_label = "Animatrice"
+                default_edge_fallback = "fr-FR-DeniseNeural"
+                default_gemini_fallback = "Puck"
 
             if progress_callback:
                 progress_callback(idx + 1, pct, f"Synthèse {idx + 1}/{total_lines} ({role_label} — {chosen_eng})...")
@@ -3308,7 +3316,7 @@ class PodcastEngine:
 
             # 1. Synthèse Gemini Flash TTS
             if chosen_eng == "gemini_tts":
-                chosen_gemini_voice = voice_solo_gemini if role_label == "Chronique Solo" else (voice_b_gemini if role_label == "Exégète" else voice_a_gemini)
+                gem_voice = chosen_voice if chosen_voice in ("Puck", "Charon", "Kore", "Fenrir", "Aoede") else default_gemini_fallback
                 try:
                     GeminiQuotaTracker.check_and_increment(
                         estimated_tokens=max(10, len(clean_text) // 4),
@@ -3319,7 +3327,7 @@ class PodcastEngine:
                     prompt_turn = f"TTS in French with natural expression:\n{clean_text}"
                     pcm = cls._call_gemini_tts_api(
                         prompt=prompt_turn,
-                        speech_config=[{"voice": chosen_gemini_voice}],
+                        speech_config=[{"voice": gem_voice}],
                         model_id=gemini_model,
                         cfg=cfg
                     )
@@ -3330,12 +3338,11 @@ class PodcastEngine:
 
             # 2. Synthèse Mistral Voxtral
             if chosen_eng == "voxtral" and not line_mp3:
-                chosen_vox = voice_solo_voxtral if role_label == "Chronique Solo" else (voice_b_voxtral if role_label == "Exégète" else voice_a_voxtral)
                 mistral_key = cfg.get("mistral_api_key")
                 if mistral_key:
                     try:
                         import httpx
-                        v_res = cls.resolve_voxtral_voice_id(chosen_vox)
+                        v_res = cls.resolve_voxtral_voice_id(chosen_voice)
                         resp = httpx.post(
                             f"{cls.VOXTRAL_API_BASE}/audio/speech",
                             headers={"Authorization": f"Bearer {mistral_key}", "Content-Type": "application/json"},
@@ -3344,6 +3351,9 @@ class PodcastEngine:
                         )
                         if resp.status_code == 200:
                             line_mp3 = resp.content
+                        else:
+                            logger.warning("[PodcastEngine] Voxtral status %d réplique %d: %s. Repli Edge-TTS.", resp.status_code, idx + 1, resp.text[:120])
+                            chosen_eng = "edge_tts"
                     except Exception as e_vox:
                         logger.warning("[PodcastEngine] Erreur Voxtral réplique %d : %s. Repli Edge-TTS.", idx + 1, e_vox)
                         chosen_eng = "edge_tts"
@@ -3352,8 +3362,10 @@ class PodcastEngine:
 
             # 3. Synthèse Edge-TTS (ou repli)
             if not line_mp3:
-                fallback_voice = voice_solo_edge if role_label == "Chronique Solo" else (voice_b_edge if role_label == "Exégète" else voice_a_edge)
+                fallback_voice = chosen_voice if (chosen_voice and str(chosen_voice).startswith("fr-")) else cls.VOXTRAL_EMOTION_EDGE_MAP.get(chosen_voice, default_edge_fallback)
                 line_mp3 = cls._single_edge_tts_call(clean_text, fallback_voice)
+                if not line_mp3 and fallback_voice != default_edge_fallback:
+                    line_mp3 = cls._single_edge_tts_call(clean_text, default_edge_fallback)
 
             line_duration = max(0.5, len(line_mp3) / 6000.0) if line_mp3 else 1.0
             start_t = round(current_timeline_sec, 3)

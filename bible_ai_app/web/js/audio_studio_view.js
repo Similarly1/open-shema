@@ -387,7 +387,9 @@ const AudioStudioView = {
     // 1c quater. Voix en Mode Mix Multi-Moteurs
     el.selectMixedEngineHost?.addEventListener('change', (e) => {
       this.updateMixedEngineVoices('host', e.target.value);
-      this.saveVoiceOption({ speaker_a_engine: e.target.value });
+      this.saveVoiceOption({ speaker_a_engine: e.target.value, speaker_a_voice: el.selectMixedVoiceHost?.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
     });
     el.selectMixedVoiceHost?.addEventListener('change', (e) => {
       this.saveVoiceOption({ speaker_a_voice: e.target.value });
@@ -396,7 +398,9 @@ const AudioStudioView = {
     });
     el.selectMixedEngineScholar?.addEventListener('change', (e) => {
       this.updateMixedEngineVoices('scholar', e.target.value);
-      this.saveVoiceOption({ speaker_b_engine: e.target.value });
+      this.saveVoiceOption({ speaker_b_engine: e.target.value, speaker_b_voice: el.selectMixedVoiceScholar?.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
     });
     el.selectMixedVoiceScholar?.addEventListener('change', (e) => {
       this.saveVoiceOption({ speaker_b_voice: e.target.value });
@@ -405,7 +409,9 @@ const AudioStudioView = {
     });
     el.selectMixedEngineSolo?.addEventListener('change', (e) => {
       this.updateMixedEngineVoices('solo', e.target.value);
-      this.saveVoiceOption({ solo_engine: e.target.value });
+      this.saveVoiceOption({ solo_engine: e.target.value, solo_voice: el.selectMixedVoiceSolo?.value });
+      this.updateVoiceSummary();
+      this.updateTurnCardsVoiceLabels();
     });
     el.selectMixedVoiceSolo?.addEventListener('change', (e) => {
       this.saveVoiceOption({ solo_voice: e.target.value });
@@ -1184,6 +1190,8 @@ const AudioStudioView = {
     } else if (voicesList.length > 0) {
       selectEl.value = voicesList[0].id || voicesList[0].name;
     }
+    this.updateVoiceSummary();
+    this.updateTurnCardsVoiceLabels();
   },
 
   refreshMixedEngineViews() {
@@ -1442,12 +1450,9 @@ const AudioStudioView = {
     return alternate ? alternate.id : currentVoiceId;
   },
 
-  updateTurnCardsVoiceLabels() {
+  getResolvedSpeakerNames() {
     const el = this.elements;
-    const cards = el.scriptList?.querySelectorAll('.audio-studio-turn-card') || [];
-    if (cards.length === 0) return;
-
-    const activeEngine = this.config?.engine || 'edge_tts';
+    const activeEngine = el.selectEngine?.value || this.config?.engine || 'edge_tts';
     let hostName, scholarName, soloName;
 
     if (activeEngine === 'gemini_tts') {
@@ -1455,18 +1460,27 @@ const AudioStudioView = {
       scholarName = this.getVoiceShortName(el.selectGeminiScholar?.value || this.config?.gemini_voice_speaker_b || 'Charon');
       soloName = this.getVoiceShortName(el.selectGeminiSolo?.value || this.config?.gemini_voice_solo || 'Kore');
     } else if (activeEngine === 'voxtral') {
-      hostName = this.getVoiceShortName(el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy');
-      scholarName = this.getVoiceShortName(el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
-      soloName = this.getVoiceShortName(el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
+      hostName = this.getVoiceShortName(el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'gb_jane_curious');
+      scholarName = this.getVoiceShortName(el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'gb_oliver_neutral');
+      soloName = this.getVoiceShortName(el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'gb_oliver_neutral');
     } else if (activeEngine === 'mixed') {
-      hostName = this.getVoiceShortName(el.selectMixedVoiceHost?.value || this.config?.speaker_a_voice || 'Puck');
-      scholarName = this.getVoiceShortName(el.selectMixedVoiceScholar?.value || this.config?.speaker_b_voice || 'Fabrice');
-      soloName = this.getVoiceShortName(el.selectMixedVoiceSolo?.value || this.config?.solo_voice || 'Puck');
+      hostName = this.getVoiceShortName(el.selectMixedVoiceHost?.value || this.config?.speaker_a_voice || 'Denise');
+      scholarName = this.getVoiceShortName(el.selectMixedVoiceScholar?.value || this.config?.speaker_b_voice || 'Oliver');
+      soloName = this.getVoiceShortName(el.selectMixedVoiceSolo?.value || this.config?.solo_voice || 'Oliver');
     } else {
-      hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural');
-      scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-CH-FabriceNeural');
-      soloName = this.getVoiceShortName(el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-CH-FabriceNeural');
+      hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
+      scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
+      soloName = this.getVoiceShortName(el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
     }
+    return { hostName, scholarName, soloName };
+  },
+
+  updateTurnCardsVoiceLabels() {
+    const el = this.elements;
+    const cards = el.scriptList?.querySelectorAll('.audio-studio-turn-card') || [];
+    if (cards.length === 0) return;
+
+    const { hostName, scholarName, soloName } = this.getResolvedSpeakerNames();
 
     cards.forEach(card => {
       const vRole = card.dataset.voiceRole;
@@ -3291,17 +3305,7 @@ const AudioStudioView = {
     }
     card.dataset.voiceRole = voiceRole;
 
-    const isVoxtral = (this.config?.engine === 'voxtral');
-    let hostName, scholarName, soloName;
-    if (isVoxtral) {
-      hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy');
-      scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
-      soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
-    } else {
-      hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
-      scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
-      soloName = this.getVoiceShortName(this.elements.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
-    }
+    const { hostName, scholarName, soloName } = this.getResolvedSpeakerNames();
 
     let roleClass = 'role-host';
     let displaySpeaker = '';
@@ -3313,7 +3317,7 @@ const AudioStudioView = {
       displaySpeaker = `Exégète (${scholarName})`;
     } else {
       roleClass = 'role-host';
-      displaySpeaker = `Animateur (${hostName})`;
+      displaySpeaker = `Animatrice (${hostName})`;
     }
     card.dataset.speakerName = displaySpeaker;
 
@@ -3570,18 +3574,8 @@ const AudioStudioView = {
       const pauseEl = card.querySelector('.turn-pause-input');
       // Lire le rôle depuis le dataset de la card (défini lors du rendu)
       const voiceRole = card.dataset.voiceRole || (idx % 2 === 0 ? 'A' : 'B');
-      const isVoxtral = (this.config?.engine === 'voxtral');
-      let hostName, scholarName, soloName;
-      if (isVoxtral) {
-        hostName = this.getVoiceShortName(this.elements.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy');
-        scholarName = this.getVoiceShortName(this.elements.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
-        soloName = this.getVoiceShortName(this.elements.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
-      } else {
-        hostName = this.getVoiceShortName(this.elements.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural');
-        scholarName = this.getVoiceShortName(this.elements.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-FR-HenriNeural');
-        soloName = this.getVoiceShortName(this.elements.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural');
-      }
-      const fallbackSpeaker = (voiceRole === 'B') ? `Exégète (${scholarName})` : (voiceRole === 'solo' ? `Narrateur (${soloName})` : `Animateur (${hostName})`);
+      const { hostName, scholarName, soloName } = this.getResolvedSpeakerNames();
+      const fallbackSpeaker = (voiceRole === 'B') ? `Exégète (${scholarName})` : (voiceRole === 'solo' ? `Narrateur (${soloName})` : `Animatrice (${hostName})`);
       const speakerName = card.dataset.speakerName || fallbackSpeaker;
 
       list.push({
@@ -3803,24 +3797,24 @@ const AudioStudioView = {
     }
 
     try {
-      const activeEngine = this.config?.engine || 'edge_tts';
+      const activeEngine = el.selectEngine?.value || this.config?.engine || 'edge_tts';
       let spkA, spkB, spkSolo;
       if (activeEngine === 'gemini_tts') {
         spkA = el.selectGeminiHost?.value || this.config?.gemini_voice_speaker_a || 'Puck';
         spkB = el.selectGeminiScholar?.value || this.config?.gemini_voice_speaker_b || 'Charon';
         spkSolo = el.selectGeminiSolo?.value || this.config?.gemini_voice_solo || 'Puck';
       } else if (activeEngine === 'voxtral') {
-        spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy';
-        spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral';
-        spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral';
+        spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'gb_jane_curious';
+        spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'gb_oliver_neutral';
+        spkSolo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'gb_oliver_neutral';
       } else if (activeEngine === 'mixed') {
-        spkA = el.selectMixedVoiceHost?.value || this.config?.speaker_a_voice || 'Puck';
-        spkB = el.selectMixedVoiceScholar?.value || this.config?.speaker_b_voice || 'fr-CH-FabriceNeural';
-        spkSolo = el.selectMixedVoiceSolo?.value || this.config?.solo_voice || 'Puck';
+        spkA = el.selectMixedVoiceHost?.value || this.config?.speaker_a_voice || 'fr-FR-DeniseNeural';
+        spkB = el.selectMixedVoiceScholar?.value || this.config?.speaker_b_voice || 'gb_oliver_neutral';
+        spkSolo = el.selectMixedVoiceSolo?.value || this.config?.solo_voice || 'gb_oliver_neutral';
       } else {
-        spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
-        spkB = el.selectVoiceScholar?.value || this.config?.voice_scholar || 'fr-CH-FabriceNeural';
-        spkSolo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-CH-FabriceNeural';
+        spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-DeniseNeural';
+        spkB = el.selectVoiceScholar?.value || this.config?.voice_scholar || 'fr-FR-HenriNeural';
+        spkSolo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-FR-HenriNeural';
       }
 
       const customOptions = {
@@ -3828,6 +3822,9 @@ const AudioStudioView = {
         format: this.format,
         engine: activeEngine,
         engine_mode: (activeEngine === 'mixed') ? 'mixed' : 'single',
+        speaker_a_voice: spkA,
+        speaker_b_voice: spkB,
+        solo_voice: spkSolo,
         voice_speaker_a: spkA,
         voice_speaker_b: spkB,
         voice_solo: spkSolo,
@@ -3835,12 +3832,12 @@ const AudioStudioView = {
         gemini_voice_speaker_a: el.selectGeminiHost?.value || this.config?.gemini_voice_speaker_a || 'Puck',
         gemini_voice_speaker_b: el.selectGeminiScholar?.value || this.config?.gemini_voice_speaker_b || 'Charon',
         gemini_voice_solo: el.selectGeminiSolo?.value || this.config?.gemini_voice_solo || 'Puck',
-        speaker_a_engine: el.selectMixedEngineHost?.value || this.config?.speaker_a_engine || 'gemini_tts',
-        speaker_b_engine: el.selectMixedEngineScholar?.value || this.config?.speaker_b_engine || 'edge_tts',
-        solo_engine: el.selectMixedEngineSolo?.value || this.config?.solo_engine || 'gemini_tts',
-        voxtral_voice_speaker_a: el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy',
-        voxtral_voice_scholar: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral',
-        voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral',
+        speaker_a_engine: el.selectMixedEngineHost?.value || this.config?.speaker_a_engine || 'edge_tts',
+        speaker_b_engine: el.selectMixedEngineScholar?.value || this.config?.speaker_b_engine || 'voxtral',
+        solo_engine: el.selectMixedEngineSolo?.value || this.config?.solo_engine || 'edge_tts',
+        voxtral_voice_speaker_a: el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'gb_jane_curious',
+        voxtral_voice_scholar: el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'gb_oliver_neutral',
+        voxtral_voice_solo: el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'gb_oliver_neutral',
         voxtral_modulate: el.checkVoxtralModulate ? el.checkVoxtralModulate.checked : true,
         pause_ms: parseInt(el.inputPauseMs?.value, 10) || 350,
         mastering_enabled: el.checkMastering ? el.checkMastering.checked : true,
