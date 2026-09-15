@@ -44,46 +44,138 @@ class DictionaryManager:
     def load_registry(cls):
         if cls._registry is not None:
             return cls._registry
-            
+
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        from core.paths import get_user_data_path, resolve_data_path
+
+        # 5 dictionnaires fondateurs officiels intégrés dans Open Shema
+        base_registry = [
+            {
+                "id": "nouveau_dictionnaire",
+                "name": "Nouveau dictionnaire biblique. Révisé et augmenté",
+                "type": "custom",
+                "enabled": True,
+                "priority": 1,
+                "count": 7016,
+                "badge": "7 016 art.",
+                "author": "Collectif / Éditions Emmaüs",
+                "year": "1992",
+                "file": "dictionaries/nouveau_dictionnaire.json",
+                "description": "Nouveau Dictionnaire Biblique révisé et augmenté (7 016 articles). Référence théologique, géographique et historique majeure pour l'étude biblique."
+            },
+            {
+                "id": "calmet",
+                "name": "Dictionnaire Historique et Critique Dom Calmet (1728)",
+                "type": "custom",
+                "enabled": True,
+                "priority": 2,
+                "count": 5369,
+                "badge": "5 369 art.",
+                "author": "Dom Augustin Calmet",
+                "year": "1728",
+                "file": "data/calmet_dict.json",
+                "description": "Dictionnaire Historique, Critique, Chronologique, Géographique et Littéral de la Bible par Dom Augustin Calmet (1728).\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema."
+            },
+            {
+                "id": "vigouroux",
+                "name": "Dictionnaire de la Bible - F. Vigouroux (1912)",
+                "type": "custom",
+                "enabled": True,
+                "priority": 3,
+                "count": 8312,
+                "badge": "8 312 art.",
+                "author": "Fulcran Vigouroux & Collaborateurs",
+                "year": "1895–1912",
+                "file": "data/vigouroux_dict.json",
+                "description": "Dictionnaire de la Bible de Fulcran Vigouroux en 5 tomes (1895-1912). Référence monumentale pour l'exégèse biblique, l'histoire et l'archéologie proche-orientale."
+            },
+            {
+                "id": "bailly",
+                "name": "Dictionnaire Grec-Français Anatole Bailly (1901)",
+                "type": "greek",
+                "enabled": True,
+                "priority": 4,
+                "count": 14642,
+                "badge": "14 642 ent.",
+                "author": "Anatole Bailly",
+                "year": "1901",
+                "file": "data/bailly_lexicon.json",
+                "description": "Dictionnaire Grec-Français d'Anatole Bailly (1901 / 2020), monument lexical pour l'étude philologique approfondie du grec biblique (Septante et Nouveau Testament)."
+            },
+            {
+                "id": "strong",
+                "name": "Lexique Hébreu & Grec Strong",
+                "type": "strong",
+                "enabled": True,
+                "priority": 5,
+                "count": 14024,
+                "badge": "14 024 ent.",
+                "author": "James Strong",
+                "year": "1890",
+                "file": "data/strong_lexicon.json",
+                "description": "Lexique Hébreu, Araméen et Grec de James Strong (1890) avec lemmes, racines, définitions et étymologies complètes.\n\nSource & formatage initial : Bible Parser (Didier Fontaine / Areopage.net). Intégration, restructuration et présentation UI : Open Shema."
+            }
+        ]
+
+        loaded = []
         r_path = cls.get_registry_path()
         if os.path.exists(r_path):
             try:
                 with open(r_path, "r", encoding="utf-8") as f:
-                    cls._registry = json.load(f)
-                    return cls._registry
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        # Ne conserver que les vrais dictionnaires (officiels ou situés dans un dossier dictionaries)
+                        base_ids = {b["id"] for b in base_registry}
+                        for d in data:
+                            if not isinstance(d, dict):
+                                continue
+                            d_id = d.get("id", "")
+                            d_file = d.get("file", "").replace("\\", "/")
+                            if (d_id in base_ids or "dictionaries" in d_file or d_id.startswith("dict_") or d.get("type") in ("strong", "greek")) and "wikisource" not in d_id:
+                                loaded.append(d)
             except Exception as e:
                 logger.error(f"Erreur lecture registry.json : {e}")
-        # Registre par défaut vierge : aucun dictionnaire pré-installé d'office
-        # Les dictionnaires (Vigouroux 8 312 articles, etc.) se téléchargent à la demande depuis le Store / open-shema-data
-        base_registry = []
 
-        if not os.path.exists(r_path):
-            cls._registry = base_registry
-        else:
-            try:
-                with open(r_path, "r", encoding="utf-8") as f:
-                    cls._registry = json.load(f)
-            except Exception as e:
-                logger.error(f"Erreur lecture registry.json : {e}")
-                cls._registry = base_registry
+        # Fusion robuste : s'assurer que tous les dictionnaires officiels installés sont présents
+        registry_map = {d.get("id"): d for d in loaded if d.get("id")}
+        for base_d in base_registry:
+            b_id = base_d["id"]
+            if b_id not in registry_map:
+                if cls.is_dictionary_installed(base_d):
+                    registry_map[b_id] = dict(base_d)
+            else:
+                # Si l'entrée existante n'a pas de fichier renseigné, injecter le fichier par défaut
+                if not registry_map[b_id].get("file") and base_d.get("file"):
+                    registry_map[b_id]["file"] = base_d["file"]
 
-        # Auto-découverte dynamique uniquement des dictionnaires explicitement importés par l'utilisateur dans user_data_dir/dictionaries/
-        from core.paths import get_user_data_path
-        user_dicts_dir = get_user_data_path("dictionaries")
-        if os.path.exists(user_dicts_dir):
-            for fn in os.listdir(user_dicts_dir):
-                if fn.endswith((".sqlite", ".json")) and fn != "registry.json":
-                    d_slug = os.path.splitext(fn)[0].replace("dict_", "").lower()
-                    if not any(d.get("id") == d_slug for d in cls._registry):
-                        clean_name = d_slug.replace("_", " ").title()
-                        cls._registry.append({
-                            "id": d_slug,
-                            "name": clean_name,
-                            "type": "custom",
-                            "enabled": True,
-                            "priority": len(cls._registry) + 1,
-                            "file": os.path.join(user_dicts_dir, fn)
-                        })
+        # Auto-découverte dynamique uniquement dans les dossiers dédiés aux dictionnaires
+        search_dirs = [
+            os.path.join(base_dir, "data", "dictionaries"),
+            get_user_data_path("dictionaries")
+        ]
+        ignored_files = {
+            "registry.json", "polished_cache.json", "vigouroux_illustrations.json", 
+            "wikisource_vigouroux_titles.json", ".gitkeep"
+        }
+        for s_dir in search_dirs:
+            if os.path.exists(s_dir):
+                for fn in os.listdir(s_dir):
+                    if fn.endswith((".sqlite", ".json")) and fn not in ignored_files:
+                        d_slug = os.path.splitext(fn)[0].replace("dict_", "").lower()
+                        if d_slug not in registry_map:
+                            clean_name = d_slug.replace("_", " ").title()
+                            registry_map[d_slug] = {
+                                "id": d_slug,
+                                "name": clean_name,
+                                "type": "custom",
+                                "enabled": True,
+                                "priority": len(registry_map) + 1,
+                                "file": os.path.join(s_dir, fn)
+                            }
+
+        # Convertir en liste triée par priorité
+        cls._registry = list(registry_map.values())
+        cls._registry.sort(key=lambda x: x.get("priority", 99))
 
         cls.save_registry(cls._registry)
         return cls._registry
@@ -144,6 +236,7 @@ class DictionaryManager:
             return cls._dict_cache[dict_id]
             
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        from core.paths import resolve_data_path, get_user_data_path
         rel_file = dict_info.get("file", "")
         
         if os.path.isabs(rel_file):
@@ -153,7 +246,11 @@ class DictionaryManager:
                 os.path.join(base_dir, "data", rel_file),
                 os.path.join(base_dir, rel_file),
                 os.path.join(base_dir, "data", "dictionaries", os.path.basename(rel_file)),
-                os.path.join(base_dir, "data", os.path.basename(rel_file))
+                os.path.join(base_dir, "data", os.path.basename(rel_file)),
+                resolve_data_path(rel_file),
+                resolve_data_path("dictionaries", os.path.basename(rel_file)),
+                get_user_data_path("dictionaries", os.path.basename(rel_file)),
+                get_user_data_path(os.path.basename(rel_file))
             ]
             file_path = next((p for p in candidates if os.path.exists(p)), candidates[0])
         
@@ -199,13 +296,16 @@ class DictionaryManager:
         dict_type = dict_info.get("type", "custom")
         dict_id = (dict_info.get("id") or "").lower()
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        from core.paths import resolve_data_path, get_user_data_path
         
         if dict_type == "strong" or dict_id == "strong":
             candidates = [
                 os.path.join(base_dir, "data", "strong_lexicon.json"),
                 os.path.join(base_dir, "data", "dictionaries", "strong_lexicon.json"),
                 os.path.join(base_dir, "data", "dictionaries", "bible_strong.sqlite"),
-                os.path.join(base_dir, "data", "dictionaries", "dict_strong.sqlite")
+                os.path.join(base_dir, "data", "dictionaries", "dict_strong.sqlite"),
+                resolve_data_path("strong_lexicon.json"),
+                resolve_data_path("dictionaries", "strong_lexicon.json")
             ]
             return any(os.path.exists(p) for p in candidates)
             
@@ -214,7 +314,9 @@ class DictionaryManager:
                 os.path.join(base_dir, "data", "bailly_lexicon.json"),
                 os.path.join(base_dir, "data", "dictionaries", "bailly_lexicon.json"),
                 os.path.join(base_dir, "data", "dictionaries", "dict_bailly.sqlite"),
-                os.path.join(base_dir, "data", "dictionaries", "dict_bailly.json")
+                os.path.join(base_dir, "data", "dictionaries", "dict_bailly.json"),
+                resolve_data_path("bailly_lexicon.json"),
+                resolve_data_path("dictionaries", "bailly_lexicon.json")
             ]
             return any(os.path.exists(p) for p in candidates)
 
@@ -228,7 +330,11 @@ class DictionaryManager:
                     os.path.join(base_dir, "data", rel_file),
                     os.path.join(base_dir, rel_file),
                     os.path.join(base_dir, "data", "dictionaries", os.path.basename(rel_file)),
-                    os.path.join(base_dir, "data", os.path.basename(rel_file))
+                    os.path.join(base_dir, "data", os.path.basename(rel_file)),
+                    resolve_data_path(rel_file),
+                    resolve_data_path("dictionaries", os.path.basename(rel_file)),
+                    get_user_data_path("dictionaries", os.path.basename(rel_file)),
+                    get_user_data_path(os.path.basename(rel_file))
                 ]
                 if any(os.path.exists(p) for p in candidates):
                     return True
@@ -285,8 +391,10 @@ class DictionaryManager:
                 item["subtitle"] = f"{item.get('author', 'Anatole Bailly')} ({item.get('year', '1901')})"
             else:
                 data = cls.load_dictionary_file(d)
-                if data and "articles" in data:
+                if isinstance(data, dict) and "articles" in data:
                     item["count"] = len(data["articles"])
+                elif isinstance(data, list):
+                    item["count"] = len(data)
                 elif "count" in custom_meta:
                     item["count"] = custom_meta["count"]
                 cnt = item.get("count", 0)
@@ -348,6 +456,12 @@ class DictionaryManager:
             from core.strong_lexicon import StrongLexicon
             bailly_data = StrongLexicon.load_bailly()
             by_strong = bailly_data.get("by_strong", {})
+            GREEK_TO_LATIN = {
+                'Α': 'A', 'Β': 'B', 'Γ': 'G', 'Δ': 'D', 'Ε': 'E', 'Ζ': 'Z', 'Η': 'E',
+                'Θ': 'T', 'Ι': 'I', 'Κ': 'K', 'Λ': 'L', 'Μ': 'M', 'Ν': 'N', 'Ξ': 'X',
+                'Ο': 'O', 'Π': 'P', 'Ρ': 'R', 'Σ': 'S', 'Τ': 'T', 'Υ': 'U', 'Φ': 'P',
+                'Χ': 'C', 'Ψ': 'P', 'Ω': 'O'
+            }
             for code, entries in by_strong.items():
                 if not entries: continue
                 first = entries[0]
@@ -357,7 +471,8 @@ class DictionaryManager:
                 norm_title = f"{cls.normalize_term(code)} {cls.normalize_term(hw)}".strip()
                 snippet = txt[:120] + "..." if len(txt) > 120 else txt
                 snippet = re.sub(r'^[,\.\:\;\—\–\-\s\'\^£«»\(\)\[\]]+', '', snippet).strip()
-                first_letter = unicodedata.normalize('NFD', hw.upper())[0] if hw else code.upper()[0]
+                raw_fl = unicodedata.normalize('NFD', hw.upper())[0] if hw else code.upper()[0]
+                first_letter = GREEK_TO_LATIN.get(raw_fl, raw_fl)
 
                 indexed_items.append({
                     "slug": code,

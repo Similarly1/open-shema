@@ -142,7 +142,10 @@ const LibraryView = {
       const readBtn = card.querySelector('.lib-btn-icon.read');
       const handleRead = () => {
         const bType = (book.type || '').toLowerCase();
-        if (bType.includes('théo') || bType.includes('theo') || bType.includes('étude') || bType.includes('etude') || book.chapters_count > 0) {
+        const fPath = (book.file_path || '').toLowerCase();
+        const isEbook = fPath.endsWith('.epub') || fPath.endsWith('.pdf') || (book.chapters_count > 0 && !book.dict_id);
+
+        if (isEbook || bType.includes('théo') || bType.includes('theo') || bType.includes('étude') || bType.includes('etude')) {
           if (typeof TheologyView !== 'undefined') {
             TheologyView.openBook(book.name);
           }

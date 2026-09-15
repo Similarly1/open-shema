@@ -490,7 +490,10 @@
     "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Nouveau_dictionnaire_biblique__R_vis__et_augment.jpg",
     "type": "Dictionnaire",
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
-    "active": true
+    "active": true,
+    "name": "nouveau_dictionnaire",
+    "dict_id": "nouveau_dictionnaire",
+    "articles_count": 7016
   },
   "Lire/Comprendre": {
     "title": "Lire et comprendre la Bible",
@@ -891,7 +894,9 @@
     "source_type": "general",
     "book_code": null,
     "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
-    "active": true
+    "active": true,
+    "dict_id": "bailly",
+    "articles_count": 14642
   },
   "HODGE": {
     "name": "HODGE",
@@ -994,5 +999,56 @@
     "chapters_count": 36,
     "chunks_count": 157,
     "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Ebooks\\9782924595961 La guerre des spectacles.epub"
+  },
+  "DOJAT": {
+    "name": "DOJAT",
+    "title": "Dictionary of Jesus and the Gospels (The IVP Bible Dictionary Series)",
+    "author": "Joel B. Green",
+    "description": "Recipient of a Christianity Today 1993 Critics Choice Award! Third Place Winner of Christianity Today's Book of the Year list award! The Dictionary of Jesus and the Gospels is unique among reference books on the Bible, the first volume of its kind since James Hastings published his Dictionary of Christ and the Gospels in 1909. In the more than eight decades since Hastings our understanding of Jesus, the Evangelists and their world has grown remarkably. New interpretive methods have illumined the text, the ever-changing profile of modern culture has put new questions to the Gospels, and our understanding of the Judaism of Jesus' day has advanced in ways that could not have been predicted in Hasting's day. But for many readers of the Gospels the new outlook on the Gospels remains hidden within technical journals and academic monographs. The Dictionary of Jesus and the Gospels bridges the gap between scholars and those pastors, teachers, students and lay people desiring in-depth treatment of select topics in an accessible and summary format. The topics range from cross-sectional themes (such as faith, law, Sabbath) to methods of interpretation (such as form criticism, redaction criticism, and death of Jesus) to each of the four Gospels as a whole. Some articles--such as the Dead Sea Scrolls, rabbinic traditions and revolutionary movements at the time of Jesus--provide significant background information to the Gospels. Others reflect recent and less familiar issues in Jesus and Gospel studies, such as divine man, ancient rhetoric and the chreiai (aphorisms). Contemporary concerns of general interest are discussed in articles covering such topics as healing, the demonic and the historical reliability of the Gospels. And for those entrusted with communicating the message of the Gospels, there is an extensive article on preaching from the Gospels. The Dictionary of Jesus and the Gospels presents the fruit of evangelical New Testament scholarship at the end of the twentieth century--committed to the authority of Scripture, utilizing the best of critical methods, and maintaining dialog with contemporary scholarship and challenges facing the church.\n**",
+    "year": "1992",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\DOJAT.png",
+    "type": "Dictionnaire",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 9,
+    "chunks_count": 0,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\Dictionary of Jesus and the Gospels (The IVP Bible Dictionary Series) ( etc.) (z-library.sk, 1lib.sk, z-lib.sk).epub"
+  },
+  "AITTN": {
+    "name": "AITTN",
+    "title": "An Introduction to the New Testament",
+    "author": "D. A. Carson",
+    "description": "An Introduction to the New Testament focuses on 'special introduction' that is historical questions dealing with authorship, date, sources, purpose, destination, and so forth. This approach stands in contrast to recent texts that concentrate more on literary form, rhetorical criticism, and historical parallels ---topics the authors don't minimize, but instead think are better given extended treatment in exegesis courses. By refocusing on the essentials, An Introduction to the New Testament ensures that the New Testament books will be accurately understood within historical settings.For each New Testament document, the authors also provide a substantial summary of that book's content, discuss the book's theological contribution to the overall canon, and give an account of current studies on that book, including recent literary and social-science approaches to interpretation.This second edition reflects significant revision and expansion from the original, making this highly...",
+    "year": "2018",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\AITTN.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 25,
+    "chunks_count": 925,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\An Introduction to the New Testament (Carson, D. A.Moo, Douglas J) (z-library.sk, 1lib.sk, z-lib.sk).epub"
+  },
+  "AITTO": {
+    "name": "AITTO",
+    "title": "An Introduction to the Old Testament: Second Edition",
+    "author": "Tremper Longman III",
+    "description": "This second edition of An Introduction to the Old Testament integrates and interacts with recent developments in Old Testament scholarship. Several distinctive set it apart from other introductions to the Old Testament: • It is thoroughly evangelical in its perspective • It emphasizes “special introduction”—the study of individual books • It interacts in an irenic spirit with the historical-critical method • It features points of research history and representative scholars rather than an exhaustive treatment of past scholarship • It deals with the meaning of each book, not in isolation but in a canonical context • It probes the meaning of each book in the setting of its culture Including callouts, charts, and graphs, this text is written with an eye on understanding the nature of Old Testament historiography. This upper-level introduction to the Old Testament offers students a solid understanding of three key issues: historical background, literary analysis, and theological message.\n**About the Author\nTremper Longman III (PhD, Yale University) is the Robert H. Gundry Professor of Biblical Studies and the chair of the Religious Studies department at Westmont College in Santa Barbara, California, where he lives with his wife, Alice. He is the Old Testament editor for the revised Expositor's Bible Commentary and has authored many articles and books on the Psalms and other Old Testament books.\nThe late Raymond B. Dillard (PhD, Dropsie University) was professor of Old Testament language and literature at Westminster Theological Seminary. \n\nProduct Description\nThis second edition of An Introduction to the Old Testament integrates and interacts with recent developments in Old Testament scholarship. Several distinctive set it apart from other introductions to the Old Testament: * It is thoroughly evangelical in its perspective * It emphasizes 'special introduction'---the study of individual books * It interacts in an irenic spirit with the historical-critical method * It features points of research history and representative scholars rather than an exhaustive treatment of past scholarship * It deals with the meaning of each book, not in isolation but in a canonical context * It probes the meaning of each book in the setting of its culture Including callouts, charts, and graphs, this text is written with an eye on understanding the nature of Old Testament historiography. This upper-level introduction to the Old Testament offers students a solid understanding of three key issues: historical background, literary analysis, and theological message. About the Author\nTremper Longman III (PhD, Yale University) is the Robert H. Gundry Professor of Biblical Studies and the chair of the Religious Studies department at Westmont College in Santa Barbara, California, where he lives with his wife, Alice. He is the Old Testament editor for the revised Expositor's Bible Commentary and has authored many articles and books on the Psalms and other Old Testament books. \nThe late Raymond B. Dillard (PhD, Dropsie University) was professor of Old Testament language and literature at Westminster Theological Seminary.",
+    "year": "2006",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\AITTO.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 37,
+    "chunks_count": 702,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\An Introduction to the Old Testament Second Edition ( etc.) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   }
 }

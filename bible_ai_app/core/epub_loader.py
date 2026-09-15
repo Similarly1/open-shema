@@ -180,9 +180,12 @@ class EpubLoader:
                 norm_t = strip_accents(title)
                 is_section = bool(is_part_regex.match(norm_t))
 
+                is_intro_book = any(w in book_title_norm for w in ["introduction", "intro", "guide", "survey", "handbook", "manuel"])
                 classification = cls.classify_chapter_title(
                     title, 
-                    is_systematic_theology=is_syst_theol, 
+                    is_systematic_theology=is_syst_theol,
+                    is_intro_book=is_intro_book,
+                    book_dominant_scope=book_dominant_scope,
                     book_author=metadata.get("author", "")
                 )
                 
@@ -243,7 +246,14 @@ class EpubLoader:
         return metadata
 
     @classmethod
-    def classify_chapter_title(cls, title: str, is_systematic_theology: bool = False, book_author: str = "") -> Dict[str, Any]:
+    def classify_chapter_title(
+        cls, 
+        title: str, 
+        is_systematic_theology: bool = False, 
+        is_intro_book: bool = False,
+        book_dominant_scope: str = "GLOBAL",
+        book_author: str = ""
+    ) -> Dict[str, Any]:
         """
         Détecte automatiquement le livre biblique, le corpus et le type RAG à partir du titre du chapitre.
         """
@@ -268,7 +278,7 @@ class EpubLoader:
                 return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
 
         # Détection spécifique des sections de notes (notes de bas de page, notes de fin, endnotes)
-        norm_clean = re.sub(r'^[0-9ivxlcdm\.\:\-\s]+', '', norm).strip()
+        norm_clean = re.sub(r'^(?:[0-9]+|[ivxlcdm]+)[\.\:\-\s]+', '', norm, flags=re.I).strip()
         if (norm_clean in ["notes", "notes de fin", "notes de fin de texte", "notes de bas de page", "endnotes", "footnotes", "chapter notes", "notes des chapitres"] 
             or _has_word(["endnotes", "footnotes", "notes de fin", "notes de bas de page"])):
             return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "endnotes"}
@@ -308,8 +318,9 @@ class EpubLoader:
         norm_ord = re.sub(r'\b(troisieme|3eme|3e)\b', '3', norm_ord)
         norm_ord = re.sub(r'\b(quatrieme|4eme|4e)\b', '4', norm_ord)
 
-        # Nettoyage des préfixes
+        # Nettoyage des préfixes et des numérotations ordinales de chapitres (ex: "30. Micah" -> "micah")
         clean_title = norm_ord
+        clean_title = re.sub(r'^(?:[0-9]+|[ivxlcdm]+)[\.\:\-\s]+', '', clean_title, flags=re.I).strip()
         clean_title = re.sub(r'\b(l[\'’]|la|le|les|de|d[\'’]|du|des|au|aux|a|the|of|to|introduction)\b', ' ', clean_title)
         clean_title = re.sub(r'\b(evangile|epitre|lettre|livre|selon|gospel|epistle|letter|book)\b', ' ', clean_title)
         clean_title = re.sub(r'\s+', ' ', clean_title).strip()
@@ -326,7 +337,12 @@ class EpubLoader:
         if code:
             fr_name = REVERSE_BOOK_MAPPING.get(code, code)
             scope = "OT" if code in OT_CODES else ("NT" if code in NT_CODES else ("APOCRYPHA" if code in APOCRYPHA_CODES else "GLOBAL"))
-            is_intro = any(kw in norm for kw in ["introduction", "intro", "preface"]) or clean_title == strip_accents(fr_name)
+            is_intro = (
+                is_intro_book 
+                or any(kw in norm for kw in ["introduction", "intro", "preface"]) 
+                or clean_title == strip_accents(fr_name)
+                or clean_title in BOOK_MAPPING
+            )
             stype = "book_intro" if is_intro else ("systematic_theology" if is_systematic_theology else "general")
             return {
                 "book_code": code,
@@ -352,8 +368,9 @@ class EpubLoader:
             return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": default_stype}
         elif _has_word(theol_keywords):
             return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "systematic_theology"}
-        elif _has_word(["lire", "comprendre", "symetrie", "harmonie", "etude", "canon", "inspiration", "revelation"]):
-            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "biblical_theology"}
+        elif _has_word(["lire", "comprendre", "symetrie", "harmonie", "etude", "canon", "inspiration", "revelation", "introduction"]):
+            st = "ot_context" if book_dominant_scope == "OT" else ("nt_context" if book_dominant_scope == "NT" else "biblical_theology")
+            return {"book_code": None, "book_name": None, "corpus_scope": book_dominant_scope or "GLOBAL", "source_type": st}
 
         return {
             "book_code": None,
@@ -367,10 +384,11 @@ class EpubLoader:
         cls, 
         z: zipfile.ZipFile, 
         zip_file: str, 
-        html_content: str
+        html_content: str,
+        global_soups_cache: Optional[Dict[str, Any]] = None
     ) -> Tuple[List[str], List[Dict[str, str]]]:
         """
-        Analyse universelle du HTML d'un chapitre EPUB :
+        Analyse universelle et haute-performance du HTML d'un chapitre EPUB :
         - Résout et extrait les notes de bas de page (inter-fichiers et intra-fichiers)
         - Normalise les appels de notes en marqueurs markdown standardisés [^id]
         - Extrait les paragraphes structurés, titres et citations
@@ -386,8 +404,23 @@ class EpubLoader:
         for p_tag in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["page-papier", "page_papier", "pagenum", "pagebreak", "page-number"])}):
             p_tag.decompose()
 
-        # Cache de parsing des fichiers du zip référencés pour ce chapitre
-        zip_soups_cache = {zip_file: soup}
+        # 3. Pré-marquer les conteneurs de notes dédiés dans le fichier courant pour éviter les comparaisons récursives O(N^2)
+        for fn_cont in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["_idfootnotes", "footnotes", "theol-footnotes"])}):
+            fn_cont['_os_skip_fn'] = '1'
+            for child in fn_cont.find_all(True):
+                child['_os_skip_fn'] = '1'
+
+        for aside in soup.find_all('aside'):
+            if aside.get('epub:type') == 'footnote' or 'footnote' in str(aside.get('class', [])).lower():
+                aside['_os_skip_fn'] = '1'
+                for child in aside.find_all(True):
+                    child['_os_skip_fn'] = '1'
+
+        # Cache partagé de parsing des fichiers du zip (évite de re-parser les mêmes fichiers de notes entre chapitres)
+        zip_soups_cache = global_soups_cache if global_soups_cache is not None else {}
+        if zip_file not in zip_soups_cache:
+            zip_soups_cache[zip_file] = soup
+
         def get_file_soup(target_zip):
             if target_zip not in zip_soups_cache:
                 if target_zip in z.namelist():
@@ -434,9 +467,7 @@ class EpubLoader:
                 candidate_links.append((tag, a_tag, href))
 
         extracted_footnotes = {}
-        footnote_elements_to_skip = set()
         fn_counter = 0
-
         base_ch_filename = zip_file.split('/')[-1]
 
         for wrapper_tag, a_tag, href in candidate_links:
@@ -461,31 +492,14 @@ class EpubLoader:
                             container = block_parent
 
                     if target_zip == zip_file:
-                        footnote_elements_to_skip.add(container)
-                        if container.name in ['div', 'aside'] or 'footnote' in ' '.join(container.get('class', [])).lower():
-                            footnote_elements_to_skip.add(container)
+                        container['_os_skip_fn'] = '1'
+                        for child in container.find_all(True):
+                            child['_os_skip_fn'] = '1'
 
-                    # Cloner le conteneur pour extraire le texte et préserver la mise en forme
-                    c_copy = BeautifulSoup(str(container), 'html.parser')
-
-                    # Supprimer les liens retours (backlinks)
-                    for bl in c_copy.find_all('a'):
-                        bl_href = bl.get('href', '')
-                        bl_txt = bl.get_text(strip=True)
-                        if (base_ch_filename in bl_href) or (bl_txt in ['↩', '↑', '^', '[retour]', 'retour', 'back']) or (bl.get('id') == anchor):
-                            bl.decompose()
-
-                    # Convertir les balises de style en Markdown portable
-                    for it_tag in c_copy.find_all(['i', 'em', 'cite']):
-                        it_text = it_tag.get_text()
-                        if it_text.strip():
-                            it_tag.replace_with(f"*{it_text}*")
-                    for bd_tag in c_copy.find_all(['b', 'strong']):
-                        bd_text = bd_tag.get_text()
-                        if bd_text.strip():
-                            bd_tag.replace_with(f"**{bd_text}**")
-
-                    raw_txt = c_copy.get_text(separator=' ', strip=True)
+                    # Extraction propre du texte de la note sans réinstanciation coûteuse de BeautifulSoup
+                    raw_txt = container.get_text(separator=' ', strip=True)
+                    # Nettoyer les mentions de retour
+                    raw_txt = re.sub(r'\b(?:retour|back|\[retour\]|[↩↑^])\b', '', raw_txt, flags=re.I).strip()
                     # Nettoyer les préfixes numériques résiduels ("1.", "[1]", "1 ")
                     note_text = re.sub(r'^(?:\[\^?\d+\]|\b\d+\b)\s*[\.\:\-\)]*\s*', '', raw_txt).strip()
 
@@ -504,20 +518,10 @@ class EpubLoader:
             if note_text and fn_id not in extracted_footnotes:
                 extracted_footnotes[fn_id] = note_text
 
-        # Détecter également les conteneurs de notes dédiés dans le fichier courant
-        for fn_cont in soup.find_all(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["_idfootnotes", "footnotes", "theol-footnotes"])}):
-            footnote_elements_to_skip.add(fn_cont)
-            for child in fn_cont.find_all(['div', 'p', 'li', 'aside']):
-                footnote_elements_to_skip.add(child)
-
-        for aside in soup.find_all('aside'):
-            if aside.get('epub:type') == 'footnote' or 'footnote' in str(aside.get('class', [])).lower():
-                footnote_elements_to_skip.add(aside)
-
-        # Extraire les paragraphes du corps de texte
+        # Extraire les paragraphes du corps de texte (accès O(1) sans parcours récursif de parents)
         paragraphs = []
         for el in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "li", "blockquote", "aside"]):
-            if el in footnote_elements_to_skip or any(parent in footnote_elements_to_skip for parent in el.parents):
+            if el.has_attr('_os_skip_fn'):
                 continue
 
             tag_name = el.name.lower()
@@ -526,8 +530,7 @@ class EpubLoader:
 
             # Vérifier si cet élément est une définition de note de fin non liée
             is_fn_def = False
-            if ("footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside" or
-                el.find_parent(attrs={"class": lambda c: c and any(k in str(c).lower() for k in ["footnote", "notes", "noteref"])})):
+            if ("footnote" in classes_lower or "note" in classes_lower or el.get("epub:type") == "footnote" or tag_name == "aside"):
                 is_fn_def = True
 
             txt = el.get_text(separator=" ", strip=True)
@@ -604,6 +607,7 @@ class EpubLoader:
         embed_model = metadata.get("embedding_model", "study_library")
 
         chunk_counter = 0
+        global_soups_cache = {}
 
         with zipfile.ZipFile(epub_path, 'r') as z:
             for ch in selected_chapters:
@@ -621,7 +625,9 @@ class EpubLoader:
 
                 try:
                     html_content = z.read(zip_file).decode('utf-8', errors='ignore')
-                    paragraphs, footnotes = cls.process_chapter_html(z, zip_file, html_content)
+                    paragraphs, footnotes = cls.process_chapter_html(
+                        z, zip_file, html_content, global_soups_cache=global_soups_cache
+                    )
 
                     # Ajouter les définitions de notes à la fin du texte pour enrichir l'indexation sémantique
                     if footnotes:

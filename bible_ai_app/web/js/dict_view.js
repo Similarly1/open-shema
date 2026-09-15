@@ -482,10 +482,15 @@ const DictView = {
         </div>
       `;
     }
-    const nameEl = document.getElementById('dict-active-name');
+    const nameEl = document.getElementById('dict-active-book-title') || document.getElementById('dict-active-name');
     if (nameEl) nameEl.textContent = 'Aucun dictionnaire';
-    const badgeEl = document.getElementById('dict-active-badge');
-    if (badgeEl) badgeEl.textContent = '0 dictionnaire';
+    const metaEl = document.getElementById('dict-active-book-meta');
+    if (metaEl) metaEl.textContent = '0 article';
+    const badgeEl = document.getElementById('dict-active-count-badge') || document.getElementById('dict-active-badge');
+    if (badgeEl) badgeEl.textContent = '0 art.';
+    const initialsEl = document.getElementById('dict-active-book-initials');
+    if (initialsEl) initialsEl.textContent = '—';
+
     const bodyEl = document.getElementById('dict-article-body');
     if (bodyEl) {
       bodyEl.innerHTML = `
@@ -565,7 +570,23 @@ const DictView = {
   },
 
   async selectDictionary(dictId, targetSlug = null) {
-    const dInfo = this.allDictionaries.find(d => d.id === dictId || d.name === dictId) || this.allDictionaries[0];
+    let dInfo = null;
+    if (dictId && Array.isArray(this.allDictionaries)) {
+      const q = String(dictId).toLowerCase().trim();
+      dInfo = this.allDictionaries.find(d => {
+        const dId = (d.id || '').toLowerCase();
+        const dName = (d.name || d.title || '').toLowerCase();
+        return dId === q || 
+               dName === q || 
+               (q === 'bai' && dId === 'bailly') ||
+               (q.includes('nouveau') && dId.includes('nouveau')) ||
+               (q.includes('calmet') && dId.includes('calmet')) ||
+               (q.includes('strong') && dId.includes('strong')) ||
+               (q.includes('vigo') && dId.includes('vigouroux')) ||
+               dName.includes(q);
+      });
+    }
+    if (!dInfo) dInfo = this.allDictionaries && this.allDictionaries.length > 0 ? this.allDictionaries[0] : null;
     if (!dInfo) return;
 
     this.activeDictId = dInfo.id;

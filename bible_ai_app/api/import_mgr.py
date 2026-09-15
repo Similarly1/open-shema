@@ -789,9 +789,16 @@ class ImportMixin:
         else:
             # Classification automatique du type d'ouvrage pour les non-Bibles
             info["is_bible"] = False
-            if any(w in combined_text for w in ["commentaire", "commentary", "explication", "vers par vers"]):
+            title_and_base = f"{title_lower} {base_lower}"
+            if any(w in title_and_base for w in ["dictionnaire", "dictionary", "lexique", "lexicon", "encyclopedie"]):
+                info["type"] = "Dictionnaire"
+            elif any(w in title_and_base for w in ["theologie", "theology", "doctrine", "introduction", "intro", "dogmatique", "ethique", "histoire", "manuel", "guide", "survey", "handbook"]):
+                info["type"] = "Théologie"
+            elif any(w in title_and_base for w in ["commentaire", "commentary", "explication", "vers par vers", "homelie"]):
                 info["type"] = "Commentaire"
-            elif any(w in combined_text for w in ["dictionnaire", "dictionary", "lexique", "lexicon", "encyclopedie"]):
+            elif any(w in desc_lower for w in ["commentaire biblique", "bible commentary", "explication verset par verset", "verse-by-verse"]):
+                info["type"] = "Commentaire"
+            elif any(w in desc_lower for w in ["dictionnaire", "dictionary", "encyclopedie"]):
                 info["type"] = "Dictionnaire"
             else:
                 info["type"] = "Théologie"

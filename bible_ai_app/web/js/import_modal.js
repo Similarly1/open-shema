@@ -236,6 +236,11 @@ const ImportModal = {
           BibleReader.currentBible1 = this.lastImportedBookInfo.name;
           BibleReader.navigateTo('Gen', 1);
         }
+      } else if (this.lastImportedBookInfo?.type === 'Dictionnaire' && !this.lastImportedBookInfo?.file_path?.toLowerCase().endsWith('.epub') && !this.lastImportedBookInfo?.file_path?.toLowerCase().endsWith('.pdf')) {
+        App.switchView('dict');
+        if (typeof DictView !== 'undefined' && typeof DictView.openDictionary === 'function') {
+          DictView.openDictionary(this.lastImportedBookInfo?.dict_id || this.lastImportedBookInfo?.name);
+        }
       } else {
         App.switchView('theology');
         if (typeof TheologyView !== 'undefined') {
