@@ -1435,6 +1435,7 @@ const AudioStudioView = {
     document.querySelectorAll('.as-custom-item.is-playing').forEach(item => {
       item.classList.remove('is-playing');
     });
+    this.resetAllCardPreviewIcons();
   },
 
   async previewVoiceInItem(voiceId, engine, role, btnEl) {
@@ -1582,6 +1583,79 @@ const AudioStudioView = {
   // Rétrocompatibilité
   async previewTrack(trackId, btnEl) {
     return this.previewSoundpackTrackInItem(trackId, btnEl);
+  },
+
+  async previewSoundpackTrackFromCard(trackId, iconBtn) {
+    if (!trackId || trackId === 'none') {
+      this.showErrorToast("Aucune piste audio n'est sélectionnée pour cet élément.");
+      return;
+    }
+
+    const isCurrentPlaying = (this.currentPreviewTrackId === trackId && this.previewAudio && !this.previewAudio.paused);
+
+    if (this.previewAudio) {
+      this.previewAudio.pause();
+      this.previewAudio.currentTime = 0;
+    }
+    this.resetAllCardPreviewIcons();
+    this.resetAllItemPlayButtons();
+
+    if (isCurrentPlaying) {
+      this.currentPreviewTrackId = null;
+      return;
+    }
+
+    this.currentPreviewTrackId = trackId;
+
+    if (iconBtn) {
+      iconBtn.classList.add('is-loading');
+    }
+
+    try {
+      const res = await API.call('audio_studio_get_soundpack_track_url', trackId);
+      if (iconBtn) iconBtn.classList.remove('is-loading');
+
+      if (this.currentPreviewTrackId !== trackId) return;
+
+      const audioUrl = res?.audio_url || res?.track_url || res?.url;
+      if (res && res.success && audioUrl) {
+        if (!this.previewAudio) {
+          this.previewAudio = new Audio();
+        }
+        this.previewAudio.src = audioUrl;
+        this.previewAudio.volume = 0.7;
+        await this.previewAudio.play();
+
+        if (iconBtn) {
+          iconBtn.classList.add('is-playing');
+          iconBtn.title = 'Arrêter la préécoute';
+        }
+
+        this.previewAudio.onended = () => {
+          this.resetAllCardPreviewIcons();
+          this.currentPreviewTrackId = null;
+        };
+        this.previewAudio.onerror = () => {
+          this.resetAllCardPreviewIcons();
+          this.currentPreviewTrackId = null;
+        };
+      } else {
+        this.resetAllCardPreviewIcons();
+        this.currentPreviewTrackId = null;
+        this.showErrorToast("Impossible de charger la piste sonore.");
+      }
+    } catch (err) {
+      this.resetAllCardPreviewIcons();
+      this.currentPreviewTrackId = null;
+      console.warn('[AudioStudioView] Erreur préécoute carte:', err);
+    }
+  },
+
+  resetAllCardPreviewIcons() {
+    document.querySelectorAll('.as-timeline-event-icon').forEach(icon => {
+      icon.classList.remove('is-playing', 'is-loading');
+      icon.title = 'Cliquer pour écouter cet extrait sonore';
+    });
   },
 
   // =========================================================================
@@ -2534,10 +2608,21 @@ const AudioStudioView = {
       }
     }
 
+    const effectiveTrackId = event.track_id || (evType === 'sfx' ? 'sfx_desert_wind' : (evType === 'fade_out' ? 'bed_cozy_jazz_study' : 'jingle_piano_solemn'));
+
     card.innerHTML = `
-      <div class="as-timeline-event-icon">
-        ${iconSvg}
-      </div>
+      <button type="button" class="as-timeline-event-icon as-event-preview-btn" title="${isKaraoke ? 'Cliquer pour écouter à partir de ' + timeLabel : 'Écouter un extrait de ce son'}" data-track-id="${effectiveTrackId}">
+        <span class="as-icon-default">${iconSvg}</span>
+        <span class="as-icon-hover" title="Écouter un extrait">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+        </span>
+        <span class="as-icon-playing" title="Arrêter la lecture">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        </span>
+        <span class="as-icon-loading">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="as-spin"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>
+        </span>
+      </button>
       <div class="as-timeline-event-body">
         <div class="as-timeline-event-header">
           <div class="as-timeline-event-title">${this.escapeHtml(event.title || 'Événement sonore')}</div>
@@ -2558,11 +2643,22 @@ const AudioStudioView = {
       </div>
     `;
 
+    // Événement préécoute sur l'icône
+    const iconBtn = card.querySelector('.as-timeline-event-icon');
+    if (iconBtn && !isKaraoke) {
+      iconBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const trId = iconBtn.dataset.trackId || effectiveTrackId;
+        this.previewSoundpackTrackFromCard(trId, iconBtn);
+      });
+    }
+
     // Événement changement de piste
     const trackSelect = card.querySelector('.as-event-track-select');
     if (trackSelect) {
       trackSelect.addEventListener('change', (e) => {
         event.track_id = e.target.value;
+        if (iconBtn) iconBtn.dataset.trackId = e.target.value;
         const chosen = tracks.find(t => t.id === e.target.value);
         if (chosen) {
           if (evType === 'sfx') {
@@ -2970,6 +3066,8 @@ const AudioStudioView = {
 
     const el = this.elements;
     const isVoxtral = (this.config?.engine === 'voxtral');
+    const hasMusic = this.activeAudioEvents.some(e => e.type === 'music' || e.type === 'intro_music' || e.type === 'fade_out' || e.type === 'outro' || e.type === 'outro_music');
+    const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
 
     // Contrôle et ajustement automatique en cas de doublon en mode dialogue
     if (this.format === 'dialogue') {
@@ -3032,9 +3130,6 @@ const AudioStudioView = {
         }
         voiceSummaryHtml = `<strong>${this.escapeHtml(vSolo)}</strong> (Chroniqueur)`;
       }
-
-      const hasMusic = this.activeAudioEvents.some(e => e.type === 'music' || e.type === 'intro_music' || e.type === 'fade_out' || e.type === 'outro' || e.type === 'outro_music');
-      const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
 
       let habillageTitle = '<span style="color: var(--text-muted);">Voix pure (Aucun habillage)</span>';
       if (hasMusic && hasSfx) {

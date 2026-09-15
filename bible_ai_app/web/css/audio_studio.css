@@ -1988,8 +1988,8 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
 }
 
 .as-timeline-event-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   background: rgba(234, 88, 12, 0.12);
   color: var(--accent-orange, #ea580c);
@@ -1999,6 +1999,77 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
   justify-content: center;
   font-size: 14px;
   flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  outline: none;
+}
+
+body.theme-light .as-timeline-event-icon,
+[data-theme="light"] .as-timeline-event-icon {
+  background: rgba(234, 88, 12, 0.08);
+  border-color: rgba(234, 88, 12, 0.2);
+}
+
+.as-timeline-event-icon .as-icon-default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease;
+}
+
+.as-timeline-event-icon .as-icon-hover,
+.as-timeline-event-icon .as-icon-playing,
+.as-timeline-event-icon .as-icon-loading {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Survol : transformation fluide en bouton Play */
+.as-timeline-event-icon:hover {
+  background: var(--accent-orange, #ea580c) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-orange, #ea580c) !important;
+  transform: scale(1.08);
+  box-shadow: 0 2px 10px rgba(234, 88, 12, 0.35);
+}
+
+.as-timeline-event-icon:hover .as-icon-default {
+  display: none !important;
+}
+
+.as-timeline-event-icon:hover .as-icon-hover {
+  display: flex !important;
+}
+
+/* En cours de lecture (Playing) */
+.as-timeline-event-icon.is-playing {
+  background: var(--accent-orange, #ea580c) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-orange, #ea580c) !important;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.3);
+}
+
+.as-timeline-event-icon.is-playing .as-icon-default,
+.as-timeline-event-icon.is-playing:hover .as-icon-hover {
+  display: none !important;
+}
+
+.as-timeline-event-icon.is-playing .as-icon-playing {
+  display: flex !important;
+}
+
+/* En cours de chargement (Loading) */
+.as-timeline-event-icon.is-loading .as-icon-default,
+.as-timeline-event-icon.is-loading .as-icon-hover,
+.as-timeline-event-icon.is-loading .as-icon-playing {
+  display: none !important;
+}
+
+.as-timeline-event-icon.is-loading .as-icon-loading {
+  display: flex !important;
 }
 
 .as-timeline-event-body {
@@ -2088,17 +2159,19 @@ body.theme-light .as-timeline-event-desc,
 .as-event-track-select {
   background: var(--bg-card, #1e293b);
   color: var(--text-primary);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.18));
   border-radius: 6px;
-  font-size: 11px;
-  padding: 2px 8px;
-  height: 24px;
+  font-size: 12px;
+  line-height: normal;
+  padding: 4px 10px;
+  height: 32px;
+  box-sizing: border-box;
   outline: none;
   cursor: pointer;
-  max-width: 170px;
+  max-width: 210px;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: border-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .as-event-track-select:hover,
@@ -2111,6 +2184,18 @@ body.theme-light .as-event-track-select,
   background: #f8fafc;
   color: #0f172a;
   border-color: #cbd5e1;
+}
+
+.as-event-track-select option {
+  background: var(--bg-card, #1e293b);
+  color: var(--text-primary);
+  padding: 6px 10px;
+}
+
+body.theme-light .as-event-track-select option,
+[data-theme="light"] .as-event-track-select option {
+  background: #ffffff;
+  color: #0f172a;
 }
 
 .as-event-btn-delete {
