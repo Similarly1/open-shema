@@ -2608,21 +2608,35 @@ const AudioStudioView = {
       }
     }
 
+    const isFadeOut = (evType === 'fade_out');
     const effectiveTrackId = event.track_id || (evType === 'sfx' ? 'sfx_desert_wind' : (evType === 'fade_out' ? 'bed_cozy_jazz_study' : 'jingle_piano_solemn'));
 
+    let iconHtml = '';
+    if (isFadeOut) {
+      iconHtml = `
+        <div class="as-timeline-event-icon as-event-icon-static" title="Extinction musicale (Silence)">
+          <span class="as-icon-default">${iconSvg}</span>
+        </div>
+      `;
+    } else {
+      iconHtml = `
+        <button type="button" class="as-timeline-event-icon as-event-preview-btn" title="${isKaraoke ? 'Cliquer pour écouter à partir de ' + timeLabel : 'Écouter un extrait de ce son'}" data-track-id="${effectiveTrackId}">
+          <span class="as-icon-default">${iconSvg}</span>
+          <span class="as-icon-hover" title="Écouter un extrait">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          </span>
+          <span class="as-icon-playing" title="Arrêter la lecture">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </span>
+          <span class="as-icon-loading">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="as-spin"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+      `;
+    }
+
     card.innerHTML = `
-      <button type="button" class="as-timeline-event-icon as-event-preview-btn" title="${isKaraoke ? 'Cliquer pour écouter à partir de ' + timeLabel : 'Écouter un extrait de ce son'}" data-track-id="${effectiveTrackId}">
-        <span class="as-icon-default">${iconSvg}</span>
-        <span class="as-icon-hover" title="Écouter un extrait">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-        </span>
-        <span class="as-icon-playing" title="Arrêter la lecture">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
-        </span>
-        <span class="as-icon-loading">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="as-spin"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>
-        </span>
-      </button>
+      ${iconHtml}
       <div class="as-timeline-event-body">
         <div class="as-timeline-event-header">
           <div class="as-timeline-event-title">${this.escapeHtml(event.title || 'Événement sonore')}</div>
