@@ -122,6 +122,22 @@ const ImportModal = {
     document.getElementById('btn-import-next')?.addEventListener('click', () => this.nextStep());
     document.getElementById('btn-submit-import-modal')?.addEventListener('click', () => this.submit());
 
+    // Bouton d'aide sur les classifications RAG (toggle au clic ou affichage au survol)
+    const btnHelp = document.getElementById('btn-import-help');
+    const popoverHelp = document.getElementById('import-classification-popover');
+    if (btnHelp && popoverHelp) {
+      btnHelp.addEventListener('click', (e) => {
+        e.stopPropagation();
+        popoverHelp.classList.toggle('pinned');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!popoverHelp.contains(e.target) && e.target !== btnHelp && !btnHelp.contains(e.target)) {
+          popoverHelp.classList.remove('pinned');
+        }
+      });
+    }
+
     // Clics sur les indicateurs du stepper
     document.querySelectorAll('.wizard-step').forEach(stepEl => {
       stepEl.addEventListener('click', () => {

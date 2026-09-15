@@ -9502,7 +9502,92 @@
 
         <!-- PIED DE PAGE DE NAVIGATION DU WIZARD -->
         <div class="modal-footer" id="import-modal-footer">
-          <button class="btn-secondary" id="btn-cancel-import-modal">Annuler</button>
+          <div class="import-footer-left" style="display: flex; align-items: center; gap: 10px; position: relative;">
+            <button class="btn-secondary" id="btn-cancel-import-modal">Annuler</button>
+            <div class="import-classification-help-wrap">
+              <button type="button" class="btn-import-help" id="btn-import-help" aria-label="Aide sur les classifications RAG">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Aide classifications</span>
+              </button>
+              
+              <!-- POPOVER D'AIDE EXPLICATIVE -->
+              <div class="import-classification-popover" id="import-classification-popover">
+                <div class="popover-header">
+                  <div style="display: flex; align-items: center; gap: 7px;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <strong>Guide des Classifications RAG</strong>
+                  </div>
+                  <span class="popover-badge">Moteur Tri-Flux</span>
+                </div>
+                
+                <div class="popover-section">
+                  <div class="popover-section-title">TYPES DE SOURCE (RÔLE DANS LE RAG)</div>
+                  
+                  <div class="popover-item">
+                    <span class="badge-type-pill pill-general">Général</span>
+                    <span class="popover-desc">Aperçu transversal, chapitre d'ensemble ou sujet thématique général.</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-type-pill pill-intro">Intro</span>
+                    <span class="popover-desc">Introduction critique ou canonique à un livre biblique (auteur, date, plan, destinataires).</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-type-pill pill-theol">Théol.</span>
+                    <span class="popover-desc">Étude doctrinale ou théologie biblique approfondie (salut, royaume, christologie, etc.).</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-type-pill pill-context">Contexte</span>
+                    <span class="popover-desc">Arrière-plan historique, archéologique, culturel ou géographique du monde biblique.</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-type-pill pill-comm">Commentaire</span>
+                    <span class="popover-desc">Exégèse continue ou explication verset par verset / péricope par péricope.</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-type-pill pill-notes">Notes</span>
+                    <span class="popover-desc">Appareil de notes de fin ou footnotes (décoché par défaut pour ne pas polluer l'index).</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-type-pill pill-appendix">Annexe</span>
+                    <span class="popover-desc">Sommaire, bibliographie, index, crédits ou notices d'auteurs (décoché par défaut).</span>
+                  </div>
+                </div>
+
+                <div class="popover-section">
+                  <div class="popover-section-title">PORTÉES BIBLIQUES (CORPUS SCOPE)</div>
+
+                  <div class="popover-item">
+                    <span class="badge-scope-pill pill-global">GLOBAL</span>
+                    <span class="popover-desc">S'applique à l'ensemble des Écritures ou transcende un testament particulier.</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-scope-pill pill-at">AT</span>
+                    <span class="popover-desc">Ancien Testament (39 livres hébreux : Genèse à Malachie / Torah, Histoire, Prophètes).</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-scope-pill pill-nt">NT</span>
+                    <span class="popover-desc">Nouveau Testament (27 livres grecs : Évangiles, Actes, Épîtres, Apocalypse).</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-scope-pill pill-inter">INTER</span>
+                    <span class="popover-desc">Période intertestamentaire (Second Temple, époques perse et hellénistique).</span>
+                  </div>
+                  <div class="popover-item">
+                    <span class="badge-scope-pill pill-apo">APO</span>
+                    <span class="popover-desc">Livres deutérocanoniques / apocryphes de la période biblique.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           
           <div style="display: flex; align-items: center; gap: 8px;">
             <button class="btn-secondary hidden" id="btn-import-prev" style="display: flex; align-items: center; gap: 4px;">

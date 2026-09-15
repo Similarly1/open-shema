@@ -155,7 +155,11 @@ class EpubLoader:
             current_active_book_code = None
             current_active_book_name = None
 
-            is_syst_theol = any(w in book_title_norm for w in ["systematic theology", "theologie systematique", "theologie dogmatique", "dogmatique", "christian theology", "theologie chretienne"])
+            is_syst_theol = any(w in book_title_norm for w in [
+                "systematic theology", "theologie systematique", "theologie dogmatique", 
+                "dogmatique", "dogmatics", "christian theology", "theologie chretienne",
+                "theology", "theologie", "doctrine", "doctrines", "biblical theology", "theologie biblique"
+            ])
             classified_chapters = []
             
             for idx, entry in enumerate(toc_entries):
@@ -201,11 +205,17 @@ class EpubLoader:
                         current_active_scope = classification["corpus_scope"]
                         current_active_book_code = classification["book_code"]
                         current_active_book_name = classification["book_name"]
-                    elif classification["corpus_scope"] == "GLOBAL" and current_active_scope != "GLOBAL":
+                    elif depth > 0 and current_active_book_code:
                         classification["corpus_scope"] = current_active_scope
-                        if not classification["book_code"] and current_active_book_code:
+                        if not classification["book_code"]:
                             classification["book_code"] = current_active_book_code
                             classification["book_name"] = current_active_book_name
+                    elif classification["corpus_scope"] == "GLOBAL" and current_active_scope != "GLOBAL":
+                        classification["corpus_scope"] = current_active_scope
+
+                    if depth == 0 and not classification["book_code"]:
+                        current_active_book_code = None
+                        current_active_book_name = None
                 
                 # Déterminer si inclus par défaut
                 is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
@@ -269,12 +279,7 @@ class EpubLoader:
         # 0. Vérifier si c'est le nom de l'auteur de l'ouvrage ou une page d'auteur
         if book_author and len(book_author) > 3:
             norm_author = strip_accents(book_author)
-            if norm == norm_author or norm_author in norm or norm in norm_author:
-                return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
-
-        # Noms d'auteurs ou signatures courantes isolées (ex: "John MacArthur", "John Piper", "Jean Calvin")
-        if re.search(r'\b(john|jean|james|peter|pierre|paul|marc|mark|luke|luc|matthew|matthieu)\s+[a-z]+', norm):
-            if not _has_word(["evangile", "epitre", "lettre", "gospel", "epistle", "selon"]):
+            if norm == norm_author or (len(norm) > 4 and (norm == f"par {norm_author}" or norm == f"by {norm_author}")):
                 return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
 
         # Détection spécifique des sections de notes (notes de bas de page, notes de fin, endnotes)
@@ -352,30 +357,49 @@ class EpubLoader:
             }
 
         # 5. Détection thématique générale par mots entiers
-        theol_keywords = [
-            "salut", "grace", "justification", "foi", "doctrine", "trinite", "trinity", 
-            "saint-esprit", "holy spirit", "dieu", "god", "christ", "eschatologie", "eschatology", 
-            "theologie", "theology", "church", "eglise", "sanctification", "glorification", 
-            "regeneration", "creation", "atonement", "expiation", "resurrection", "covenant", 
-            "alliance", "sin", "peche", "providence", "angels", "anges", "demons", "heaven", 
-            "ciel", "hell", "enfer", "prayer", "priere", "worship", "culte", "sacrament", 
-            "bapteme", "baptism", "death", "mort", "election", "predestination", "perseverance"
-        ]
-
+        default_scope = book_dominant_scope if book_dominant_scope in ["OT", "NT", "APOCRYPHA", "INTER"] else "GLOBAL"
         default_stype = "systematic_theology" if is_systematic_theology else "general"
 
-        if _has_word(["christ", "jesus", "messie", "evangile", "gospel", "parole divine"]):
+        theol_keywords = [
+            # Français & Anglais
+            "salut", "salvation", "grace", "justification", "foi", "faith", "doctrine", "doctrines", 
+            "trinite", "trinité", "trinity", "saint-esprit", "holy spirit", "dieu", "god", "christ", 
+            "eschatologie", "eschatology", "theologie", "théologie", "theology", "church", "eglise", 
+            "église", "sanctification", "glorification", "regeneration", "régénération", 
+            "creation", "création", "atonement", "expiation", "resurrection", "résurrection", 
+            "covenant", "alliance", "sin", "sins", "peche", "péché", "providence", "angels", 
+            "anges", "demons", "démons", "heaven", "ciel", "hell", "enfer", "prayer", "priere", 
+            "prière", "worship", "culte", "sacrament", "sacrement", "bapteme", "baptême", "baptism", 
+            "death", "mort", "election", "élection", "predestination", "prédestination", 
+            "perseverance", "persévérance", "kingdom", "royaume", "reign", "regne", "règne", 
+            "messiah", "messie", "righteousness", "justice", "law", "loi", "ethics", "ethique", 
+            "éthique", "redemption", "rédemption", "parable", "parables", "parabole", "paraboles", 
+            "disciple", "disciples", "discipleship", "incarnation", "reconciliation", 
+            "réconciliation", "communion", "christology", "christologie", "pneumatology", 
+            "pneumatologie", "ecclesiology", "ecclésiologie", "soteriology", "sotériologie", 
+            "anthropology", "anthropologie", "baptist", "baptiste", "son of man", "fils de l'homme", 
+            "son of god", "fils de dieu"
+        ]
+
+        is_nt_theme = _has_word(["christ", "jesus", "messie", "messiah", "evangile", "gospel", "parole divine", "baptist", "baptiste", "son of man", "fils de l'homme", "apostle", "apotre"])
+        is_ot_theme = _has_word(["yahwe", "yahweh", "torah", "tanakh", "israel", "patriarch", "patriarchs", "patriarche", "patriarches", "prophet", "prophets", "prophete", "prophetes"])
+
+        if _has_word(theol_keywords):
+            sc = "NT" if is_nt_theme else ("OT" if is_ot_theme else default_scope)
+            return {"book_code": None, "book_name": None, "corpus_scope": sc, "source_type": "systematic_theology"}
+        elif is_nt_theme:
             return {"book_code": None, "book_name": None, "corpus_scope": "NT", "source_type": default_stype}
-        elif _has_word(theol_keywords):
-            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "systematic_theology"}
+        elif is_ot_theme:
+            sc = "OT" if default_scope in ["OT", "GLOBAL"] else default_scope
+            return {"book_code": None, "book_name": None, "corpus_scope": sc, "source_type": default_stype}
         elif _has_word(["lire", "comprendre", "symetrie", "harmonie", "etude", "canon", "inspiration", "revelation", "introduction"]):
-            st = "ot_context" if book_dominant_scope == "OT" else ("nt_context" if book_dominant_scope == "NT" else "biblical_theology")
-            return {"book_code": None, "book_name": None, "corpus_scope": book_dominant_scope or "GLOBAL", "source_type": st}
+            st = "ot_context" if default_scope == "OT" else ("nt_context" if default_scope == "NT" else "biblical_theology")
+            return {"book_code": None, "book_name": None, "corpus_scope": default_scope, "source_type": st}
 
         return {
             "book_code": None,
             "book_name": None,
-            "corpus_scope": "GLOBAL",
+            "corpus_scope": default_scope,
             "source_type": default_stype
         }
 
