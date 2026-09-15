@@ -5466,20 +5466,18 @@
 
                     <!-- Conteneur de tous les contrôles de réglage (masqué pendant la synthèse) -->
                     <div id="as-step2-config-controls" style="display: flex; flex-direction: column; gap: 8px;">
-                      <!-- Sélecteur de Moteur Vocal Interactif (Edge-TTS vs Mistral Voxtral) -->
-                      <div class="audio-studio-engine-toggle" id="as-engine-toggle" style="margin-top: 10px;">
-                        <button type="button" class="engine-toggle-btn active" id="as-engine-btn-edge" data-engine="edge_tts">
-                          <span>Edge-TTS (Gratuit)</span>
-                        </button>
-                        <button type="button" class="engine-toggle-btn" id="as-engine-btn-gemini" data-engine="gemini_tts">
-                          <span>Google Gemini Flash</span>
-                        </button>
-                        <button type="button" class="engine-toggle-btn" id="as-engine-btn-voxtral" data-engine="voxtral">
-                          <span>Mistral Voxtral</span>
-                        </button>
-                        <button type="button" class="engine-toggle-btn" id="as-engine-btn-mixed" data-engine="mixed">
-                          <span>Mix Multi-Moteurs</span>
-                        </button>
+                      <!-- Sélecteur de Moteur Vocal Interactif (Menu déroulant épuré) -->
+                      <div class="audio-studio-form-row" style="margin-top: 10px;">
+                        <div class="audio-studio-form-label">
+                          <span>Moteur de génération vocale</span>
+                          <span id="as-engine-select-badge" style="font-size: 10px; font-weight: 600; text-transform: none; color: var(--accent-orange, #ea580c);">Gratuit, illimité</span>
+                        </div>
+                        <select id="as-engine-select" class="audio-studio-select" style="font-weight: 600;">
+                          <option value="edge_tts">Microsoft Edge-TTS (Gratuit, illimité)</option>
+                          <option value="gemini_tts">Google Gemini Flash TTS (Haute fidélité, 1 appel)</option>
+                          <option value="voxtral">Mistral Voxtral (Expressif)</option>
+                          <option value="mixed">Mix Multi-Moteurs (Personnalisé par locuteur)</option>
+                        </select>
                       </div>
 
                     <!-- Sélecteur de Format dans l'Étape 2 (Dialogue / Solo) -->

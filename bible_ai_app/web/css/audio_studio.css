@@ -2349,27 +2349,30 @@ body.palette-light-clean #audio-studio-player-status,
   color: #64748b !important;
 }
 
-/* Grille pour le selecteur de moteur 4 boutons (Edge-TTS, Voxtral, Gemini, Mix) */
-.audio-studio-engine-toggle {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: var(--bg-surface, rgba(0, 0, 0, 0.25));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+/* Sélecteur déroulant épuré de moteur vocal */
+#as-engine-select {
+  cursor: pointer;
   border-radius: 8px;
-  padding: 3px;
-  gap: 3px;
+  background-color: var(--bg-surface-elevated, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  color: var(--text-primary, #f8fafc);
+  font-weight: 600;
+  padding: 6px 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-@media (max-width: 680px) {
-  .audio-studio-engine-toggle {
-    grid-template-columns: repeat(2, 1fr);
-  }
+#as-engine-select:focus {
+  border-color: var(--accent-orange, #ea580c);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
 }
 
-.engine-toggle-btn {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+body.theme-light #as-engine-select,
+body.palette-light-clean #as-engine-select,
+[data-theme="light"] #as-engine-select {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
 }
 
 /* Carte Locuteur en mode Multi-Moteurs */

@@ -135,10 +135,8 @@ const AudioStudioView = {
 
       // Synthèse & Voix
       engineBadge: document.getElementById('audio-studio-engine-badge'),
-      engineBtnEdge: document.getElementById('as-engine-btn-edge'),
-      engineBtnGemini: document.getElementById('as-engine-btn-gemini'),
-      engineBtnVoxtral: document.getElementById('as-engine-btn-voxtral'),
-      engineBtnMixed: document.getElementById('as-engine-btn-mixed'),
+      selectEngine: document.getElementById('as-engine-select'),
+      engineSelectBadge: document.getElementById('as-engine-select-badge'),
       voicesEdgeContainer: document.getElementById('as-voices-edge-container'),
       voicesGeminiContainer: document.getElementById('as-voices-gemini-container'),
       voicesVoxtralContainer: document.getElementById('as-voices-voxtral-container'),
@@ -312,11 +310,10 @@ const AudioStudioView = {
       API.call('audio_studio_save_config', { include_profile: el.optProfile.checked });
     });
 
-    // 1b. Sélecteur de moteur audio interactif (Edge-TTS, Gemini, Voxtral, Mixed)
-    el.engineBtnEdge?.addEventListener('click', () => this.setEngine('edge_tts'));
-    el.engineBtnGemini?.addEventListener('click', () => this.setEngine('gemini_tts'));
-    el.engineBtnVoxtral?.addEventListener('click', () => this.setEngine('voxtral'));
-    el.engineBtnMixed?.addEventListener('click', () => this.setEngine('mixed'));
+    // 1b. Sélecteur de moteur audio interactif (Menu déroulant épuré)
+    el.selectEngine?.addEventListener('change', (e) => {
+      this.setEngine(e.target.value);
+    });
 
     // 1c. Changement direct des voix et synchronisation intelligente de la paire (Edge-TTS)
     el.selectVoiceHost?.addEventListener('change', () => {
@@ -648,11 +645,14 @@ const AudioStudioView = {
     this.config.engine = engine;
     const el = this.elements;
 
-    // Mise à jour visuelle des 4 boutons
-    el.engineBtnEdge?.classList.toggle('active', engine === 'edge_tts');
-    el.engineBtnGemini?.classList.toggle('active', engine === 'gemini_tts');
-    el.engineBtnVoxtral?.classList.toggle('active', engine === 'voxtral');
-    el.engineBtnMixed?.classList.toggle('active', engine === 'mixed');
+    // Synchronisation du menu déroulant et du badge d'information
+    if (el.selectEngine) el.selectEngine.value = engine;
+    if (el.engineSelectBadge) {
+      if (engine === 'gemini_tts') el.engineSelectBadge.textContent = 'Haute fidélité, 1 appel';
+      else if (engine === 'voxtral') el.engineSelectBadge.textContent = 'Expressif, émotionnel';
+      else if (engine === 'mixed') el.engineSelectBadge.textContent = 'Multi-voix sur mesure';
+      else el.engineSelectBadge.textContent = 'Gratuit, illimité';
+    }
 
     // Affichage du conteneur adéquat
     if (el.voicesEdgeContainer) el.voicesEdgeContainer.style.display = (engine === 'edge_tts') ? 'flex' : 'none';
