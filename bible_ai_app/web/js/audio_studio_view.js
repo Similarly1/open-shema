@@ -2353,15 +2353,43 @@ const AudioStudioView = {
     s = s.replace(/;\s*/g, ' — ');
     s = s.replace(/\s{2,}/g, ' ').trim();
 
+    // 6. Correction des omissions d'accents des LLM
+    s = s.replace(/\bcrpite\b/gi, 'crépite')
+         .replace(/\bcrpitent\b/gi, 'crépitent')
+         .replace(/\bcrpitement\b/gi, 'crépitement')
+         .replace(/\bcrpitements\b/gi, 'crépitements')
+         .replace(/\bcrpitant\b/gi, 'crépitant')
+         .replace(/\bcrpitante\b/gi, 'crépitante');
+
     return s;
+  },
+
+  cleanScriptText(text) {
+    if (!text) return '';
+    return text
+      .replace(/\bcrpite\b/gi, 'crépite')
+      .replace(/\bcrpitent\b/gi, 'crépitent')
+      .replace(/\bcrpitement\b/gi, 'crépitement')
+      .replace(/\bcrpitements\b/gi, 'crépitements')
+      .replace(/\bcrpitant\b/gi, 'crépitant')
+      .replace(/\bcrpitante\b/gi, 'crépitante');
+  },
+
+  hasScriptVocalDivergence(script) {
+    if (!Array.isArray(script) || script.length === 0) return false;
+    return script.some(turn => {
+      const lit = (this.cleanScriptText(turn.text) || '').trim();
+      const sp = (this.cleanScriptText(turn.speech_text) || this.toPhoneticScript(lit)).trim();
+      return lit !== sp;
+    });
   },
 
   getPhoneticSpeechText(turn) {
     if (!turn) return '';
     if (turn.speech_text && turn.speech_text.trim() && turn.speech_text.trim() !== (turn.text || '').trim()) {
-      return turn.speech_text;
+      return this.cleanScriptText(turn.speech_text);
     }
-    return this.toPhoneticScript(turn.text || '');
+    return this.toPhoneticScript(this.cleanScriptText(turn.text || ''));
   },
 
   setTextMode(mode) {
@@ -2448,17 +2476,40 @@ const AudioStudioView = {
     }
   },
 
+  deduplicateAudioEvents(events) {
+    if (!Array.isArray(events)) return [];
+    const result = [];
+    for (const ev of events) {
+      if (!ev) continue;
+      const isDuplicate = result.some(existing => {
+        // Même track_id à un moment très proche (moins de 6 secondes)
+        if (existing.track_id && ev.track_id && existing.track_id === ev.track_id) {
+          const diff = Math.abs((Number(existing.start_time) || 0) - (Number(ev.start_time) || 0));
+          return diff < 6.0;
+        }
+        // Un seul jingle d'intro, un seul fade out, un seul outro
+        if (ev.type === 'music' && existing.type === 'music') return true;
+        if (ev.type === 'fade_out' && existing.type === 'fade_out') return true;
+        if (ev.type === 'outro' && existing.type === 'outro') return true;
+        return false;
+      });
+      if (!isDuplicate) {
+        result.push(ev);
+      }
+    }
+    return result;
+  },
+
   getEpisodeAudioEvents(podcast) {
     if (!podcast) return [];
+    let events = [];
     if (Array.isArray(this.activeAudioEvents) && this.activeAudioEvents.length > 0) {
-      return this.activeAudioEvents;
+      events = this.activeAudioEvents;
+    } else if (Array.isArray(podcast.audio_events) && podcast.audio_events.length > 0) {
+      events = [...podcast.audio_events];
     }
-    if (Array.isArray(podcast.audio_events) && podcast.audio_events.length > 0) {
-      this.activeAudioEvents = [...podcast.audio_events];
-      return this.activeAudioEvents;
-    }
-    // Par défaut, aucun habillage automatique : voix pure
-    return [];
+    this.activeAudioEvents = this.deduplicateAudioEvents(events);
+    return this.activeAudioEvents;
   },
 
   toggleMusicJingleEvents(enable) {
@@ -2497,6 +2548,7 @@ const AudioStudioView = {
     } else {
       this.activeAudioEvents = this.activeAudioEvents.filter(e => e.type === 'sfx');
     }
+    this.activeAudioEvents = this.deduplicateAudioEvents(this.activeAudioEvents);
     this.renderScript();
   },
 
@@ -2507,13 +2559,25 @@ const AudioStudioView = {
     const textSample = script.slice(0, 8).map(d => d.text || '').join(' ').toLowerCase();
     const full = `${corpus} ${textSample}`;
 
-    if (full.includes('coq') || full.includes('pierre')) return 'sfx_rooster_crow';
-    if (full.includes('mer') || full.includes('barque') || full.includes('galilée') || full.includes('vague') || full.includes('eau')) return 'sfx_ocean_shore_waves';
-    if (full.includes('feu') || full.includes('braise') || full.includes('camp')) return 'sfx_campfire_crackle';
-    if (full.includes('brebis') || full.includes('berger') || full.includes('agneau')) return 'sfx_sheep_flock_bells';
-    if (full.includes('marché') || full.includes('marche ') || full.includes('ville') || full.includes('jérusalem')) return 'sfx_ancient_marketplace';
-    if (full.includes('foule') || full.includes('clameur') || full.includes('pilate') || full.includes('crucifie')) return 'sfx_angry_crowd';
-    if (full.includes('pas') || full.includes('sentier') || full.includes('emmaüs')) return 'sfx_footsteps_trail';
+    // 1. Chant du coq / Reniement de Pierre
+    if (full.includes('coq') || full.includes('renie') || full.includes('pierre')) return 'sfx_rooster_crow';
+    // 2. Désert / Jean-Baptiste / Jourdain
+    if (full.includes('jean-baptiste') || full.includes('désert') || full.includes('desert') || full.includes('jourdain')) return 'sfx_desert_wind';
+    // 3. Procès / Foule en colère / Pilate / Crucifixion
+    if (full.includes('pilate') || full.includes('ponce pilate') || full.includes('crucifie') || full.includes('émeute') || full.includes('tribunal') || full.includes('condamne')) return 'sfx_angry_crowd';
+    // 4. Temple / Siloé / Parvis / Jérusalem / Foule attentive
+    if (full.includes('temple') || full.includes('parvis') || full.includes('synagogue') || full.includes('siloé') || full.includes('siloe') || full.includes('foule') || full.includes('assemblée') || full.includes('multitude')) return 'sfx_crowd_murmur';
+    // 5. Marché / Ruelles / Ville
+    if (full.includes('marché') || full.includes('marche ') || full.includes('ruelle') || full.includes('ville') || full.includes('jérusalem')) return 'sfx_ancient_marketplace';
+    // 6. Mer / Lac / Barque / Tempête (exclut 'galilée' isolé)
+    if (full.includes('mer de galilée') || full.includes('lac de galilée') || full.includes('mer') || full.includes('barque') || full.includes('tempête') || full.includes('ressac') || full.includes('rivage') || full.includes('filets')) return 'sfx_ocean_shore_waves';
+    // 7. Feu de camp
+    if (full.includes('feu') || full.includes('braise') || full.includes('camp') || full.includes('flamme')) return 'sfx_campfire_crackle';
+    // 8. Brebis / Troupeau
+    if (full.includes('brebis') || full.includes('berger') || full.includes('agneau') || full.includes('troupeau')) return 'sfx_sheep_flock_bells';
+    // 9. Pas / Sentier d'Emmaüs
+    if (full.includes('sentier') || full.includes('emmaüs') || full.includes('chemin')) return 'sfx_footsteps_trail';
+    // 10. Nuit / Grillons / Gethsémané
     if (full.includes('nuit') || full.includes('grillon') || full.includes('gethsémané')) return 'sfx_night_crickets';
     return 'sfx_desert_wind';
   },
@@ -2538,6 +2602,7 @@ const AudioStudioView = {
     } else {
       this.activeAudioEvents = this.activeAudioEvents.filter(e => e.type !== 'sfx');
     }
+    this.activeAudioEvents = this.deduplicateAudioEvents(this.activeAudioEvents);
     this.renderScript();
   },
 
@@ -2553,8 +2618,17 @@ const AudioStudioView = {
   addManualAudioEvent() {
     if (!this.currentPodcast) return;
     const tracks = this.soundpack?.tracks || [];
-    const sfxId = this.detectContextualSfxId();
-    const tr = tracks.find(t => t.id === sfxId) || tracks[0];
+    const usedTrackIds = new Set((this.activeAudioEvents || []).map(e => e.track_id));
+    const sfxTracks = tracks.filter(t => t.category === 'sfx');
+
+    let sfxId = this.detectContextualSfxId();
+    // Si ce bruitage est déjà présent dans la timeline, proposer la prochaine ambiance
+    if (usedTrackIds.has(sfxId)) {
+      const alt = sfxTracks.find(t => !usedTrackIds.has(t.id));
+      if (alt) sfxId = alt.id;
+    }
+
+    const tr = tracks.find(t => t.id === sfxId) || sfxTracks[0] || tracks[0];
     const trackName = tr?.name || 'Ambiance sonore';
     const isSfx = tr?.category === 'sfx';
 
@@ -2567,6 +2641,8 @@ const AudioStudioView = {
       end_time: 15.0,
       description: "Habillage sonore inséré manuellement dans le déroulé"
     });
+
+    this.activeAudioEvents = this.deduplicateAudioEvents(this.activeAudioEvents);
 
     if (isSfx && this.elements.checkSfxAuto) this.elements.checkSfxAuto.checked = true;
     if (!isSfx && this.elements.checkMusicJingle) this.elements.checkMusicJingle.checked = true;
@@ -2768,7 +2844,15 @@ const AudioStudioView = {
     // Affichage des répliques
     if (el.scriptEmptyState) el.scriptEmptyState.style.display = 'none';
     if (el.scriptList) el.scriptList.style.display = 'flex';
-    if (el.addTurnContainer) el.addTurnContainer.style.display = 'block';
+    if (el.addTurnContainer) el.addTurnContainer.style.display = 'flex';
+
+    // Affichage conditionnel de la barre de choix [Texte littéraire] / [Script vocal TTS] :
+    // Masquée si aucune divergence phonétique ou textuelle n'existe
+    const hasDiff = this.hasScriptVocalDivergence(script);
+    const modeBar = document.querySelector('.as-text-mode-bar');
+    if (modeBar) {
+      modeBar.style.display = hasDiff ? 'flex' : 'none';
+    }
 
     if (el.scriptList) {
       el.scriptList.innerHTML = '';
@@ -2817,6 +2901,10 @@ const AudioStudioView = {
     card.dataset.turnIndex = idx;
     if (typeof turn.start_time === 'number') card.dataset.startTime = turn.start_time;
     if (typeof turn.end_time === 'number') card.dataset.endTime = turn.end_time;
+
+    // Nettoyage des coquilles de texte
+    turn.text = this.cleanScriptText(turn.text);
+    if (turn.speech_text) turn.speech_text = this.cleanScriptText(turn.speech_text);
 
     const isSolo = (this.format === 'solo');
     let voiceRole = turn.voice_role;
@@ -3588,6 +3676,13 @@ const AudioStudioView = {
       ? p.script_dialogue
       : (Array.isArray(p.dialogue) ? p.dialogue : []);
 
+    // Affichage conditionnel de la sous-barre [Texte littéraire] / [Script vocal TTS] en karaoké
+    const hasDiff = this.hasScriptVocalDivergence(script);
+    const karaokeModeBar = document.querySelector('.as-karaoke-text-mode-bar');
+    if (karaokeModeBar) {
+      karaokeModeBar.style.display = hasDiff ? 'flex' : 'none';
+    }
+
     const audioEvents = this.getEpisodeAudioEvents(p);
     const introEvent = audioEvents.find(e => e.type === 'music' || e.type === 'intro_music');
     const sfxEvents = audioEvents.filter(e => e.type === 'sfx');
@@ -3619,7 +3714,8 @@ const AudioStudioView = {
         : `#${idx + 1}`;
 
       const isPhonetic = (this.textMode === 'phonetic');
-      const textDisplay = isPhonetic ? this.getPhoneticSpeechText(turn) : (turn.text || '');
+      const cleanTurnText = this.cleanScriptText(turn.text || '');
+      const textDisplay = isPhonetic ? this.getPhoneticSpeechText(turn) : cleanTurnText;
 
       card.innerHTML = `
         <div class="as-karaoke-speaker" style="color: ${roleColor};">

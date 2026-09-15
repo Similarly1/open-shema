@@ -1109,6 +1109,13 @@ class PodcastEngine:
             raw_text_clean = re.sub(r'\[pause:\s*[\d\.]+\s*s?\]', '', raw_text).strip()
             literary_text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+til\b', r'\1-il', raw_text_clean)
             literary_text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+telle\b', r'\1-elle', literary_text)
+            # Correction des coquilles et omissions d'accents fréquentes des LLM
+            literary_text = re.sub(r'\bcrpite\b', 'crépite', literary_text)
+            literary_text = re.sub(r'\bcrpitent\b', 'crépitent', literary_text)
+            literary_text = re.sub(r'\bcrpitement\b', 'crépitement', literary_text)
+            literary_text = re.sub(r'\bcrpitements\b', 'crépitements', literary_text)
+            literary_text = re.sub(r'\bcrpitant\b', 'crépitant', literary_text)
+            literary_text = re.sub(r'\bcrpitante\b', 'crépitante', literary_text)
 
             # Script vocal / phonétique optimisé pour la synthèse TTS (références développées, énumérations posées)
             speech_text = cls._clean_text_for_speech(literary_text)
@@ -1509,6 +1516,14 @@ class PodcastEngine:
         text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+tils\b', r'\1-ils', text)
         text = re.sub(r'\b([a-zA-ZÀ-ÿ]+)\s+telles\b', r'\1-elles', text)
 
+        # 4bis-b. Correction des coquilles fréquentes des LLM (omission d'accents sur verbes descriptifs)
+        text = re.sub(r'\bcrpite\b', 'crépite', text)
+        text = re.sub(r'\bcrpitent\b', 'crépitent', text)
+        text = re.sub(r'\bcrpitement\b', 'crépitement', text)
+        text = re.sub(r'\bcrpitements\b', 'crépitements', text)
+        text = re.sub(r'\bcrpitant\b', 'crépitant', text)
+        text = re.sub(r'\bcrpitante\b', 'crépitante', text)
+
         # 4ter. Équilibrage prosodique des énumérations de versets ou chiffres
         # Ex: "Aux versets 10, 12 et 14" -> "Aux versets 10, 12, et 14"
         # Permet à chaque élément énuméré d'avoir la même respiration naturelle posée
@@ -1703,20 +1718,28 @@ class PodcastEngine:
         # 2. Jean-Baptiste / Désert / Jourdain / Baptême (Luc 3, Matthieu 3, Marc 1...)
         if any(w in corpus for w in ["jean-baptiste", "jean baptiste", "luc 3", "luc 1", "matthieu 3", "marc 1", "désert", "desert", "aride", "voix au désert", "sauvage", "solitude", "jourdain", "baptême"]):
             return "sfx_desert_wind"
-        if any(w in corpus for w in ["mer", "barque", "pêche", "galilée", "tempête", "ressac", "rivage", "lac", "tibériade", "poisson"]):
+        # 3. Contexte hostile / Procès / Pilate / Émeute / Condamnation / Foule agitée
+        if any(w in corpus for w in ["foule en colère", "crucifie", "pilate", "ponce pilate", "clameur", "émeute", "tribunal", "condamne", "barabbas"]):
+            return "sfx_angry_crowd"
+        # 4. Temple / Synagogue / Jérusalem / Foule attentive / Siloé / Parvis
+        if any(w in corpus for w in ["temple", "parvis", "synagogue", "jérusalem", "jerusalem", "siloé", "siloe", "tour de siloé", "foule", "assemblée", "multitude", "auditoire", "auditeurs"]):
+            return "sfx_crowd_murmur"
+        # 5. Marché antique / Ruelles urbaines / Marchands
+        if any(w in corpus for w in ["marché", "marche ", "ruelle", "ruelles", "ville", "place publique", "marchand"]):
+            return "sfx_ancient_marketplace"
+        # 6. Mer / Lac / Barque / Pêche / Tempête (restreint à la mer ou bord de l'eau, exclut 'galilée' isolé)
+        if any(w in corpus for w in ["mer de galilée", "lac de galilée", "mer de tibériade", "lac de gênésareth", "mer", "barque", "pêche", "tempête", "ressac", "rivage", "lac", "tibériade", "filets", "eau"]):
             return "sfx_ocean_shore_waves"
+        # 7. Feu de camp / Veillée nocturne
         if any(w in corpus for w in ["feu", "braise", "foyer", "camp", "veillée", "flamme"]):
             return "sfx_campfire_crackle"
+        # 8. Brebis / Troupeau / Berger
         if any(w in corpus for w in ["brebis", "berger", "pâturage", "troupeau", "agneau", "pâtre"]):
             return "sfx_sheep_flock_bells"
-        if any(w in corpus for w in ["marché", "marche ", "ruelle", "ville", "place publique", "marchand"]):
-            return "sfx_ancient_marketplace"
-        if any(w in corpus for w in ["foule en colère", "crucifie", "pilate", "clameur", "émeute", "tribunal", "condamne"]):
-            return "sfx_angry_crowd"
-        if any(w in corpus for w in ["foule", "assemblée", "synagogue", "temple", "auditoire", "multitude", "auditeurs"]):
-            return "sfx_crowd_murmur"
+        # 9. Marche / Sentier d'Emmaüs
         if any(w in corpus for w in ["marche", "sentier", "voyage", "chemin", "route d'emmaüs", "emmaüs"]):
             return "sfx_footsteps_trail"
+        # 10. Nuit / Gethsémané / Grillons
         if any(w in corpus for w in ["nuit", "gethsémané", "grillon", "étoile", "prière", "soir"]):
             return "sfx_night_crickets"
 
