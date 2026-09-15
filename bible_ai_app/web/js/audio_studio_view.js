@@ -1447,13 +1447,21 @@ const AudioStudioView = {
     const cards = el.scriptList?.querySelectorAll('.audio-studio-turn-card') || [];
     if (cards.length === 0) return;
 
-    const isVoxtral = (this.config?.engine === 'voxtral');
+    const activeEngine = this.config?.engine || 'edge_tts';
     let hostName, scholarName, soloName;
 
-    if (isVoxtral) {
+    if (activeEngine === 'gemini_tts') {
+      hostName = this.getVoiceShortName(el.selectGeminiHost?.value || this.config?.gemini_voice_speaker_a || 'Puck');
+      scholarName = this.getVoiceShortName(el.selectGeminiScholar?.value || this.config?.gemini_voice_speaker_b || 'Charon');
+      soloName = this.getVoiceShortName(el.selectGeminiSolo?.value || this.config?.gemini_voice_solo || 'Kore');
+    } else if (activeEngine === 'voxtral') {
       hostName = this.getVoiceShortName(el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy');
       scholarName = this.getVoiceShortName(el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral');
       soloName = this.getVoiceShortName(el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral');
+    } else if (activeEngine === 'mixed') {
+      hostName = this.getVoiceShortName(el.selectMixedVoiceHost?.value || this.config?.speaker_a_voice || 'Puck');
+      scholarName = this.getVoiceShortName(el.selectMixedVoiceScholar?.value || this.config?.speaker_b_voice || 'Fabrice');
+      soloName = this.getVoiceShortName(el.selectMixedVoiceSolo?.value || this.config?.solo_voice || 'Puck');
     } else {
       hostName = this.getVoiceShortName(el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural');
       scholarName = this.getVoiceShortName(el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-CH-FabriceNeural');
@@ -1480,12 +1488,12 @@ const AudioStudioView = {
 
   getVoiceShortName(voiceId) {
     if (!voiceId) return 'Voix';
-    const all = [...(this.voices || []), ...(this.voxtralVoices || [])];
-    const match = all.find(v => v.id === voiceId);
+    const all = [...(this.voices || []), ...(this.voxtralVoices || []), ...(this.geminiVoices || [])];
+    const match = all.find(v => v.id === voiceId || v.name === voiceId);
     if (match && match.name) {
       return match.name.split('(')[0].trim();
     }
-    const parts = voiceId.split('-');
+    const parts = String(voiceId).split('-');
     if (parts.length >= 3) {
       return parts[2].replace('Neural', '').replace('Multilingual', '');
     }
@@ -1496,9 +1504,19 @@ const AudioStudioView = {
     const el = this.elements;
     if (!el.voiceSummary) return;
 
-    const isVoxtral = (this.config?.engine === 'voxtral');
+    const activeEngine = this.config?.engine || 'edge_tts';
 
-    if (isVoxtral) {
+    if (activeEngine === 'gemini_tts') {
+      const spkA = el.selectGeminiHost?.value || this.config?.gemini_voice_speaker_a || 'Puck';
+      const spkB = el.selectGeminiScholar?.value || this.config?.gemini_voice_speaker_b || 'Charon';
+      const solo = el.selectGeminiSolo?.value || this.config?.gemini_voice_solo || 'Kore';
+
+      if (this.format === 'dialogue') {
+        el.voiceSummary.innerHTML = `<strong>Gemini Voix 1 (Animatrice) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 (Exégète) :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
+      } else {
+        el.voiceSummary.innerHTML = `<strong>Gemini Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
+      }
+    } else if (activeEngine === 'voxtral') {
       const spkA = el.selectVoxtralHost?.value || this.config?.voxtral_voice_speaker_a || 'Marie - Happy';
       const spkB = el.selectVoxtralScholar?.value || this.config?.voxtral_voice_speaker_b || 'Marie - Neutral';
       const solo = el.selectVoxtralSolo?.value || this.config?.voxtral_voice_solo || 'Marie - Neutral';
@@ -1508,9 +1526,19 @@ const AudioStudioView = {
       } else {
         el.voiceSummary.innerHTML = `<strong>Voxtral Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
       }
+    } else if (activeEngine === 'mixed') {
+      const spkA = el.selectMixedVoiceHost?.value || this.config?.speaker_a_voice || 'Puck';
+      const spkB = el.selectMixedVoiceScholar?.value || this.config?.speaker_b_voice || 'Fabrice';
+      const solo = el.selectMixedVoiceSolo?.value || this.config?.solo_voice || 'Puck';
+
+      if (this.format === 'dialogue') {
+        el.voiceSummary.innerHTML = `<strong>Mix Voix 1 :</strong> ${this.escapeHtml(this.getVoiceLabel(spkA))} &bull; <strong>Voix 2 :</strong> ${this.escapeHtml(this.getVoiceLabel(spkB))}`;
+      } else {
+        el.voiceSummary.innerHTML = `<strong>Mix Voix Narrateur (Solo) :</strong> ${this.escapeHtml(this.getVoiceLabel(solo))}`;
+      }
     } else {
       const spkA = el.selectVoiceHost?.value || this.config?.voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
-      const spkB = el.selectVoiceScholar?.value || this.config?.voice_speaker_b || 'fr-CH-FabriceNeural';
+      const spkB = el.selectVoiceScholar?.value || this.config?.voice_scholar || 'fr-CH-FabriceNeural';
       const solo = el.selectVoiceSolo?.value || this.config?.voice_solo || 'fr-CH-FabriceNeural';
 
       if (this.format === 'dialogue') {
@@ -1522,8 +1550,8 @@ const AudioStudioView = {
   },
 
   getVoiceLabel(voiceId) {
-    const all = [...(this.voices || []), ...(this.voxtralVoices || [])];
-    const match = all.find(v => v.id === voiceId);
+    const all = [...(this.voices || []), ...(this.voxtralVoices || []), ...(this.geminiVoices || [])];
+    const match = all.find(v => v.id === voiceId || v.name === voiceId);
     if (match) return match.name;
     return voiceId || 'Standard';
   },
