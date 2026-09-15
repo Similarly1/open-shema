@@ -2469,11 +2469,11 @@ const AudioStudioView = {
         this.activeAudioEvents.push({
           id: 'event_intro_music',
           type: 'music',
-          title: "Jingle & Ambiance d'ouverture",
+          title: "Jingle d'ouverture",
           track_id: 'jingle_piano_solemn',
           start_time: 0.0,
           end_time: 10.0,
-          description: "Amorce musicale solo (10s), descente douce à 00:08 avant la voix"
+          description: "Jingle solo (10s), descente douce à 00:08 avant la voix"
         });
         this.activeAudioEvents.push({
           id: 'event_fade_out',
@@ -3275,13 +3275,13 @@ const AudioStudioView = {
         pitch: el.checkCalmProsody?.checked ? '-3Hz' : '+0Hz',
         inject_breaks: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
         audio_events: this.activeAudioEvents,
-        music_enabled: hasMusic,
-        jingle_enabled: hasMusic,
+        music_enabled: Boolean(this.activeAudioEvents.find(e => (e.type === 'fade_out' || e.type === 'outro') && e.track_id && !e.track_id.startsWith('jingle'))),
+        jingle_enabled: Boolean(this.activeAudioEvents.find(e => (e.type === 'music' || e.type === 'intro_music') && e.track_id)),
         sfx_enabled: hasSfx,
-        bg_music: hasMusic ? (this.activeAudioEvents.find(e => (e.type === 'fade_out' || e.type === 'outro' || e.type === 'music') && e.track_id)?.track_id || 'bed_cozy_jazz_study') : 'none',
-        jingle_intro: hasMusic ? (this.activeAudioEvents.find(e => (e.type === 'music' || e.type === 'intro_music') && e.track_id)?.track_id || 'jingle_piano_solemn') : 'none',
+        bg_music: this.activeAudioEvents.find(e => (e.type === 'fade_out' || e.type === 'outro') && e.track_id && !e.track_id.startsWith('jingle'))?.track_id || 'none',
+        jingle_intro: this.activeAudioEvents.find(e => (e.type === 'music' || e.type === 'intro_music') && e.track_id)?.track_id || 'none',
         sfx_ambient: hasSfx ? (this.activeAudioEvents.find(e => e.type === 'sfx' && e.track_id)?.track_id || 'auto') : 'none',
-        ducking_enabled: hasMusic && (el.checkDucking ? el.checkDucking.checked : true),
+        ducking_enabled: Boolean(this.activeAudioEvents.find(e => (e.type === 'fade_out' || e.type === 'outro'))) && (el.checkDucking ? el.checkDucking.checked : true),
         ducking_db: this.config?.ducking_db || -30.0,
         music_timing: el.selectMusicTiming?.value || 'intro_outro',
         music_intro_sec: 10.0

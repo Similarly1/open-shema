@@ -1806,21 +1806,31 @@ class PodcastEngine:
                         # - Outro : retour musical sous les dernières paroles et crescendo de fin
                         env = np.zeros(total_samples, dtype=np.float32)
 
-                        # Amorce solo (0s à 8s)
-                        intro_ramp_down_start = max(0, lead_in_samples - int(2.0 * sample_rate))
-                        intro_ramp_in = min(int(1.5 * sample_rate), intro_ramp_down_start)
-                        if intro_ramp_in > 0:
-                            env[:intro_ramp_in] = np.linspace(0.0, intro_gain, intro_ramp_in)
-                            env[intro_ramp_in:intro_ramp_down_start] = intro_gain
+                        if has_jingle:
+                            # Strictement aucun son de musique pendant le jingle !
+                            # Le jingle joue seul en amorce de 0s à 10s (avec descente à 8s).
+                            # La musique n'entre qu'après le jingle, en fondu doux direct vers le niveau ducké (-30 dB)
+                            music_fade_in_len = min(int(2.0 * sample_rate), max(0, fade_out_start - lead_in_samples))
+                            if music_fade_in_len > 0:
+                                env[lead_in_samples:lead_in_samples + music_fade_in_len] = np.linspace(0.0, duck_gain, music_fade_in_len)
+                            if fade_out_start > (lead_in_samples + music_fade_in_len):
+                                env[lead_in_samples + music_fade_in_len:fade_out_start] = duck_gain
                         else:
-                            env[:intro_ramp_down_start] = intro_gain
+                            # Amorce solo (0s à 8s) sans jingle : la musique pose seule le décor
+                            intro_ramp_down_start = max(0, lead_in_samples - int(2.0 * sample_rate))
+                            intro_ramp_in = min(int(1.5 * sample_rate), intro_ramp_down_start)
+                            if intro_ramp_in > 0:
+                                env[:intro_ramp_in] = np.linspace(0.0, intro_gain, intro_ramp_in)
+                                env[intro_ramp_in:intro_ramp_down_start] = intro_gain
+                            else:
+                                env[:intro_ramp_down_start] = intro_gain
 
-                        # Descente de 2 secondes avant l'arrivée de la voix (8s à 10s)
-                        if lead_in_samples > intro_ramp_down_start:
-                            env[intro_ramp_down_start:lead_in_samples] = np.linspace(intro_gain, duck_gain, lead_in_samples - intro_ramp_down_start)
+                            # Descente de 2 secondes avant l'arrivée de la voix (8s à 10s)
+                            if lead_in_samples > intro_ramp_down_start:
+                                env[intro_ramp_down_start:lead_in_samples] = np.linspace(intro_gain, duck_gain, lead_in_samples - intro_ramp_down_start)
 
-                        # Sous la voix pendant 10 secondes (10s à 20s) : ducking feutré (-30 dB)
-                        env[lead_in_samples:fade_out_start] = duck_gain
+                            # Sous la voix pendant 10 secondes (10s à 20s) : ducking feutré (-30 dB)
+                            env[lead_in_samples:fade_out_start] = duck_gain
 
                         # Fondu d'extinction progressif (20s à 24s)
                         if fade_out_end > fade_out_start:
@@ -1843,11 +1853,19 @@ class PodcastEngine:
                         # Mode continu : ambiance en nappe sur tout l'épisode avec ducking feutré (-30 dB) sous chaque parole
                         env = np.full(total_samples, swell_gain, dtype=np.float32)
 
-                        # Descente de 2 secondes avant l'arrivée de la voix
-                        intro_ramp_down_start = max(0, lead_in_samples - int(2.0 * sample_rate))
-                        env[:intro_ramp_down_start] = intro_gain
-                        if lead_in_samples > intro_ramp_down_start:
-                            env[intro_ramp_down_start:lead_in_samples] = np.linspace(intro_gain, duck_gain, lead_in_samples - intro_ramp_down_start)
+                        if has_jingle:
+                            # Silence musical complet pendant le jingle (0s à 10s)
+                            env[:lead_in_samples] = 0.0
+                            # Entrée progressive vers le niveau ducké (-30 dB) au début de la voix
+                            fade_in_len = min(int(2.0 * sample_rate), speech_len)
+                            if fade_in_len > 0:
+                                env[lead_in_samples:lead_in_samples + fade_in_len] = np.linspace(0.0, duck_gain, fade_in_len)
+                        else:
+                            # Descente de 2 secondes avant l'arrivée de la voix
+                            intro_ramp_down_start = max(0, lead_in_samples - int(2.0 * sample_rate))
+                            env[:intro_ramp_down_start] = intro_gain
+                            if lead_in_samples > intro_ramp_down_start:
+                                env[intro_ramp_down_start:lead_in_samples] = np.linspace(intro_gain, duck_gain, lead_in_samples - intro_ramp_down_start)
 
                         # Ducking sous chaque réplique avec attack / release douces
                         for item in shifted_dialogue:
@@ -1858,7 +1876,7 @@ class PodcastEngine:
                             s_att = max(0, s_samp - att_samp)
                             e_rel = min(total_samples, e_samp + rel_samp)
                             env[s_samp:e_samp] = duck_gain
-                            if s_samp > s_att:
+                            if s_samp > s_att and s_att >= lead_in_samples:
                                 env[s_att:s_samp] = np.linspace(env[s_att], duck_gain, s_samp - s_att)
                             if e_rel > e_samp:
                                 env[e_samp:e_rel] = np.linspace(duck_gain, swell_gain, e_rel - e_samp)
@@ -2024,23 +2042,31 @@ class PodcastEngine:
         sfx_ambient_id = opts.get("sfx_ambient") or opts.get("sfx")
 
         if isinstance(incoming_audio_events, list):
-            has_music_event = any(e.get("type") in ("music", "intro", "intro_music", "outro", "outro_music", "fade_out", "fadeout") for e in incoming_audio_events)
+            has_music_event = any(e.get("type") in ("fade_out", "fadeout", "outro", "outro_music") for e in incoming_audio_events)
+            has_jingle_event = any(e.get("type") in ("music", "intro", "intro_music") for e in incoming_audio_events)
             has_sfx_event = any(e.get("type") == "sfx" for e in incoming_audio_events)
 
-            if not has_music_event:
-                music_enabled = False
+            if not has_jingle_event:
                 jingle_enabled = False
-                bg_music_id = None
                 jingle_intro_id = None
             else:
-                music_enabled = True
                 jingle_enabled = True
                 j_ev = next((e for e in incoming_audio_events if e.get("type") in ("music", "intro", "intro_music") and e.get("track_id")), None)
                 if j_ev and j_ev.get("track_id") not in ("none", "", None):
                     jingle_intro_id = j_ev.get("track_id")
+                else:
+                    jingle_intro_id = cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")
+
+            if not has_music_event:
+                music_enabled = False
+                bg_music_id = None
+            else:
+                music_enabled = True
                 bg_ev = next((e for e in incoming_audio_events if e.get("type") in ("fade_out", "fadeout", "outro", "outro_music") and e.get("track_id")), None)
                 if bg_ev and bg_ev.get("track_id") not in ("none", "", None):
                     bg_music_id = bg_ev.get("track_id")
+                else:
+                    bg_music_id = cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")
 
             if not has_sfx_event:
                 sfx_enabled = False
@@ -2053,13 +2079,16 @@ class PodcastEngine:
                 elif not sfx_ambient_id or sfx_ambient_id == "none":
                     sfx_ambient_id = "auto"
 
-        # Résolution selon les drapeaux booléens des 2 cases à cocher
+        # Résolution selon les drapeaux booléens
         if music_enabled is False:
             bg_music_id = None
-            jingle_intro_id = None
         else:
             if bg_music_id is None:
                 bg_music_id = cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")
+
+        if jingle_enabled is False:
+            jingle_intro_id = None
+        else:
             if jingle_intro_id is None:
                 jingle_intro_id = cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")
 
@@ -2135,19 +2164,24 @@ class PodcastEngine:
                         lead_in = 10.0 if (jingle_path or bg_path) else 0.5
                         audio_events = []
                         if jingle_path or bg_path:
-                            j_title = "Jingle & Ambiance d'introduction"
                             if jingle_path:
-                                j_title = "Jingle Piano Solennel & Nappe" if "solemn" in jingle_path else "Générique d'introduction & Nappe"
+                                j_title = "Jingle d'ouverture"
+                                j_desc = "Jingle solo (10s), descente douce à 00:08 avant la voix"
+                                j_track = jingle_intro_id or "jingle_piano_solemn"
+                            else:
+                                j_title = "Ambiance musicale d'ouverture"
+                                j_desc = "Amorce musicale solo (10s), descente douce à 00:08 avant la voix"
+                                j_track = bg_music_id or "bed_cozy_jazz_study"
                             audio_events.append({
                                 "id": "event_intro_music",
                                 "type": "music",
                                 "title": j_title,
                                 "label": "00:00 – 00:10",
-                                "description": "Amorce musicale solo (10s), descente douce à 00:08 avant la voix",
+                                "description": j_desc,
                                 "start_time": 0.0,
                                 "end_time": lead_in,
                                 "icon": "music",
-                                "track_id": jingle_intro_id or "jingle_piano_solemn"
+                                "track_id": j_track
                             })
                         if sfx_path and sfx_ambient_id:
                             sfx_name = "Vent du Désert" if "desert" in sfx_ambient_id else sfx_ambient_id
