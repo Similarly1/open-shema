@@ -22,6 +22,19 @@ logger = logging.getLogger("webview_app")
 
 try:
     import webview
+    import webview.util
+    _orig_interop = webview.util.interop_dll_path
+    def _safe_interop_dll_path(dll_name: str) -> str:
+        try:
+            return _orig_interop(dll_name)
+        except FileNotFoundError:
+            # Sécurité anti-crash pour les sondes multi-plateformes (win-arm64, win-x86)
+            app_root = os.path.dirname(os.path.abspath(__file__))
+            fallback_dir = os.path.join(app_root, "_internal", "webview", "lib")
+            if os.path.exists(fallback_dir):
+                return fallback_dir
+            return app_root
+    webview.util.interop_dll_path = _safe_interop_dll_path
 except ImportError:
     webview = None
 from typing import Dict, List, Any, Optional

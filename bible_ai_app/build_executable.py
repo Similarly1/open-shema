@@ -177,13 +177,12 @@ def build():
             shutil.copytree(src_assets, dest_assets)
 
         # 4. Purge des binaires incompatibles avec le pipeline de signature Windows Store (erreur 0x800700C1)
-        # Élimine les résidus Tcl/Tk et les DLLs d'architectures étrangères (x86, ARM64)
-        print("-> Nettoyage des binaires et dépendances incompatibles Store (anti-0x800700C1)...")
+        # Élimine uniquement les résidus Tcl/Tk (qui causaient 0x800700C1)
+        print("-> Nettoyage des résidus Tcl/Tk (anti-0x800700C1)...")
         files_to_purge = [
             os.path.join(dist_app_dir, "_internal", "tcl86t.dll"),
             os.path.join(dist_app_dir, "_internal", "tk86t.dll"),
             os.path.join(dist_app_dir, "_internal", "_tkinter.pyd"),
-            os.path.join(dist_app_dir, "_internal", "webview", "lib", "WebBrowserInterop.x86.dll"),
         ]
         dirs_to_purge = [
             os.path.join(dist_app_dir, "_internal", "tcl"),
@@ -192,8 +191,6 @@ def build():
             os.path.join(dist_app_dir, "_internal", "_tcl_data"),
             os.path.join(dist_app_dir, "_internal", "_tk_data"),
             os.path.join(dist_app_dir, "_internal", "clr_loader", "ffi", "dlls", "x86"),
-            os.path.join(dist_app_dir, "_internal", "webview", "lib", "runtimes", "win-x86"),
-            os.path.join(dist_app_dir, "_internal", "webview", "lib", "runtimes", "win-arm64"),
         ]
         for f in files_to_purge:
             if os.path.exists(f):
@@ -207,6 +204,18 @@ def build():
                     shutil.rmtree(d)
                 except Exception:
                     pass
+
+        # 5. Garantie de présence des runtimes WebView2 (win-arm64, win-x64, win-x86)
+        # Crucial pour éviter 'Cannot find win-arm64' sur Surface Laptop et machines Windows on ARM
+        try:
+            import webview
+            wv_src_lib = os.path.join(os.path.dirname(webview.__file__), "lib")
+            wv_dst_lib = os.path.join(dist_app_dir, "_internal", "webview", "lib")
+            if os.path.exists(wv_src_lib):
+                shutil.copytree(wv_src_lib, wv_dst_lib, dirs_exist_ok=True)
+                print("-> Synchronisation complète des runtimes WebView2 (win-arm64, win-x64, win-x86) effectuée.")
+        except Exception as e:
+            print(f"Avertissement synchronisation runtimes webview : {e}")
 
         print("\n[SUCCÈS] Build généré avec succès dans 'dist/OpenShema/' !")
         print("Pour tester : dist\\OpenShema\\OpenShema.exe\n")

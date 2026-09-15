@@ -20,7 +20,7 @@ PACKAGE_NAME = "OpenShema.OpenShema"
 PUBLISHER_ID = "CN=EE79AB15-04CF-49DC-868E-EEEB85DD3708"
 PUBLISHER_DISPLAY_NAME = "Open Shema"
 DISPLAY_NAME = "Open Shema"
-PACKAGE_VERSION = "0.3.1.0"  # Format Quad: Major.Minor.Build.Revision (Le 4e chiffre doit impérativement être 0 pour le Store)
+PACKAGE_VERSION = "0.3.2.0"  # Format Quad: Major.Minor.Build.Revision (Le 4e chiffre doit impérativement être 0 pour le Store)
 STORE_ID = "9NXC16S8DHT3"
 BG_COLOR = "#0F172A"
 
@@ -208,13 +208,12 @@ def build_msix(rebuild_binary=False):
     generate_store_assets()
     generate_appx_manifest()
 
-    # Nettoyage de sécurité des binaires incompatibles avec le pipeline de signature du Store (0x800700C1)
+    # Nettoyage de sécurité des résidus Tcl/Tk (qui causaient 0x800700C1)
     internal_dir = os.path.join(APP_DIR, "_internal")
     files_to_purge = [
         os.path.join(internal_dir, "tcl86t.dll"),
         os.path.join(internal_dir, "tk86t.dll"),
         os.path.join(internal_dir, "_tkinter.pyd"),
-        os.path.join(internal_dir, "webview", "lib", "WebBrowserInterop.x86.dll"),
     ]
     dirs_to_purge = [
         os.path.join(internal_dir, "tcl"),
@@ -223,8 +222,6 @@ def build_msix(rebuild_binary=False):
         os.path.join(internal_dir, "_tcl_data"),
         os.path.join(internal_dir, "_tk_data"),
         os.path.join(internal_dir, "clr_loader", "ffi", "dlls", "x86"),
-        os.path.join(internal_dir, "webview", "lib", "runtimes", "win-x86"),
-        os.path.join(internal_dir, "webview", "lib", "runtimes", "win-arm64"),
     ]
     for f in files_to_purge:
         if os.path.exists(f):
@@ -238,6 +235,18 @@ def build_msix(rebuild_binary=False):
                 shutil.rmtree(d)
             except Exception:
                 pass
+
+    # Garantie absolue de présence des runtimes WebView2 (win-arm64, win-x64, win-x86)
+    # Requis par pywebview sur Surface Laptop et architectures Windows on ARM
+    try:
+        import webview
+        wv_src_lib = os.path.join(os.path.dirname(webview.__file__), "lib")
+        wv_dst_lib = os.path.join(internal_dir, "webview", "lib")
+        if os.path.exists(wv_src_lib):
+            shutil.copytree(wv_src_lib, wv_dst_lib, dirs_exist_ok=True)
+            print("-> Synchronisation complète des runtimes WebView2 (win-arm64, win-x64, win-x86) effectuée.")
+    except Exception as e:
+        print(f"Avertissement synchronisation runtimes webview : {e}")
 
     # Retrait du marqueur .portable du conteneur MSIX (les données écrites doivent aller dans %LOCALAPPDATA%)
     portable_f = os.path.join(APP_DIR, ".portable")
