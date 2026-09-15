@@ -1958,38 +1958,42 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
 .as-timeline-event-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.65), rgba(15, 23, 42, 0.8));
-  border: 1px dashed rgba(234, 88, 12, 0.35);
+  gap: 14px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: var(--bg-card, #1e293b);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
   border-left: 4px solid var(--accent-orange, #ea580c);
   transition: all 0.2s ease;
   cursor: pointer;
   user-select: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .as-timeline-event-card:hover {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
   border-color: var(--accent-orange, #ea580c);
-  transform: translateX(2px);
+  border-left-color: var(--accent-orange, #ea580c);
+  transform: translateX(3px);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.12);
 }
 
 .as-timeline-event-card.is-active,
 .as-timeline-event-card.active-karaoke {
   border-color: var(--accent-orange, #ea580c);
   border-left-color: var(--accent-orange, #ea580c);
-  background: linear-gradient(135deg, rgba(234, 88, 12, 0.2), rgba(15, 23, 42, 0.92)) !important;
-  box-shadow: 0 0 14px rgba(234, 88, 12, 0.35);
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.12), var(--bg-card, #1e293b)) !important;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.3), 0 6px 18px rgba(234, 88, 12, 0.18) !important;
+  transform: translateX(4px);
 }
 
 .as-timeline-event-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: rgba(234, 88, 12, 0.15);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(234, 88, 12, 0.12);
   color: var(--accent-orange, #ea580c);
+  border: 1px solid rgba(234, 88, 12, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2000,17 +2004,20 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
 .as-timeline-event-body {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .as-timeline-event-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
 }
 
 .as-timeline-event-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
   display: flex;
@@ -2019,20 +2026,55 @@ body.theme-light .as-btn-suggest-axes .audio-studio-spinner {
 }
 
 .as-timeline-event-badge {
-  font-size: 10.5px;
+  font-size: 11px;
   font-family: var(--font-mono, monospace);
   font-weight: 600;
   color: var(--accent-orange, #ea580c);
-  background: rgba(234, 88, 12, 0.12);
-  padding: 1px 7px;
-  border-radius: 4px;
+  background: rgba(234, 88, 12, 0.1);
+  border: 1px solid rgba(234, 88, 12, 0.25);
+  padding: 2px 8px;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
 .as-timeline-event-desc {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-secondary);
-  line-height: 1.25;
-  margin-top: 1px;
+  line-height: 1.35;
+}
+
+/* Optimisation Mode Clair (body.theme-light & data-theme light) */
+body.theme-light .as-timeline-event-card,
+[data-theme="light"] .as-timeline-event-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  border-left-color: var(--accent-orange, #ea580c);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+body.theme-light .as-timeline-event-card:hover,
+[data-theme="light"] .as-timeline-event-card:hover {
+  background: #ffffff;
+  border-color: var(--accent-orange, #ea580c);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.12);
+}
+
+body.theme-light .as-timeline-event-card.is-active,
+body.theme-light .as-timeline-event-card.active-karaoke,
+[data-theme="light"] .as-timeline-event-card.is-active,
+[data-theme="light"] .as-timeline-event-card.active-karaoke {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.08), #ffffff) !important;
+  border-color: var(--accent-orange, #ea580c);
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.25), 0 4px 14px rgba(234, 88, 12, 0.12) !important;
+}
+
+body.theme-light .as-timeline-event-title,
+[data-theme="light"] .as-timeline-event-title {
+  color: #0f172a;
+}
+
+body.theme-light .as-timeline-event-desc,
+[data-theme="light"] .as-timeline-event-desc {
+  color: #475569;
 }
 
