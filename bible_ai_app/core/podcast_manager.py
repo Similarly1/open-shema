@@ -3131,35 +3131,56 @@ class PodcastEngine:
             )
         except RuntimeError as q_err:
             logger.warning("[PodcastEngine] %s. Repli automatique sur Edge-TTS.", q_err)
+            if progress_callback:
+                progress_callback(1, 20, f"Quota quotidien Gemini atteint. Repli automatique sur Edge-TTS...")
+            is_female_solo = any(f_voice in str(raw_solo).lower() for f_voice in ("kore", "aoede", "female", "féminine", "femme"))
+            edge_solo = "fr-FR-VivienneMultilingualNeural" if is_female_solo else "fr-FR-HenriNeural"
             mapped_opts = dict(opts)
-            mapped_opts["voice_speaker_a"] = "fr-FR-DeniseNeural"
+            mapped_opts["voice_speaker_a"] = "fr-FR-VivienneMultilingualNeural"
             mapped_opts["voice_speaker_b"] = "fr-FR-HenriNeural"
-            mapped_opts["voice_solo"] = "fr-FR-HenriNeural"
+            mapped_opts["voice_solo"] = edge_solo
             res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
-            res["engine"] = "gemini_tts"
-            record["engine"] = "gemini_tts"
+            res["engine"] = "edge_tts"
+            record["engine"] = "edge_tts"
             PodcastHistory.upsert(record)
             return record
 
-        if progress_callback:
-            progress_callback(1, 40, f"Génération audio neuronale Gemini Flash ({model_id})...")
+        pcm_bytes = None
+        models_to_try = [model_id]
+        fallback_model = "gemini-2.5-flash-preview-tts" if "3.1" in model_id else "gemini-3.1-flash-tts-preview"
+        if fallback_model not in models_to_try:
+            models_to_try.append(fallback_model)
 
-        try:
-            pcm_bytes = cls._call_gemini_tts_api(
-                prompt=full_prompt,
-                speech_config=speech_config,
-                model_id=model_id,
-                cfg=cfg
-            )
-        except Exception as e_gen:
-            logger.error("[PodcastEngine] Erreur synthèse Gemini TTS : %s. Repli automatique sur Edge-TTS.", e_gen)
+        last_api_err = None
+        for current_model in models_to_try:
+            try:
+                if progress_callback:
+                    progress_callback(1, 40, f"Génération audio neuronale Gemini Flash ({current_model})...")
+                pcm_bytes = cls._call_gemini_tts_api(
+                    prompt=full_prompt,
+                    speech_config=speech_config,
+                    model_id=current_model,
+                    cfg=cfg
+                )
+                if pcm_bytes:
+                    break
+            except Exception as e_gen:
+                last_api_err = e_gen
+                logger.warning("[PodcastEngine] Tentative échouée avec %s : %s", current_model, e_gen)
+
+        if not pcm_bytes:
+            logger.error("[PodcastEngine] Erreur synthèse Gemini TTS après essais : %s. Repli automatique sur Edge-TTS.", last_api_err)
+            if progress_callback:
+                progress_callback(1, 45, "Indisponibilité temporaire de l'API Google. Repli automatique sur Edge-TTS...")
+            is_female_solo = any(f_voice in str(raw_solo).lower() for f_voice in ("kore", "aoede", "female", "féminine", "femme"))
+            edge_solo = "fr-FR-VivienneMultilingualNeural" if is_female_solo else "fr-FR-HenriNeural"
             mapped_opts = dict(opts)
-            mapped_opts["voice_speaker_a"] = "fr-FR-DeniseNeural"
+            mapped_opts["voice_speaker_a"] = "fr-FR-VivienneMultilingualNeural"
             mapped_opts["voice_speaker_b"] = "fr-FR-HenriNeural"
-            mapped_opts["voice_solo"] = "fr-FR-HenriNeural"
+            mapped_opts["voice_solo"] = edge_solo
             res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
-            res["engine"] = "gemini_tts"
-            record["engine"] = "gemini_tts"
+            res["engine"] = "edge_tts"
+            record["engine"] = "edge_tts"
             PodcastHistory.upsert(record)
             return record
 
