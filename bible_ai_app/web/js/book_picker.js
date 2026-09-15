@@ -466,7 +466,7 @@ const BookPicker = {
 
       if (book.testament === 'OT') {
         this.otGridEl?.appendChild(btn);
-      } else {
+      } else if (book.testament === 'NT') {
         this.ntGridEl?.appendChild(btn);
       }
     });

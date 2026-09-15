@@ -246,7 +246,7 @@ class BibleReaderMixin:
         return None
 
     def get_books_list(self) -> List[Dict[str, Any]]:
-        """Retourne la liste complète des livres bibliques."""
+        """Retourne la liste des 66 livres bibliques du canon standard (39 AT + 27 NT)."""
         books = []
         for name, code, ch_count in BOOKS_OT:
             books.append({
@@ -261,13 +261,6 @@ class BibleReaderMixin:
                 "name": name,
                 "chapters": ch_count,
                 "testament": "NT"
-            })
-        for name, code, ch_count in BOOKS_DEUTERO:
-            books.append({
-                "code": code,
-                "name": name,
-                "chapters": ch_count,
-                "testament": "DEUTERO"
             })
         return books
 
