@@ -2888,8 +2888,16 @@ const AudioStudioView = {
             <input type="number" class="turn-pause-input" value="${pauseMs}" min="100" max="2500" step="50">
             <span>ms</span>
           </label>
-          <button type="button" class="btn-icon btn-sm btn-delete-turn" title="Supprimer cette réplique" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer;">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          <button type="button" class="as-turn-btn-action as-turn-btn-edit" title="Modifier le texte de cette partie du script">
+            <span class="as-btn-icon-pencil">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </span>
+            <span class="as-btn-icon-check" style="display: none;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+          </button>
+          <button type="button" class="as-turn-btn-action as-turn-btn-delete" title="Supprimer cette partie du script">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
         </div>
       </div>
@@ -2922,9 +2930,57 @@ const AudioStudioView = {
       }
     });
 
+    // Événement édition (crayon / validation)
+    const btnEdit = card.querySelector('.as-turn-btn-edit');
+    const iconPencil = card.querySelector('.as-btn-icon-pencil');
+    const iconCheck = card.querySelector('.as-btn-icon-check');
+    if (btnEdit && textarea) {
+      btnEdit.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isEditing = card.classList.contains('is-editing');
+        if (!isEditing) {
+          card.classList.add('is-editing');
+          if (iconPencil) iconPencil.style.display = 'none';
+          if (iconCheck) iconCheck.style.display = 'inline-flex';
+          btnEdit.title = "Valider et terminer la modification";
+          btnEdit.classList.add('active');
+          textarea.focus();
+          const len = textarea.value.length;
+          textarea.setSelectionRange(len, len);
+        } else {
+          card.classList.remove('is-editing');
+          if (iconPencil) iconPencil.style.display = 'inline-flex';
+          if (iconCheck) iconCheck.style.display = 'none';
+          btnEdit.title = "Modifier le texte de cette partie du script";
+          btnEdit.classList.remove('active');
+          textarea.blur();
+          if (typeof App !== 'undefined' && typeof App.showToast === 'function') {
+            App.showToast('Modification enregistrée');
+          }
+        }
+      });
+
+      textarea.addEventListener('focus', () => {
+        card.classList.add('is-editing');
+        if (iconPencil) iconPencil.style.display = 'none';
+        if (iconCheck) iconCheck.style.display = 'inline-flex';
+        btnEdit.title = "Valider et terminer la modification";
+        btnEdit.classList.add('active');
+      });
+
+      textarea.addEventListener('blur', () => {
+        card.classList.remove('is-editing');
+        if (iconPencil) iconPencil.style.display = 'inline-flex';
+        if (iconCheck) iconCheck.style.display = 'none';
+        btnEdit.title = "Modifier le texte de cette partie du script";
+        btnEdit.classList.remove('active');
+      });
+    }
+
     // Événement suppression
-    const btnDelete = card.querySelector('.btn-delete-turn');
-    btnDelete?.addEventListener('click', () => {
+    const btnDelete = card.querySelector('.as-turn-btn-delete');
+    btnDelete?.addEventListener('click', (e) => {
+      e.stopPropagation();
       this.deleteTurn(idx);
     });
 
@@ -2961,16 +3017,18 @@ const AudioStudioView = {
       speaker_name: nextSpeaker,
       voice_role: voiceRole,
       text: '',
-      pause_after_ms: 350
+      speech_text: '',
+      pause_after_ms: 350,
+      start_time: 0.0,
+      end_time: 0.0
     });
 
     this.renderScript();
 
-    // Focus sur la nouvelle réplique
     setTimeout(() => {
       const cards = this.elements.scriptList?.querySelectorAll('.audio-studio-turn-card');
-      if (cards && cards.length > 0) {
-        const lastCard = cards[cards.length - 1];
+      const lastCard = cards?.[cards.length - 1];
+      if (lastCard) {
         lastCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         const ta = lastCard.querySelector('textarea');
         ta?.focus();
@@ -2979,9 +3037,31 @@ const AudioStudioView = {
   },
 
   deleteTurn(idx) {
-    if (this.currentPodcast?.script_dialogue?.[idx]) {
-      this.currentPodcast.script_dialogue.splice(idx, 1);
-      this.renderScript();
+    if (!this.currentPodcast) return;
+    const p = this.currentPodcast;
+    const script = Array.isArray(p.script_dialogue)
+      ? p.script_dialogue
+      : (Array.isArray(p.dialogue) ? p.dialogue : null);
+
+    if (!script || idx < 0 || idx >= script.length) return;
+
+    script.splice(idx, 1);
+    if (Array.isArray(p.dialogue) && p.dialogue !== script) {
+      if (idx < p.dialogue.length) {
+        p.dialogue.splice(idx, 1);
+      }
+    }
+    p.script_dialogue = script;
+    script.forEach((t, i) => { t.index = i; });
+
+    if (p.id && typeof PodcastHistory !== 'undefined' && typeof PodcastHistory.upsert === 'function') {
+      PodcastHistory.upsert(p);
+    }
+
+    this.renderScript();
+
+    if (typeof App !== 'undefined' && typeof App.showToast === 'function') {
+      App.showToast('Partie du script supprimée');
     }
   },
 
