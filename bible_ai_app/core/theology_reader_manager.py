@@ -505,6 +505,8 @@ class TheologyReaderManager:
                     with zipfile.ZipFile(fpath, 'r') as z:
                         if ch_info["zip_file"] in z.namelist():
                             html_content = z.read(ch_info["zip_file"]).decode('utf-8', errors='ignore')
+                            if ch_info.get("anchor"):
+                                html_content = EpubLoader.slice_html_by_chapter(html_content, ch_info, inspect_data.get("chapters", []))
                             direct_paragraphs, direct_footnotes = EpubLoader.process_chapter_html(z, ch_info["zip_file"], html_content)
 
                             for idx_p, p_text in enumerate(direct_paragraphs):

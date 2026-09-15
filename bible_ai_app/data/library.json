@@ -1050,5 +1050,22 @@
     "chapters_count": 37,
     "chunks_count": 702,
     "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\An Introduction to the Old Testament Second Edition ( etc.) (z-library.sk, 1lib.sk, z-lib.sk).epub"
+  },
+  "ATOTN": {
+    "name": "ATOTN",
+    "title": "A Theology of the New Testament",
+    "author": "George Eldon Ladd",
+    "description": "Ladd's magisterial work on New Testament theology has well served thousands of seminary students since its publication in 1974. Enhanced and updated here by Donald A Hagner, this comprehensive, standard evangelical text now features augmented bibliographies and two completely new chapters on subjects that Ladd himself wanted to treat in a revised edition—the theology of each of the Synoptic Evangelists and the issue of unity and diversity in the New Testament—written, respectively, by R. T. France and David Wenham.Review\n\"Professor Ladd has produced a book which is massive in its intensity, vigorous in its approach, and attractive in its motivation\" Theology \"One of the most valid and valuable, comprehensive and coherent, contributions to our understanding of New Testament theology in recent years\" Methodist Recorder \"... up-to-date detailed bibliographies and helpful subject index. The language has also been made more 'inclusive'. For over twenty years this standard conservative work has met the needs of many theological students. As a result of the changes it will undoubtedly continue to meet the needs of many more. It is a good basic tool.\" Ministry Today About the Author\nGeorge Eldon Ladd (1911–1982) was professor of New Testament exegesis and theology at Fuller Theological Seminary, Pasadena, California. His numerous books include The New Testament and Criticism, A Commentary on the Revelation of John, and Theology of the New Testament.",
+    "year": "1975",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\ATOTN.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 47,
+    "chunks_count": 833,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\A Theology of the New Testament (George Eldon Ladd) (z-library.sk, 1lib.sk, z-lib.sk).epub"
   }
 }

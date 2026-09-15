@@ -21,6 +21,9 @@ import uuid
 import asyncio
 import logging
 import datetime
+import threading
+import io
+import wave
 from typing import Dict, List, Any, Optional, Callable, Tuple
 
 logger = logging.getLogger("podcast_manager")
@@ -122,7 +125,91 @@ class PodcastHistory:
                         logger.warning("[PodcastHistory] Erreur suppression MP3 %s : %s", audio_path, e)
             cls.save_all(new_items)
             return True
-        return False
+class GeminiQuotaTracker:
+    """Suivi et limitation des quotas Gemini TTS (RPM, RPD, TPM)."""
+
+    QUOTA_FILE = os.path.join(get_podcasts_dir(), "gemini_tts_quota.json")
+    _lock = threading.Lock()
+
+    @classmethod
+    def _load_data(cls) -> dict:
+        try:
+            if os.path.exists(cls.QUOTA_FILE):
+                with open(cls.QUOTA_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+        except Exception as e:
+            logger.warning("[GeminiQuotaTracker] Erreur lecture quota: %s", e)
+        return {}
+
+    @classmethod
+    def _save_data(cls, data: dict):
+        try:
+            os.makedirs(os.path.dirname(cls.QUOTA_FILE), exist_ok=True)
+            with open(cls.QUOTA_FILE, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+        except Exception as e:
+            logger.warning("[GeminiQuotaTracker] Erreur sauvegarde quota: %s", e)
+
+    @classmethod
+    def get_status(cls, rpm_limit: int = 3, rpd_limit: int = 10, tpm_limit: int = 10000) -> dict:
+        with cls._lock:
+            data = cls._load_data()
+            today = datetime.date.today().isoformat()
+            if data.get("date") != today:
+                return {
+                    "date": today,
+                    "requests_today": 0,
+                    "tokens_today": 0,
+                    "rpd_limit": rpd_limit,
+                    "rpm_limit": rpm_limit,
+                    "tpm_limit": tpm_limit,
+                    "remaining_rpd": rpd_limit if rpd_limit > 0 else 9999
+                }
+            reqs = int(data.get("requests_today", 0))
+            rem = max(0, rpd_limit - reqs) if rpd_limit > 0 else 9999
+            return {
+                "date": today,
+                "requests_today": reqs,
+                "tokens_today": int(data.get("tokens_today", 0)),
+                "rpd_limit": rpd_limit,
+                "rpm_limit": rpm_limit,
+                "tpm_limit": tpm_limit,
+                "remaining_rpd": rem
+            }
+
+    @classmethod
+    def check_and_increment(cls, estimated_tokens: int = 0, rpm_limit: int = 3, rpd_limit: int = 10, tpm_limit: int = 10000):
+        with cls._lock:
+            data = cls._load_data()
+            today = datetime.date.today().isoformat()
+            if data.get("date") != today:
+                data = {
+                    "date": today,
+                    "requests_today": 0,
+                    "tokens_today": 0,
+                    "last_request_timestamp": 0.0
+                }
+
+            requests_today = int(data.get("requests_today", 0))
+            if rpd_limit > 0 and requests_today >= rpd_limit:
+                raise RuntimeError(
+                    f"Quota quotidien Gemini Flash TTS atteint ({requests_today}/{rpd_limit} requêtes aujourd'hui). "
+                    "Repli automatique sur Edge-TTS."
+                )
+
+            if rpm_limit > 0:
+                last_ts = float(data.get("last_request_timestamp", 0.0))
+                min_interval = 60.0 / float(rpm_limit)
+                elapsed = time.time() - last_ts
+                if elapsed < min_interval:
+                    sleep_sec = min_interval - elapsed
+                    logger.info("[GeminiQuotaTracker] Régulation RPM Gemini : pause de %.1f secondes...", sleep_sec)
+                    time.sleep(sleep_sec)
+
+            data["requests_today"] = requests_today + 1
+            data["tokens_today"] = int(data.get("tokens_today", 0)) + estimated_tokens
+            data["last_request_timestamp"] = time.time()
+            cls._save_data(data)
 
 
 class PodcastEngine:
@@ -175,6 +262,47 @@ class PodcastEngine:
 
     VOXTRAL_MODEL = "voxtral-mini-tts-2603"
     VOXTRAL_API_BASE = "https://api.mistral.ai/v1"
+
+    GEMINI_TTS_MODELS = [
+        {"id": "gemini-3.1-flash-tts-preview", "name": "Gemini 3.1 Flash TTS (Recommandé, dernière génération)", "recommended": True},
+        {"id": "gemini-2.5-flash-preview-tts", "name": "Gemini 2.5 Flash TTS (Ultra-rapide)", "recommended": False},
+    ]
+
+    GEMINI_TTS_VOICES = [
+        # Voix Recommandées en Français (Timbres optimaux)
+        {"id": "Puck",      "name": "Puck (Masculine, engageante & naturelle — Recommandé FR)",       "gender": "Male",   "role": "both",    "category": "Voix Recommandées (Français)", "languages": ["fr"], "recommended_fr": True},
+        {"id": "Charon",    "name": "Charon (Masculine, grave, profonde & érudite — Recommandé FR)", "gender": "Male",   "role": "scholar", "category": "Voix Recommandées (Français)", "languages": ["fr"], "recommended_fr": True},
+        {"id": "Aoede",     "name": "Aoede (Féminine, posée, chaleureuse & fluide — Recommandée FR)", "gender": "Female", "role": "host",    "category": "Voix Recommandées (Français)", "languages": ["fr"], "recommended_fr": True},
+        {"id": "Kore",      "name": "Kore (Féminine, claire, douce & expressive — Recommandée FR)",    "gender": "Female", "role": "host",    "category": "Voix Recommandées (Français)", "languages": ["fr"], "recommended_fr": True},
+        {"id": "Fenrir",    "name": "Fenrir (Masculine, dynamique, chaleureuse & articulée — FR)",   "gender": "Male",   "role": "scholar", "category": "Voix Recommandées (Français)", "languages": ["fr"], "recommended_fr": True},
+
+        # Catalogue Complet des 30 Voix Google (Multilingue / Français natif)
+        {"id": "Leda",      "name": "Leda (Féminine, douce & mélodieuse)",        "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Orpheus",   "name": "Orpheus (Masculine, résonnante & solennelle)", "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Zephyr",    "name": "Zephyr (Masculine, claire & fluide)",         "gender": "Male",   "role": "both",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Callisto",  "name": "Callisto (Féminine, calme & posée)",          "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Europa",    "name": "Europa (Féminine, vive & articulée)",          "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Ganymede",  "name": "Ganymede (Masculine, ferme & posée)",         "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Io",        "name": "Io (Féminine, vive & expressive)",            "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Titan",     "name": "Titan (Masculine, puissante & affirmée)",      "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Oberon",    "name": "Oberon (Masculine, chaleureuse & posée)",     "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Miranda",   "name": "Miranda (Féminine, expressive & douce)",       "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Ariel",     "name": "Ariel (Féminine, lumineuse & aérienne)",      "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Umbriel",   "name": "Umbriel (Masculine, posée & méditative)",     "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Titania",   "name": "Titania (Féminine, majestueuse & claire)",    "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Cupid",     "name": "Cupid (Féminine, enjouée & légère)",          "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Enceladus", "name": "Enceladus (Masculine, intime & posée)",       "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Dione",     "name": "Dione (Féminine, claire & sereine)",          "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Rhea",      "name": "Rhea (Féminine, douce & harmonieuse)",        "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Iapetus",   "name": "Iapetus (Masculine, sobre & profonde)",       "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Hyperion",  "name": "Hyperion (Masculine, dynamique & assurée)",   "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Phoebe",    "name": "Phoebe (Féminine, posée & équilibrée)",       "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Proteus",   "name": "Proteus (Masculine, articulée & précise)",    "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Triton",    "name": "Triton (Masculine, sobre & affirmée)",        "gender": "Male",   "role": "scholar", "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Nereid",    "name": "Nereid (Féminine, fluide & discrète)",        "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Thalassa",  "name": "Thalassa (Féminine, contemplative & douce)",   "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+        {"id": "Naiad",     "name": "Naiad (Féminine, délicate & limpide)",        "gender": "Female", "role": "host",    "category": "Catalogue Complet Google (30 voix)", "languages": ["fr"]},
+    ]
 
     DEPTH_CHAR_LIMITS = {
         0: 1000,  # Éclair (~250 tokens / source)
@@ -273,16 +401,26 @@ class PodcastEngine:
 
     @classmethod
     def get_available_voices(cls, cfg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Retourne le catalogue complet des voix Edge-TTS et Mistral Voxtral."""
+        """Retourne le catalogue complet des voix Edge-TTS, Mistral Voxtral et Google Gemini TTS."""
         voxtral_voices = cls.VOXTRAL_DEFAULT_VOICES
+        rpm = 3
+        rpd = 10
+        tpm = 10000
         if cfg:
             api_key = cfg.get("mistral_api_key", "")
             if api_key:
                 voxtral_voices = cls.fetch_voxtral_voices(api_key)
+            rpm = int(cfg.get("gemini_tts_rpm_limit", 3))
+            rpd = int(cfg.get("gemini_tts_rpd_limit", 10))
+            tpm = int(cfg.get("gemini_tts_tpm_limit", 10000))
+        quota_status = GeminiQuotaTracker.get_status(rpm_limit=rpm, rpd_limit=rpd, tpm_limit=tpm)
         return {
             "voices": cls.EDGE_VOICES,
             "edge_tts": cls.EDGE_VOICES,
-            "voxtral": voxtral_voices
+            "voxtral": voxtral_voices,
+            "gemini_tts": cls.GEMINI_TTS_VOICES,
+            "gemini_models": cls.GEMINI_TTS_MODELS,
+            "gemini_quota": quota_status
         }
 
     @classmethod
@@ -2078,8 +2216,13 @@ class PodcastEngine:
 
         chosen_engine = engine or record.get("engine") or cfg.get("audio_studio_engine", "edge_tts")
         opts = custom_options or {}
+        engine_mode = opts.get("engine_mode") or cfg.get("audio_studio_engine_mode", "single")
 
-        if chosen_engine == "voxtral":
+        if chosen_engine == "mixed" or engine_mode == "mixed":
+            res = cls._synthesize_mixed_engines(podcast_id, record, dialogue, opts, cfg, progress_callback)
+        elif chosen_engine == "gemini_tts":
+            res = cls._synthesize_gemini_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
+        elif chosen_engine == "voxtral":
             res = cls._synthesize_voxtral(podcast_id, record, dialogue, opts, cfg, progress_callback)
         else:
             res = cls._synthesize_edge_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
@@ -2698,7 +2841,32 @@ class PodcastEngine:
         audio_bytes = b""
         cfg = load_config()
 
-        if engine == "voxtral":
+        if engine == "gemini_tts":
+            api_key = cfg.get("google_api_key") or cfg.get("gemini_api_key") or os.getenv("GEMINI_API_KEY")
+            if api_key:
+                try:
+                    from google import genai
+                    client = genai.Client(api_key=api_key)
+                    model_id = cfg.get("audio_studio_gemini_model", "gemini-3.1-flash-tts-preview")
+                    resp = client.interactions.create(
+                        model=model_id,
+                        input=sample_text,
+                        response_format={"type": "audio"},
+                        generation_config={
+                            "speech_config": [
+                                {"voice": voice_id}
+                            ]
+                        }
+                    )
+                    if resp and resp.output_audio and resp.output_audio.data:
+                        raw_pcm = base64.b64decode(resp.output_audio.data)
+                        audio_bytes = cls._pcm_to_mp3(raw_pcm, 24000)
+                except Exception as e:
+                    logger.warning("[PodcastEngine] Erreur Gemini TTS sample : %s", e)
+
+            if not audio_bytes:
+                audio_bytes = cls._single_edge_tts_call(sample_text, "fr-FR-VivienneMultilingualNeural")
+        elif engine == "voxtral":
             mistral_key = cfg.get("mistral_api_key")
             if mistral_key:
                 try:
@@ -2769,6 +2937,443 @@ class PodcastEngine:
         frames_count = max(1, int(duration_ms / 24.0))
         silent_frame = b'\xff\xf3d\xc4' + b'\x00' * (frame_size - 4)
         return silent_frame * frames_count
+
+    @classmethod
+    def _pcm_to_mp3(cls, pcm_bytes: bytes, sample_rate: int = 24000) -> bytes:
+        """Convertit des octets PCM 16-bit mono 24kHz en MP3 encodé via PyAV."""
+        if not pcm_bytes:
+            return b""
+        try:
+            import wave
+            import av
+            import io
+            wav_buf = io.BytesIO()
+            with wave.open(wav_buf, "wb") as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(2)
+                wf.setframerate(sample_rate)
+                wf.writeframes(pcm_bytes)
+            wav_buf.seek(0)
+
+            in_c = av.open(wav_buf, "r")
+            out_buf = io.BytesIO()
+            out_c = av.open(out_buf, "w", format="mp3")
+            st = out_c.add_stream("libmp3lame", rate=sample_rate)
+            st.bit_rate = 64000
+            st.layout = "mono"
+            for frame in in_c.decode(audio=0):
+                for packet in st.encode(frame):
+                    out_c.mux(packet)
+            for packet in st.encode(None):
+                out_c.mux(packet)
+            out_c.close()
+            in_c.close()
+            return out_buf.getvalue()
+        except Exception as e_conv:
+            logger.error("[PodcastEngine] Erreur conversion PCM vers MP3 : %s", e_conv)
+            return b""
+
+    @classmethod
+    def _call_gemini_tts_api(
+        cls,
+        prompt: str,
+        speech_config: list,
+        model_id: str,
+        cfg: Dict[str, Any],
+        max_retries: int = 3
+    ) -> bytes:
+        """
+        Appelle l'API Google Gemini Flash TTS pour générer de l'audio PCM.
+        Implémente un retry automatique avec backoff exponentiel pour parer aux erreurs 500 temporaires.
+        """
+        api_key = cfg.get("google_api_key") or cfg.get("gemini_api_key") or os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("Aucune clé API Google configurée pour Gemini Flash TTS.")
+
+        from google import genai
+        client = genai.Client(api_key=api_key)
+
+        last_err = None
+        for attempt in range(max_retries):
+            try:
+                response = client.interactions.create(
+                    model=model_id,
+                    input=prompt,
+                    response_format={"type": "audio"},
+                    generation_config={
+                        "speech_config": speech_config
+                    }
+                )
+                if response and response.output_audio and response.output_audio.data:
+                    raw_b64 = response.output_audio.data
+                    return base64.b64decode(raw_b64)
+                else:
+                    raise RuntimeError("L'API Gemini n'a retourné aucune donnée audio.")
+            except Exception as e:
+                last_err = e
+                logger.warning(
+                    "[PodcastEngine] Tentative %d/%d échouée pour Gemini TTS (%s): %s",
+                    attempt + 1, max_retries, model_id, e
+                )
+                if attempt < max_retries - 1:
+                    time.sleep(2.0 * (attempt + 1))
+
+        # Fallback direct REST via httpx si l'interaction SDK échoue
+        try:
+            import httpx
+            url = f"https://generativelanguage.googleapis.com/v1beta/interactions?key={api_key}"
+            payload = {
+                "model": model_id,
+                "input": prompt,
+                "response_format": {"type": "audio"},
+                "generation_config": {
+                    "speech_config": speech_config
+                }
+            }
+            resp = httpx.post(url, json=payload, timeout=60.0)
+            if resp.status_code == 200:
+                data = resp.json()
+                out_audio = data.get("output_audio", {}).get("data")
+                if out_audio:
+                    return base64.b64decode(out_audio)
+        except Exception as e_rest:
+            logger.warning("[PodcastEngine] Tentative REST de secours échouée: %s", e_rest)
+
+        raise RuntimeError(f"Échec de l'appel Gemini Flash TTS après {max_retries} tentatives : {last_err}")
+
+    @classmethod
+    def _synthesize_gemini_tts(
+        cls,
+        podcast_id: str,
+        record: Dict[str, Any],
+        dialogue: List[Dict[str, Any]],
+        opts: Dict[str, Any],
+        cfg: Dict[str, Any],
+        progress_callback: Optional[Callable[[int, int, str], None]] = None
+    ) -> Dict[str, Any]:
+        """
+        Synthèse vocale neuronale via Google Gemini Flash TTS (Proposition C : Hybrid Batching).
+        Génère l'intégralité du dialogue ou de la chronique en 1 seul appel API pour respecter les quotas gratuits.
+        """
+        model_id = opts.get("gemini_model") or cfg.get("audio_studio_gemini_model", "gemini-3.1-flash-tts-preview")
+        raw_a = opts.get("gemini_voice_speaker_a") or opts.get("voice_speaker_a") or cfg.get("audio_studio_gemini_voice_speaker_a", "Puck")
+        raw_b = opts.get("gemini_voice_speaker_b") or opts.get("voice_speaker_b") or cfg.get("audio_studio_gemini_voice_speaker_b", "Charon")
+        raw_solo = opts.get("gemini_voice_solo") or opts.get("voice_solo") or cfg.get("audio_studio_gemini_voice_solo", "Puck")
+
+        rpm_limit = int(cfg.get("gemini_tts_rpm_limit", 3))
+        rpd_limit = int(cfg.get("gemini_tts_rpd_limit", 10))
+        tpm_limit = int(cfg.get("gemini_tts_tpm_limit", 10000))
+
+        mastering_enabled = opts.get("mastering_enabled", cfg.get("audio_studio_mastering_enabled", True))
+        total_lines = len(dialogue)
+
+        api_key = cfg.get("google_api_key") or cfg.get("gemini_api_key") or os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            logger.warning("[PodcastEngine] Clé API Google absente pour Gemini TTS. Repli automatique sur Edge-TTS.")
+            mapped_opts = dict(opts)
+            mapped_opts["voice_speaker_a"] = "fr-FR-DeniseNeural"
+            mapped_opts["voice_speaker_b"] = "fr-FR-HenriNeural"
+            mapped_opts["voice_solo"] = "fr-FR-HenriNeural"
+            res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
+            res["engine"] = "gemini_tts"
+            record["engine"] = "gemini_tts"
+            PodcastHistory.upsert(record)
+            return record
+
+        fmt = str(record.get("format_type") or record.get("format") or opts.get("format_type") or "dialogue").lower()
+        is_solo = (fmt == "solo" or total_lines <= 1)
+
+        if progress_callback:
+            progress_callback(1, 15, f"Préparation de l'épisode complet ({model_id})...")
+
+        # Construction du prompt et de la configuration de voix selon le format
+        if is_solo:
+            speech_config = [
+                {"voice": raw_solo}
+            ]
+            clean_turns = []
+            for item in dialogue:
+                txt = item.get("speech_text") or item.get("text", "")
+                ct = cls._clean_text_for_speech(txt)
+                if ct:
+                    clean_turns.append(ct)
+            joined_text = "\n\n".join(clean_turns)
+            full_prompt = f"TTS the following theological reflection in French with natural pacing, clear articulation, and warm depth:\n\n{joined_text}"
+        else:
+            spk_a_name = "Animatrice"
+            spk_b_name = "Exégète"
+            speech_config = [
+                {"speaker": spk_a_name, "voice": raw_a},
+                {"speaker": spk_b_name, "voice": raw_b}
+            ]
+            lines = [
+                "TTS the following dialogue in French with natural pacing, lively interaction, and clear theological depth between Animatrice and Exégète:"
+            ]
+            for idx, item in enumerate(dialogue):
+                v_role = str(item.get("voice_role", "")).upper()
+                spk = str(item.get("speaker", "")).lower()
+                is_b = (v_role in ("B", "SCHOLAR") or any(k in spk for k in ("scholar", "théolog", "exég", "chercheur", "henri", "charon")))
+                role_name = spk_b_name if is_b else spk_a_name
+                txt = item.get("speech_text") or item.get("text", "")
+                ct = cls._clean_text_for_speech(txt)
+                if ct:
+                    lines.append(f"{role_name}: {ct}")
+            full_prompt = "\n".join(lines)
+
+        est_tokens = max(50, len(full_prompt) // 4)
+
+        try:
+            GeminiQuotaTracker.check_and_increment(
+                estimated_tokens=est_tokens,
+                rpm_limit=rpm_limit,
+                rpd_limit=rpd_limit,
+                tpm_limit=tpm_limit
+            )
+        except RuntimeError as q_err:
+            logger.warning("[PodcastEngine] %s. Repli automatique sur Edge-TTS.", q_err)
+            mapped_opts = dict(opts)
+            mapped_opts["voice_speaker_a"] = "fr-FR-DeniseNeural"
+            mapped_opts["voice_speaker_b"] = "fr-FR-HenriNeural"
+            mapped_opts["voice_solo"] = "fr-FR-HenriNeural"
+            res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
+            res["engine"] = "gemini_tts"
+            record["engine"] = "gemini_tts"
+            PodcastHistory.upsert(record)
+            return record
+
+        if progress_callback:
+            progress_callback(1, 40, f"Génération audio neuronale Gemini Flash ({model_id})...")
+
+        try:
+            pcm_bytes = cls._call_gemini_tts_api(
+                prompt=full_prompt,
+                speech_config=speech_config,
+                model_id=model_id,
+                cfg=cfg
+            )
+        except Exception as e_gen:
+            logger.error("[PodcastEngine] Erreur synthèse Gemini TTS : %s. Repli automatique sur Edge-TTS.", e_gen)
+            mapped_opts = dict(opts)
+            mapped_opts["voice_speaker_a"] = "fr-FR-DeniseNeural"
+            mapped_opts["voice_speaker_b"] = "fr-FR-HenriNeural"
+            mapped_opts["voice_solo"] = "fr-FR-HenriNeural"
+            res = cls._synthesize_edge_tts(podcast_id, record, dialogue, mapped_opts, cfg, progress_callback)
+            res["engine"] = "gemini_tts"
+            record["engine"] = "gemini_tts"
+            PodcastHistory.upsert(record)
+            return record
+
+        if progress_callback:
+            progress_callback(total_lines, 80, "Encodage MP3 haute qualité et calcul des repères...")
+
+        mp3_audio = cls._pcm_to_mp3(pcm_bytes, 24000)
+        if not mp3_audio:
+            logger.warning("[PodcastEngine] Échec encodage MP3 Gemini, repli Edge-TTS.")
+            return cls._synthesize_edge_tts(podcast_id, record, dialogue, opts, cfg, progress_callback)
+
+        total_duration = round(max(1.0, len(pcm_bytes) / 48000.0), 2)
+
+        # Répartition proportionnelle des repères karaoké
+        total_chars = sum(len(item.get("speech_text") or item.get("text", "")) for item in dialogue) or 1
+        curr_t = 0.0
+        updated_dialogue = []
+        for idx, item in enumerate(dialogue):
+            txt = item.get("speech_text") or item.get("text", "")
+            prop = max(0.05, len(txt) / total_chars)
+            seg_dur = round(prop * total_duration, 3)
+            new_item = dict(item)
+            new_item["start_time"] = round(curr_t, 3)
+            curr_t += seg_dur
+            new_item["end_time"] = round(min(total_duration, curr_t), 3)
+            updated_dialogue.append(new_item)
+
+        if mastering_enabled and len(mp3_audio) > 1000:
+            if progress_callback:
+                progress_callback(total_lines, 92, "Application du mastering studio DSP...")
+            mp3_audio = cls.apply_audio_mastering(mp3_audio, {"mastering_enabled": True})
+
+        audio_filename = f"{podcast_id}.mp3"
+        out_path = os.path.join(get_podcasts_dir(), audio_filename)
+        with open(out_path, "wb") as f:
+            f.write(mp3_audio)
+
+        record["dialogue"] = updated_dialogue
+        record["script_dialogue"] = updated_dialogue
+        record["audio_file"] = audio_filename
+        record["duration_seconds"] = total_duration
+        record["engine"] = "gemini_tts"
+        record["gemini_model"] = model_id
+        record["voice_speaker_a"] = raw_a
+        record["voice_speaker_b"] = raw_b
+        record["voice_solo"] = raw_solo
+        record["status"] = "ready"
+        record["updated_at"] = datetime.datetime.now().isoformat()
+
+        PodcastHistory.upsert(record)
+
+        if progress_callback:
+            progress_callback(total_lines, 100, f"Épisode Gemini Flash finalisé ({cls.format_duration(total_duration)})")
+
+        return record
+
+    @classmethod
+    def _synthesize_mixed_engines(
+        cls,
+        podcast_id: str,
+        record: Dict[str, Any],
+        dialogue: List[Dict[str, Any]],
+        opts: Dict[str, Any],
+        cfg: Dict[str, Any],
+        progress_callback: Optional[Callable[[int, int, str], None]] = None
+    ) -> Dict[str, Any]:
+        """
+        Synthèse vocale multi-moteurs : permet d'assigner un moteur distinct à chaque locuteur
+        (ex: Locuteur A / Animatrice sur Edge-TTS, Locuteur B / Exégète sur Gemini Flash TTS).
+        """
+        spk_a_engine = opts.get("speaker_a_engine") or cfg.get("audio_studio_speaker_a_engine", "gemini_tts")
+        spk_b_engine = opts.get("speaker_b_engine") or cfg.get("audio_studio_speaker_b_engine", "edge_tts")
+        solo_engine = opts.get("solo_engine") or cfg.get("audio_studio_solo_engine", "gemini_tts")
+
+        voice_a_edge = opts.get("voice_speaker_a") or cfg.get("audio_studio_voice_speaker_a", "fr-FR-VivienneMultilingualNeural")
+        voice_b_edge = opts.get("voice_speaker_b") or cfg.get("audio_studio_voice_speaker_b", "fr-CH-FabriceNeural")
+        voice_solo_edge = opts.get("voice_solo") or cfg.get("audio_studio_voice_solo", "fr-CH-FabriceNeural")
+
+        voice_a_gemini = opts.get("gemini_voice_speaker_a") or cfg.get("audio_studio_gemini_voice_speaker_a", "Puck")
+        voice_b_gemini = opts.get("gemini_voice_speaker_b") or cfg.get("audio_studio_gemini_voice_speaker_b", "Charon")
+        voice_solo_gemini = opts.get("gemini_voice_solo") or cfg.get("audio_studio_gemini_voice_solo", "Puck")
+
+        voice_a_voxtral = opts.get("voxtral_voice_speaker_a") or cfg.get("audio_studio_voxtral_voice_speaker_a", "Marie - Happy")
+        voice_b_voxtral = opts.get("voxtral_voice_speaker_b") or cfg.get("audio_studio_voxtral_voice_speaker_b", "Marie - Neutral")
+        voice_solo_voxtral = opts.get("voxtral_voice_solo") or cfg.get("audio_studio_voxtral_voice_solo", "Marie - Neutral")
+
+        gemini_model = opts.get("gemini_model") or cfg.get("audio_studio_gemini_model", "gemini-3.1-flash-tts-preview")
+        rpm_limit = int(cfg.get("gemini_tts_rpm_limit", 3))
+        rpd_limit = int(cfg.get("gemini_tts_rpd_limit", 10))
+        tpm_limit = int(cfg.get("gemini_tts_tpm_limit", 10000))
+
+        total_lines = len(dialogue)
+        accumulated_audio = bytearray()
+        current_timeline_sec = 0.0
+        updated_dialogue = []
+
+        fmt = str(record.get("format_type") or record.get("format") or opts.get("format_type") or "dialogue").lower()
+
+        for idx, item in enumerate(dialogue):
+            pct = int(10 + (idx / max(total_lines, 1)) * 80)
+            v_role = str(item.get("voice_role", "")).upper()
+            spk = str(item.get("speaker", "")).lower()
+            text = item.get("text", "").strip()
+            speech_text = (item.get("speech_text") or "").strip()
+            if not text and not speech_text:
+                continue
+
+            clean_text = cls._clean_text_for_speech(speech_text if speech_text else text)
+
+            # Déterminer rôle et moteur
+            if fmt == "solo" and v_role != "B" and not any(k in spk for k in ("scholar", "théolog", "exég")):
+                chosen_eng = solo_engine
+                role_label = "Chronique Solo"
+            elif v_role in ("B", "SCHOLAR") or any(k in spk for k in ("scholar", "théologien", "exégète", "henri", "charon")):
+                chosen_eng = spk_b_engine
+                role_label = "Exégète"
+            else:
+                chosen_eng = spk_a_engine
+                role_label = "Animatrice"
+
+            if progress_callback:
+                progress_callback(idx + 1, pct, f"Synthèse {idx + 1}/{total_lines} ({role_label} — {chosen_eng})...")
+
+            line_mp3 = b""
+
+            # 1. Synthèse Gemini Flash TTS
+            if chosen_eng == "gemini_tts":
+                chosen_gemini_voice = voice_solo_gemini if role_label == "Chronique Solo" else (voice_b_gemini if role_label == "Exégète" else voice_a_gemini)
+                try:
+                    GeminiQuotaTracker.check_and_increment(
+                        estimated_tokens=max(10, len(clean_text) // 4),
+                        rpm_limit=rpm_limit,
+                        rpd_limit=rpd_limit,
+                        tpm_limit=tpm_limit
+                    )
+                    prompt_turn = f"TTS in French with natural expression:\n{clean_text}"
+                    pcm = cls._call_gemini_tts_api(
+                        prompt=prompt_turn,
+                        speech_config=[{"voice": chosen_gemini_voice}],
+                        model_id=gemini_model,
+                        cfg=cfg
+                    )
+                    line_mp3 = cls._pcm_to_mp3(pcm, 24000)
+                except Exception as e_gem:
+                    logger.warning("[PodcastEngine] Erreur Gemini réplique %d : %s. Repli Edge-TTS.", idx + 1, e_gem)
+                    chosen_eng = "edge_tts"
+
+            # 2. Synthèse Mistral Voxtral
+            if chosen_eng == "voxtral" and not line_mp3:
+                chosen_vox = voice_solo_voxtral if role_label == "Chronique Solo" else (voice_b_voxtral if role_label == "Exégète" else voice_a_voxtral)
+                mistral_key = cfg.get("mistral_api_key")
+                if mistral_key:
+                    try:
+                        import httpx
+                        v_res = cls.resolve_voxtral_voice_id(chosen_vox)
+                        resp = httpx.post(
+                            f"{cls.VOXTRAL_API_BASE}/audio/speech",
+                            headers={"Authorization": f"Bearer {mistral_key}", "Content-Type": "application/json"},
+                            json={"model": cls.VOXTRAL_MODEL, "input": clean_text, "voice": v_res, "response_format": "mp3"},
+                            timeout=60.0
+                        )
+                        if resp.status_code == 200:
+                            line_mp3 = resp.content
+                    except Exception as e_vox:
+                        logger.warning("[PodcastEngine] Erreur Voxtral réplique %d : %s. Repli Edge-TTS.", idx + 1, e_vox)
+                        chosen_eng = "edge_tts"
+                else:
+                    chosen_eng = "edge_tts"
+
+            # 3. Synthèse Edge-TTS (ou repli)
+            if not line_mp3:
+                fallback_voice = voice_solo_edge if role_label == "Chronique Solo" else (voice_b_edge if role_label == "Exégète" else voice_a_edge)
+                line_mp3 = cls._single_edge_tts_call(clean_text, fallback_voice)
+
+            line_duration = max(0.5, len(line_mp3) / 6000.0) if line_mp3 else 1.0
+            start_t = round(current_timeline_sec, 3)
+            end_t = round(start_t + line_duration, 3)
+
+            if line_mp3:
+                accumulated_audio.extend(line_mp3)
+
+            pause_ms = int(item.get("pause_after_ms", cfg.get("audio_studio_pause_ms", 350)))
+            current_timeline_sec = end_t + (pause_ms / 1000.0)
+
+            if pause_ms >= 100:
+                accumulated_audio.extend(cls._generate_mp3_silence(pause_ms))
+
+            new_item = dict(item)
+            new_item["start_time"] = start_t
+            new_item["end_time"] = end_t
+            new_item["engine_used"] = chosen_eng
+            updated_dialogue.append(new_item)
+
+        audio_filename = f"{podcast_id}.mp3"
+        out_path = os.path.join(get_podcasts_dir(), audio_filename)
+        with open(out_path, "wb") as f:
+            f.write(accumulated_audio)
+
+        total_duration = round(current_timeline_sec, 2)
+        record["dialogue"] = updated_dialogue
+        record["script_dialogue"] = updated_dialogue
+        record["audio_file"] = audio_filename
+        record["duration_seconds"] = total_duration
+        record["engine"] = "mixed"
+        record["status"] = "ready"
+        record["updated_at"] = datetime.datetime.now().isoformat()
+
+        PodcastHistory.upsert(record)
+
+        if progress_callback:
+            progress_callback(total_lines, 100, f"Épisode Mix Multi-Moteurs finalisé ({cls.format_duration(total_duration)})")
+
+        return record
+
 
     @classmethod
     def export_to_note(cls, podcast_id: str) -> Dict[str, Any]:

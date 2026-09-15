@@ -65,7 +65,9 @@ BOILERPLATE_KEYWORDS = [
     "abbreviations", "master index", "charts", "maps", "personality profiles",
     "profiles", "study notes", "cross-references", "cross references",
     "concordance", "reading plan", "timeline", "timelines", "features of",
-    "user guide", "how to use", "why the", "what is application"
+    "user guide", "how to use", "why the", "what is application",
+    "title page", "titlepage", "half title", "works cited", "works-cited",
+    "author index", "subject index", "share your thoughts"
 ]
 
 class EpubLoader:
@@ -151,9 +153,8 @@ class EpubLoader:
                 re.IGNORECASE
             )
 
-            current_active_scope = book_dominant_scope
-            current_active_book_code = None
-            current_active_book_name = None
+            active_books_by_depth: Dict[int, Dict[str, str]] = {}
+            last_sibling_book: Optional[Dict[str, str]] = None
 
             is_syst_theol = any(w in book_title_norm for w in [
                 "systematic theology", "theologie systematique", "theologie dogmatique", 
@@ -161,11 +162,13 @@ class EpubLoader:
                 "theology", "theologie", "doctrine", "doctrines", "biblical theology", "theologie biblique"
             ])
             classified_chapters = []
+            raw_files_cache: Dict[str, str] = {}
             
             for idx, entry in enumerate(toc_entries):
                 title = entry.get("title", f"Chapitre {idx+1}").strip()
                 src = entry.get("src", "")
                 depth = entry.get("depth", 0)
+                anchor = src.split("#")[1] if "#" in src else None
                 
                 # Résoudre le chemin de fichier dans le ZIP
                 file_zip_path = cls._resolve_zip_path(opf_dir, src.split("#")[0])
@@ -174,10 +177,23 @@ class EpubLoader:
                 size_chars = 0
                 if file_zip_path in z.namelist():
                     try:
-                        raw_html = z.read(file_zip_path).decode('utf-8', errors='ignore')
-                        soup = BeautifulSoup(raw_html, 'html.parser')
-                        text_only = soup.get_text()
-                        size_chars = len(text_only.strip())
+                        if file_zip_path not in raw_files_cache:
+                            raw_files_cache[file_zip_path] = z.read(file_zip_path).decode('utf-8', errors='ignore')
+                        raw_html = raw_files_cache[file_zip_path]
+
+                        if anchor:
+                            # Découpage ultra-rapide de la tranche du chapitre
+                            slice_html = cls.slice_html_by_chapter(
+                                raw_html,
+                                {"anchor": anchor, "zip_file": file_zip_path, "id": idx + 1},
+                                [{"id": i + 1, "anchor": e.get("src", "").split("#")[1] if "#" in e.get("src", "") else None, "zip_file": cls._resolve_zip_path(opf_dir, e.get("src", "").split("#")[0])} for i, e in enumerate(toc_entries)]
+                            )
+                            text_only = re.sub(r'<[^>]+>', ' ', slice_html)
+                            size_chars = len(' '.join(text_only.split()))
+                        else:
+                            soup = BeautifulSoup(raw_html, 'html.parser')
+                            text_only = soup.get_text()
+                            size_chars = len(text_only.strip())
                     except Exception:
                         pass
                 
@@ -199,23 +215,45 @@ class EpubLoader:
                     if base_fn in ["note.html", "notes.html", "note.xhtml", "notes.xhtml", "endnotes.html", "endnotes.xhtml", "footnotes.html", "footnotes.xhtml"]:
                         classification["source_type"] = "endnotes"
 
-                # Propagation contextuelle intelligente pour les sous-sections
+                # Propagation contextuelle intelligente pour les sections et sous-sections
                 if classification["source_type"] not in ["appendix", "endnotes"]:
-                    if classification["book_code"]:
-                        current_active_scope = classification["corpus_scope"]
-                        current_active_book_code = classification["book_code"]
-                        current_active_book_name = classification["book_name"]
-                    elif depth > 0 and current_active_book_code:
-                        classification["corpus_scope"] = current_active_scope
-                        if not classification["book_code"]:
-                            classification["book_code"] = current_active_book_code
-                            classification["book_name"] = current_active_book_name
-                    elif classification["corpus_scope"] == "GLOBAL" and current_active_scope != "GLOBAL":
-                        classification["corpus_scope"] = current_active_scope
+                    # Si on remonte en profondeur ou qu'on change de niveau, purger les niveaux >= depth
+                    for d in list(active_books_by_depth.keys()):
+                        if d >= depth:
+                            del active_books_by_depth[d]
 
-                    if depth == 0 and not classification["book_code"]:
-                        current_active_book_code = None
-                        current_active_book_name = None
+                    is_continuation = bool(re.search(r'\b(part|partie|suite|tome|volume)\s*([2-9ivxlcdm]+)\b', norm_t, re.IGNORECASE))
+
+                    if classification["book_code"]:
+                        active_books_by_depth[depth] = {
+                            "book_code": classification["book_code"],
+                            "book_name": classification["book_name"],
+                            "corpus_scope": classification["corpus_scope"]
+                        }
+                        last_sibling_book = active_books_by_depth[depth]
+                    elif is_continuation and last_sibling_book:
+                        # Suite directe du chapitre frère précédent
+                        classification["book_code"] = last_sibling_book["book_code"]
+                        classification["book_name"] = last_sibling_book["book_name"]
+                        if classification["corpus_scope"] == "GLOBAL":
+                            classification["corpus_scope"] = last_sibling_book["corpus_scope"]
+                    else:
+                        # Recherche d'un livre parent dans un niveau hiérarchique supérieur (d < depth)
+                        parent_book = None
+                        for d in sorted(active_books_by_depth.keys(), reverse=True):
+                            if d < depth:
+                                parent_book = active_books_by_depth[d]
+                                break
+                        if parent_book:
+                            classification["book_code"] = parent_book["book_code"]
+                            classification["book_name"] = parent_book["book_name"]
+                            if classification["corpus_scope"] == "GLOBAL":
+                                classification["corpus_scope"] = parent_book["corpus_scope"]
+                        else:
+                            last_sibling_book = None
+
+                    if classification["corpus_scope"] == "GLOBAL" and book_dominant_scope != "GLOBAL":
+                        classification["corpus_scope"] = book_dominant_scope
                 
                 # Déterminer si inclus par défaut
                 is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
@@ -338,6 +376,21 @@ class EpubLoader:
             code = BOOK_MAPPING[norm_ord]
         elif norm in BOOK_MAPPING:
             code = BOOK_MAPPING[norm]
+        elif any(sep in norm for sep in [":", "-", "—", "–"]):
+            # Détection de livre en sous-titre (ex: "THE GIFT OF I AM: DEUTERONOMY", "LAND, PART 1: JOSHUA")
+            segments = re.split(r'[:\-—–]', norm)
+            sub = segments[-1].strip()
+            clean_sub = re.sub(r'\b(l[\'’]|la|le|les|de|d[\'’]|du|des|au|aux|a|the|of|to|part|partie)\b', ' ', sub)
+            clean_sub = re.sub(r'[^\w\s]', '', clean_sub).strip()
+            clean_sub = re.sub(r'\s+', ' ', clean_sub).strip()
+            if clean_sub in BOOK_MAPPING:
+                code = BOOK_MAPPING[clean_sub]
+            else:
+                for sub_part in re.split(r'\b(?:and|et|ou|or)\b', clean_sub):
+                    sp = sub_part.strip()
+                    if sp in BOOK_MAPPING:
+                        code = BOOK_MAPPING[sp]
+                        break
 
         if code:
             fr_name = REVERSE_BOOK_MAPPING.get(code, code)
@@ -632,6 +685,7 @@ class EpubLoader:
 
         chunk_counter = 0
         global_soups_cache = {}
+        raw_files_cache: Dict[str, str] = {}
 
         with zipfile.ZipFile(epub_path, 'r') as z:
             for ch in selected_chapters:
@@ -648,7 +702,12 @@ class EpubLoader:
                     continue
 
                 try:
-                    html_content = z.read(zip_file).decode('utf-8', errors='ignore')
+                    if zip_file not in raw_files_cache:
+                        raw_files_cache[zip_file] = z.read(zip_file).decode('utf-8', errors='ignore')
+                    html_content = raw_files_cache[zip_file]
+                    if ch.get("anchor"):
+                        html_content = cls.slice_html_by_chapter(html_content, ch, selected_chapters)
+
                     paragraphs, footnotes = cls.process_chapter_html(
                         z, zip_file, html_content, global_soups_cache=global_soups_cache
                     )
@@ -887,7 +946,7 @@ class EpubLoader:
                     top_points = root.findall(".//navPoint")
                 _parse_nav_points(top_points, 0)
                 
-                if toc_entries:
+                if toc_entries and len(toc_entries) > 2:
                     return toc_entries
             except Exception as e:
                 logger.error(f"[EpubLoader] Erreur parsing NCX: {e}")
@@ -926,12 +985,21 @@ class EpubLoader:
                             h = a.get('href', '')
                             if t:
                                 toc_entries.append({"title": t, "src": h, "depth": 0})
-                if toc_entries:
+                if toc_entries and len(toc_entries) > 2:
                     return toc_entries
             except Exception as e:
                 logger.error(f"[EpubLoader] Erreur parsing Nav: {e}")
 
-        # 3. Fallback : utiliser le Spine si aucun TOC n'a été trouvé
+        # 3. Récupération intelligente depuis le HTML interne si le TOC est absent ou tronqué (ex: EPUB convertis depuis Kindle/Calibre)
+        if len(toc_entries) <= 2:
+            recovered = cls._recover_toc_from_html(z, opf_dir, manifest, spine)
+            if len(recovered) > len(toc_entries):
+                return recovered
+
+        if toc_entries:
+            return toc_entries
+
+        # 4. Fallback : utiliser le Spine si aucun TOC n'a été trouvé
         for idref in spine:
             if idref in manifest:
                 href = manifest[idref].get("href", "")
@@ -943,6 +1011,222 @@ class EpubLoader:
                 })
 
         return toc_entries
+
+    @classmethod
+    def _recover_toc_from_html(
+        cls, 
+        z: zipfile.ZipFile, 
+        opf_dir: str, 
+        manifest: Dict[str, Dict[str, str]], 
+        spine: List[str]
+    ) -> List[Dict[str, Any]]:
+        """
+        Récupère automatiquement la table des matières depuis le contenu HTML interne
+        lorsque le fichier toc.ncx ou spine est tronqué ou dégénéré (ex: EPUB convertis depuis Kindle/Calibre).
+        """
+        candidate_files = []
+        for idref in spine:
+            if idref in manifest:
+                href = manifest[idref].get("href", "")
+                full_path = cls._resolve_zip_path(opf_dir, href)
+                if "cover" not in full_path.lower():
+                    candidate_files.append((full_path, href))
+
+        if not candidate_files:
+            for n in z.namelist():
+                if n.lower().endswith(('.html', '.xhtml', '.htm')) and "cover" not in n.lower():
+                    rel_h = os.path.relpath(n, opf_dir).replace('\\', '/') if opf_dir else n
+                    candidate_files.append((n, rel_h))
+
+        for full_zip_path, rel_href in candidate_files:
+            if full_zip_path not in z.namelist():
+                continue
+            
+            # Ne tester que les fichiers ayant du contenu significatif (> 50 Ko)
+            if z.getinfo(full_zip_path).file_size < 50000:
+                continue
+
+            try:
+                raw_html = z.read(full_zip_path).decode('utf-8', errors='ignore')
+            except Exception:
+                continue
+
+            # --- METHODE 1 : Détection d'un bloc de Table des Matières HTML ---
+            toc_match = re.search(
+                r'<h[1-3][^>]*>\s*(?:<[^>]+>\s*)*(?:TABLE OF CONTENTS|CONTENTS|TABLE DES MATI[EÈ]RES|SOMMAIRE|INHALTSVERZEICHNIS)\s*(?:<[^>]+>\s*)*</h[1-3]>', 
+                raw_html, 
+                re.I
+            )
+            if toc_match:
+                start_pos = toc_match.end()
+                next_h1 = re.search(r'<h1[^>]*>', raw_html[start_pos:], re.I)
+                end_pos = start_pos + next_h1.start() if next_h1 else start_pos + 80000
+                toc_chunk = raw_html[start_pos:end_pos]
+                
+                soup_toc = BeautifulSoup(toc_chunk, 'html.parser')
+                entries = []
+                for el in soup_toc.find_all(['p', 'blockquote', 'li']):
+                    if el.find(['p', 'blockquote', 'li']):
+                        continue
+                    
+                    txt = ' '.join(el.get_text().split()).strip()
+                    if not txt or len(txt) < 2:
+                        continue
+
+                    target_anchor = None
+                    for a in el.find_all('a'):
+                        href_val = a.get('href', '')
+                        if '#' in href_val:
+                            target_anchor = href_val.split('#')[1]
+                            break
+                        elif a.get('filepos'):
+                            fp = a.get('filepos').lstrip('0')
+                            if a.get('id') and not a.get('id').startswith('filepos'):
+                                target_anchor = a.get('id')
+                            elif fp:
+                                target_anchor = f"filepos{fp}"
+                            break
+                        elif a.get('id') and not a.get('id').startswith('filepos'):
+                            target_anchor = a.get('id')
+                            break
+
+                    if not target_anchor:
+                        for a in el.find_all('a'):
+                            if a.get('id'):
+                                target_anchor = a.get('id')
+                                break
+
+                    is_part = bool(re.match(r'^(part\s+[a-z0-9]+|partie\s+[a-z0-9]+|volume\s+[a-z0-9]+|tome\s+[a-z0-9]+|livre\s+[a-z0-9]+)', txt, re.I))
+                    is_chap = bool(re.match(r'^(chapter\s+[0-9]+|chapitre\s+[0-9]+)', txt, re.I))
+                    depth = 0 if (is_part or el.name == 'p') else 1
+
+                    src_entry = f"{rel_href}#{target_anchor}" if target_anchor else rel_href
+                    entries.append({
+                        "title": txt,
+                        "src": src_entry,
+                        "depth": depth
+                    })
+
+                if len(entries) >= 3:
+                    return entries
+
+            # --- METHODE 2 : Analyse des balises d'en-tête structurelles (h1, h2) ---
+            soup_full = BeautifulSoup(raw_html, 'html.parser')
+            heading_entries = []
+            seen_anchors = set()
+
+            for h in soup_full.find_all(['h1', 'h2']):
+                txt = ' '.join(h.get_text().split()).strip()
+                if not txt or len(txt) < 3:
+                    continue
+                txt_up = txt.upper()
+                if any(k in txt_up for k in ['THOUGHT QUESTION', 'EXCURSUS', 'FIGURE ', 'TABLE ']):
+                    continue
+
+                is_part = bool(re.match(r'^(part\s+[a-z0-9]+|partie\s+[a-z0-9]+|volume\s+[a-z0-9]+|tome\s+[a-z0-9]+|livre\s+[a-z0-9]+)', txt, re.I))
+                is_chap = bool(re.match(r'^(chapter\s+[0-9]+|chapitre\s+[0-9]+)', txt, re.I))
+                is_major_section = any(k in txt_up for k in [
+                    'CONTENTS', 'TABLE OF CONTENTS', 'TABLE DES MATIERES', 
+                    'PREFACE', 'ABBREVIATIONS', 'INTRODUCTION', 'WORKS CITED', 
+                    'BIBLIOGRAPHY', 'BIBLIOGRAPHIE', 'INDEX', 'AUTHOR INDEX', 
+                    'SUBJECT INDEX', 'ABOUT THE AUTHOR', 'ABOUT THE PUBLISHER'
+                ])
+
+                if not (h.name == 'h1' or is_part or is_chap or (is_major_section and len(txt) < 60)):
+                    continue
+
+                aid = None
+                for a in h.find_all('a'):
+                    if a.get('id') or a.get('name'):
+                        aid = a.get('id') or a.get('name')
+                        break
+                if not aid:
+                    prev_a = h.find_previous('a')
+                    if prev_a and (prev_a.get('id') or prev_a.get('name')):
+                        aid = prev_a.get('id') or prev_a.get('name')
+
+                if aid and aid in seen_anchors:
+                    continue
+                if aid:
+                    seen_anchors.add(aid)
+
+                depth = 0 if (is_part or is_major_section) else 1
+                src_entry = f"{rel_href}#{aid}" if aid else rel_href
+                heading_entries.append({
+                    "title": txt,
+                    "src": src_entry,
+                    "depth": depth
+                })
+
+            if len(heading_entries) >= 3:
+                return heading_entries
+
+        return []
+
+    @classmethod
+    def slice_html_by_chapter(
+        cls, 
+        raw_html: str, 
+        ch_info: Dict[str, Any], 
+        all_chapters: List[Dict[str, Any]]
+    ) -> str:
+        """
+        Découpe un fichier HTML monolithique pour ne conserver que la portion correspondant
+        au chapitre donné (de son ancre de début jusqu'à l'ancre du chapitre suivant dans le même fichier).
+        """
+        anchor = ch_info.get("anchor")
+        if not anchor:
+            return raw_html
+
+        zip_file = ch_info.get("zip_file")
+        current_idx = None
+        for i, c in enumerate(all_chapters):
+            if c.get("id") == ch_info.get("id"):
+                current_idx = i
+                break
+
+        next_anchor = None
+        if current_idx is not None:
+            for j in range(current_idx + 1, len(all_chapters)):
+                c_next = all_chapters[j]
+                if c_next.get("zip_file") == zip_file and c_next.get("anchor"):
+                    next_anchor = c_next.get("anchor")
+                    break
+
+        # Chercher la fin de la table des matières éventuelle pour éviter de matcher dans le sommaire
+        toc_match = re.search(
+            r'<h[1-3][^>]*>\s*(?:<[^>]+>\s*)*(?:TABLE OF CONTENTS|CONTENTS|TABLE DES MATI[EÈ]RES|SOMMAIRE)\s*(?:<[^>]+>\s*)*</h[1-3]>', 
+            raw_html, 
+            re.I
+        )
+        search_start = 0
+        if toc_match:
+            next_h1 = re.search(r'<h1[^>]*>', raw_html[toc_match.end():], re.I)
+            search_start = toc_match.end() + (next_h1.start() if next_h1 else 40000)
+
+        pattern_start = rf'(?:id|name)=["\']{re.escape(anchor)}["\']'
+        m_start = re.search(pattern_start, raw_html[search_start:])
+        if not m_start:
+            m_start = re.search(pattern_start, raw_html)
+            start_pos = m_start.start() if m_start else 0
+        else:
+            start_pos = search_start + m_start.start()
+
+        tag_back = raw_html.rfind('<', max(0, start_pos - 150), start_pos)
+        if tag_back != -1:
+            start_pos = tag_back
+
+        end_pos = len(raw_html)
+        if next_anchor:
+            pattern_end = rf'(?:id|name)=["\']{re.escape(next_anchor)}["\']'
+            m_end = re.search(pattern_end, raw_html[start_pos + 50:])
+            if m_end:
+                end_pos = start_pos + 50 + m_end.start()
+                tag_back_end = raw_html.rfind('<', max(0, end_pos - 150), end_pos)
+                if tag_back_end != -1:
+                    end_pos = tag_back_end
+
+        return raw_html[start_pos:end_pos]
 
     @classmethod
     def _resolve_zip_path(cls, base_dir: str, rel_path: str) -> str:
