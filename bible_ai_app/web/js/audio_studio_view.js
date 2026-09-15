@@ -19,6 +19,7 @@ const AudioStudioView = {
   currentRateIdx: 0,
   activeKaraokeTurnIndex: -1,
   textMode: 'literary', // 'literary' (texte soigné & grec original) ou 'phonetic' (script vocal TTS)
+  activeAudioEvents: [], // Liste explicite WYSIWYG des éléments sonores (intro, bruitages, fadeout, outro)
 
   // Éléments DOM
   elements: {},
@@ -128,6 +129,7 @@ const AudioStudioView = {
       scriptList: document.getElementById('audio-studio-script-list'),
       addTurnContainer: document.getElementById('audio-studio-add-turn-container'),
       btnAddTurn: document.getElementById('btn-audio-studio-add-turn'),
+      btnAddSound: document.getElementById('btn-audio-studio-add-sound'),
       btnNavToStep1: document.getElementById('btn-as-nav-to-step1'),
       btnNavToStep3: document.getElementById('btn-as-nav-to-step3'),
 
@@ -422,14 +424,24 @@ const AudioStudioView = {
       });
     });
 
-    // Liaison de la case musique & jingle avec le ducking
+    // Liaison dynamique des cases musique & bruitages avec la timeline sonore WYSIWYG
     el.checkMusicJingle?.addEventListener('change', () => {
+      this.toggleMusicJingleEvents(el.checkMusicJingle.checked);
       if (el.checkDucking) {
         el.checkDucking.disabled = !el.checkMusicJingle.checked;
         if (el.checkDucking.parentElement) {
           el.checkDucking.parentElement.style.opacity = el.checkMusicJingle.checked ? '1' : '0.45';
         }
       }
+    });
+
+    el.checkSfxAuto?.addEventListener('change', () => {
+      this.toggleSfxEvents(el.checkSfxAuto.checked);
+    });
+
+    // Ajout manuel d'un habillage sonore (jingle / bruitage)
+    el.btnAddSound?.addEventListener('click', () => {
+      this.addManualAudioEvent();
     });
 
     // 10. Lecteur Audio
@@ -686,10 +698,9 @@ const AudioStudioView = {
           el.checkCalmProsody.checked = res.calm_prosody !== false;
         }
 
-        const hasMusic = (res.bg_music && res.bg_music !== 'none') || (res.jingle_intro && res.jingle_intro !== 'none');
-        const hasSfx = (res.sfx_ambient && res.sfx_ambient !== 'none');
-        if (el.checkMusicJingle) el.checkMusicJingle.checked = (typeof res.bg_music !== 'undefined') ? hasMusic : true;
-        if (el.checkSfxAuto) el.checkSfxAuto.checked = (typeof res.sfx_ambient !== 'undefined') ? hasSfx : true;
+        // Habillage sonore par défaut : voix pure sans musique ni bruitage tant que l'utilisateur ne coche pas explicitement
+        if (el.checkMusicJingle) el.checkMusicJingle.checked = false;
+        if (el.checkSfxAuto) el.checkSfxAuto.checked = false;
         if (el.checkDucking && typeof res.ducking_enabled !== 'undefined') {
           el.checkDucking.checked = res.ducking_enabled !== false;
         }
@@ -2137,6 +2148,9 @@ const AudioStudioView = {
       if (res && res.success && res.podcast) {
         this.finishScriptReasoning(true);
         this.currentPodcast = res.podcast;
+        this.activeAudioEvents = [];
+        if (el.checkMusicJingle) el.checkMusicJingle.checked = false;
+        if (el.checkSfxAuto) el.checkSfxAuto.checked = false;
         this.renderScript();
         this.loadHistory();
 
@@ -2362,70 +2376,163 @@ const AudioStudioView = {
 
   getEpisodeAudioEvents(podcast) {
     if (!podcast) return [];
+    if (Array.isArray(this.activeAudioEvents) && this.activeAudioEvents.length > 0) {
+      return this.activeAudioEvents;
+    }
     if (Array.isArray(podcast.audio_events) && podcast.audio_events.length > 0) {
-      return podcast.audio_events;
+      this.activeAudioEvents = [...podcast.audio_events];
+      return this.activeAudioEvents;
     }
+    // Par défaut, aucun habillage automatique : voix pure
+    return [];
+  },
 
-    const events = [];
-    const dur = podcast.duration_seconds || 120;
-    const hasMusic = (podcast.has_music !== false && podcast.bg_music !== 'none' && podcast.jingle_intro !== 'none');
-    const hasSfx = (podcast.has_sfx !== false && podcast.sfx_ambient !== 'none');
-
-    if (hasMusic) {
-      events.push({
-        id: 'event_intro_music',
-        type: 'music',
-        title: "Jingle & Nappe d'ouverture",
-        start_time: 0.0,
-        end_time: 10.0,
-        description: "Amorce musicale solo pour poser l'ambiance radiophonique"
-      });
+  toggleMusicJingleEvents(enable) {
+    if (enable) {
+      const hasMusic = this.activeAudioEvents.some(e => e.type === 'music' || e.type === 'intro_music' || e.type === 'fade_out' || e.type === 'outro' || e.type === 'outro_music');
+      if (!hasMusic) {
+        const dur = this.currentPodcast?.duration_seconds || 90.0;
+        this.activeAudioEvents.push({
+          id: 'event_intro_music',
+          type: 'music',
+          title: "Jingle & Ambiance d'ouverture",
+          track_id: 'jingle_piano_solemn',
+          start_time: 0.0,
+          end_time: 10.0,
+          description: "Amorce musicale solo (10s), descente douce à 00:08 avant la voix"
+        });
+        this.activeAudioEvents.push({
+          id: 'event_fade_out',
+          type: 'fade_out',
+          title: "Extinction musicale (Fade-out)",
+          track_id: 'bed_cozy_jazz_study',
+          start_time: 20.0,
+          end_time: 24.0,
+          description: "Silence musical complet pour laisser place à l'écoute de l'exégèse"
+        });
+        this.activeAudioEvents.push({
+          id: 'event_outro_music',
+          type: 'outro',
+          title: "Conclusion & Outro musical",
+          track_id: 'bed_cozy_jazz_study',
+          start_time: Math.max(25.0, dur - 6.0),
+          end_time: dur,
+          description: "Remontée en crescendo de la nappe musicale et fondu final"
+        });
+      }
+    } else {
+      this.activeAudioEvents = this.activeAudioEvents.filter(e => e.type === 'sfx');
     }
+    this.renderScript();
+  },
 
-    if (hasSfx) {
-      events.push({
-        id: 'event_sfx_ambient',
-        type: 'sfx',
-        title: "Ambiance sonore contextuelle",
-        start_time: 0.0,
-        end_time: Math.min(20.0, dur),
-        description: "Bruitages et textures acoustiques d'époque"
-      });
+  detectContextualSfxId() {
+    const p = this.currentPodcast;
+    const corpus = `${p?.subject || ''} ${p?.title || ''} ${p?.summary || ''}`.toLowerCase();
+    const script = p?.script_dialogue || p?.dialogue || [];
+    const textSample = script.slice(0, 8).map(d => d.text || '').join(' ').toLowerCase();
+    const full = `${corpus} ${textSample}`;
+
+    if (full.includes('coq') || full.includes('pierre')) return 'sfx_rooster_crow';
+    if (full.includes('mer') || full.includes('barque') || full.includes('galilée') || full.includes('vague') || full.includes('eau')) return 'sfx_ocean_shore_waves';
+    if (full.includes('feu') || full.includes('braise') || full.includes('camp')) return 'sfx_campfire_crackle';
+    if (full.includes('brebis') || full.includes('berger') || full.includes('agneau')) return 'sfx_sheep_flock_bells';
+    if (full.includes('marché') || full.includes('marche ') || full.includes('ville') || full.includes('jérusalem')) return 'sfx_ancient_marketplace';
+    if (full.includes('foule') || full.includes('clameur') || full.includes('pilate') || full.includes('crucifie')) return 'sfx_angry_crowd';
+    if (full.includes('pas') || full.includes('sentier') || full.includes('emmaüs')) return 'sfx_footsteps_trail';
+    if (full.includes('nuit') || full.includes('grillon') || full.includes('gethsémané')) return 'sfx_night_crickets';
+    return 'sfx_desert_wind';
+  },
+
+  toggleSfxEvents(enable) {
+    if (enable) {
+      const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
+      if (!hasSfx) {
+        const sfxId = this.detectContextualSfxId();
+        const sfxTrack = (this.soundpack?.tracks || []).find(t => t.id === sfxId);
+        const sfxName = sfxTrack?.name || 'Vent du Désert & Souffle';
+        this.activeAudioEvents.push({
+          id: 'event_sfx_ambient',
+          type: 'sfx',
+          title: `Bruitage contextuel : ${sfxName}`,
+          track_id: sfxId,
+          start_time: 0.5,
+          end_time: 20.0,
+          description: "Ambiance sonore contextuelle en amorce"
+        });
+      }
+    } else {
+      this.activeAudioEvents = this.activeAudioEvents.filter(e => e.type !== 'sfx');
     }
+    this.renderScript();
+  },
 
-    if (hasMusic) {
-      events.push({
-        id: 'event_music_fadeout',
-        type: 'fade_out',
-        title: "Extinction musicale (Fade-out)",
-        start_time: 20.0,
-        end_time: 24.0,
-        description: "Fondu progressif pour laisser la place à la voix pure"
-      });
+  deleteAudioEvent(eventId) {
+    this.activeAudioEvents = this.activeAudioEvents.filter(e => (e.id || e.type) !== eventId);
+    const hasMusic = this.activeAudioEvents.some(e => e.type === 'music' || e.type === 'intro_music' || e.type === 'fade_out' || e.type === 'outro' || e.type === 'outro_music');
+    const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
+    if (this.elements.checkMusicJingle) this.elements.checkMusicJingle.checked = hasMusic;
+    if (this.elements.checkSfxAuto) this.elements.checkSfxAuto.checked = hasSfx;
+    this.renderScript();
+  },
 
-      const outroStart = Math.max(25.0, dur - 15.0);
-      events.push({
-        id: 'event_outro_music',
-        type: 'outro',
-        title: "Générique & Outro musical",
-        start_time: outroStart,
-        end_time: dur,
-        description: "Retour musical en crescendo et fondu final"
-      });
-    }
+  addManualAudioEvent() {
+    if (!this.currentPodcast) return;
+    const tracks = this.soundpack?.tracks || [];
+    const sfxId = this.detectContextualSfxId();
+    const tr = tracks.find(t => t.id === sfxId) || tracks[0];
+    const trackName = tr?.name || 'Ambiance sonore';
+    const isSfx = tr?.category === 'sfx';
 
-    return events;
+    this.activeAudioEvents.push({
+      id: `event_manual_${Date.now()}`,
+      type: isSfx ? 'sfx' : 'music',
+      title: `${isSfx ? 'Bruitage contextuel' : 'Musique & Jingle'} : ${trackName}`,
+      track_id: tr?.id || sfxId,
+      start_time: 0.5,
+      end_time: 15.0,
+      description: "Habillage sonore inséré manuellement dans le déroulé"
+    });
+
+    if (isSfx && this.elements.checkSfxAuto) this.elements.checkSfxAuto.checked = true;
+    if (!isSfx && this.elements.checkMusicJingle) this.elements.checkMusicJingle.checked = true;
+    this.renderScript();
   },
 
   createAudioEventCard(event, isKaraoke = false) {
     const card = document.createElement('div');
     card.className = 'as-timeline-event-card';
-    card.dataset.eventType = event.type || 'music';
+    const evType = (event.type === 'intro_music' ? 'music' : (event.type === 'outro_music' ? 'outro' : (event.type === 'fadeout' ? 'fade_out' : event.type)));
+    card.dataset.eventType = evType || 'music';
+    const eventId = event.id || `event_${event.type}`;
+    card.dataset.eventId = eventId;
     if (typeof event.start_time === 'number') card.dataset.startTime = event.start_time;
     if (typeof event.end_time === 'number') card.dataset.endTime = event.end_time;
 
     const timeLabel = `${this.formatTime(event.start_time || 0)} – ${this.formatTime(event.end_time || 0)}`;
-    const iconSvg = this.getAudioEventIconSvg(event.type);
+    const iconSvg = this.getAudioEventIconSvg(evType);
+
+    // Construction du sélecteur de piste sonore personnalisée
+    let trackOptionsHtml = '';
+    const tracks = this.soundpack?.tracks || [];
+    if (!isKaraoke && tracks.length > 0 && evType !== 'fade_out') {
+      let filteredTracks = [];
+      if (evType === 'sfx') {
+        filteredTracks = tracks.filter(t => t.category === 'sfx');
+      } else if (evType === 'music') {
+        filteredTracks = tracks.filter(t => t.category === 'jingle_intro' || t.category === 'music');
+      } else {
+        filteredTracks = tracks.filter(t => t.category === 'music');
+      }
+      if (filteredTracks.length > 0) {
+        trackOptionsHtml = `<select class="as-event-track-select" title="Changer la piste sonore">`;
+        filteredTracks.forEach(tr => {
+          const sel = (tr.id === event.track_id) ? 'selected' : '';
+          trackOptionsHtml += `<option value="${tr.id}" ${sel}>${this.escapeHtml(tr.name)}</option>`;
+        });
+        trackOptionsHtml += `</select>`;
+      }
+    }
 
     card.innerHTML = `
       <div class="as-timeline-event-icon">
@@ -2434,11 +2541,49 @@ const AudioStudioView = {
       <div class="as-timeline-event-body">
         <div class="as-timeline-event-header">
           <div class="as-timeline-event-title">${this.escapeHtml(event.title || 'Événement sonore')}</div>
-          <span class="as-timeline-event-badge">${timeLabel}</span>
+          <div class="as-event-actions">
+            ${trackOptionsHtml}
+            <span class="as-timeline-event-badge">${timeLabel}</span>
+            ${!isKaraoke ? `
+              <button type="button" class="as-event-btn-delete" title="Supprimer cet élément sonore">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            ` : ''}
+          </div>
         </div>
         <div class="as-timeline-event-desc">${this.escapeHtml(event.description || '')}</div>
       </div>
     `;
+
+    // Événement changement de piste
+    const trackSelect = card.querySelector('.as-event-track-select');
+    if (trackSelect) {
+      trackSelect.addEventListener('change', (e) => {
+        event.track_id = e.target.value;
+        const chosen = tracks.find(t => t.id === e.target.value);
+        if (chosen) {
+          if (evType === 'sfx') {
+            event.title = `Bruitage contextuel : ${chosen.name}`;
+          } else if (evType === 'music') {
+            event.title = chosen.name;
+          }
+        }
+        const titleEl = card.querySelector('.as-timeline-event-title');
+        if (titleEl) titleEl.textContent = event.title;
+      });
+    }
+
+    // Événement suppression
+    const btnDelete = card.querySelector('.as-event-btn-delete');
+    if (btnDelete) {
+      btnDelete.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.deleteAudioEvent(eventId);
+      });
+    }
 
     if (isKaraoke) {
       card.title = `Cliquer pour écouter à partir de ${this.formatTime(event.start_time || 0)}`;
@@ -2518,17 +2663,17 @@ const AudioStudioView = {
     if (el.scriptList) {
       el.scriptList.innerHTML = '';
       const audioEvents = this.getEpisodeAudioEvents(p);
-      const introEvent = audioEvents.find(e => e.type === 'music');
-      const sfxEvent = audioEvents.find(e => e.type === 'sfx');
-      const fadeEvent = audioEvents.find(e => e.type === 'fade_out');
-      const outroEvent = audioEvents.find(e => e.type === 'outro');
+      const introEvent = audioEvents.find(e => e.type === 'music' || e.type === 'intro_music');
+      const sfxEvents = audioEvents.filter(e => e.type === 'sfx');
+      const fadeEvent = audioEvents.find(e => e.type === 'fade_out' || e.type === 'fadeout');
+      const outroEvent = audioEvents.find(e => e.type === 'outro' || e.type === 'outro_music');
 
       if (introEvent) {
         el.scriptList.appendChild(this.createAudioEventCard(introEvent, false));
       }
-      if (sfxEvent) {
-        el.scriptList.appendChild(this.createAudioEventCard(sfxEvent, false));
-      }
+      sfxEvents.forEach(sfx => {
+        el.scriptList.appendChild(this.createAudioEventCard(sfx, false));
+      });
 
       script.forEach((turn, idx) => {
         const card = this.createTurnCard(turn, idx);
@@ -2732,7 +2877,10 @@ const AudioStudioView = {
 
   clearScript() {
     this.currentPodcast = null;
+    this.activeAudioEvents = [];
     const el = this.elements;
+    if (el.checkMusicJingle) el.checkMusicJingle.checked = false;
+    if (el.checkSfxAuto) el.checkSfxAuto.checked = false;
     if (el.episodeTitleInput) el.episodeTitleInput.value = 'Nouveau script audio';
     if (el.metaTurns) el.metaTurns.textContent = '0 réplique';
     if (el.metaDuration) el.metaDuration.textContent = 'Durée estimée : ~0 min';
@@ -2885,8 +3033,8 @@ const AudioStudioView = {
         voiceSummaryHtml = `<strong>${this.escapeHtml(vSolo)}</strong> (Chroniqueur)`;
       }
 
-      const hasMusic = el.checkMusicJingle ? el.checkMusicJingle.checked : true;
-      const hasSfx = el.checkSfxAuto ? el.checkSfxAuto.checked : true;
+      const hasMusic = this.activeAudioEvents.some(e => e.type === 'music' || e.type === 'intro_music' || e.type === 'fade_out' || e.type === 'outro' || e.type === 'outro_music');
+      const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
 
       let habillageTitle = '<span style="color: var(--text-muted);">Voix pure (Aucun habillage)</span>';
       if (hasMusic && hasSfx) {
@@ -3017,13 +3165,14 @@ const AudioStudioView = {
         rate: el.selectRate?.value || (el.checkCalmProsody?.checked ? '-14%' : '+0%'),
         pitch: el.checkCalmProsody?.checked ? '-3Hz' : '+0Hz',
         inject_breaks: el.checkCalmProsody ? el.checkCalmProsody.checked : true,
-        music_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true),
-        jingle_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true),
-        sfx_enabled: (el.checkSfxAuto ? el.checkSfxAuto.checked : true),
-        bg_music: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) ? 'bed_cozy_jazz_study' : 'none',
-        jingle_intro: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) ? 'jingle_piano_solemn' : 'none',
-        sfx_ambient: (el.checkSfxAuto ? el.checkSfxAuto.checked : true) ? 'auto' : 'none',
-        ducking_enabled: (el.checkMusicJingle ? el.checkMusicJingle.checked : true) && (el.checkDucking ? el.checkDucking.checked : true),
+        audio_events: this.activeAudioEvents,
+        music_enabled: hasMusic,
+        jingle_enabled: hasMusic,
+        sfx_enabled: hasSfx,
+        bg_music: hasMusic ? (this.activeAudioEvents.find(e => (e.type === 'fade_out' || e.type === 'outro' || e.type === 'music') && e.track_id)?.track_id || 'bed_cozy_jazz_study') : 'none',
+        jingle_intro: hasMusic ? (this.activeAudioEvents.find(e => (e.type === 'music' || e.type === 'intro_music') && e.track_id)?.track_id || 'jingle_piano_solemn') : 'none',
+        sfx_ambient: hasSfx ? (this.activeAudioEvents.find(e => e.type === 'sfx' && e.track_id)?.track_id || 'auto') : 'none',
+        ducking_enabled: hasMusic && (el.checkDucking ? el.checkDucking.checked : true),
         ducking_db: this.config?.ducking_db || -30.0,
         music_timing: el.selectMusicTiming?.value || 'intro_outro',
         music_intro_sec: 10.0
@@ -3251,17 +3400,17 @@ const AudioStudioView = {
       : (Array.isArray(p.dialogue) ? p.dialogue : []);
 
     const audioEvents = this.getEpisodeAudioEvents(p);
-    const introEvent = audioEvents.find(e => e.type === 'music');
-    const sfxEvent = audioEvents.find(e => e.type === 'sfx');
-    const fadeEvent = audioEvents.find(e => e.type === 'fade_out');
-    const outroEvent = audioEvents.find(e => e.type === 'outro');
+    const introEvent = audioEvents.find(e => e.type === 'music' || e.type === 'intro_music');
+    const sfxEvents = audioEvents.filter(e => e.type === 'sfx');
+    const fadeEvent = audioEvents.find(e => e.type === 'fade_out' || e.type === 'fadeout');
+    const outroEvent = audioEvents.find(e => e.type === 'outro' || e.type === 'outro_music');
 
     if (introEvent) {
       el.karaokeScriptFlow.appendChild(this.createAudioEventCard(introEvent, true));
     }
-    if (sfxEvent) {
-      el.karaokeScriptFlow.appendChild(this.createAudioEventCard(sfxEvent, true));
-    }
+    sfxEvents.forEach(sfx => {
+      el.karaokeScriptFlow.appendChild(this.createAudioEventCard(sfx, true));
+    });
 
     script.forEach((turn, idx) => {
       const card = document.createElement('div');
@@ -3519,6 +3668,15 @@ const AudioStudioView = {
         if (res.podcast.study_mode) {
           this.setStudyMode(res.podcast.study_mode);
         }
+        if (Array.isArray(res.podcast.audio_events) && res.podcast.audio_events.length > 0) {
+          this.activeAudioEvents = [...res.podcast.audio_events];
+        } else {
+          this.activeAudioEvents = [];
+        }
+        const hasMusic = this.activeAudioEvents.some(e => e.type === 'music' || e.type === 'intro_music' || e.type === 'fade_out' || e.type === 'outro' || e.type === 'outro_music');
+        const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
+        if (this.elements.checkMusicJingle) this.elements.checkMusicJingle.checked = hasMusic;
+        if (this.elements.checkSfxAuto) this.elements.checkSfxAuto.checked = hasSfx;
         this.renderScript();
         this.loadHistory();
         this.toggleHistoryDrawer(false);

@@ -5433,11 +5433,15 @@
                     <!-- Injecté dynamiquement par audio_studio_view.js -->
                   </div>
 
-                  <!-- Bouton d'ajout d'une réplique manuelle -->
-                  <div id="audio-studio-add-turn-container">
-                    <button type="button" class="audio-studio-add-turn-btn" id="btn-audio-studio-add-turn">
+                  <!-- Bouton d'ajout d'une réplique manuelle ou d'un son -->
+                  <div id="audio-studio-add-turn-container" style="display: flex; gap: 8px;">
+                    <button type="button" class="audio-studio-add-turn-btn" id="btn-audio-studio-add-turn" style="flex: 1;">
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                       <span>Ajouter une réplique</span>
+                    </button>
+                    <button type="button" class="audio-studio-add-turn-btn" id="btn-audio-studio-add-sound" style="flex: 1;" title="Ajouter manuellement un jingle, une musique ou un bruitage contextuel">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                      <span>Ajouter un habillage sonore</span>
                     </button>
                   </div>
                 </div>
@@ -5700,13 +5704,13 @@
 
                       <!-- Checkbox 1 : Musique de fond & Jingle -->
                       <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Ajoute une nappe musicale douce et un jingle introductif d'amorce">
-                        <input type="checkbox" id="as-check-music-jingle" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
+                        <input type="checkbox" id="as-check-music-jingle" style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
                         <span>Musique d'ambiance de fond &amp; Jingle d'intro</span>
                       </label>
 
                       <!-- Checkbox 2 : Bruitages contextuels auto -->
                       <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);" title="Détecte automatiquement les ambiances sonores selon le passage (désert, sentier, mer de Galilée, foule...)">
-                        <input type="checkbox" id="as-check-sfx-auto" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
+                        <input type="checkbox" id="as-check-sfx-auto" style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
                         <span>Bruitages sonores d'ambiance contextuels (Auto-détectés)</span>
                       </label>
 

@@ -2078,3 +2078,55 @@ body.theme-light .as-timeline-event-desc,
   color: #475569;
 }
 
+.as-event-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.as-event-track-select {
+  background: var(--bg-card, #1e293b);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  border-radius: 6px;
+  font-size: 11px;
+  padding: 2px 8px;
+  height: 24px;
+  outline: none;
+  cursor: pointer;
+  max-width: 170px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: border-color 0.15s ease;
+}
+
+.as-event-track-select:hover,
+.as-event-track-select:focus {
+  border-color: var(--accent-orange, #ea580c);
+}
+
+body.theme-light .as-event-track-select,
+[data-theme="light"] .as-event-track-select {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.as-event-btn-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.as-event-btn-delete:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}

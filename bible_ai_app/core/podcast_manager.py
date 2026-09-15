@@ -1892,7 +1892,7 @@ class PodcastEngine:
                         spot_end = min(total_samples, spot_start + s_len)
                         spot_len = spot_end - spot_start
                         if spot_len > 0:
-                            sfx_gain = 10.0 ** (-20.0 / 20.0)
+                            sfx_gain = 10.0 ** (-12.0 / 20.0)
                             spot_env = np.ones(spot_len, dtype=np.float32) * sfx_gain
                             fade_s = min(spot_len // 4, int(0.4 * sample_rate))
                             if fade_s > 0:
@@ -1907,7 +1907,7 @@ class PodcastEngine:
                             sfx_track[:, s_idx:s_idx + take] = sfx_audio[:, :take]
                             s_idx += take
 
-                        sfx_gain = 10.0 ** (-26.0 / 20.0)
+                        sfx_gain = 10.0 ** (-12.0 / 20.0)
                         if music_timing == "intro_outro":
                             # S'estompe après l'introduction pour ne pas encombrer l'exégèse
                             fade_start = lead_in_samples + int(music_intro_sec * sample_rate)
@@ -2012,7 +2012,9 @@ class PodcastEngine:
             except Exception:
                 pass
 
-        # Flags explicites de contrôle
+        # Flags explicites de contrôle et prise en compte du déroulé frontend WYSIWYG
+        incoming_audio_events = opts.get("audio_events")
+
         music_enabled = opts.get("music_enabled")
         jingle_enabled = opts.get("jingle_enabled")
         sfx_enabled = opts.get("sfx_enabled")
@@ -2021,16 +2023,45 @@ class PodcastEngine:
         jingle_intro_id = opts.get("jingle_intro")
         sfx_ambient_id = opts.get("sfx_ambient") or opts.get("sfx")
 
+        if isinstance(incoming_audio_events, list):
+            has_music_event = any(e.get("type") in ("music", "intro", "intro_music", "outro", "outro_music", "fade_out", "fadeout") for e in incoming_audio_events)
+            has_sfx_event = any(e.get("type") == "sfx" for e in incoming_audio_events)
+
+            if not has_music_event:
+                music_enabled = False
+                jingle_enabled = False
+                bg_music_id = None
+                jingle_intro_id = None
+            else:
+                music_enabled = True
+                jingle_enabled = True
+                j_ev = next((e for e in incoming_audio_events if e.get("type") in ("music", "intro", "intro_music") and e.get("track_id")), None)
+                if j_ev and j_ev.get("track_id") not in ("none", "", None):
+                    jingle_intro_id = j_ev.get("track_id")
+                bg_ev = next((e for e in incoming_audio_events if e.get("type") in ("fade_out", "fadeout", "outro", "outro_music") and e.get("track_id")), None)
+                if bg_ev and bg_ev.get("track_id") not in ("none", "", None):
+                    bg_music_id = bg_ev.get("track_id")
+
+            if not has_sfx_event:
+                sfx_enabled = False
+                sfx_ambient_id = None
+            else:
+                sfx_enabled = True
+                sfx_ev = next((e for e in incoming_audio_events if e.get("type") == "sfx" and e.get("track_id")), None)
+                if sfx_ev and sfx_ev.get("track_id") not in ("none", "", None, "auto"):
+                    sfx_ambient_id = sfx_ev.get("track_id")
+                elif not sfx_ambient_id or sfx_ambient_id == "none":
+                    sfx_ambient_id = "auto"
+
         # Résolution selon les drapeaux booléens des 2 cases à cocher
         if music_enabled is False:
             bg_music_id = None
-        elif bg_music_id is None:
-            bg_music_id = cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")
-
-        if jingle_enabled is False:
             jingle_intro_id = None
-        elif jingle_intro_id is None:
-            jingle_intro_id = cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")
+        else:
+            if bg_music_id is None:
+                bg_music_id = cfg.get("audio_studio_bg_music", "bed_cozy_jazz_study")
+            if jingle_intro_id is None:
+                jingle_intro_id = cfg.get("audio_studio_jingle_intro", "jingle_piano_solemn")
 
         if sfx_enabled is False or sfx_ambient_id in ("none", "null", "false", ""):
             sfx_ambient_id = None
@@ -2053,7 +2084,7 @@ class PodcastEngine:
             sfx_ambient_id = None
 
         ducking_enabled = opts.get("ducking_enabled", cfg.get("audio_studio_ducking_enabled", True))
-        ducking_db = float(opts.get("ducking_db", cfg.get("audio_studio_ducking_db", -24.0)))
+        ducking_db = float(opts.get("ducking_db", cfg.get("audio_studio_ducking_db", -30.0)))
 
         bg_path = cls.resolve_soundpack_track_path(bg_music_id) if bg_music_id else None
         jingle_path = cls.resolve_soundpack_track_path(jingle_intro_id) if jingle_intro_id else None
@@ -2108,46 +2139,54 @@ class PodcastEngine:
                             if jingle_path:
                                 j_title = "Jingle Piano Solennel & Nappe" if "solemn" in jingle_path else "Générique d'introduction & Nappe"
                             audio_events.append({
-                                "type": "intro_music",
-                                "title": f"🎵 {j_title}",
+                                "id": "event_intro_music",
+                                "type": "music",
+                                "title": j_title,
                                 "label": "00:00 – 00:10",
                                 "description": "Amorce musicale solo (10s), descente douce à 00:08 avant la voix",
                                 "start_time": 0.0,
                                 "end_time": lead_in,
-                                "icon": "music"
+                                "icon": "music",
+                                "track_id": jingle_intro_id or "jingle_piano_solemn"
                             })
                         if sfx_path and sfx_ambient_id:
                             sfx_name = "Vent du Désert" if "desert" in sfx_ambient_id else sfx_ambient_id
                             audio_events.append({
+                                "id": "event_sfx_ambient",
                                 "type": "sfx",
-                                "title": f"🍃 Bruitage contextuel : {sfx_name}",
+                                "title": f"Bruitage contextuel : {sfx_name}",
                                 "label": f"00:00 – 00:{int(min(lead_in + 10.0, 20.0)):02d}",
                                 "description": "Ambiance sonore contextuelle en amorce",
                                 "start_time": 0.5,
                                 "end_time": round(min(lead_in + 10.0, 20.0), 2),
-                                "icon": "wind"
+                                "icon": "wind",
+                                "track_id": sfx_ambient_id
                             })
                         if bg_path and mix_opts.get("music_timing") == "intro_outro":
                             fo_start = round(lead_in + mix_opts.get("music_intro_sec", 10.0), 1)
                             audio_events.append({
-                                "type": "fadeout",
-                                "title": "🔇 Extinction musicale (Fade-out)",
+                                "id": "event_fade_out",
+                                "type": "fade_out",
+                                "title": "Extinction musicale (Fade-out)",
                                 "label": f"{int(fo_start//60):02d}:{int(fo_start%60):02d}",
                                 "description": "Silence musical complet pour laisser place à l'écoute de l'exégèse",
                                 "start_time": fo_start,
                                 "end_time": round(fo_start + 4.0, 1),
-                                "icon": "volume-x"
+                                "icon": "volume-x",
+                                "track_id": bg_music_id or "bed_cozy_jazz_study"
                             })
                         if jingle_path or bg_path:
                             outro_t = max(0.0, round(total_dur - 6.0, 1))
                             audio_events.append({
-                                "type": "outro_music",
-                                "title": "🎵 Conclusion & Outro musical",
+                                "id": "event_outro_music",
+                                "type": "outro",
+                                "title": "Conclusion & Outro musical",
                                 "label": f"{int(outro_t//60):02d}:{int(outro_t%60):02d} – {int(total_dur//60):02d}:{int(total_dur%60):02d}",
                                 "description": "Remontée en crescendo de la nappe musicale et fondu final",
                                 "start_time": outro_t,
                                 "end_time": round(total_dur, 1),
-                                "icon": "music"
+                                "icon": "music",
+                                "track_id": bg_music_id or "bed_cozy_jazz_study"
                             })
 
                         res["audio_events"] = audio_events
