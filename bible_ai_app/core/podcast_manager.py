@@ -1060,6 +1060,8 @@ class PodcastEngine:
                     speaker_name = "Denise" if speaker_role == "A" else "Henri"
                     speaker_val = "host" if speaker_role == "A" else "scholar"
 
+            raw_text = str(item.get("text", "")).strip()
+
             # Détection et conversion des balises [pause: X.Xs]
             item_pause = int(item.get("pause_after_ms", default_pause))
             pause_match = re.search(r'\[pause:\s*([\d\.]+)\s*s?\]', raw_text, re.IGNORECASE)
