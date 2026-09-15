@@ -866,7 +866,9 @@ class PodcastEngine:
             format_clean = "solo"
 
         # 1. Récupération du prompt système de base
-        if format_clean == "solo":
+        if study_mode in ("immersion", "narrative"):
+            system_prompt = cfg.get("prompt_immersion") or DEFAULT_IMMERSION_SYSTEM_PROMPT
+        elif format_clean == "solo":
             system_prompt = cfg.get("prompt_audio_studio_solo") or DEFAULT_AUDIO_STUDIO_SOLO_PROMPT
         else:
             system_prompt = cfg.get("prompt_audio_studio_dialogue") or DEFAULT_AUDIO_STUDIO_DIALOGUE_PROMPT
@@ -900,7 +902,7 @@ class PodcastEngine:
         }.get(study_mode, "Étude Théologique")
 
         mode_block = ""
-        if mode_instruction:
+        if mode_instruction and study_mode not in ("immersion", "narrative"):
             mode_block = (
                 f"ORIENTATION SPÉCIFIQUE DU MODE D'ÉTUDE CHOISI : **{mode_title.upper()}**\n"
                 f"Adoptez rigoureusement l'angle méthodologique suivant dans le contenu des explications et des interventions :\n"
@@ -917,7 +919,18 @@ class PodcastEngine:
                     "-> Veillez à articuler l'échange de manière à traiter méthodiquement chacun de ces axes au fil du dialogue ou de la chronique.\n\n"
                 )
 
-        if format_clean == "solo":
+        if study_mode in ("immersion", "narrative"):
+            format_instruction = (
+                "FORMAT DEMANDÉ : **IMMERSION NARRATIVE (FICTION AUDIO & RÉCIT SENSORIEL DU Ier SIÈCLE)**\n"
+                "- Il n'y a qu'UN SEUL narrateur ('narrator') qui raconte l'histoire vivante à l'oreille de l'auditeur, comme dans une fiction radio immersive ou un documentaire sonore captivant.\n"
+                "- RÈGLE DU 4e MUR (RÈGLE ABSOLUE & CRITIQUE) :\n"
+                "  * Le narrateur raconte DIRECTEMENT l'histoire à l'auditeur. Il ne dit JAMAIS les titres de son plan !\n"
+                "  * INTERDICTION FORMELLE d'écrire ou de faire prononcer des intitulés de structure (ne JAMAIS écrire « Acte 1 », « Acte premier », « L'accroche sensorielle », « Acte deux », « Le gouffre », etc.) dans le texte parlé.\n"
+                "  * Chaque réplique du JSON doit contenir UNIQUEMENT la narration vivante, sans aucun préfixe ni méta-titre.\n"
+                "- Rédigez 4 à 6 répliques narratives substantielles et immersives (80 à 120 mots par réplique, pour un total d'environ 400 à 500 mots, durée 2 min 30 à 3 min 30).\n"
+                "- Dans le JSON, chaque élément du tableau 'dialogue' doit avoir 'speaker': 'narrator', 'speaker_name': 'Narrateur', 'voice_role': 'solo'.\n\n"
+            )
+        elif format_clean == "solo":
             format_instruction = (
                 "FORMAT DEMANDÉ : **CHRONIQUE THÉOLOGIQUE SOLO (UN SEUL ORATEUR)**\n"
                 "- Il n'y a qu'UN SEUL orateur enseignant/pasteur ('narrator').\n"
@@ -958,14 +971,14 @@ class PodcastEngine:
 
         if study_mode in ("immersion", "narrative"):
             length_instruction = (
-                "EXIGENCE SPÉCIFIQUE DU FORMAT IMMERSION NARRATIVE (ROBERT MCKEE & KENNETH BAILEY) :\n"
-                "- Durée cible : 2 min 30 à 4 minutes (soit environ 350 à 450 mots au total).\n"
-                "- Découpez le tableau 'dialogue' en 3 blocs dramatiques majeurs correspondant aux 3 Actes :\n"
-                "  1. Acte 1 (0s–45s) : Accroche sensorielle immédiate (au moins 3 sens mobilisés), événement déclencheur concret, zéro chiffre/date/encyclopédisme.\n"
-                "  2. Acte 2 (45s–2m15s) : Le Gouffre (The Gap) et la tension socio-culturelle réelle du Proche-Orient antique (Honneur/Honte, occupation romaine, codes de pureté/hospitalité, risque social).\n"
-                "  3. Acte 3 (2m15s–3m15s) : Climax dramatique et passerelle textuelle (« Need to know ») qui s'interrompt au seuil exact de la lecture de la péricope.\n"
-                "- Chaque élément du dialogue doit avoir 'speaker': 'narrator', 'speaker_name': 'Narrateur', 'voice_role': 'solo'.\n"
-                "- Insérez des balises de respiration orales [pause: 1.2s] ou [pause: 1.5s] avant les moments de tension ou de révélation.\n\n"
+                "PROGRESSION DRAMATIQUE FLUIDE (INVISIBLE POUR L'AUDITEUR — NE JAMAIS EN FAIRE DES TITRES ORALISÉS) :\n"
+                "- Développez une narration continue et progressive enchaînant naturellement les 3 mouvements suivants, fondus d'un paragraphe à l'autre sans aucune annonce d'acte :\n"
+                "  1. Ouverture sensorielle (0s–45s) : Plongée physique immédiate (chaleur écrasante, poussière sous les sandales, odeurs d'herbes brûlées ou d'huile, bruits d'ambiance) et survenue d'un événement concret qui rompt le calme quotidien. Zéro chiffre/date/cours encyclopédique.\n"
+                "  2. Montée de la tension et gouffre socio-culturel (45s–2m15s) : Le conflit selon Kenneth E. Bailey (code omniprésent de l'Honneur et de la Honte, poids de l'occupant romain, regards inquisiteurs des chefs religieux, faim viscérale des disciples, risque social de transgression).\n"
+                "  3. Climax et seuil du texte (2m15s–3m15s) : La tension dramatique est à son comble. Suspendre le récit au seuil exact de la rencontre ou de la parole de Jésus (« Need to know »), créant une soif irrésistible de lire la suite dans le texte biblique.\n"
+                "- RÈGLE FORMELLE : Le tableau 'dialogue' doit contenir entre 4 et 6 paragraphes narratifs développés (SANS aucun titre d'acte).\n"
+                "- Insérez des balises orales [pause: 1.2s] ou [pause: 1.5s] avant les moments clés de tension ou de silence pesant.\n"
+                "- TITRE DE L'ÉMISSION : Donnez un titre évocateur et littéraire (ex: « Au Seuil du Sabbat », « La Moisson Fragile », « Le Silence des Collines de Galilée »). Ne mettez JAMAIS de termes méta comme « Immersif », « Audio », « Chapitre Douze » ou « Format » dans le titre !\n\n"
             )
         else:
             length_instruction = (
@@ -1062,6 +1075,26 @@ class PodcastEngine:
 
             raw_text = str(item.get("text", "")).strip()
 
+            # Détection et élimination fine des méta-titres d'actes parasites (ex: "Acte premier. L'accroche sensorielle.")
+            starts_act = bool(re.match(r'^(?:Acte\s+(?:premier|première|un|deux|trois|troisième|quatre|quatrième|cinq|cinquième|\d+|I|II|III|IV|V)|Partie\s+\d+|Scène\s+\d+)\b', raw_text, re.IGNORECASE))
+            if starts_act:
+                words = raw_text.split()
+                meta_keywords = ("accroche", "sensorielle", "gouffre", "tension", "socio-culturelle", "climax", "passerelle", "incident", "dramatique")
+                has_meta_kw = any(kw in raw_text.lower() for kw in meta_keywords)
+                if len(words) <= 5 or (has_meta_kw and len(words) <= 10):
+                    continue
+
+                # Si ce n'est pas un pur intitulé mais un paragraphe commençant par "Acte 1." ou "Acte premier :", retirer seulement le préfixe
+                raw_text = re.sub(
+                    r'^(?:Acte\s+(?:premier|première|un|deux|trois|troisième|quatre|quatrième|cinq|cinquième|\d+|I|II|III|IV|V)|Partie\s+\d+|Scène\s+\d+)[\s\.\:\-–—]+',
+                    '',
+                    raw_text,
+                    flags=re.IGNORECASE
+                ).strip()
+
+            if not raw_text:
+                continue
+
             # Détection et conversion des balises [pause: X.Xs]
             item_pause = int(item.get("pause_after_ms", default_pause))
             pause_match = re.search(r'\[pause:\s*([\d\.]+)\s*s?\]', raw_text, re.IGNORECASE)
@@ -1081,7 +1114,7 @@ class PodcastEngine:
             speech_text = cls._clean_text_for_speech(literary_text)
 
             clean_dialogue.append({
-                "index": idx,
+                "index": len(clean_dialogue),
                 "speaker": speaker_val,
                 "speaker_name": speaker_name,
                 "voice_role": speaker_role,
@@ -1092,9 +1125,17 @@ class PodcastEngine:
                 "end_time": 0.0
             })
 
+        for i, itm in enumerate(clean_dialogue):
+            itm["index"] = i
+
+        raw_title = parsed_script.get("title") or f"{'Chronique' if format_clean == 'solo' else 'Échange'} — {subject_or_ref}"
+        clean_title = re.sub(r"\bL['’]Immersif\s+", "Le ", raw_title, flags=re.IGNORECASE)
+        clean_title = re.sub(r"\bImmersif\b\s*", "", clean_title, flags=re.IGNORECASE).strip()
+        clean_title = re.sub(r"\s+:\s+:", " :", clean_title).strip(" :")
+
         podcast_record = {
             "id": script_id,
-            "title": parsed_script.get("title") or f"{'Chronique' if format_clean == 'solo' else 'Échange'} — {subject_or_ref}",
+            "title": clean_title,
             "summary": parsed_script.get("summary") or "",
             "subject": subject_or_ref,
             "study_mode": study_mode,

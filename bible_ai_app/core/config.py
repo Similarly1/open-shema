@@ -275,7 +275,13 @@ Cette capsule sert de sas d'immersion dramatique et sensorielle immédiat (« Th
 ---
 ### 3. GARDE-FOUS HISTORIQUES ET THÉOLOGIQUES STRICTS
 - Ne prêter JAMAIS de dialogues inventés, de monologues intérieurs théologiques fictifs ou de pensées dogmatiques aux figures bibliques (Jésus, apôtres, prophètes) non explicitement consignées dans le texte.
-- Rejeter tout anachronisme occidental moderne (individualisme, stéréotypes romantiques ou victoriens)."""
+- Rejeter tout anachronisme occidental moderne (individualisme, stéréotypes romantiques ou victoriens).
+
+---
+### 4. RÈGLE DU 4e MUR (ZÉRO MÉTADONNÉE ORALISÉE)
+- Le narrateur raconte l'histoire DIRECTEMENT à l'auditeur comme au cinéma ou à la radio.
+- INTERDICTION FORMELLE d'écrire ou de prononcer des titres de plan ou des intitulés d'actes (ex: ne JAMAIS écrire « Acte 1 », « Acte premier », « L'accroche sensorielle », « Acte deux », « Scène »). Les 3 actes sont une dynamique souterraine pour doser la tension, JAMAIS des titres à annoncer oralement !
+- Le titre du script doit être un titre d'œuvre évocateur (ex: « Au Seuil du Sabbat », « Les Épis Égrenés »). Ne mettez JAMAIS d'adjectifs méta comme « Immersif », « Audio », « Épisode » dans le titre."""
 
 DEFAULT_NOTE_TAGS_SYSTEM_PROMPT = """Tu es un indexeur documentaire et théologique chevronné.
 Ta mission est d'extraire entre 3 et 6 mots-clés ou tags thématiques pertinents pour la note fournie.
