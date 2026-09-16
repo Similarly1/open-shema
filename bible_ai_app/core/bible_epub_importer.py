@@ -262,17 +262,33 @@ class BibleEpubImporter:
             if opf_files and has_verse_anchors:
                 return cls._parse_spine_anchors(z, opf_files[0])
 
+            # Vérifier si l'EPUB contient des marqueurs Adobe InDesign (Parole Vivante, Sagesse Vivante, Prophétie Vivante...)
+            indesign_markers = [b'LV-02-livres', b'PV-03-titres', b'K-bible-exp-n-verset', b'PV-00-exposant', b'bible-1-txt', b'_idGenDropcap']
+            is_indesign = False
+            for s_name in sample_htmls:
+                content_sample = z.read(s_name)
+                if any(m in content_sample for m in indesign_markers):
+                    is_indesign = True
+                    break
+
+            if is_indesign:
+                res = cls._parse_indesign(z)
+                if res:
+                    return res
+
             doc_infos = [info for info in z.infolist() if (info.filename.endswith('.xhtml') or info.filename.endswith('.html')) and 'cover' not in info.filename.lower()]
             
             if len(doc_infos) > 5:
-                return cls._parse_multifile_structured(z)
+                res = cls._parse_multifile_structured(z)
+                if res:
+                    return res
 
-            doc_infos.sort(key=lambda x: x.file_size, reverse=True)
-            if not doc_infos:
-                raise ValueError("Aucun document HTML trouvé dans l'EPUB.")
+            # Fallbacks croisés si la première tentative n'a rien renvoyé
+            res = cls._parse_indesign(z)
+            if res:
+                return res
 
-            main_html = z.read(doc_infos[0].filename).decode('utf-8', errors='ignore')
-            return cls._parse_indesign_single(main_html)
+            return cls._parse_multifile_structured(z)
 
     @classmethod
     def _parse_spine_anchors(cls, z: zipfile.ZipFile, opf_path: str) -> Dict[str, Dict[str, Dict[str, str]]]:
@@ -486,93 +502,139 @@ class BibleEpubImporter:
         return clean_result
 
     @classmethod
-    def _parse_indesign_single(cls, html_content: str) -> Dict[str, Dict[str, Dict[str, str]]]:
-        soup = BeautifulSoup(html_content, 'html.parser')
-        body = soup.find('body')
-        if not body:
-            return {}
+    def _parse_indesign(cls, z: zipfile.ZipFile) -> Dict[str, Dict[str, Dict[str, str]]]:
+        # Ordonner les fichiers selon le spine OPF si présent, sinon par nom de fichier
+        doc_names = []
+        opf_files = [n for n in z.namelist() if n.endswith('.opf')]
+        if opf_files:
+            try:
+                opf_dir = os.path.dirname(opf_files[0])
+                opf_soup = BeautifulSoup(z.read(opf_files[0]).decode('utf-8', errors='ignore'), 'xml')
+                manifest = {}
+                for item in opf_soup.find_all('item'):
+                    href = item.get('href')
+                    if opf_dir:
+                        href = f"{opf_dir}/{href}"
+                    manifest[item.get('id')] = href
+                for itemref in opf_soup.find_all('itemref'):
+                    idref = itemref.get('idref')
+                    if idref in manifest and manifest[idref] in z.namelist():
+                        fn = manifest[idref]
+                        if (fn.endswith('.xhtml') or fn.endswith('.html')) and 'cover' not in fn.lower():
+                            doc_names.append(fn)
+            except Exception:
+                doc_names = []
 
+        if not doc_names:
+            doc_names = [info.filename for info in z.infolist() if (info.filename.endswith('.xhtml') or info.filename.endswith('.html')) and 'cover' not in info.filename.lower()]
+            doc_names.sort()
+
+        html_docs = [z.read(fn).decode('utf-8', errors='ignore') for fn in doc_names]
+        return cls._parse_indesign_docs(html_docs)
+
+    @classmethod
+    def _parse_indesign_single(cls, html_content: str) -> Dict[str, Dict[str, Dict[str, str]]]:
+        return cls._parse_indesign_docs([html_content])
+
+    @classmethod
+    def _parse_indesign_docs(cls, html_docs: List[str]) -> Dict[str, Dict[str, Dict[str, str]]]:
         bible: Dict[str, Dict[str, Dict[str, list]]] = {}
         current_book: Optional[str] = None
         current_chapter: Optional[str] = None
         current_verse: Optional[str] = None
 
-        for el in body.find_all('p', recursive=True):
-            classes = el.get('class', [])
-            is_book_header = False
-            book_id = el.get('id', '')
-            b_name = ""
+        for html_content in html_docs:
+            soup = BeautifulSoup(html_content, 'html.parser')
+            body = soup.find('body')
+            if not body:
+                continue
 
-            if any('PV-03-titres-tx-biblique' in c for c in classes) or any('LV-02-livres' in c for c in classes):
-                is_book_header = True
-                b_name = resolve_book_name(book_id, el.get_text(separator=' '))
+            for el in body.find_all('p', recursive=True):
+                classes = el.get('class', [])
+                book_id = el.get('id', '')
 
-            if is_book_header and b_name:
-                current_book = b_name
-                if current_book not in bible:
-                    bible[current_book] = {}
-                current_chapter = "1" if normalize_key(current_book) in SINGLE_CHAPTER_BOOKS else None
-                if current_chapter and current_chapter not in bible[current_book]:
+                # 1. Détection de titre de livre (éviter les introductions 'LV-02-livres-INTRO')
+                if (any('PV-03-titres-tx-biblique' in c for c in classes) or any('LV-02-livres' in c for c in classes)) and not any('intro' in c.lower() for c in classes):
+                    b_name = resolve_book_name(book_id, el.get_text(separator=' '))
+                    if b_name:
+                        current_book = b_name
+                        if current_book not in bible:
+                            bible[current_book] = {}
+                        current_chapter = "1" if normalize_key(current_book) in SINGLE_CHAPTER_BOOKS else None
+                        if current_chapter and current_chapter not in bible[current_book]:
+                            bible[current_book][current_chapter] = {}
+                        current_verse = None
+                        continue
+
+                if not current_book:
+                    continue
+
+                # Ignorer les éléments non textuels de la Bible (intertitres éditoriaux, notes, tableaux, introductions, etc.)
+                if any(k in c.lower() for c in classes for k in ['intertitre', 'sous-titre', 'intro', 'kuen-', 'nbp', 'tableau', 'tdm', 'tx-biblique-final']) or any(c.startswith('PV-02-st') for c in classes):
+                    current_verse = None
+                    continue
+
+                # 2. Détection de début de chapitre (lettrine / dropcap / classe chapitre)
+                lettrine = el.find(class_=lambda c: c and 'lettrine' in str(c).lower())
+                dropcap = el.find(class_=lambda c: c and ('dropcap' in str(c).lower() or 'lettrine' in str(c).lower()))
+                is_chapter_p = any('chapitre' in c.lower() or '1e-ligne' in c.lower() for c in classes) or (dropcap is not None and not current_chapter)
+
+                if is_chapter_p or dropcap:
+                    c_str = ''
+                    if lettrine and lettrine.get_text(strip=True):
+                        c_str = lettrine.get_text(strip=True)
+                    elif dropcap and dropcap.get_text(strip=True):
+                        c_str = dropcap.get_text(strip=True)
+                    else:
+                        m = re.search(r'^\s*(\d+)', el.get_text(strip=True))
+                        if m:
+                            c_str = m.group(1)
+
+                    m_chap = re.search(r'^\d+', c_str.strip())
+                    if m_chap:
+                        cand_num = str(int(m_chap.group(0)))
+                        current_chapter = cand_num
+                        if current_chapter not in bible[current_book]:
+                            bible[current_book][current_chapter] = {}
+                        current_verse = "1"
+                        if current_verse not in bible[current_book][current_chapter]:
+                            bible[current_book][current_chapter][current_verse] = []
+
+                if not current_chapter:
+                    continue
+
+                if current_chapter not in bible[current_book]:
                     bible[current_book][current_chapter] = {}
-                current_verse = None
-                continue
 
-            if not current_book:
-                continue
+                # 3. Supprimer les appels de notes et liens parasites
+                for note in el.find_all(['span', 'a'], class_=lambda c: c and any(k in str(c).lower() for k in ['note-en-bas-de-page', 'nbp', '_idfootnotelink', '_idfootnote'])):
+                    note.decompose()
 
-            lettrine = el.find(class_=lambda c: c and 'lettrine' in c)
-            dropcap = el.find(class_=lambda c: c and ('dropcap' in str(c).lower() or 'lettrine' in str(c).lower()))
-            is_chapter_p = any('chapitre' in c or '1e-ligne' in c for c in classes) or (dropcap is not None and not current_chapter)
-
-            if is_chapter_p or dropcap:
-                c_str = ''
-                if lettrine and lettrine.get_text(strip=True):
-                    c_str = lettrine.get_text(strip=True)
-                elif dropcap and dropcap.get_text(strip=True):
-                    c_str = dropcap.get_text(strip=True)
-                else:
-                    m = re.search(r'^\s*(\d+)', el.get_text(strip=True))
-                    if m:
-                        c_str = m.group(1)
-
-                m_chap = re.search(r'^\d+', c_str.strip())
-                if m_chap:
-                    cand_num = str(int(m_chap.group(0)))
-                    current_chapter = cand_num
-                    if current_chapter not in bible[current_book]:
-                        bible[current_book][current_chapter] = {}
-                    current_verse = "1"
-                    if current_verse not in bible[current_book][current_chapter]:
-                        bible[current_book][current_chapter][current_verse] = []
-
-            if not current_chapter:
-                continue
-
-            if current_chapter not in bible[current_book]:
-                bible[current_book][current_chapter] = {}
-
-            for child in el.contents:
-                if isinstance(child, Tag):
-                    child_classes = child.get('class', [])
-                    if any('exposant' in c.lower() for c in child_classes):
-                        v_raw = child.get_text(strip=True).replace('I', '1').replace('l', '1').replace('O', '0')
-                        v_match = re.search(r'^\d+(?:-\d+)?', v_raw)
-                        if v_match:
-                            current_verse = v_match.group(0)
+                # 4. Extraction du verset et du texte
+                for child in el.contents:
+                    if isinstance(child, Tag):
+                        child_classes = child.get('class', [])
+                        if any('dropcap' in c.lower() or 'lettrine' in c.lower() for c in child_classes):
+                            continue
+                        if any(k in cls.lower() for cls in child_classes for k in ['exposant', 'exp-n-verset', 'verset', 'verse']) and not any('note' in cls.lower() or 'nbp' in cls.lower() for cls in child_classes):
+                            v_raw = child.get_text(strip=True).replace('I', '1').replace('l', '1').replace('O', '0')
+                            v_match = re.search(r'^\d+(?:-\d+)?', v_raw)
+                            if v_match:
+                                current_verse = v_match.group(0)
+                                if current_verse not in bible[current_book][current_chapter]:
+                                    bible[current_book][current_chapter][current_verse] = []
+                                continue
+                        t = child.get_text(separator=' ')
+                        if t and current_verse:
                             if current_verse not in bible[current_book][current_chapter]:
                                 bible[current_book][current_chapter][current_verse] = []
-                            continue
-                    t = child.get_text(separator=' ')
-                    if t and current_verse:
-                        if current_verse not in bible[current_book][current_chapter]:
-                            bible[current_book][current_chapter][current_verse] = []
-                        bible[current_book][current_chapter][current_verse].append(t)
-                elif isinstance(child, NavigableString):
-                    t = str(child)
-                    if t and current_verse:
-                        if current_verse not in bible[current_book][current_chapter]:
-                            bible[current_book][current_chapter][current_verse] = []
-                        bible[current_book][current_chapter][current_verse].append(t)
+                            bible[current_book][current_chapter][current_verse].append(t)
+                    elif isinstance(child, NavigableString):
+                        t = str(child)
+                        if t and current_verse:
+                            if current_verse not in bible[current_book][current_chapter]:
+                                bible[current_book][current_chapter][current_verse] = []
+                            bible[current_book][current_chapter][current_verse].append(t)
 
         clean_result: Dict[str, Dict[str, Dict[str, str]]] = {}
         for b_k, ch_dict in bible.items():
@@ -580,7 +642,16 @@ class BibleEpubImporter:
             for ch_k in sorted(ch_dict.keys(), key=lambda x: int(x) if x.isdigit() else 0):
                 clean_result[b_k][ch_k] = {}
                 for v_k in sorted(ch_dict[ch_k].keys(), key=lambda x: int(x.split('-')[0]) if re.match(r'^\d+', x) else 0):
-                    t = clean_verse_text(''.join(ch_dict[ch_k][v_k]))
+                    raw_joined = " ".join(ch_dict[ch_k][v_k])
+                    t = clean_verse_text(raw_joined)
+                    
+                    # Réparation d'éventuelle coupure lettrine ('A u commencement' -> 'Au commencement')
+                    t = re.sub(r'^([A-ZÀ-ÖØ-ß])\s+([a-zà-öø-ÿ])', r'\1\2', t)
+                    
+                    # Nettoyer d'éventuels résidus d'en-tête répétés sur le verset 1
+                    if v_k == "1":
+                        t = re.sub(rf'^(?:{re.escape(b_k)}|Psaumes?|Chapitre)\s+{ch_k}\s*', '', t, flags=re.I).strip()
+                        t = re.sub(r'^\d+\.\d+–\d+\.\d+\s*', '', t).strip()
                     if t:
                         clean_result[b_k][ch_k][v_k] = t
         return clean_result
