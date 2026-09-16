@@ -289,8 +289,22 @@ def _run_download_and_stage(download_url: str, target_version: str):
 
         # Décompression dans le dossier staged
         _set_update_state(percent=94.0, speed_str="", downloaded_str="Décompression...")
+
+        def _safe_extractall(zf: zipfile.ZipFile, dest_dir: str) -> None:
+            """Extrait un ZIP en vérifiant chaque chemin d'entrée pour prévenir le Zip Slip.
+            Lève ValueError si un chemin tente de sortir du répertoire de destination.
+            """
+            real_dest = os.path.realpath(dest_dir)
+            for member in zf.namelist():
+                member_real = os.path.realpath(os.path.join(real_dest, member))
+                if not member_real.startswith(real_dest + os.sep) and member_real != real_dest:
+                    raise ValueError(
+                        f"Zip Slip détecté : l'entrée '{member}' tente de sortir du répertoire cible."
+                    )
+            zf.extractall(dest_dir)
+
         with zipfile.ZipFile(zip_path, "r") as zf:
-            zf.extractall(staged_dir)
+            _safe_extractall(zf, staged_dir)
 
         # Vérification si les fichiers sont encapsulés dans un sous-dossier OpenShema/
         subdirs = os.listdir(staged_dir)

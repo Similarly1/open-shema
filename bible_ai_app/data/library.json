@@ -1168,5 +1168,19 @@
     "total_books": 17,
     "embedding_model": "study_library",
     "active": true
+  },
+  "PROVIV": {
+    "title": "Prophetie vivante",
+    "author": "Alfred Kuen",
+    "description": "Prophetie vivante",
+    "year": "2021",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\PROVIV.png",
+    "type": "Bible",
+    "format": "json",
+    "folder_name": "PROVIV",
+    "version_code": "PROV",
+    "total_books": 17,
+    "embedding_model": "study_library",
+    "active": true
   }
 }

@@ -77,11 +77,83 @@ class WikipediaClient:
         'exorciste', 'dracula', 'saga', 'franchise', 'trilogie', 'court métrage'
     }
 
+    # Entités commerciales, modernes, technologiques ou contemporaines incompatibles avec l'histoire biblique
+    ANACHRONISM_BLACKLIST = {
+        'société', 'entreprise', 'fabricant', 'marque', 'multinationale', 'holding', 'startup',
+        'siège social', "chiffre d'affaires", 'filiale', 'commerciale', 'électronique',
+        'audio', 'microphone', 'casque audio', 'automobile', 'constructeur automobile',
+        'logiciel', 'informatique', 'téléphonie', 'smartphone', 'compagnie aérienne',
+        'banque', 'bourse', 'chaîne de magasins', 'supermarché', 'magasin', 'matériel audio',
+        'album', 'chanson', 'single', 'disque', 'discographie', 'label discographique',
+        'groupe de musique', 'groupe de rock', 'groupe de pop', 'groupe de metal',
+        'série télévisée', 'feuilleton', 'téléfilm', 'jeu vidéo', 'comics', 'manga',
+        'footballeur', 'joueur de football', 'basketteur', 'rugbyman', 'cycliste',
+        'pilote automobile', 'formule 1', 'tennisman', 'catcheur', 'boxeur',
+        'animateur de télévision', 'journaliste contemporain', 'architecte français',
+        'architecte américain', 'architecte britannique', 'député français'
+    }
+
+    MODERN_BIOGRAPHY_REGEX = re.compile(
+        r'\b(?:né|née|mort|morte)\s+(?:le\s+\d{1,2}\s+[a-zàâäéèêëîïôöùûüç]+\s+)?(?:en\s+)?(17|18|19|20)\d{2}\b',
+        re.IGNORECASE
+    )
+    MODERN_COMPANY_REGEX = re.compile(
+        r'\b(?:fondée|créée|fondé|créé)\s+(?:en\s+|le\s+)(18|19|20)\d{2}\b',
+        re.IGNORECASE
+    )
+
+    # Typologies géographiques valides
+    HISTORICAL_GEOGRAPHICAL_KEYWORDS = {
+        'ville', 'cité', 'village', 'localité', 'commune', 'agglomération', 'bourg', 'oasis', 'capitale',
+        'région', 'province', 'district', 'gouvernorat', 'territoire', 'pays', 'royaume', 'empire',
+        'désert', 'désertique', 'mont', 'montagne', 'monts', 'colline', 'vallée', 'plaine', 'plateau',
+        'oued', 'wadi', 'fleuve', 'rivière', "cours d'eau", 'mer', 'lac', 'golfe', 'baie', 'détroit',
+        'île', 'îles', 'archipel', 'péninsule', 'source', 'puits', 'port', 'état'
+    }
+
+    # Ancres historiques, archéologiques, antiques ou bibliques indispensables pour le contexte géographique
+    BIBLICAL_ANCIENT_KEYWORDS = {
+        'tell', 'ruines', 'site archéologique', 'vestiges', 'fouilles', 'antique', 'antiquité',
+        'ancien', 'ancienne', 'âge du bronze', 'âge du fer', 'époque hellénistique', 'époque romaine',
+        'époque perse', 'époque byzantine', 'époque ottomane',
+        'proche-orient', 'moyen-orient', 'levant', 'croissant fertile', 'mésopotamie', 'anatolie',
+        'israël', 'palestine', 'judée', 'samarie', 'galilée', 'chanaan', 'canaan', 'phénicie',
+        'égypte', 'syrie', 'jordanie', 'liban', 'sinaï', 'négev', 'bashan', 'basan', 'hauran',
+        'galaad', 'moab', 'édom', 'ammon', 'italie', 'rome', 'romain', 'romaine', 'grèce', 'grec',
+        'méditerranée', 'mer méditerranée', 'latin', 'latium', 'bassin levantin', 'bassin méditerranéen',
+        'bible', 'biblique', 'ancien testament', 'nouveau testament', 'torah', 'tanakh',
+        'hébreu', 'sémitique', 'araméen', 'patrimoine mondial'
+    }
+
+    # Entités textuelles ou humaines non-géographiques à écarter en contexte de lieux
+    NON_PLACE_INDICATORS = {
+        'personnage', 'personnalité', 'roi de', 'reine de', 'prince de', 'princesse de',
+        'prophète', 'apôtre', 'patriarche', 'homme politique', 'femme politique',
+        'livre de', 'livres de', 'évangile', 'épître', 'psaume', 'cantique', 'sourate',
+        'est un personnage', 'est un roi', 'est le fils', 'est une reine', 'est un apôtre'
+    }
+
     @classmethod
     def strip_accents(cls, text: str) -> str:
         if not text:
             return ""
         return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn').lower()
+
+    @classmethod
+    def is_title_relevant_for_place(cls, query: str, title: str) -> bool:
+        """Vérifie si le titre de l'article correspond bien au nom du lieu recherché."""
+        if not query or not title:
+            return False
+        q_norm = cls.strip_accents(query).strip().lower()
+        t_norm = cls.strip_accents(title).strip().lower()
+        if not q_norm or not t_norm:
+            return False
+        if q_norm == t_norm or q_norm in t_norm or t_norm in q_norm:
+            return True
+        q_words = [w for w in q_norm.split() if len(w) > 2]
+        if q_words and all(w in t_norm for w in q_words):
+            return True
+        return False
 
     @classmethod
     def is_pop_culture(cls, text: str) -> bool:
@@ -100,10 +172,58 @@ class WikipediaClient:
         return False
 
     @classmethod
-    def get_summary(cls, query: str, exact_title: str = None, lang: str = "fr") -> dict:
+    def is_anachronistic_or_irrelevant(cls, title: str, desc: str = "", extract: str = "", context: str = None, query: str = None) -> bool:
+        """
+        Détecte si un article Wikipédia est anachronique, commercial ou hors sujet.
+        Si context == 'place', applique des filtres stricts garantissant que l'article
+        concerne bien une entité géographique ayant une assise historique, archéologique ou biblique.
+        """
+        combined = f"{title} {desc} {extract[:400]}".lower()
+
+        # 1. Pop-culture générale
+        if cls.is_pop_culture(title) or cls.is_pop_culture(desc) or cls.is_pop_culture(extract[:200]):
+            return True
+
+        # 2. Mots-clés d'entreprises / marques / anachronismes commerciaux
+        for bad_kw in cls.ANACHRONISM_BLACKLIST:
+            if bad_kw in combined:
+                return True
+
+        # 3. Dates de biographies contemporaines (ex: architecte ou footballeur né en 1889 ou 1975)
+        if cls.MODERN_BIOGRAPHY_REGEX.search(combined):
+            return True
+
+        # 4. Dates de création d'entreprises modernes (ex: fondée en 1925)
+        if cls.MODERN_COMPANY_REGEX.search(combined):
+            return True
+
+        # 5. Filtrage contextuel spécifique aux lieux bibliques et antiques
+        if context == 'place':
+            # Si une requête est fournie, vérifier la pertinence directe du titre
+            if query and not cls.is_title_relevant_for_place(query, title):
+                return True
+
+            # Rejet des entités non-géographiques (personnages, rois, livres bibliques)
+            first_sentence = extract[:150].lower()
+            for np in cls.NON_PLACE_INDICATORS:
+                if np in title.lower() or np in desc.lower() or np in first_sentence:
+                    return True
+
+            has_geo = any(k in combined for k in cls.HISTORICAL_GEOGRAPHICAL_KEYWORDS)
+            if not has_geo:
+                return True
+            has_anc = any(k in combined for k in cls.BIBLICAL_ANCIENT_KEYWORDS)
+            if not has_anc:
+                return True
+
+        return False
+
+    @classmethod
+    def get_summary(cls, query: str, exact_title: str = None, lang: str = "fr", context: str = None) -> dict:
         """
         Récupère le résumé Wikipédia d'un terme ou d'un titre exact.
         Retourne l'article sélectionné et une liste riche de candidats alternatifs sélectionnables par l'utilisateur.
+        Si context == 'place', applique le filtrage strict anti-anachronisme géographique et antique.
         """
         if not query or not query.strip():
             return {"found": False, "error": "Requête vide"}
@@ -111,12 +231,12 @@ class WikipediaClient:
         clean_q = query.strip()
         target_title = exact_title.strip() if exact_title else None
         
-        cache_key = f"{lang}:{target_title or clean_q.lower()}"
+        cache_key = f"{lang}:{context or ''}:{target_title or clean_q.lower()}"
         if cache_key in cls._cache and not exact_title:
             return cls._cache[cache_key]
 
         # 1. Récupérer tous les candidats correspondants
-        candidates = cls.search_candidates(clean_q, lang=lang, limit=10)
+        candidates = cls.search_candidates(clean_q, lang=lang, limit=10, context=context)
 
         # 2. Déterminer le titre à charger
         chosen_title = target_title
@@ -129,12 +249,13 @@ class WikipediaClient:
         # 3. Charger les données détaillées de l'article retenu via l'Action API robuste
         result = cls._fetch_direct_summary(chosen_title, lang)
         
-        # 4. Repli si l'article obtenu est invalide ou pop-culture
-        if not result or not result.get("found") or cls.is_pop_culture(result.get("description", "")) or cls.is_pop_culture(result.get("extract", "")[:100]):
+        # 4. Repli si l'article obtenu est invalide, anachronique ou pop-culture
+        if not result or not result.get("found") or cls.is_anachronistic_or_irrelevant(result.get("title", ""), result.get("description", ""), result.get("extract", ""), context=context, query=clean_q):
+            result = None
             for cand in candidates:
                 if cand["title"] != chosen_title:
                     res_alt = cls._fetch_direct_summary(cand["title"], lang)
-                    if res_alt and res_alt.get("found") and not cls.is_pop_culture(res_alt.get("description", "")) and not cls.is_pop_culture(res_alt.get("extract", "")[:100]):
+                    if res_alt and res_alt.get("found") and not cls.is_anachronistic_or_irrelevant(res_alt.get("title", ""), res_alt.get("description", ""), res_alt.get("extract", ""), context=context, query=clean_q):
                         result = res_alt
                         chosen_title = cand["title"]
                         break
@@ -253,39 +374,46 @@ class WikipediaClient:
         return {"found": False, "error": "Impossible de charger le contenu"}
 
     @classmethod
-    def search_candidates(cls, query: str, lang: str = "fr", limit: int = 10) -> list:
+    def search_candidates(cls, query: str, lang: str = "fr", limit: int = 10, context: str = None) -> list:
         """
         Recherche intelligente des articles Wikipédia candidats :
-        - Vérifie les alias théologiques majeurs
-        - Effectue plusieurs passes de recherche (requête brute, +bible, +théologie)
-        - Élimine la pop-culture et les essais modernes non encyclopédiques
-        - Trie par pertinence doctrinale et biblique
+        - Vérifie les alias théologiques majeurs (si hors contexte 'place')
+        - Effectue plusieurs passes de recherche ciblées
+        - Élimine la pop-culture, les entreprises et les entités contemporaines (anachronismes)
+        - Trie par pertinence doctrinale, biblique ou historico-géographique
         """
         clean_q = re.sub(r'[^a-zA-Z0-9àâäéèêëîïôöùûüç\s]', '', query).lower().strip()
         candidates_map = {}
 
-        # 1. Injecter d'abord les alias théologiques s'ils correspondent
-        matched_aliases = []
-        if clean_q in cls.THEOLOGICAL_ALIASES:
-            matched_aliases = cls.THEOLOGICAL_ALIASES[clean_q]
-        else:
-            for k, v in cls.THEOLOGICAL_ALIASES.items():
-                if k in clean_q or clean_q in k:
-                    matched_aliases.extend(v)
+        # 1. Injecter d'abord les alias théologiques s'ils correspondent (sauf en mode purement géographique)
+        if context != 'place':
+            matched_aliases = []
+            if clean_q in cls.THEOLOGICAL_ALIASES:
+                matched_aliases = cls.THEOLOGICAL_ALIASES[clean_q]
+            else:
+                for k, v in cls.THEOLOGICAL_ALIASES.items():
+                    if k in clean_q or clean_q in k:
+                        matched_aliases.extend(v)
 
-        for idx, alias in enumerate(matched_aliases):
-            if alias not in candidates_map:
-                candidates_map[alias] = {
-                    "title": alias,
-                    "snippet": f"Article théologique et biblique de référence pour « {query} »",
-                    "score_bonus": 100 - (idx * 5)
-                }
+            for idx, alias in enumerate(matched_aliases):
+                if alias not in candidates_map:
+                    candidates_map[alias] = {
+                        "title": alias,
+                        "snippet": f"Article théologique et biblique de référence pour « {query} »",
+                        "score_bonus": 100 - (idx * 5)
+                    }
 
-        # 2. Requêtes de recherche Wikipédia
+        # 2. Requêtes de recherche Wikipédia ciblées
         queries_to_run = [query]
-        if len(query.split()) == 1:
-            queries_to_run.append(f"{query} bible")
-            queries_to_run.append(f"{query} théologie")
+        if context == 'place':
+            if len(query.split()) == 1:
+                queries_to_run.append(f"{query} Bible")
+                queries_to_run.append(f"{query} Proche-Orient")
+                queries_to_run.append(f"{query} antique")
+        else:
+            if len(query.split()) == 1:
+                queries_to_run.append(f"{query} bible")
+                queries_to_run.append(f"{query} théologie")
 
         for q_str in queries_to_run:
             encoded_q = urllib.parse.quote(q_str)
@@ -307,8 +435,8 @@ class WikipediaClient:
                             clean_snip = re.sub(r'<[^>]+>', '', raw_snip).strip()
                             clean_snip = clean_snip.replace("&quot;", '"').replace("&#039;", "'").replace("&amp;", "&")
 
-                            # Filtrer immédiatement si pop-culture ou essai moderne
-                            if cls.is_pop_culture(title) or cls.is_pop_culture(clean_snip):
+                            # Filtrer immédiatement si anachronique, pop-culture ou hors sujet
+                            if cls.is_anachronistic_or_irrelevant(title, "", clean_snip, context=context, query=query):
                                 continue
 
                             if title not in candidates_map:
@@ -330,8 +458,8 @@ class WikipediaClient:
             snip_lower = cand["snippet"].lower()
             score = cand.get("score_bonus", 0)
 
-            # Rejet pop-culture résiduelle
-            if cls.is_pop_culture(title) or cls.is_pop_culture(cand["snippet"]):
+            # Rejet anachronisme résiduel
+            if cls.is_anachronistic_or_irrelevant(title, "", cand["snippet"], context=context, query=query):
                 continue
 
             # Correspondance exacte ou proche
@@ -343,9 +471,10 @@ class WikipediaClient:
                 score += 12
 
             # Bonus contexte biblique / religieux
-            for kw in cls.BIBLICAL_KEYWORDS:
+            keywords_to_check = cls.BIBLICAL_ANCIENT_KEYWORDS if context == 'place' else cls.BIBLICAL_KEYWORDS
+            for kw in keywords_to_check:
                 if kw in snip_lower or kw in t_lower:
-                    score += 20
+                    score += 25
                     break
 
             # Pénaliser les simples pages d'homonymie

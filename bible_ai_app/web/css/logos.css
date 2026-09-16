@@ -12876,24 +12876,29 @@ body.palette-dark-warm .ctx-submenu {
 }
 
 /* Timeline des étapes d'itinéraire */
-.itinerary-info-banner {
+.itinerary-summary-badge {
   background-color: var(--bg-card);
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  padding: 5px 9px;
+  border-radius: 5px;
+  margin-bottom: 6px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  border: 1px solid var(--border-subtle, var(--border-color));
 }
 
 .itinerary-steps-timeline {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 4px 0;
+  gap: 5px;
+  padding: 2px 0;
 }
 
 .itinerary-step-item {
   display: flex;
-  gap: 10px;
-  padding: 8px 10px;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 9px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -12904,42 +12909,121 @@ body.palette-dark-warm .ctx-submenu {
 .itinerary-step-item:hover {
   background-color: var(--bg-subtle);
   border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+.itinerary-step-item.active {
+  background-color: var(--bg-active, rgba(37, 99, 235, 0.08));
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 1.5px var(--accent-blue);
 }
 
 .step-num-bubble {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
   border-radius: 50%;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 9.5px;
   font-weight: 700;
   margin-top: 1px;
+  flex-shrink: 0;
 }
 
 .step-content {
   flex: 1;
+  min-width: 0;
 }
 
 .step-name {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--text-primary);
   display: block;
   margin-bottom: 2px;
+  line-height: 1.25;
 }
 
 .step-desc {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-secondary);
   line-height: 1.35;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* 2. Canevas Cartographique Central */
+/* Infobulles popup d'étapes d'itinéraires sur la carte */
+.open-shema-map-popup .leaflet-popup-content-wrapper {
+  background: var(--bg-card, #1e293b);
+  color: var(--text-primary, #f8fafc);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  padding: 0;
+}
+
+.open-shema-map-popup .leaflet-popup-content {
+  margin: 10px 12px;
+  line-height: 1.4;
+}
+
+.open-shema-map-popup .leaflet-popup-tip {
+  background: var(--bg-card, #1e293b);
+}
+
+.itinerary-leaflet-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 190px;
+  max-width: 290px;
+}
+
+.itin-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.itin-step-pill {
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: unset !important;
+  border-radius: 4px !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  padding: 2px 7px !important;
+  line-height: 1.2 !important;
+  background-color: rgba(37, 99, 235, 0.12) !important;
+  color: var(--accent-blue) !important;
+  border: 1px solid currentColor !important;
+  flex-shrink: 0 !important;
+}
+
+.itin-step-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.itin-popup-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  font-style: normal;
+}
+
+/* 2. Canevas Cartographique Central & Inspecteur Latéral */
 .maps-canvas-pane {
   flex: 1;
   position: relative;
@@ -12975,6 +13059,7 @@ body.palette-dark-warm .ctx-submenu {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
+  user-select: none;
 }
 
 .map-layer-btn:hover {
@@ -12987,33 +13072,130 @@ body.palette-dark-warm .ctx-submenu {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
-/* Marqueurs personnalisés (SVG DivIcons) */
-.custom-map-pin {
-  width: 24px;
-  height: 24px;
+.maps-filter-period-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.maps-cluster-hint {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  background-color: rgba(37, 99, 235, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   MARQUEURS CARTOGRAPHIQUES & CLUSTERS INTELLIGENTS
+   ========================================================================== */
+
+/* Bulles de grappes / Clusters dynamiques */
+.map-cluster-bubble {
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 2px #ffffff;
+  font-family: var(--font-ui, 'Inter', sans-serif);
+  font-weight: 800;
+  color: #ffffff;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  user-select: none;
 }
 
-.custom-map-pin:hover {
-  transform: scale(1.25);
+.map-cluster-bubble:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
   z-index: 1000 !important;
 }
 
+.cluster-small {
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle at 30% 30%, #3B82F6, #1D4ED8);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  font-size: 11px;
+}
+
+.cluster-medium {
+  width: 38px;
+  height: 38px;
+  background: radial-gradient(circle at 30% 30%, #6366F1, #4338CA);
+  border: 2.5px solid rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+}
+
+.cluster-large {
+  width: 44px;
+  height: 44px;
+  background: radial-gradient(circle at 30% 30%, #8B5CF6, #6D28D9);
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  font-size: 13px;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3), 0 4px 14px rgba(0,0,0,0.5);
+}
+
+/* Pins personnalisés par catégorie et importance */
+.custom-map-pin {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 2px #ffffff;
+}
+
+.custom-map-pin:hover {
+  transform: scale(1.3);
+  z-index: 999 !important;
+}
+
+.custom-map-pin.pin-selected {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 3px #F59E0B, 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  z-index: 1001 !important;
+}
+
+.pin-major {
+  width: 28px;
+  height: 28px;
+}
+
+.pin-medium {
+  width: 22px;
+  height: 22px;
+}
+
+.pin-minor {
+  width: 16px;
+  height: 16px;
+}
+
+.pin-svg {
+  display: block;
+}
+
+/* Couleurs par type */
+.pin-city { background-color: #2563EB; }
+.pin-sea { background-color: #0284C7; }
+.pin-river { background-color: #06B6D4; }
+.pin-mountain { background-color: #7C3AED; }
+.pin-region { background-color: #D97706; }
+.pin-island { background-color: #059669; }
+
+/* Marqueur d'étape d'itinéraire */
 .itinerary-step-pin {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 2px #ffffff;
   cursor: pointer;
@@ -13025,240 +13207,502 @@ body.palette-dark-warm .ctx-submenu {
   z-index: 1000 !important;
 }
 
-/* Popups Leaflet adaptés au thème Open Shema */
-.open-shema-map-popup .leaflet-popup-content-wrapper {
-  background-color: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-  padding: 0;
+/* Tooltip Leaflet minimal et fluide au survol */
+.open-shema-map-tooltip {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+  padding: 4px 8px !important;
+  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
 }
 
-.open-shema-map-popup .leaflet-popup-content {
-  margin: 10px 12px;
-  line-height: 1.4;
-  font-family: var(--font-ui, 'Inter', sans-serif);
+.open-shema-map-tooltip::before {
+  border-top-color: var(--border-color) !important;
 }
 
-.open-shema-map-popup .leaflet-popup-tip {
-  background-color: var(--bg-card);
-}
-
-.leaflet-custom-popup .popup-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 13px;
-  margin-bottom: 4px;
-}
-
-.leaflet-custom-popup .popup-type-badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  background-color: rgba(37, 99, 235, 0.15);
-  color: var(--accent-blue);
-  padding: 1px 5px;
-  border-radius: 3px;
-}
-
-.leaflet-custom-popup .popup-modern {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.leaflet-custom-popup .popup-desc {
-  font-size: 11.5px;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.leaflet-custom-popup .popup-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-top: 1px solid var(--border-color);
-  padding-top: 6px;
-  margin-top: 6px;
-}
-
-.leaflet-custom-popup .popup-verses-badge {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.leaflet-custom-popup .popup-action-btn {
-  background: none;
-  border: none;
-  color: var(--accent-blue);
-  font-size: 11.5px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-}
-
-.leaflet-custom-popup .popup-action-btn:hover {
-  text-decoration: underline;
-}
-
-/* 3. Panneau flottant de détails du lieu sélectionné */
-.map-place-details-card {
+/* ==========================================================================
+   VOLET LATÉRAL INSPECTEUR DE LIEU (DRAWER MODERNE ÉPURÉ)
+   ========================================================================== */
+.maps-details-drawer {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 380px;
-  max-width: calc(100% - 40px);
-  max-height: 480px;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: 320px;
+  max-width: calc(100% - 24px);
   background-color: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   z-index: 500;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: popoverFadeIn 0.16s ease-out;
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, bottom 0.22s ease;
 }
 
-.map-place-details-card.hidden {
-  display: none;
+.maps-details-drawer.hidden {
+  transform: translateX(350px);
+  pointer-events: none;
+  opacity: 0;
 }
 
-.details-card-header {
+/* En mode itinéraire : le volet droit s'arrête strictement au-dessus du bandeau de navigation inférieur */
+.maps-workspace-layout.itinerary-mode .maps-details-drawer {
+  bottom: 82px;
+}
+
+/* ==========================================================================
+   MODE ITINÉRAIRE : ÉPURATION DE LA BARRE GAUCHE (PISTE 1)
+   ========================================================================== */
+.maps-workspace-layout.itinerary-mode .maps-search-box,
+.maps-workspace-layout.itinerary-mode .maps-filters-row,
+.maps-workspace-layout.itinerary-mode .maps-filter-period-box,
+.maps-workspace-layout.itinerary-mode #map-cluster-info {
+  display: none !important;
+}
+
+.itinerary-selector-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.itinerary-exit-link {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  opacity: 0.9;
+  transition: opacity 0.15s ease;
+}
+
+.itinerary-exit-link:hover {
+  opacity: 1;
+}
+
+.itinerary-exit-link.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   MODE IMMERSION CARTOGRAPHIQUE (PLEIN ÉCRAN CARTE SANS VOLETS NI MENU GÉNÉRAL)
+   ========================================================================== */
+body.map-immersion-active #sidebar {
+  display: none !important;
+}
+
+.maps-workspace-layout.immersion-mode .maps-sidebar-pane {
+  display: none !important;
+}
+
+/* ==========================================================================
+   BOUTONS D'ACTION DU BANDEAU SUPÉRIEUR DES CARTES (RECENTRER, DÉTAILS, IMMERSION)
+   ========================================================================== */
+.map-header-divider {
+  width: 1px;
+  height: 18px;
+  background-color: var(--border-color);
+  margin: 0 4px;
+}
+
+.map-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 11px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.map-header-btn svg {
+  color: var(--text-muted);
+  transition: color 0.15s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.map-header-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.map-header-btn:hover svg {
+  color: var(--text-primary);
+}
+
+.map-header-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Effet tactile de rotation au clic pour le bouton Recentrer */
+.map-header-btn#btn-map-reset-view:active svg {
+  transform: rotate(90deg);
+}
+
+/* État Actif raffiné et équilibré pour Détails & Immersion */
+.map-header-btn.active {
+  background-color: var(--bg-active) !important;
+  color: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 1px var(--accent-blue), 0 2px 6px rgba(2, 132, 199, 0.15) !important;
+}
+
+.map-header-btn.active svg {
+  color: var(--accent-blue) !important;
+}
+
+/* ==========================================================================
+   BARRE FLOTTANTE INFÉRIEURE DE NAVIGATION D'ITINÉRAIRE (PISTE 2)
+   ========================================================================== */
+.map-itinerary-bottom-bar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 450;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--bg-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-color);
+  border-radius: 36px;
+  padding: 6px 10px 6px 14px;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.42), 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: calc(100% - 40px);
+  animation: itinBarSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: left 0.26s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+/* Recentrage automatique du bandeau inférieur dans l'espace carte restant quand le volet droit est ouvert */
+.maps-workspace-layout.drawer-open .map-itinerary-bottom-bar {
+  left: calc((100% - 336px) / 2);
+  max-width: calc(100% - 364px);
+}
+
+.map-itinerary-bottom-bar.hidden {
+  display: none !important;
+}
+
+@keyframes itinBarSlideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 18px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.itin-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle, var(--border-color));
+  color: var(--text-primary);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.itin-nav-btn:hover:not(:disabled) {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+.itin-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.itin-bottom-step-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 8px;
+  cursor: pointer;
+  min-width: 140px;
+  max-width: 320px;
+  text-align: center;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.itin-bottom-step-info:hover {
+  background-color: var(--bg-subtle);
+}
+
+.itin-bottom-step-info:hover #itin-bottom-step-name {
+  color: var(--accent-blue);
+}
+
+.itin-bottom-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.itin-bottom-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: var(--accent-blue);
+  padding: 1.5px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.2px;
+}
+
+#itin-bottom-step-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: color 0.15s ease;
+}
+
+.itin-bottom-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+  line-height: 1.3;
+}
+
+.itin-details-shortcut-btn {
+  background: none;
+  border: 1px solid var(--border-subtle, var(--border-color));
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.itin-details-shortcut-btn:hover {
+  background-color: var(--bg-active);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.drawer-header {
   padding: 12px 14px;
   background-color: var(--bg-subtle);
   border-bottom: 1px solid var(--border-color);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 10px;
 }
 
-.details-title-group {
+.drawer-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.drawer-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.details-title {
+.drawer-title {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
+  line-height: 1.25;
 }
 
-.confidence-badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+.drawer-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.conf-certain {
-  background-color: rgba(16, 185, 129, 0.15);
-  color: #10B981;
+.drawer-ancient-label {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
-.conf-probable {
-  background-color: rgba(245, 158, 11, 0.15);
-  color: #F59E0B;
+.drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.conf-disputed {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #EF4444;
-}
-
-.details-close-btn {
+.drawer-icon-btn {
   background: none;
-  border: none;
+  border: 1px solid transparent;
   color: var(--text-muted);
-  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
+  transition: all 0.15s ease;
 }
 
-.details-close-btn:hover {
+.drawer-icon-btn:hover {
   background-color: var(--bg-active);
   color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
-.details-card-body {
+.drawer-body {
   padding: 14px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
 }
 
-.details-info-grid {
+.drawer-info-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+  gap: 6px;
   background-color: var(--bg-subtle);
-  padding: 8px 10px;
-  border-radius: 6px;
+  border: 1px solid var(--border-subtle, var(--border-color));
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
 }
 
-.info-field {
+.drawer-info-row {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
 }
 
-.info-label {
-  color: var(--text-muted);
-  font-weight: 500;
+.periods-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
 }
 
-.info-value {
-  color: var(--text-primary);
+.period-tag {
+  font-size: 9.5px;
   font-weight: 600;
-  text-align: right;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue);
+  border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
-.details-comment-box {
+.drawer-comment-card {
   font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.45;
   background-color: var(--bg-subtle);
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
   border-left: 3px solid var(--accent-blue);
 }
 
-.details-comment-text {
+.drawer-comment-text {
   margin: 0;
 }
 
-.details-verses-section {
+.drawer-verses-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.details-verses-title {
+.verses-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-section-title {
   margin: 0;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--text-muted);
-  letter-spacing: 0.4px;
+}
+
+.verses-count-pill {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  background-color: rgba(37, 99, 235, 0.12);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.verses-help-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .details-verses-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  max-height: 150px;
+  max-height: 140px;
   overflow-y: auto;
+  padding: 2px 0;
 }
 
 .place-verse-pill {
@@ -13268,9 +13712,10 @@ body.palette-dark-warm .ctx-submenu {
   font-size: 11px;
   font-weight: 600;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
   transition: all 0.15s ease;
+  user-select: none;
 }
 
 .place-verse-pill:hover {
@@ -13278,6 +13723,344 @@ body.palette-dark-warm .ctx-submenu {
   color: #ffffff;
   border-color: var(--accent-blue);
   transform: translateY(-1px);
+}
+
+.place-verse-pill.active {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+
+/* Boîte d'aperçu de verset in-situ */
+.maps-verse-preview-box {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: popoverFadeIn 0.18s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.maps-verse-preview-box.hidden {
+  display: none;
+}
+
+.preview-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle, var(--border-color));
+}
+
+.preview-ref-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--accent-blue);
+}
+
+.preview-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-close-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-active);
+}
+
+.preview-verse-text {
+  font-family: 'EB Garamond', 'Georgia', serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  font-style: normal;
+  max-height: 140px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.preview-box-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.btn-jump-reader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  background-color: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: 5px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-jump-reader:hover {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
+}
+
+/* ======================================================= */
+/* SECTION WIKIPÉDIA & ARCHÉOLOGIE DANS LE VOLET DU LIEU   */
+/* ======================================================= */
+.drawer-wiki-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 4px;
+}
+
+.wiki-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wiki-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-blue);
+}
+
+.wiki-source-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  background-color: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle, var(--border-color));
+}
+
+.maps-wiki-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.maps-wiki-loading {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  padding: 12px 0;
+  text-align: center;
+  font-style: italic;
+}
+
+.maps-wiki-empty {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+.maps-wiki-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.maps-wiki-thumb-wrap {
+  width: 100%;
+  max-height: 140px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background-color: #000000;
+}
+
+.maps-wiki-thumb {
+  width: 100%;
+  max-height: 140px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.maps-wiki-thumb:hover {
+  transform: scale(1.03);
+}
+
+.maps-wiki-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.maps-wiki-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.maps-wiki-desc {
+  font-size: 11px;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.maps-wiki-extract {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  position: relative;
+  word-break: break-word;
+}
+
+.maps-wiki-extract.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.maps-wiki-btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.maps-wiki-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.maps-wiki-toggle-btn:hover {
+  color: var(--accent-blue-hover, var(--text-primary));
+}
+
+.maps-wiki-open-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-decoration: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 3px 8px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  margin-left: auto;
+}
+
+.maps-wiki-open-link:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+/* ======================================================= */
+/* INFOBULLE FLOTTANTE AU SURVOL DES VERSETS (CARTE)       */
+/* ======================================================= */
+.maps-verse-hover-tooltip {
+  position: fixed;
+  z-index: 100050;
+  max-width: 320px;
+  min-width: 240px;
+  background-color: var(--bg-card, #ffffff);
+  color: var(--text-primary, #1e293b);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  padding: 10px 13px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.22), 0 6px 12px -2px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.maps-verse-hover-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.maps-verse-hover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+}
+
+.maps-verse-hover-ref {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--accent-blue, #2563eb);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.maps-verse-hover-version {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  background-color: var(--bg-subtle, rgba(0, 0, 0, 0.04));
+  padding: 1.5px 5.5px;
+  border-radius: 4px;
+  letter-spacing: 0.2px;
+}
+
+.maps-verse-hover-body {
+  font-family: 'EB Garamond', 'Georgia', serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-primary, #1e293b);
+  font-style: italic;
+  max-height: 160px;
+  overflow-y: auto;
+  word-wrap: break-word;
+}
+
+.maps-verse-hover-loading {
+  color: var(--text-muted, #64748b);
+  font-style: italic;
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
 }
 
 /* ======================================================= */

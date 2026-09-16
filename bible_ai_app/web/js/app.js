@@ -837,6 +837,15 @@ const App = {
     if (cleanViewName !== 'notes') {
       document.body.classList.remove('has-mindmap');
     }
+    if (cleanViewName !== 'maps') {
+      document.body.classList.remove('map-immersion-active');
+      if (typeof MapsView !== 'undefined' && MapsView.toggleImmersionMode) {
+        const layout = document.getElementById('maps-workspace-layout');
+        if (layout && layout.classList.contains('immersion-mode')) {
+          MapsView.toggleImmersionMode(false);
+        }
+      }
+    }
 
     // Synchroniser l'état actif de la barre latérale et des sous-menus
     document.querySelectorAll('#sidebar .nav-item, .sidebar-menu .nav-item, .sidebar-nav .nav-item, .sidebar-footer .nav-item, .nav-sub-item').forEach(b => {

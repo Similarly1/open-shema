@@ -658,7 +658,28 @@ DEFAULTS = {
     ],
 }
 
-def load_config():
+# ---------------------------------------------------------------------------
+# Cache de configuration — évite de relire config.json à chaque appel de méthode
+# ---------------------------------------------------------------------------
+_config_cache: dict | None = None
+_config_cache_ts: float = 0.0
+_CONFIG_CACHE_TTL: float = 1.0  # secondes — suffisant pour une app desktop
+
+
+def load_config(use_cache: bool = True):
+    """Charge la configuration depuis config.json avec cache TTL d'1 seconde.
+
+    Args:
+        use_cache: Désactiver le cache uniquement pour les tests ou les cas où
+                   une fraîcheur absolue est requise (ex: juste après save_config).
+                   En usage normal, laisser à True.
+    """
+    global _config_cache, _config_cache_ts
+    import time as _time
+    now = _time.monotonic()
+    if use_cache and _config_cache is not None and (now - _config_cache_ts) < _CONFIG_CACHE_TTL:
+        return dict(_config_cache)
+
     cfg_file = resolve_data_path("config.json")
     if not os.path.exists(cfg_file):
         ensure_data_directories()
@@ -699,7 +720,10 @@ def load_config():
     except Exception as e:
         logger.debug("Erreur injection secrets dans load_config : %s", e)
 
-    return config
+    # Mettre à jour le cache
+    _config_cache = config
+    _config_cache_ts = now
+    return dict(config)
 
 def save_config(config_dict):
     """Sauvegarde la configuration sur disque.
@@ -708,6 +732,7 @@ def save_config(config_dict):
     qu'une clé API injectée en mémoire via load_secrets_into_config() ne soit jamais
     persistée en clair dans config.json, même si l'appelant l'a oublié.
     """
+    global _config_cache, _config_cache_ts
     target_path = get_config_path()
     try:
         # Purge des secrets avant écriture (filet de sécurité systématique)
@@ -723,6 +748,11 @@ def save_config(config_dict):
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
         with open(target_path, "w", encoding="utf-8") as f:
             json.dump(clean_dict, f, indent=4)
+
+        # Invalider le cache pour que le prochain load_config() recharge depuis le disque
+        _config_cache = None
+        _config_cache_ts = 0.0
+
     except OSError as e:
         logger.error(
             "Impossible de sauvegarder la configuration (%s) : %s. "

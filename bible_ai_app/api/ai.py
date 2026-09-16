@@ -112,27 +112,14 @@ class AiMixin:
             f"{{\n  \"sections\": [\n    {{\"type\": \"intro\", \"title\": \"...\", \"contentHtml\": \"<p>...</p>\"}}\n  ]\n}}"
         )
 
-        from ai.llm_client import LLMClient
-        import json
-        import re
-        import datetime
+        from api._utils import build_llm_client_from_config
 
         last_err = None
         result_sections = None
         used_model = None
 
         for cur_model in models_to_try:
-            lower_m = cur_model.lower()
-            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
-                token = self.config.get("infomaniak_token", "")
-                pid = self.config.get("infomaniak_product_id", "251")
-                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
-            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
-                api_key = self.config.get("mistral_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
-            else:
-                api_key = self.config.get("gemini_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+            client = build_llm_client_from_config(cur_model, self.config)
 
             try:
                 out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
@@ -254,25 +241,14 @@ class AiMixin:
             f"5. Ne réécrivez pas le sermon à la place de l'auteur : fournissez un diagnostic lucide, précis et constructif."
         )
 
-        from ai.llm_client import LLMClient
-        import datetime
+        from api._utils import build_llm_client_from_config
 
         last_err = None
         evaluation_text = None
         used_model = None
 
         for cur_model in models_to_try:
-            lower_m = cur_model.lower()
-            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
-                token = self.config.get("infomaniak_token", "")
-                pid = self.config.get("infomaniak_product_id", "251")
-                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
-            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
-                api_key = self.config.get("mistral_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
-            else:
-                api_key = self.config.get("gemini_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+            client = build_llm_client_from_config(cur_model, self.config)
 
             try:
                 out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
@@ -1175,23 +1151,13 @@ class AiMixin:
             f"Il est STRICTEMENT INTERDIT de rédiger des notes courtes d'une seule phrase. Rédige un véritable paragraphe riche pour chaque note !"
         )
 
-        from ai.llm_client import LLMClient
+        from api._utils import build_llm_client_from_config
         used_model = primary_model
         last_err = None
         result_mindmap = None
 
         for cur_model in models_to_try:
-            lower_m = cur_model.lower()
-            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
-                token = self.config.get("infomaniak_token", "")
-                pid = self.config.get("infomaniak_product_id", "251")
-                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
-            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
-                api_key = self.config.get("mistral_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
-            else:
-                api_key = self.config.get("gemini_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+            client = build_llm_client_from_config(cur_model, self.config)
 
             try:
                 out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)

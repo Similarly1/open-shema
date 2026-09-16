@@ -319,8 +319,11 @@ class AudioStudioMixin:
                 try:
                     win = get_global_window()
                     if win:
-                        clean_msg = str(msg).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"')
-                        win.evaluate_js(f"window.AudioStudioView && window.AudioStudioView.updateScriptProgress({int(pct)}, '{clean_msg}')")
+                        import json as _json
+                        # json.dumps() produit un littéral JS sûr (guillemets doubles, séquences
+                        # d'échappement complètes) sans risque d'injection JS.
+                        safe_msg = _json.dumps(str(msg))
+                        win.evaluate_js(f"window.AudioStudioView && window.AudioStudioView.updateScriptProgress({int(pct)}, {safe_msg})")
                 except Exception as _e_prog:
                     logger.debug("[audio_studio_generate_script] evaluate_js error: %s", _e_prog)
 
@@ -384,8 +387,11 @@ class AudioStudioMixin:
                 try:
                     win = get_global_window()
                     if win:
-                        clean_msg = str(msg).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"')
-                        win.evaluate_js(f"window.AudioStudioView && window.AudioStudioView.updateSynthesisProgress({int(pct)}, '{clean_msg}')")
+                        import json as _json
+                        # json.dumps() produit un littéral JS sûr (guillemets doubles, séquences
+                        # d'échappement complètes) sans risque d'injection JS.
+                        safe_msg = _json.dumps(str(msg))
+                        win.evaluate_js(f"window.AudioStudioView && window.AudioStudioView.updateSynthesisProgress({int(pct)}, {safe_msg})")
                 except Exception as _e_prog:
                     logger.debug("[audio_studio_synthesize] evaluate_js error: %s", _e_prog)
 

@@ -104,7 +104,7 @@ const API = {
     });
   },
 
-  async ensureMethodReady(methodName, maxWaitMs = 1200) {
+  async ensureMethodReady(methodName, maxWaitMs = 5000) {
     if (window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
       return true;
     }
@@ -133,7 +133,7 @@ const API = {
 
   async call(methodName, ...args) {
     // S'assurer que la méthode spécifique est prête sur le pont pywebview
-    const ready = await this.ensureMethodReady(methodName, 1200);
+    const ready = await this.ensureMethodReady(methodName, 5000);
     if (ready && window.pywebview?.api && typeof window.pywebview.api[methodName] === 'function') {
       try {
         return await window.pywebview.api[methodName](...args);
@@ -261,6 +261,14 @@ const API = {
     return await this.call('get_verse_preview', rawReference, bibleName);
   },
 
+  async getWikipediaSummary(query, exactTitle = null, context = null) {
+    return await this.call('get_wikipedia_summary', query, exactTitle, context);
+  },
+
+  async getWikipediaExtended(title) {
+    return await this.call('get_wikipedia_extended', title);
+  },
+
   async askAI(question, bookCode, chapterNum, verseNum) {
     return await this.call('ask_ai', question, bookCode, chapterNum, verseNum);
   },
@@ -376,8 +384,8 @@ const API = {
   },
 
 
-  async getBiblicalPlaces(query = '', placeType = null, limit = 150) {
-    return await this.call('get_biblical_places', query, placeType, limit);
+  async getBiblicalPlaces(query = '', placeType = null, limit = 250, period = null, sortBy = 'mentions') {
+    return await this.call('get_biblical_places', query, placeType, limit, period, sortBy);
   },
 
   async getChapterPlaces(bookCode, chapterNum) {
@@ -406,8 +414,8 @@ const API = {
       return [
         { id: 'LSG', name: 'LSG', title: 'Louis Segond 1910 (Strong)', version_code: 'LSG', active: true },
         { id: 'DARBY', name: 'DARBY', title: 'Bible J.N. Darby', version_code: 'DARB', active: true },
-        { id: 'Colombe', name: 'Colombe', title: 'Bible à la Colombe', version_code: 'COL', active: true },
-        { id: 'Segond_21', name: 'Segond 21', title: 'Bible Segond 21', version_code: 'S21', active: true }
+        { id: 'OSTERVALD', name: 'Ostervald', title: 'Ostervald 1744 (Domaine Public)', version_code: 'OST', active: true },
+        { id: 'MARTIN', name: 'Martin', title: 'David Martin 1707 (Domaine Public)', version_code: 'MAR', active: true }
       ];
     }
     if (method === 'get_current_passage') {

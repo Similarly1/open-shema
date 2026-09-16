@@ -17,6 +17,48 @@ logger = logging.getLogger(__name__)
 current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+# ---------------------------------------------------------------------------
+# Factory LLM centralisée — évite la duplication du bloc de détection provider
+# ---------------------------------------------------------------------------
+
+def build_llm_client_from_config(model: str, config: dict):
+    """Construit un LLMClient en détectant automatiquement le provider depuis
+    le nom de modèle, puis en lisant la clé API correspondante dans *config*.
+
+    Centralise la logique qui était dupliquée ~8 fois dans les Mixins API.
+    Utilise ``resolve_llm_provider()`` de ``ai.llm_client`` comme source de vérité.
+
+    Args:
+        model:  Nom du modèle LLM (ex: ``"gemini-3.7-flash"``, ``"mistral-large-latest"``,
+                ``"mistralai/Ministral-3B"``).
+        config: Dictionnaire de configuration (issu de ``load_config()``).
+
+    Returns:
+        Instance de ``LLMClient`` prête à l'emploi.
+    """
+    from ai.llm_client import LLMClient, resolve_llm_provider
+    provider = resolve_llm_provider(model)
+    if provider == "infomaniak":
+        return LLMClient(
+            api_key=config.get("infomaniak_token", ""),
+            model=model,
+            provider="infomaniak",
+            product_id=config.get("infomaniak_product_id", "251"),
+        )
+    if provider == "mistral":
+        return LLMClient(
+            api_key=config.get("mistral_api_key", ""),
+            model=model,
+            provider="mistral",
+        )
+    # Défaut : Gemini
+    return LLMClient(
+        api_key=config.get("gemini_api_key", ""),
+        model=model,
+        provider="gemini",
+    )
+
+
 _BACKUP_MANIFEST_VERSION = "1.0"
 _BACKUP_COMPONENTS = [
     ("chroma_db",      "📦 Vecteurs ChromaDB"),

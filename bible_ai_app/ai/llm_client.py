@@ -18,11 +18,31 @@ except ImportError:
         ChatMessage = None
 
 def resolve_llm_provider(model_name: str) -> str:
-    """Détermine le fournisseur (provider) en fonction du nom du modèle."""
+    """Détermine le fournisseur (provider) en fonction du nom du modèle.
+
+    Règles de priorité (ordre décroissant) :
+    - Infomaniak : modèles hébergés sur l'infrastructure Infomaniak, identifiés par
+      leur namespace (slash), leur marque ou leur famille.
+    - Mistral direct : API officielle Mistral AI (mistral-, open-mistral-, codestral-, pixtral-).
+    - Gemini : défaut pour tous les modèles Google.
+    """
     m = model_name.lower()
-    if "infomaniak" in m or "ministral" in m or "qwen" in m or "bge" in m or "llama" in m:
+    _INFOMANIAK_KEYWORDS = (
+        "/",          # namespace Infomaniak (ex: mistralai/Ministral-3B)
+        "infomaniak",
+        "ministral",
+        "qwen",
+        "bge",
+        "llama",
+        "swiss-ai",
+        "gemma",
+        "kimi",
+        "nemotron",
+    )
+    if any(k in m for k in _INFOMANIAK_KEYWORDS):
         return "infomaniak"
-    elif "mistral" in m:
+    _MISTRAL_DIRECT_KEYWORDS = ("mistral-", "open-mistral-", "codestral", "pixtral")
+    if any(m.startswith(k) or k in m for k in _MISTRAL_DIRECT_KEYWORDS):
         return "mistral"
     return "gemini"
 

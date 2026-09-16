@@ -102,9 +102,34 @@ class TaskManager:
             return list(cls._tasks.values())
 
     @classmethod
+    def push_event(cls, event_type: str, data: dict):
+        """Envoie un événement générique à l'interface WebView.
+
+        Alias de compatibilité utilisé par audio_studio.py pour signaler la
+        progression des tâches longues (génération de script, synthèse audio).
+        Crée automatiquement la tâche si elle n'existe pas encore.
+
+        Args:
+            event_type: Type d'événement (ex: ``"task_progress"``).
+            data:       Dictionnaire de données de l'événement. Champs reconnus :
+                        ``task_id``, ``title``, ``progress`` (int 0-100), ``message`` (str).
+        """
+        task_id = data.get("task_id", "audio_studio")
+        with cls._lock:
+            if task_id not in cls._tasks:
+                cls.start_task(task_id, data.get("title", task_id))
+            task = cls._tasks.get(task_id)
+            if task:
+                if "progress" in data:
+                    task["progress"] = min(100, max(0, int(data["progress"])))
+                if "message" in data:
+                    task["detail"] = data["message"]
+                cls._notify(event_type, task)
+
+    @classmethod
     def _notify(cls, event_type: str, task: Dict[str, Any]):
         if cls._window_callback:
             try:
                 cls._window_callback(event_type, task)
             except Exception as e:
-                logger.debug(f"[TaskManager] Erreur notification window: {e}")
+                logger.debug("[TaskManager] Erreur notification window: %s", e)

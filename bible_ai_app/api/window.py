@@ -704,8 +704,10 @@ class WindowMixin:
                         f"window.CommentaryWindow && window.CommentaryWindow.receiveChapterDataB64('{b64_str}', {v_int})"
                     )
                 else:
+                    import json as _json
+                    _safe_book = _json.dumps(str(book_code))
                     _COMMENTARY_WINDOW.evaluate_js(
-                        f"window.CommentaryWindow && window.CommentaryWindow.handleVerseChanged('{book_code}', {ch_int}, {v_int})"
+                        f"window.CommentaryWindow && window.CommentaryWindow.handleVerseChanged({_safe_book}, {ch_int}, {v_int})"
                     )
             except Exception as e:
                 logger.debug(f"Erreur evaluate_js sync_verse: {e}")
@@ -719,7 +721,9 @@ class WindowMixin:
         _LAST_ACTIVE_PASSAGE = (book_code, ch_int, v_int)
         if _GLOBAL_WINDOW:
             try:
-                js_call = f"window.BibleReader && window.BibleReader.navigateTo('{book_code}', {ch_int}, {v_int})"
+                import json as _json
+                _safe_book = _json.dumps(str(book_code))
+                js_call = f"window.BibleReader && window.BibleReader.navigateTo({_safe_book}, {ch_int}, {v_int})"
                 _GLOBAL_WINDOW.evaluate_js(js_call)
             except Exception as e:
                 logger.debug(f"Erreur evaluate_js navigate_main: {e}")

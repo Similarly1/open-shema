@@ -62,10 +62,10 @@ class ContentMixin:
                     logger.warning(f"Erreur lecture {p}: {e}")
         return {}
 
-    def get_biblical_places(self, query: str = "", place_type: Optional[str] = None, limit: int = 150) -> List[Dict[str, Any]]:
-        """Recherche des lieux bibliques avec filtre optionnel par type."""
+    def get_biblical_places(self, query: str = "", place_type: Optional[str] = None, limit: int = 250, period: Optional[str] = None, sort_by: Optional[str] = "mentions") -> List[Dict[str, Any]]:
+        """Recherche des lieux bibliques avec filtre optionnel par type et par période."""
         try:
-            return MapsManager.search_places(query=query, place_type=place_type, limit=limit)
+            return MapsManager.search_places(query=query, place_type=place_type, limit=limit, period=period, sort_by=sort_by)
         except Exception as e:
             logger.error(f"Erreur API get_biblical_places: {e}")
             return []
@@ -468,9 +468,8 @@ class ContentMixin:
         from core.wikipedia_client import WikipediaClient
         return WikipediaClient.get_extended_content(title)
 
-    def get_wikipedia_summary(self, query: str, exact_title: Optional[str] = None) -> Dict[str, Any]:
-
+    def get_wikipedia_summary(self, query: str, exact_title: Optional[str] = None, context: Optional[str] = None) -> Dict[str, Any]:
         """Récupère le résumé et les métadonnées Wikipédia pour un terme."""
         from core.wikipedia_client import WikipediaClient
-        return WikipediaClient.get_summary(query, exact_title=exact_title)
+        return WikipediaClient.get_summary(query, exact_title=exact_title, context=context)
 

@@ -54,9 +54,9 @@ class MapsManager:
         return cls._conn
 
     @classmethod
-    def search_places(cls, query: str = "", place_type: Optional[str] = None, limit: int = 150) -> List[Dict[str, Any]]:
+    def search_places(cls, query: str = "", place_type: Optional[str] = None, limit: int = 250, period: Optional[str] = None, sort_by: Optional[str] = "mentions") -> List[Dict[str, Any]]:
         """
-        Recherche des lieux bibliques par nom (français ou anglais), avec filtre optionnel par type.
+        Recherche des lieux bibliques par nom (français ou anglais), avec filtre optionnel par type et par période.
         """
         conn = cls.get_connection()
         if not conn:
@@ -75,7 +75,16 @@ class MapsManager:
             sql += " AND place_type = ?"
             params.append(place_type.lower())
 
-        sql += " ORDER BY verses_count DESC, name_fr ASC LIMIT ?"
+        if period and period.lower() != "all" and period.lower() != "toutes":
+            sql += " AND (periods LIKE ? OR periods = 'all')"
+            params.append(f"%{period.lower()}%")
+
+        if sort_by == "name_fr" or sort_by == "name":
+            sql += " ORDER BY name_fr ASC LIMIT ?"
+        elif sort_by == "type":
+            sql += " ORDER BY place_type ASC, verses_count DESC LIMIT ?"
+        else:
+            sql += " ORDER BY verses_count DESC, name_fr ASC LIMIT ?"
         params.append(limit)
 
         try:
@@ -102,7 +111,8 @@ class MapsManager:
                     "comment": clean_comment_markup(r["comment"]),
                     "verses_count": r["verses_count"],
                     "verses": verses_list[:20], # Limiter pour l'aperçu
-                    "thumbnail_url": r["thumbnail_url"]
+                    "thumbnail_url": r["thumbnail_url"],
+                    "periods": r["periods"] if "periods" in r.keys() else ""
                 })
             return results
         except Exception as e:
@@ -203,7 +213,8 @@ class MapsManager:
                 "comment": clean_comment_markup(r["comment"]),
                 "verses_count": r["verses_count"],
                 "verses_detailed": verses_detailed,
-                "thumbnail_url": r["thumbnail_url"]
+                "thumbnail_url": r["thumbnail_url"],
+                "periods": r["periods"] if "periods" in r.keys() else ""
             }
         except Exception as e:
             logger.error(f"Erreur détails lieu {place_id}: {e}")

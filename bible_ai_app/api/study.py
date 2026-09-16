@@ -241,7 +241,7 @@ class StudyMixin:
             )
 
             clean_model = config.get("translation_model") or "gemini-3.5-flash-lite"
-            from ai.llm_client import LLMClient
+            from api._utils import build_llm_client_from_config
             models_to_try = [clean_model]
             fallback_model = config.get("translation_fallback_model")
             if fallback_model and fallback_model != clean_model:
@@ -249,17 +249,7 @@ class StudyMixin:
 
             res_text = None
             for cur_model in models_to_try:
-                lower_m = cur_model.lower()
-                if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen"):
-                    token = config.get("infomaniak_token", "")
-                    pid = config.get("infomaniak_product_id", "251")
-                    client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
-                elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-"):
-                    api_key = config.get("mistral_api_key", "")
-                    client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
-                else:
-                    api_key = config.get("gemini_api_key", "")
-                    client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+                client = build_llm_client_from_config(cur_model, config)
 
                 try:
                     out = client.chat(messages=[{"role": "user", "content": prompt_text}], system_prompt="Traducteur de titres théologiques.")
@@ -369,7 +359,9 @@ class StudyMixin:
             if os.name == 'nt':
                 if os.path.exists(hl_file):
                     import subprocess
-                    subprocess.Popen(f'explorer /select,"{os.path.normpath(hl_file)}"')
+                    # Sécurité : passer une liste d'arguments, jamais une chaîne f-string,
+                    # pour éviter toute injection de commande via le chemin de fichier.
+                    subprocess.Popen(['explorer', f'/select,{os.path.normpath(hl_file)}'])
                 else:
                     os.startfile(hl_dir)
             elif sys.platform == 'darwin':
@@ -483,23 +475,13 @@ class StudyMixin:
         if reference:
             user_prompt += f"\n\nPassage biblique lié : {reference}"
 
-        from ai.llm_client import LLMClient
+        from api._utils import build_llm_client_from_config
         used_model = clean_model
         last_err = None
         generated_tags = None
 
         for cur_model in models_to_try:
-            lower_m = cur_model.lower()
-            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
-                token = self.config.get("infomaniak_token", "")
-                pid = self.config.get("infomaniak_product_id", "251")
-                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
-            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
-                api_key = self.config.get("mistral_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
-            else:
-                api_key = self.config.get("gemini_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+            client = build_llm_client_from_config(cur_model, self.config)
 
             try:
                 out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
@@ -583,23 +565,13 @@ class StudyMixin:
         if reference:
             user_prompt += f"\n\nPassage biblique lié : {reference}"
 
-        from ai.llm_client import LLMClient
+        from api._utils import build_llm_client_from_config
         used_model = clean_model
         last_err = None
         generated_title = None
 
         for cur_model in models_to_try:
-            lower_m = cur_model.lower()
-            if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen") or "swiss-ai" in lower_m or "gemma" in lower_m:
-                token = self.config.get("infomaniak_token", "")
-                pid = self.config.get("infomaniak_product_id", "251")
-                client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
-            elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-") or "codestral" in lower_m:
-                api_key = self.config.get("mistral_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
-            else:
-                api_key = self.config.get("gemini_api_key", "")
-                client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+            client = build_llm_client_from_config(cur_model, self.config)
 
             try:
                 out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)
