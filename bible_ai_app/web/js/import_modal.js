@@ -337,6 +337,22 @@ const ImportModal = {
       if (isBible) {
         this.goToStep(4);
       } else {
+        const selectedType = document.getElementById('import-book-type')?.value;
+        if (selectedType === 'Commentaire' && this.chapters && this.chapters.length > 0) {
+          let hasChanges = false;
+          this.chapters.forEach(ch => {
+            if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
+              const hasVerse = /\b\d+[:\.]\d+/.test(ch.title);
+              if (hasVerse && (ch.source_type === 'general' || ch.source_type === 'systematic_theology')) {
+                ch.source_type = 'commentary_verse';
+                hasChanges = true;
+              }
+            }
+          });
+          if (hasChanges) {
+            this.renderChaptersList(this.chapters);
+          }
+        }
         this.goToStep(3);
       }
     } else if (this.currentStep === 3) {

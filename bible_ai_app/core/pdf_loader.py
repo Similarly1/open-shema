@@ -73,9 +73,16 @@ class PdfLoader:
         if m_year:
             year = m_year.group(1)
 
-        # Fallback pour le titre
+        # Fallback pour le titre et l'auteur depuis le nom de fichier
+        base_name = os.path.splitext(os.path.basename(pdf_path))[0]
+        if not author:
+            m_auth = re.search(r'\(([^()]+?)(?:\s*\[.*?\])?\)', base_name)
+            if m_auth:
+                cand = m_auth.group(1).strip()
+                if not any(ign in cand.lower() for ign in ["z-library", "1lib", "pdf", "epub", "edition"]):
+                    author = cand
+
         if not title or len(title) < 3 or title.lower().endswith(".pdf") or "microsoft" in title.lower():
-            base_name = os.path.splitext(os.path.basename(pdf_path))[0]
             clean_name = re.sub(r'\(.*?\)', '', base_name).strip()
             clean_name = re.sub(r'^[Pp][Dd][Ff][_\s-]+', '', clean_name).strip()
             clean_name = clean_name.replace('_', ' ').strip()
@@ -123,19 +130,59 @@ class PdfLoader:
 
         # 3. Calcul de la taille et classification canonique / RAG pour chaque chapitre
         book_title_norm = strip_accents(title.lower())
+        is_commentary = any(w in book_title_norm for w in [
+            "commentary", "commentaire", "commentaires", "expository", "exegetical", "homiletical"
+        ])
         is_syst_theol = any(w in book_title_norm for w in [
             "systematic theology", "theologie systematique", "theologie dogmatique", 
-            "dogmatique", "christian theology", "theologie chretienne", "doctrine"
+            "dogmatique", "dogmatics", "christian theology", "theologie chretienne", 
+            "doctrine", "doctrines", "theology", "theologie", "biblical theology", "theologie biblique"
+        ])
+        is_dictionary = any(w in book_title_norm for w in [
+            "dictionary", "dictionnaire", "lexicon", "lexique", "encyclopedia", "encyclopedie"
         ])
 
-        current_active_scope = "GLOBAL"
-        if any(w in book_title_norm for w in ["christ", "jesus", "nouveau testament", "new testament", "evangile", "gospel", "paul", "epitres"]):
-            current_active_scope = "NT"
-        elif any(w in book_title_norm for w in ["ancien testament", "old testament", "pentateuque", "prophetes", "psaumes", "torah"]):
-            current_active_scope = "OT"
+        detected_type = "Commentaire" if is_commentary else ("Dictionnaire" if is_dictionary else "Théologie")
 
-        current_active_book_code = None
-        current_active_book_name = None
+        # Détection d'un livre biblique spécifique dans le titre de l'ouvrage
+        book_target = EpubLoader.detect_book_from_title(title)
+        book_dominant_code = book_target["book_code"] if book_target else None
+        book_dominant_name = book_target["book_name"] if book_target else None
+
+        _nt_title_kws = [
+            "christ", "jesus", "nouveau testament", "new testament", "evangile", "gospel", "paul", "epitres",
+            "matthew", "marc", "mark", "luke", "luc", "john", "jean", "acts", "actes",
+            "romans", "romains", "corinthians", "corinthiens", "galatians", "galates",
+            "ephesians", "ephesiens", "philippians", "philippiens", "colossians", "colossiens",
+            "thessalonians", "thessaloniciens", "timothy", "timothee", "titus", "tite",
+            "philemon", "hebrews", "hebreux", "james", "jacques", "peter", "pierre",
+            "revelation", "apocalypse", "jude"
+        ]
+        _ot_title_kws = [
+            "ancien testament", "old testament", "pentateuque", "prophetes", "psaumes", "torah",
+            "genesis", "genese", "exodus", "exode", "leviticus", "levitique", "numbers", "nombres",
+            "deuteronomy", "deuteronome", "joshua", "josue", "judges", "juges", "ruth",
+            "samuel", "kings", "rois", "chronicles", "chroniques", "ezra", "esdras",
+            "nehemiah", "nehemie", "esther", "psalms", "psalmes", "proverbs", "proverbes",
+            "ecclesiastes", "ecclesiaste", "isaiah", "esaie", "jeremiah", "jeremie",
+            "ezekiel", "ezechiel", "daniel", "hosea", "osee", "amos", "micah", "michee",
+            "nahum", "habakkuk", "habacuc", "zephaniah", "sophonie", "haggai", "aggee",
+            "zechariah", "zacharie", "malachi", "malachie", "joel", "jonah", "jonas",
+            "obadiah", "abdias", "job", "song of solomon", "cantique", "lamentations"
+        ]
+
+        if book_target:
+            book_dominant_scope = book_target["corpus_scope"]
+        elif any(w in book_title_norm for w in _nt_title_kws):
+            book_dominant_scope = "NT"
+        elif any(w in book_title_norm for w in _ot_title_kws):
+            book_dominant_scope = "OT"
+        else:
+            book_dominant_scope = "GLOBAL"
+
+        current_active_scope = book_dominant_scope
+        current_active_book_code = book_dominant_code
+        current_active_book_name = book_dominant_name
 
         final_chapters = []
         for ch in chapters:
@@ -159,7 +206,11 @@ class PdfLoader:
             classification = EpubLoader.classify_chapter_title(
                 ch_title,
                 is_systematic_theology=is_syst_theol,
-                book_author=author
+                book_dominant_scope=book_dominant_scope,
+                book_author=author,
+                is_commentary=is_commentary,
+                book_dominant_code=book_dominant_code,
+                book_dominant_name=book_dominant_name
             )
 
             # Si le titre ne donne rien de précis, tester un rapide scan sur le premier paragraphe
@@ -171,11 +222,17 @@ class PdfLoader:
                     classification["corpus_scope"] = heur_cls.get("corpus_scope", classification["corpus_scope"])
 
             # Propagation contextuelle pour les sous-sections
-            if classification["source_type"] != "appendix":
+            if classification["source_type"] not in ["appendix", "endnotes"]:
                 if classification["book_code"]:
                     current_active_scope = classification["corpus_scope"]
                     current_active_book_code = classification["book_code"]
                     current_active_book_name = classification["book_name"]
+                elif book_dominant_code:
+                    classification["book_code"] = book_dominant_code
+                    classification["book_name"] = book_dominant_name
+                    classification["corpus_scope"] = book_dominant_scope
+                    if is_commentary and classification["source_type"] == "general":
+                        classification["source_type"] = "commentary_verse"
                 elif classification["corpus_scope"] == "GLOBAL" and current_active_scope != "GLOBAL":
                     classification["corpus_scope"] = current_active_scope
                     if not classification["book_code"] and current_active_book_code:
@@ -208,6 +265,11 @@ class PdfLoader:
             "author": author,
             "description": description,
             "year": year,
+            "type": detected_type,
+            "corpus_scope": book_dominant_scope,
+            "book_code": book_dominant_code,
+            "book_name": book_dominant_name,
+            "source_type": "commentary_verse" if is_commentary else ("systematic_theology" if is_syst_theol else "general"),
             "language": "fr",
             "format": "pdf",
             "total_pages": total_pages,
