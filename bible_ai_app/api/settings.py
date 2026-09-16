@@ -508,7 +508,15 @@ class SettingsMixin:
         cfg = load_secrets_into_config(load_config())
         first_run_flag = cfg.get("first_run")
 
-        # Vérifier la présence physique de Bibles dans l'espace utilisateur ou bundle
+        # 1. Si l'onboarding a déjà été explicitement validé comme terminé
+        if first_run_flag is False:
+            return {"is_first_run": False, "config": cfg}
+
+        # 2. Si l'onboarding a été explicitement validé en mode 'empty' (démarrer vierge confirmé)
+        if cfg.get("empty_confirmed") is True or cfg.get("onboarding_empty_confirmed") is True:
+            return {"is_first_run": False, "config": cfg}
+
+        # 3. Vérifier la présence physique de Bibles dans l'espace utilisateur ou bundle
         from core.paths import get_user_data_path, get_bundle_data_path
         candidates = [
             get_user_data_path("bibles"),
@@ -525,23 +533,21 @@ class SettingsMixin:
             if has_bibles:
                 break
 
-        # Si l'onboarding a été explicitement validé en mode 'empty' (démarrer vierge confirmé)
-        if cfg.get("empty_confirmed") is True or cfg.get("onboarding_empty_confirmed") is True:
+        # 4. Si des Bibles sont déjà installées sur le disque, ce n'est PAS un premier lancement !
+        if has_bibles:
+            if first_run_flag is not False:
+                try:
+                    from core.config import save_config
+                    clean_cfg = dict(cfg)
+                    clean_cfg["first_run"] = False
+                    save_config(clean_cfg)
+                    cfg["first_run"] = False
+                except Exception as _e:
+                    logger.debug("Auto-réparation first_run: %s", _e)
             return {"is_first_run": False, "config": cfg}
 
-        # Si aucune Bible n'est encore installée, afficher l'assistant pour composer la bibliothèque
-        if not has_bibles:
-            return {"is_first_run": True, "config": cfg}
-
-        # Si first_run est explicitement True
-        if first_run_flag is True:
-            return {"is_first_run": True, "config": cfg}
-
-        # Si l'onboarding a déjà été validé par l'utilisateur
-        if first_run_flag is False:
-            return {"is_first_run": False, "config": cfg}
-
-        return {"is_first_run": not has_bibles, "config": cfg}
+        # Seul cas où l'assistant d'accueil doit s'ouvrir : aucune Bible et premier lancement
+        return {"is_first_run": True, "config": cfg}
 
     def download_onboarding_modules(self, modules: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Télécharge et installe les modules sélectionnés lors du premier lancement depuis open-shema-data."""
