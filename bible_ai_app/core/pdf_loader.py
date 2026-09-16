@@ -290,7 +290,7 @@ class PdfLoader:
             "corpus_scope": book_dominant_scope,
             "book_code": book_dominant_code,
             "book_name": book_dominant_name,
-            "source_type": "commentary_verse" if is_commentary else ("systematic_theology" if is_syst_theol else "general"),
+            "source_type": "commentary_verse" if is_commentary else ("nt_context" if (is_archaeology and book_dominant_scope == "NT") else ("ot_context" if is_archaeology else ("dictionary" if is_dictionary else ("systematic_theology" if (is_syst_theol or detected_type == "Théologie") else "general")))),
             "language": "fr",
             "format": "pdf",
             "total_pages": total_pages,

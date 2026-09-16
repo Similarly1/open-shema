@@ -215,7 +215,17 @@ class EpubLoader:
             metadata["book_code"] = book_dominant_code
             metadata["book_name"] = book_dominant_name
             metadata["corpus_scope"] = book_dominant_scope
-            metadata["source_type"] = "commentary_verse" if is_commentary else ("systematic_theology" if is_syst_theol else "general")
+            if is_commentary:
+                root_stype = "commentary_verse"
+            elif is_archaeology:
+                root_stype = "nt_context" if book_dominant_scope == "NT" else "ot_context"
+            elif is_dictionary:
+                root_stype = "dictionary"
+            elif is_syst_theol or detected_type == "Théologie":
+                root_stype = "systematic_theology"
+            else:
+                root_stype = "general"
+            metadata["source_type"] = root_stype
 
             is_part_regex = re.compile(
                 r'^((premier|premiere|deuxieme|troisieme|quatrieme|cinquieme|sixieme|septieme|huitieme|neuvieme|dixieme|[0-9]+(ere|eme|re|er|e)?)\s+(partie|section|volume|tome|livre)|(partie|part|section|volume|tome|livre|book)\s+([0-9ivxlcdm]+|[a-z]+))\b',

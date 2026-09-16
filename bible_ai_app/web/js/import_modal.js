@@ -164,6 +164,7 @@ const ImportModal = {
       if (!this.userModifiedId) {
         idInput.value = generateShortId(titleInput.value, typeInput.value);
       }
+      this.syncStep4WithMetadata();
       this.checkForDuplicates();
     });
 
@@ -172,7 +173,36 @@ const ImportModal = {
       if (!this.userModifiedId) {
         idInput.value = generateShortId(titleInput.value, typeInput.value);
       }
+      this.userModifiedRagType = false; // Réaligner automatiquement le type RAG
+      this.syncStep4WithMetadata();
       this.checkForDuplicates();
+    });
+
+    // Surveillance des modifications manuelles sur les champs RAG de l'Étape 4
+    document.getElementById('import-rag-scope')?.addEventListener('change', () => {
+      this.userModifiedRagScope = true;
+      const curType = document.getElementById('import-book-type')?.value;
+      if (curType === 'Archéologie & Histoire' && !this.userModifiedRagType) {
+        const sc = document.getElementById('import-rag-scope').value;
+        const stSelect = document.getElementById('import-rag-stype');
+        if (stSelect) stSelect.value = (sc === 'NT') ? 'nt_context' : 'ot_context';
+      }
+    });
+
+    document.getElementById('import-rag-stype')?.addEventListener('change', () => {
+      this.userModifiedRagType = true;
+    });
+
+    document.getElementById('import-rag-bookcode')?.addEventListener('change', () => {
+      this.userModifiedRagBook = true;
+      const bCode = document.getElementById('import-rag-bookcode')?.value;
+      if (bCode && !this.userModifiedRagScope && typeof CANONICAL_BOOKS !== 'undefined') {
+        const idx = CANONICAL_BOOKS.findIndex(b => b.code.toLowerCase() === bCode.toLowerCase());
+        if (idx !== -1) {
+          const scSelect = document.getElementById('import-rag-scope');
+          if (scSelect) scSelect.value = idx < 39 ? 'OT' : 'NT';
+        }
+      }
     });
 
     // File Pickers & Dropzone (avec stopPropagation pour éviter le double déclenchement)
@@ -468,7 +498,115 @@ const ImportModal = {
     }
   },
 
+  syncStep4WithMetadata() {
+    const selectedType = document.getElementById('import-book-type')?.value || 'Théologie';
+    const titleVal = (document.getElementById('import-book-title')?.value || '').toLowerCase();
+    
+    // 1. Détection du livre biblique dominant parmi les chapitres actifs
+    if (!this.userModifiedRagBook) {
+      const bookCounts = {};
+      (this.chapters || []).forEach(ch => {
+        if (ch.include && ch.book_code) {
+          bookCounts[ch.book_code] = (bookCounts[ch.book_code] || 0) + 1;
+        }
+      });
+      let dominantBook = '';
+      let maxCount = 0;
+      for (const [code, count] of Object.entries(bookCounts)) {
+        if (count > maxCount) {
+          maxCount = count;
+          dominantBook = code;
+        }
+      }
+      const bookSelect = document.getElementById('import-rag-bookcode');
+      if (bookSelect) {
+        bookSelect.value = dominantBook || '';
+      }
+    }
+
+    // 2. Détection de la portée du corpus (corpus_scope)
+    if (!this.userModifiedRagScope) {
+      const currentBookCode = document.getElementById('import-rag-bookcode')?.value;
+      const scopeSelect = document.getElementById('import-rag-scope');
+      
+      if (scopeSelect) {
+        if (currentBookCode && typeof CANONICAL_BOOKS !== 'undefined') {
+          const idx = CANONICAL_BOOKS.findIndex(b => b.code.toLowerCase() === currentBookCode.toLowerCase());
+          if (idx !== -1) {
+            scopeSelect.value = idx < 39 ? 'OT' : 'NT';
+          }
+        } else {
+          // Analyser les chapitres actifs
+          const scopeCounts = { OT: 0, NT: 0, GLOBAL: 0, INTER: 0, APOCRYPHA: 0 };
+          (this.chapters || []).forEach(ch => {
+            if (ch.include && ch.corpus_scope && scopeCounts[ch.corpus_scope] !== undefined) {
+              scopeCounts[ch.corpus_scope]++;
+            }
+          });
+          if (scopeCounts.NT > 0 && scopeCounts.OT === 0) {
+            scopeSelect.value = 'NT';
+          } else if (scopeCounts.OT > 0 && scopeCounts.NT === 0) {
+            scopeSelect.value = 'OT';
+          } else if (scopeCounts.OT > 0 && scopeCounts.NT > 0) {
+            scopeSelect.value = 'BOTH';
+          } else if (titleVal.includes('ancien testament') || titleVal.includes('old testament')) {
+            scopeSelect.value = 'OT';
+          } else if (titleVal.includes('nouveau testament') || titleVal.includes('new testament')) {
+            scopeSelect.value = 'NT';
+          } else {
+            scopeSelect.value = 'GLOBAL';
+          }
+        }
+      }
+    }
+
+    // 3. Détection du type de source RAG (source_type)
+    if (!this.userModifiedRagType) {
+      const stypeSelect = document.getElementById('import-rag-stype');
+      if (stypeSelect) {
+        const currentScope = document.getElementById('import-rag-scope')?.value || 'GLOBAL';
+        
+        // Compter les types dans les chapitres actifs
+        const typeCounts = {};
+        (this.chapters || []).forEach(ch => {
+          if (ch.include && ch.source_type && ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
+            typeCounts[ch.source_type] = (typeCounts[ch.source_type] || 0) + 1;
+          }
+        });
+        let dominantType = '';
+        let maxTCount = 0;
+        for (const [st, count] of Object.entries(typeCounts)) {
+          if (count > maxTCount) {
+            maxTCount = count;
+            dominantType = st;
+          }
+        }
+
+        if (selectedType === 'Commentaire') {
+          stypeSelect.value = 'commentary_verse';
+        } else if (selectedType === 'Archéologie & Histoire') {
+          stypeSelect.value = (currentScope === 'NT') ? 'nt_context' : 'ot_context';
+        } else if (selectedType === 'Dictionnaire') {
+          stypeSelect.value = 'dictionary';
+        } else if (selectedType === 'Théologie') {
+          if (dominantType === 'biblical_theology' || titleVal.includes('théologie biblique') || titleVal.includes('theologie biblique') || titleVal.includes('biblical theology')) {
+            stypeSelect.value = 'biblical_theology';
+          } else {
+            stypeSelect.value = 'systematic_theology';
+          }
+        } else if (selectedType === 'Apologétique') {
+          stypeSelect.value = dominantType || 'general';
+        } else if (dominantType) {
+          stypeSelect.value = dominantType;
+        } else {
+          stypeSelect.value = 'general';
+        }
+      }
+    }
+  },
+
   updateStep4Display() {
+    this.syncStep4WithMetadata();
     const isBible = document.getElementById('import-book-type')?.value === 'Bible';
     const isAI = App.isAIEnabled !== false;
     
@@ -579,6 +717,9 @@ const ImportModal = {
     this.coverDataUrl = book ? (book.cover_data_url || book.cover_url || book.cover_path || '') : '';
     this.chapters = [];
     this.userModifiedId = editMode;
+    this.userModifiedRagScope = editMode;
+    this.userModifiedRagType = editMode;
+    this.userModifiedRagBook = editMode;
     this.lastImportedBookInfo = null;
 
     // Recharger la liste des livres existants pour la détection des doublons
@@ -793,6 +934,21 @@ const ImportModal = {
         this.chapters = [];
         this.renderChaptersList([]);
       }
+
+      // Synchroniser la classification RAG de l'Étape 4 avec les métadonnées et chapitres analysés
+      if (info.corpus_scope && !this.userModifiedRagScope) {
+        const scEl = document.getElementById('import-rag-scope');
+        if (scEl) scEl.value = info.corpus_scope;
+      }
+      if (info.source_type && !this.userModifiedRagType) {
+        const stEl = document.getElementById('import-rag-stype');
+        if (stEl) stEl.value = info.source_type;
+      }
+      if (info.book_code && !this.userModifiedRagBook) {
+        const bkEl = document.getElementById('import-rag-bookcode');
+        if (bkEl) bkEl.value = info.book_code;
+      }
+      this.syncStep4WithMetadata();
 
       // Activer le bouton Suivant à l'étape 1
       const nextBtn = document.getElementById('btn-import-next');
@@ -1442,9 +1598,18 @@ const ImportModal = {
     try {
       const tags = await API.call('auto_classify_document_metadata', title, desc);
       if (tags) {
-        if (tags.corpus_scope) document.getElementById('import-rag-scope').value = tags.corpus_scope;
-        if (tags.source_type) document.getElementById('import-rag-stype').value = tags.source_type;
-        if (tags.book_code) document.getElementById('import-rag-bookcode').value = tags.book_code;
+        if (tags.corpus_scope) {
+          document.getElementById('import-rag-scope').value = tags.corpus_scope;
+          this.userModifiedRagScope = true;
+        }
+        if (tags.source_type) {
+          document.getElementById('import-rag-stype').value = tags.source_type;
+          this.userModifiedRagType = true;
+        }
+        if (tags.book_code) {
+          document.getElementById('import-rag-bookcode').value = tags.book_code;
+          this.userModifiedRagBook = true;
+        }
         App.showToast('Classification RAG Tri-Flux appliquée par IA !');
       }
     } catch (e) {
