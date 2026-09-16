@@ -1006,21 +1006,22 @@ Règles de style :
                     cls._bible_book_index = json.load(f)
                     return cls._bible_book_index
             except Exception as _silent_e:
-                logger.debug("Erreur ignoree : %s", _silent_e)
+                logger.debug("Erreur lecture index theologie : %s", _silent_e)
 
-        from core.reference_parser import get_standard_book_code, get_french_book_name, CANONICAL_GROUPS, get_books_for_group
-        from api._utils import get_cover_data_url
+        from core.reference_parser import get_standard_book_code, CANONICAL_GROUPS
 
         index = {}
         registry = load_books_metadata()
 
         for b_name, b_meta in registry.items():
             b_type = str(b_meta.get("type", "")).strip().lower()
-            if b_type in ["bible", "commentaire"]:
+            if b_type in ["bible", "commentaire", "dictionnaire", "dictionary"]:
+                continue
+            if b_name == "Nouveau dictionnaire biblique. Révisé et augmenté":
                 continue
             is_theo_or_study = (
-                b_type in ["théologie", "theologie", "théologique", "theology", "étude", "etude", "doctrine", "introduction", "dictionnaire"]
-                or b_name in ["STGru", "Lire/Comprendre", "Paradoxes", "LirelaBibles", "NIV", "NIV Cultural", "MacArthur BC", "NIVArchaeo", "TSM", "Nouveau dictionnaire biblique. Révisé et augmenté"]
+                b_type in ["théologie", "theologie", "théologique", "theology", "étude", "etude", "doctrine", "introduction"]
+                or b_name in ["STGru", "Lire/Comprendre", "Paradoxes", "LirelaBibles", "NIV", "NIV Cultural", "MacArthur BC", "NIVArchaeo", "TSM"]
             )
             if not is_theo_or_study:
                 continue
@@ -1028,7 +1029,6 @@ Règles de style :
             try:
                 toc_data = cls.get_book_toc(b_name)
                 cov_p = b_meta.get("cover_path")
-                cov_url = get_cover_data_url(cov_p) if (cov_p and get_cover_data_url) else None
 
                 b_code_global = b_meta.get("book_code")
                 global_grp_books = []
@@ -1045,13 +1045,14 @@ Règles de style :
                     ch_title = ch.get("title", "")
                     cid = ch.get("chapter_id", 1)
 
+                    # IMPORTANT : Ne jamais stocker de Data URL Base64 dans le cache JSON (évite l'explosion de RAM à 46 Go)
                     item = {
                         "book_name": b_name,
                         "book_title": b_meta.get("title", b_name),
                         "book_author": b_meta.get("author", ""),
                         "chapter_id": cid,
                         "chapter_title": ch_title,
-                        "cover_url": cov_url,
+                        "cover_path": cov_p,
                         "source_type": ch.get("source_type", "general")
                     }
 
@@ -1086,14 +1087,14 @@ Règles de style :
                                 index[code].append(item)
                                 break
             except Exception as _silent_e:
-                logger.debug("Erreur ignoree : %s", _silent_e)
+                logger.debug("Erreur parsing livre theologie : %s", _silent_e)
 
         try:
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
             with open(cache_path, "w", encoding="utf-8") as f:
                 json.dump(index, f, ensure_ascii=False, indent=2)
         except Exception as _silent_e:
-            logger.debug("Erreur ignoree : %s", _silent_e)
+            logger.debug("Erreur sauvegarde index theologie : %s", _silent_e)
 
         cls._bible_book_index = index
         return cls._bible_book_index
@@ -1218,6 +1219,9 @@ Règles de style :
         # Chapitres de livres de la bibliothèque dédiés à ce livre biblique (instantané en mémoire)
         book_index = cls._get_bible_book_index()
         book_matches = book_index.get(norm_code, [])
+        # Cache local des data URLs de couverture par livre pour ne pas ré-encoder inutilement
+        cover_url_cache = {}
+
         for bm in book_matches:
             if len(results) >= limit:
                 break
@@ -1225,6 +1229,11 @@ Règles de style :
             if key not in seen:
                 seen.add(key)
                 item = dict(bm)
+                b_name = bm.get("book_name")
+                cov_p = bm.get("cover_path")
+                if b_name not in cover_url_cache:
+                    cover_url_cache[b_name] = get_cover_data_url(cov_p) if (cov_p and get_cover_data_url) else None
+                item["cover_url"] = cover_url_cache[b_name]
                 item["snippet"] = None  # Chargé à la demande au survol pour affichage instantané
                 results.append(item)
 
