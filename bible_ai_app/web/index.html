@@ -1848,6 +1848,13 @@
               <option value="Essais & Pensée chrétienne">Essais & Pensée chrétienne</option>
               <option value="Livre / Autre">Autres livres</option>
             </select>
+            <button class="btn-secondary" id="btn-lib-advisor" style="display: flex; align-items: center; gap: 6px;" title="Conseils de lecture et suggestions d'équilibrage bibliographique">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+              </svg>
+              <span>Conseils &amp; Équilibrage</span>
+            </button>
             <button class="btn-secondary" id="btn-lib-open-store" style="display: flex; align-items: center; gap: 6px;" title="Parcourir le catalogue gratuit Open Shema et rechercher des e-books chrétiens">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
@@ -3477,6 +3484,37 @@
                   </p>
                 </div>
 
+                <!-- Bloc 13 : Conseiller de Lecture & Équilibrage Bibliographique -->
+                <div class="ai-model-feature-block">
+                  <div class="ai-model-feature-header">
+                    <div class="ai-model-feature-title">
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                      </svg>
+                      <span>13. Conseiller de Lecture &amp; Équilibrage Bibliographique</span>
+                    </div>
+                    <span class="ai-model-feature-badge">Bibliothèque</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label for="cfg-library-advisor-model">Modèle principal (Conseiller) :</label>
+                      <select id="cfg-library-advisor-model" class="select-field full-w ai-model-select" data-pair="library-advisor">
+                        <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Recommandé)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="cfg-library-advisor-fallback-model">Modèle de secours (Fallback) :</label>
+                      <select id="cfg-library-advisor-fallback-model" class="select-field full-w ai-model-select" data-pair="library-advisor">
+                        <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">
+                    Analyse la répartition de vos ouvrages, identifie les angles morts et suggère des lectures d'approfondissement et d'équilibre.
+                  </p>
+                </div>
+
               <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
               
               <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
@@ -4010,6 +4048,34 @@
                     </button>
                   </div>
                   <textarea id="cfg-prompt-audio-studio-axes" style="display: none;"></textarea>
+                </div>
+
+                <!-- Carte 13 : Conseiller de Lecture & Équilibrage Bibliographique -->
+                <div class="prompt-setting-card" id="prompt-card-library_advisor" style="margin-top: 12px;">
+                  <div class="prompt-card-main">
+                    <div class="prompt-card-header">
+                      <strong class="prompt-card-title">Conseiller de Lecture &amp; Équilibrage Bibliographique</strong>
+                      <span class="prompt-status-badge is-default" id="badge-library-advisor-status">Par défaut</span>
+                    </div>
+                    <p class="prompt-card-desc">Directives de diagnostic bienveillant, détection des angles morts canoniques et suggestions d'ouvrages de référence au format JSON strict.</p>
+                  </div>
+                  <div class="prompt-card-actions">
+                    <button type="button" class="btn-secondary btn-sm" id="btn-open-modal-library-advisor-prompt">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <span>Consulter / Modifier</span>
+                    </button>
+                    <button type="button" class="btn-ghost btn-sm" id="btn-reset-library-advisor-prompt" title="Rétablir le prompt d'origine">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <span>Rétablir</span>
+                    </button>
+                  </div>
+                  <textarea id="cfg-prompt-library-advisor" style="display: none;"></textarea>
                 </div>
               </div>
 
@@ -9697,6 +9763,7 @@
                       <label style="font-size: 11px;">Type de source RAG :</label>
                       <select id="import-edit-rag-stype" class="select-field full-w" style="font-size: 11.5px;">
                         <option value="general">Général (Doctrine / Pastoral)</option>
+                        <option value="essay">Essai & Pensée chrétienne</option>
                         <option value="book_intro">Introduction de livre biblique</option>
                         <option value="biblical_theology">Théologie biblique</option>
                         <option value="systematic_theology">Théologie systématique</option>
@@ -9840,6 +9907,7 @@
                     <label>Type de source RAG :</label>
                     <select id="import-rag-stype" class="select-field full-w">
                       <option value="general">Général (Doctrine / Pastoral)</option>
+                      <option value="essay">Essai & Pensée chrétienne</option>
                       <option value="book_intro">Introduction de livre biblique</option>
                       <option value="biblical_theology">Théologie biblique</option>
                       <option value="systematic_theology">Théologie systématique</option>

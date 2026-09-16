@@ -245,7 +245,8 @@ class PdfLoader:
                 is_commentary=is_commentary,
                 book_dominant_code=book_dominant_code,
                 book_dominant_name=book_dominant_name,
-                is_archaeology=is_archaeology
+                is_archaeology=is_archaeology,
+                is_essay=(is_essay or detected_type == "Essais & Pensée chrétienne")
             )
 
             # Si le titre ne donne rien de précis, tester un rapide scan sur le premier paragraphe
@@ -340,7 +341,7 @@ class PdfLoader:
             "corpus_scope": book_dominant_scope,
             "book_code": book_dominant_code,
             "book_name": book_dominant_name,
-            "source_type": "commentary_verse" if is_commentary else ("nt_context" if (is_archaeology and book_dominant_scope == "NT") else ("ot_context" if (is_archaeology and book_dominant_scope == "OT") else ("global_context" if is_archaeology else ("dictionary" if is_dictionary else ("systematic_theology" if (is_syst_theol or detected_type == "Théologie") else "general"))))),
+            "source_type": "commentary_verse" if is_commentary else ("essay" if (is_essay or detected_type == "Essais & Pensée chrétienne") else ("nt_context" if (is_archaeology and book_dominant_scope == "NT") else ("ot_context" if (is_archaeology and book_dominant_scope == "OT") else ("global_context" if is_archaeology else ("dictionary" if is_dictionary else ("systematic_theology" if (is_syst_theol or detected_type == "Théologie") else "general")))))),
             "language": "fr",
             "format": "pdf",
             "total_pages": total_pages,

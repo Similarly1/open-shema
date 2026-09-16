@@ -521,7 +521,20 @@ const ImportModal = {
           if (hasChanges) {
             this.renderChaptersList(this.chapters);
           }
-        } else if ((selectedType === 'Apologétique' || selectedType === 'Essais & Pensée chrétienne') && this.chapters && this.chapters.length > 0) {
+        } else if (selectedType === 'Essais & Pensée chrétienne' && this.chapters && this.chapters.length > 0) {
+          let hasChanges = false;
+          this.chapters.forEach(ch => {
+            if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
+              if (ch.source_type !== 'essay') {
+                ch.source_type = 'essay';
+                hasChanges = true;
+              }
+            }
+          });
+          if (hasChanges) {
+            this.renderChaptersList(this.chapters);
+          }
+        } else if (selectedType === 'Apologétique' && this.chapters && this.chapters.length > 0) {
           let hasChanges = false;
           this.chapters.forEach(ch => {
             if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
@@ -740,7 +753,9 @@ const ImportModal = {
           } else {
             stypeSelect.value = 'systematic_theology';
           }
-        } else if (selectedType === 'Apologétique' || selectedType === 'Essais & Pensée chrétienne') {
+        } else if (selectedType === 'Essais & Pensée chrétienne') {
+          stypeSelect.value = 'essay';
+        } else if (selectedType === 'Apologétique') {
           stypeSelect.value = dominantType || 'general';
         } else if (dominantType) {
           stypeSelect.value = dominantType;
@@ -1668,6 +1683,7 @@ const ImportModal = {
 
         <select class="import-chapter-select ch-stype-sel">
           <option value="general" ${ch.source_type === 'general' ? 'selected' : ''}>Général</option>
+          <option value="essay" ${ch.source_type === 'essay' ? 'selected' : ''}>Essai</option>
           <option value="book_intro" ${ch.source_type === 'book_intro' ? 'selected' : ''}>Intro</option>
           <option value="systematic_theology" ${ch.source_type === 'systematic_theology' || ch.source_type === 'biblical_theology' ? 'selected' : ''}>Théol.</option>
           <option value="global_context" ${ch.source_type === 'global_context' || ch.source_type === 'ot_context' || ch.source_type === 'nt_context' || ch.source_type === 'context' ? 'selected' : ''}>Contexte</option>

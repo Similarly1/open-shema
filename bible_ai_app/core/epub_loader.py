@@ -267,6 +267,8 @@ class EpubLoader:
                 root_stype = "dictionary"
             elif is_syst_theol or detected_type == "Théologie":
                 root_stype = "systematic_theology"
+            elif is_essay or detected_type == "Essais & Pensée chrétienne":
+                root_stype = "essay"
             else:
                 root_stype = "general"
             metadata["source_type"] = root_stype
@@ -327,7 +329,8 @@ class EpubLoader:
                     is_commentary=is_commentary,
                     book_dominant_code=book_dominant_code,
                     book_dominant_name=book_dominant_name,
-                    is_archaeology=is_archaeology
+                    is_archaeology=is_archaeology,
+                    is_essay=(is_essay or detected_type == "Essais & Pensée chrétienne")
                 )
                 
                 # Détection complémentaire par nom de fichier (ex: note.html, notes.xhtml, endnotes.html)
@@ -693,7 +696,8 @@ class EpubLoader:
         is_commentary: bool = False,
         book_dominant_code: Optional[str] = None,
         book_dominant_name: Optional[str] = None,
-        is_archaeology: bool = False
+        is_archaeology: bool = False,
+        is_essay: bool = False
     ) -> Dict[str, Any]:
         """
         Détecte automatiquement le livre biblique, le corpus et le type RAG à partir du titre du chapitre.
@@ -753,7 +757,7 @@ class EpubLoader:
                 code = BOOK_MAPPING[cand_book]
                 fr_name = REVERSE_BOOK_MAPPING.get(code, code)
                 scope = "OT" if code in OT_CODES else ("NT" if code in NT_CODES else ("APOCRYPHA" if code in APOCRYPHA_CODES else "GLOBAL"))
-                stype = "commentary_verse" if is_commentary else ("systematic_theology" if is_systematic_theology else "general")
+                stype = "commentary_verse" if is_commentary else ("essay" if is_essay else ("systematic_theology" if is_systematic_theology else "general"))
                 return {
                     "book_code": code,
                     "book_name": fr_name,
@@ -838,7 +842,7 @@ class EpubLoader:
                 or clean_title == strip_accents(fr_name)
                 or clean_title in BOOK_MAPPING
             )
-            stype = "book_intro" if is_intro else ("commentary_verse" if is_commentary else ("systematic_theology" if is_systematic_theology else "general"))
+            stype = "book_intro" if is_intro else ("commentary_verse" if is_commentary else ("essay" if is_essay else ("systematic_theology" if is_systematic_theology else "general")))
             return {
                 "book_code": code,
                 "book_name": fr_name,
@@ -859,6 +863,8 @@ class EpubLoader:
                 default_stype = "global_context"
         elif is_systematic_theology:
             default_stype = "systematic_theology"
+        elif is_essay:
+            default_stype = "essay"
         else:
             default_stype = "general"
         default_code = book_dominant_code
@@ -907,7 +913,8 @@ class EpubLoader:
 
         if _has_word(theol_keywords):
             sc = "NT" if is_nt_theme else ("OT" if is_ot_theme else default_scope)
-            return {"book_code": default_code, "book_name": default_name, "corpus_scope": sc, "source_type": "systematic_theology"}
+            st = "essay" if is_essay else "systematic_theology"
+            return {"book_code": default_code, "book_name": default_name, "corpus_scope": sc, "source_type": st}
         elif is_nt_theme:
             return {"book_code": default_code, "book_name": default_name, "corpus_scope": "NT", "source_type": default_stype}
         elif is_ot_theme:
