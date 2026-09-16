@@ -40377,6 +40377,15 @@ body.window-detached-mode #first-run-wizard-overlay {
   display: none !important;
 }
 
+html.window-detached-mode #app-splash-loader,
+body.window-detached-mode #app-splash-loader,
+.window-detached-mode .splash-loader-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 
 
 

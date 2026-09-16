@@ -52,6 +52,9 @@ const App = {
         if (appNameEl) {
           appNameEl.innerHTML = `<svg class="topbar-app-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> <span class="brand-title">Open Shema</span> <span class="topbar-detached-tag">/ ${viewTitle}</span>`;
         }
+
+        // Masquage immédiat du splash screen en mode fenêtre détachée
+        this.hideSplash();
       }
     } catch (e) {
       console.warn('[App.init] Erreur détection mode détaché:', e);
@@ -879,6 +882,14 @@ const App = {
 
   async runPreloadPipeline() {
     if (this._isPreloadingDone) return;
+
+    // En mode détaché, bascule ultra-rapide sans préchargement lourd ni splash screen
+    if (this.isDetachedMode && this.detachedViewId) {
+      this._isPreloadingDone = true;
+      this.hideSplash();
+      this.switchView(this.detachedViewId);
+      return;
+    }
 
     const wizardOverlay = document.getElementById('first-run-wizard-overlay');
     if (!this.isDetachedMode && wizardOverlay && !wizardOverlay.classList.contains('hidden')) {
@@ -2530,12 +2541,22 @@ const VintageThemeManager = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  App.init();
-});
+function _startApp() {
+  try {
+    App.init();
+  } catch (err) {
+    console.error('[App] Erreur fatale au démarrage:', err);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _startApp);
+} else {
+  _startApp();
+}
 
 window.addEventListener('pywebviewready', () => {
-  if (typeof FirstRunWizard !== 'undefined') {
+  if (!window.location.search.includes('mode=detached') && typeof FirstRunWizard !== 'undefined') {
     FirstRunWizard.init();
   }
 });

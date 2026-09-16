@@ -18,6 +18,16 @@
   <link rel="stylesheet" href="css/first_run_wizard.css">
   <link rel="stylesheet" href="css/audio_studio.css">
 
+  <script>
+    (function() {
+      try {
+        if (window.location.search && window.location.search.indexOf('mode=detached') !== -1) {
+          document.documentElement.classList.add('window-detached-mode');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <style id="vintage-core-styles">
     /* Fix pour le sélecteur de mode IA dans le volet droit */
     .drawer-ai-ref-badge {
