@@ -16,7 +16,7 @@ Ton rôle est de déterminer le corpus et le type d'un ouvrage à partir de son 
 Tu dois répondre STRICTEMENT en JSON en utilisant ce schéma :
 {
   "corpus_scope": "NT | OT | BOTH | APOCRYPHA | GLOBAL",
-  "source_type": "commentary_verse | book_intro | nt_context | ot_context | biblical_theology | systematic_theology | dictionary | sermon | general",
+  "source_type": "commentary_verse | book_intro | nt_context | ot_context | global_context | biblical_theology | systematic_theology | dictionary | sermon | general",
   "book_code": "Code USFM à 3 lettres majuscules (ex: MAT, ROM, GEN) ou null si l'ouvrage couvre plusieurs livres ou un thème large",
   "confidence": "high | low"
 }
@@ -25,7 +25,7 @@ Règles de décision :
 - corpus_scope : "GLOBAL" pour une théologie systématique, un dictionnaire biblique ou si ça couvre toute la Bible. "NT" si ça ne parle que du Nouveau Testament.
 - source_type : 
    * "commentary_verse" pour les commentaires bibliques suivis.
-   * "nt_context" ou "ot_context" pour l'histoire, la culture, l'archéologie d'un testament.
+   * "nt_context", "ot_context" ou "global_context" pour l'histoire, la culture, l'archéologie d'un testament ou de toute la Bible.
    * "systematic_theology" pour la dogmatique (Grudem, Calvin Institutio, etc.).
    * "dictionary" pour les lexiques, dictionnaires, encyclopédies.
 - book_code : Si et seulement si le livre traite d'un SEUL livre de la Bible (ex: "Commentaire sur l'épître aux Romains" -> "ROM"). Sinon "null".

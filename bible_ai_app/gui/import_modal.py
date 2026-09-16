@@ -219,6 +219,7 @@ class ImportTab(ctk.CTkScrollableFrame):
                 "book_intro",
                 "biblical_theology",
                 "systematic_theology",
+                "global_context",
                 "ot_context",
                 "nt_context",
                 "commentary_verse",
@@ -859,6 +860,7 @@ class ImportTab(ctk.CTkScrollableFrame):
         type_display_to_raw = {
             "📖 Intro": "book_intro",
             "💡 Théol.": "biblical_theology",
+            "🏛️ Context Global": "global_context",
             "🏛️ Context": "ot_context",
             "📄 Général": "general",
             "⚙️ Annexe": "appendix"

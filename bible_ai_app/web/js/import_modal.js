@@ -185,12 +185,25 @@ const ImportModal = {
       if (curType === 'Archéologie & Histoire' && !this.userModifiedRagType) {
         const sc = document.getElementById('import-rag-scope').value;
         const stSelect = document.getElementById('import-rag-stype');
-        if (stSelect) stSelect.value = (sc === 'NT') ? 'nt_context' : 'ot_context';
+        if (stSelect) {
+          if (sc === 'NT') stSelect.value = 'nt_context';
+          else if (sc === 'OT') stSelect.value = 'ot_context';
+          else stSelect.value = 'global_context';
+        }
       }
     });
 
     document.getElementById('import-rag-stype')?.addEventListener('change', () => {
       this.userModifiedRagType = true;
+      const stVal = document.getElementById('import-rag-stype')?.value;
+      if (!this.userModifiedRagScope) {
+        const scSelect = document.getElementById('import-rag-scope');
+        if (scSelect) {
+          if (stVal === 'global_context') scSelect.value = 'GLOBAL';
+          else if (stVal === 'ot_context') scSelect.value = 'OT';
+          else if (stVal === 'nt_context') scSelect.value = 'NT';
+        }
+      }
     });
 
     document.getElementById('import-rag-bookcode')?.addEventListener('change', () => {
@@ -387,7 +400,9 @@ const ImportModal = {
           this.chapters.forEach(ch => {
             if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
               if (ch.source_type === 'general' || ch.source_type === 'systematic_theology' || ch.source_type === 'commentary_verse') {
-                ch.source_type = (ch.corpus_scope === 'NT') ? 'nt_context' : 'ot_context';
+                if (ch.corpus_scope === 'NT') ch.source_type = 'nt_context';
+                else if (ch.corpus_scope === 'OT' || ch.corpus_scope === 'AT') ch.source_type = 'ot_context';
+                else ch.source_type = 'global_context';
                 hasChanges = true;
               }
             }
@@ -585,7 +600,9 @@ const ImportModal = {
         if (selectedType === 'Commentaire') {
           stypeSelect.value = 'commentary_verse';
         } else if (selectedType === 'Archéologie & Histoire') {
-          stypeSelect.value = (currentScope === 'NT') ? 'nt_context' : 'ot_context';
+          if (currentScope === 'NT') stypeSelect.value = 'nt_context';
+          else if (currentScope === 'OT' || currentScope === 'AT') stypeSelect.value = 'ot_context';
+          else stypeSelect.value = 'global_context';
         } else if (selectedType === 'Dictionnaire') {
           stypeSelect.value = 'dictionary';
         } else if (selectedType === 'Théologie') {
@@ -1437,7 +1454,7 @@ const ImportModal = {
           <option value="general" ${ch.source_type === 'general' ? 'selected' : ''}>Général</option>
           <option value="book_intro" ${ch.source_type === 'book_intro' ? 'selected' : ''}>Intro</option>
           <option value="systematic_theology" ${ch.source_type === 'systematic_theology' || ch.source_type === 'biblical_theology' ? 'selected' : ''}>Théol.</option>
-          <option value="ot_context" ${ch.source_type === 'ot_context' || ch.source_type === 'nt_context' ? 'selected' : ''}>Contexte</option>
+          <option value="global_context" ${ch.source_type === 'global_context' || ch.source_type === 'ot_context' || ch.source_type === 'nt_context' || ch.source_type === 'context' ? 'selected' : ''}>Contexte</option>
           <option value="commentary_verse" ${ch.source_type === 'commentary_verse' ? 'selected' : ''}>Commentaire</option>
           <option value="endnotes" ${ch.source_type === 'endnotes' ? 'selected' : ''}>Notes</option>
           <option value="appendix" ${ch.source_type === 'appendix' ? 'selected' : ''}>Annexe</option>
@@ -1450,10 +1467,21 @@ const ImportModal = {
 
       row.querySelector('.ch-scope-sel')?.addEventListener('change', (e) => {
         ch.corpus_scope = e.target.value;
+        if (ch.source_type === 'global_context' || ch.source_type === 'ot_context' || ch.source_type === 'nt_context') {
+          if (ch.corpus_scope === 'NT') ch.source_type = 'nt_context';
+          else if (ch.corpus_scope === 'OT' || ch.corpus_scope === 'AT') ch.source_type = 'ot_context';
+          else ch.source_type = 'global_context';
+        }
       });
 
       row.querySelector('.ch-stype-sel')?.addEventListener('change', (e) => {
-        ch.source_type = e.target.value;
+        let val = e.target.value;
+        if (val === 'global_context' || val === 'ot_context' || val === 'nt_context' || val === 'context') {
+          if (ch.corpus_scope === 'NT') val = 'nt_context';
+          else if (ch.corpus_scope === 'OT' || ch.corpus_scope === 'AT') val = 'ot_context';
+          else val = 'global_context';
+        }
+        ch.source_type = val;
       });
 
       container.appendChild(row);

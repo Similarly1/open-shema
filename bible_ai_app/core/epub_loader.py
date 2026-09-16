@@ -218,7 +218,12 @@ class EpubLoader:
             if is_commentary:
                 root_stype = "commentary_verse"
             elif is_archaeology:
-                root_stype = "nt_context" if book_dominant_scope == "NT" else "ot_context"
+                if book_dominant_scope == "NT":
+                    root_stype = "nt_context"
+                elif book_dominant_scope == "OT":
+                    root_stype = "ot_context"
+                else:
+                    root_stype = "global_context"
             elif is_dictionary:
                 root_stype = "dictionary"
             elif is_syst_theol or detected_type == "Théologie":
@@ -341,7 +346,12 @@ class EpubLoader:
                     if is_commentary and classification["source_type"] == "general" and classification["book_code"]:
                         classification["source_type"] = "commentary_verse"
                     elif is_archaeology and classification["source_type"] in ["general", "systematic_theology"]:
-                        classification["source_type"] = "nt_context" if classification["corpus_scope"] == "NT" else "ot_context"
+                        if classification["corpus_scope"] == "NT":
+                            classification["source_type"] = "nt_context"
+                        elif classification["corpus_scope"] == "OT":
+                            classification["source_type"] = "ot_context"
+                        else:
+                            classification["source_type"] = "global_context"
                 
                 # Déterminer si inclus par défaut
                 is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
@@ -591,7 +601,12 @@ class EpubLoader:
         if is_commentary:
             default_stype = "commentary_verse"
         elif is_archaeology:
-            default_stype = "nt_context" if default_scope == "NT" else "ot_context"
+            if default_scope == "NT":
+                default_stype = "nt_context"
+            elif default_scope == "OT":
+                default_stype = "ot_context"
+            else:
+                default_stype = "global_context"
         elif is_systematic_theology:
             default_stype = "systematic_theology"
         else:

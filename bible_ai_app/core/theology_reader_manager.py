@@ -71,7 +71,7 @@ class TheologyReaderManager:
             b_type = str(meta.get("type", "")).strip().lower()
             is_theology = (
                 b_type in ["théologie", "theologie", "théologique", "theology", "étude", "etude", "doctrine", "introduction"]
-                or meta.get("source_type") in ["systematic_theology", "biblical_theology", "general", "nt_context", "ot_context", "book_intro"]
+                or meta.get("source_type") in ["systematic_theology", "biblical_theology", "general", "nt_context", "ot_context", "global_context", "book_intro"]
                 or meta.get("chapters_count", 0) > 0
                 or name in ["STGru", "Lire/Comprendre", "Paradoxes", "LirelaBibles", "NIV", "NIV Cultural", "MacArthur BC", "NIVArchaeo", "TSM"]
             )

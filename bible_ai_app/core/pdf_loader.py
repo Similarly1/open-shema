@@ -251,9 +251,19 @@ class PdfLoader:
                     if is_commentary and classification["source_type"] == "general":
                         classification["source_type"] = "commentary_verse"
                     elif is_archaeology and classification["source_type"] in ["general", "systematic_theology"]:
-                        classification["source_type"] = "nt_context" if classification["corpus_scope"] == "NT" else "ot_context"
+                        if classification["corpus_scope"] == "NT":
+                            classification["source_type"] = "nt_context"
+                        elif classification["corpus_scope"] == "OT":
+                            classification["source_type"] = "ot_context"
+                        else:
+                            classification["source_type"] = "global_context"
                 elif is_archaeology and classification["source_type"] in ["general", "systematic_theology"]:
-                    classification["source_type"] = "nt_context" if classification["corpus_scope"] == "NT" else "ot_context"
+                    if classification["corpus_scope"] == "NT":
+                        classification["source_type"] = "nt_context"
+                    elif classification["corpus_scope"] == "OT":
+                        classification["source_type"] = "ot_context"
+                    else:
+                        classification["source_type"] = "global_context"
                 elif classification["corpus_scope"] == "GLOBAL" and current_active_scope != "GLOBAL":
                     classification["corpus_scope"] = current_active_scope
                     if not classification["book_code"] and current_active_book_code:
@@ -290,7 +300,7 @@ class PdfLoader:
             "corpus_scope": book_dominant_scope,
             "book_code": book_dominant_code,
             "book_name": book_dominant_name,
-            "source_type": "commentary_verse" if is_commentary else ("nt_context" if (is_archaeology and book_dominant_scope == "NT") else ("ot_context" if is_archaeology else ("dictionary" if is_dictionary else ("systematic_theology" if (is_syst_theol or detected_type == "Théologie") else "general")))),
+            "source_type": "commentary_verse" if is_commentary else ("nt_context" if (is_archaeology and book_dominant_scope == "NT") else ("ot_context" if (is_archaeology and book_dominant_scope == "OT") else ("global_context" if is_archaeology else ("dictionary" if is_dictionary else ("systematic_theology" if (is_syst_theol or detected_type == "Théologie") else "general"))))),
             "language": "fr",
             "format": "pdf",
             "total_pages": total_pages,
