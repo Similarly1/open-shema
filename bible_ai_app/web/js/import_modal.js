@@ -287,13 +287,35 @@ const ImportModal = {
     document.getElementById('btn-ch-rag-only')?.addEventListener('click', () => this.selectRagOnlyChapters());
 
     // Boutons de l'écran de succès
-    document.getElementById('btn-success-open-reader')?.addEventListener('click', () => {
+    document.getElementById('btn-success-open-reader')?.addEventListener('click', async () => {
       this.close();
       if (this.lastImportedBookInfo?.type === 'Bible') {
         App.switchView('bible');
         if (typeof BibleReader !== 'undefined') {
-          BibleReader.currentBible1 = this.lastImportedBookInfo.name;
-          BibleReader.navigateTo('Gen', 1);
+          try {
+            if (typeof API !== 'undefined' && API.getInstalledBibles) {
+              const freshBibles = await API.getInstalledBibles();
+              if (freshBibles && freshBibles.length) {
+                BibleReader.installedBibles = freshBibles;
+              }
+            }
+          } catch (e) {
+            console.error('Erreur refresh installedBibles:', e);
+          }
+
+          const bName = this.lastImportedBookInfo.name || this.lastImportedBookInfo.folder_name;
+          const firstB = this.lastImportedBookInfo.first_book 
+            || (typeof BibleReader.getFirstBookForBible === 'function' ? BibleReader.getFirstBookForBible(bName) : null)
+            || 'Gen';
+
+          if (typeof BibleReader.switchVersion === 'function') {
+            BibleReader.switchVersion(bName, firstB);
+          } else if (typeof BibleReader.selectBibleVersion === 'function') {
+            BibleReader.selectBibleVersion(bName, firstB);
+          } else {
+            BibleReader.currentBible1 = bName;
+            BibleReader.navigateTo(firstB, 1);
+          }
         }
       } else if (this.lastImportedBookInfo?.type === 'Dictionnaire' && !this.lastImportedBookInfo?.file_path?.toLowerCase().endsWith('.epub') && !this.lastImportedBookInfo?.file_path?.toLowerCase().endsWith('.pdf')) {
         App.switchView('dict');
@@ -1687,7 +1709,12 @@ const ImportModal = {
     try {
       const res = await API.call('execute_document_import', payload);
       if (res && res.success) {
-        this.lastImportedBookInfo = payload;
+        this.lastImportedBookInfo = {
+          ...payload,
+          folder_name: res?.folder_name || payload.name,
+          first_book: res?.first_book,
+          available_books: res?.available_books
+        };
         
         if (this.isEditMode) {
           this.close();

@@ -537,12 +537,24 @@ class ImportMixin:
                     with urllib.request.urlopen(req_zip, timeout=180, context=ctx) as z_resp, open(tmp_zip_path, "wb") as z_out:
                         shutil.copyfileobj(z_resp, z_out)
 
-                    # Extraction de l'archive dans les répertoires d'images
+                    # Extraction sécurisée : validation de chaque entrée ZIP pour prévenir le Zip Slip
+                    # (traversée de répertoire via chemin malveillant de type ../../).
+                    def _safe_extractall_imgs(zf, dest_dir: str) -> None:
+                        import zipfile as _zf
+                        real_dest = os.path.realpath(dest_dir)
+                        for member in zf.namelist():
+                            member_real = os.path.realpath(os.path.join(real_dest, member))
+                            if not member_real.startswith(real_dest + os.sep) and member_real != real_dest:
+                                raise ValueError(
+                                    f"Zip Slip détecté : l'entrée '{member}' tente de sortir du répertoire cible."
+                                )
+                        zf.extractall(dest_dir)
+
                     with zipfile.ZipFile(tmp_zip_path, "r") as zf:
-                        zf.extractall(img_dest_dirs[0])
+                        _safe_extractall_imgs(zf, img_dest_dirs[0])
                         for extra_idir in img_dest_dirs[1:]:
                             try:
-                                zf.extractall(extra_idir)
+                                _safe_extractall_imgs(zf, extra_idir)
                             except Exception:
                                 pass
                     try:
@@ -897,7 +909,19 @@ class ImportMixin:
                         custom_name=name, 
                         custom_metadata=metadata
                     )
-                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                    folder = b_meta.get("folder_name", b_name)
+                    avail = BibleJsonLoader.get_available_books(folder) or BibleJsonLoader.get_available_books(b_name)
+                    first_b = avail[0] if avail else "Gen"
+                    return {
+                        "success": True, 
+                        "name": b_name, 
+                        "folder_name": folder,
+                        "first_book": first_b,
+                        "available_books": avail,
+                        "is_bible": True, 
+                        "books_count": b_meta.get("total_books", 0), 
+                        "chunks_count": 0
+                    }
                 except Exception as e:
                     logger.error(f"Erreur importation Bible EPUB : {e}", exc_info=True)
                     return {"success": False, "error": f"Erreur importation Bible EPUB : {e}"}
@@ -909,7 +933,19 @@ class ImportMixin:
                         custom_name=name,
                         custom_metadata=metadata
                     )
-                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                    folder = b_meta.get("folder_name", b_name)
+                    avail = BibleJsonLoader.get_available_books(folder) or BibleJsonLoader.get_available_books(b_name)
+                    first_b = avail[0] if avail else "Gen"
+                    return {
+                        "success": True, 
+                        "name": b_name, 
+                        "folder_name": folder,
+                        "first_book": first_b,
+                        "available_books": avail,
+                        "is_bible": True, 
+                        "books_count": b_meta.get("total_books", 0), 
+                        "chunks_count": 0
+                    }
                 except Exception as e:
                     logger.error(f"Erreur importation Bible DOCX : {e}", exc_info=True)
                     return {"success": False, "error": f"Erreur importation Bible DOCX : {e}"}
@@ -920,7 +956,19 @@ class ImportMixin:
                         custom_name=name,
                         custom_metadata=metadata
                     )
-                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                    folder = b_meta.get("folder_name", b_name)
+                    avail = BibleJsonLoader.get_available_books(folder) or BibleJsonLoader.get_available_books(b_name)
+                    first_b = avail[0] if avail else "Gen"
+                    return {
+                        "success": True, 
+                        "name": b_name, 
+                        "folder_name": folder,
+                        "first_book": first_b,
+                        "available_books": avail,
+                        "is_bible": True, 
+                        "books_count": b_meta.get("total_books", 0), 
+                        "chunks_count": 0
+                    }
                 except Exception as e:
                     logger.error(f"Erreur importation Bible JSON : {e}", exc_info=True)
                     return {"success": False, "error": f"Erreur importation Bible JSON : {e}"}
@@ -931,7 +979,19 @@ class ImportMixin:
                         custom_name=name,
                         custom_metadata=metadata
                     )
-                    return {"success": True, "name": b_name, "is_bible": True, "books_count": b_meta.get("total_books", 0), "chunks_count": 0}
+                    folder = b_meta.get("folder_name", b_name)
+                    avail = BibleJsonLoader.get_available_books(folder) or BibleJsonLoader.get_available_books(b_name)
+                    first_b = avail[0] if avail else "Gen"
+                    return {
+                        "success": True, 
+                        "name": b_name, 
+                        "folder_name": folder,
+                        "first_book": first_b,
+                        "available_books": avail,
+                        "is_bible": True, 
+                        "books_count": b_meta.get("total_books", 0), 
+                        "chunks_count": 0
+                    }
                 except Exception as e:
                     logger.error(f"Erreur importation Bible CSV : {e}", exc_info=True)
                     return {"success": False, "error": f"Erreur importation Bible CSV : {e}"}

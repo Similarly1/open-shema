@@ -158,10 +158,12 @@ const LibraryView = {
         } else if (bType.includes('bibl')) {
           App.switchView('bible');
           if (typeof BibleReader !== 'undefined') {
+            const bName = book.name || book.folder_name || book.title;
+            const firstB = book.first_book || (typeof BibleReader.getFirstBookForBible === 'function' ? BibleReader.getFirstBookForBible(bName) : null);
             if (typeof BibleReader.switchVersion === 'function') {
-              BibleReader.switchVersion(book.name || book.folder_name || book.title);
+              BibleReader.switchVersion(bName, firstB);
             } else if (typeof BibleReader.selectBibleVersion === 'function') {
-              BibleReader.selectBibleVersion(book.name || book.folder_name);
+              BibleReader.selectBibleVersion(bName, firstB);
             }
           }
         } else if (bType.includes('dict')) {

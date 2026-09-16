@@ -90,6 +90,10 @@ class LibraryMixin:
                         matched["cover_url"] = ib.get("cover_url")
                     if not matched.get("folder_name"):
                         matched["folder_name"] = folder_id
+                    if not matched.get("first_book") and ib.get("first_book"):
+                        matched["first_book"] = ib.get("first_book")
+                    if not matched.get("available_books") and ib.get("available_books"):
+                        matched["available_books"] = ib.get("available_books")
                 else:
                     # Ajouter la Bible installée
                     cov_url = ib.get("cover_url") or ""
@@ -104,6 +108,8 @@ class LibraryMixin:
                         "famille": ib.get("famille", "Protestante"),
                         "cover_url": cov_url,
                         "cover_data_url": cov_url if cov_url.startswith("data:") else None,
+                        "first_book": ib.get("first_book"),
+                        "available_books": ib.get("available_books"),
                         "active": True,
                         "format": "json"
                     })
@@ -347,7 +353,7 @@ class LibraryMixin:
                 f"--- TEXTE DU CHAPITRE ---\n{text[:16000]}"
             )
 
-            from ai.llm_client import LLMClient
+            from api._utils import build_llm_client_from_config
             models_to_try = [clean_model]
             fallback_model = config.get("summary_fallback_model")
             if fallback_model and fallback_model != clean_model:
@@ -358,17 +364,7 @@ class LibraryMixin:
             last_err = None
 
             for cur_model in models_to_try:
-                lower_m = cur_model.lower()
-                if "/" in lower_m or "infomaniak" in lower_m or lower_m.startswith("qwen"):
-                    token = config.get("infomaniak_token", "")
-                    pid = config.get("infomaniak_product_id", "251")
-                    client = LLMClient(api_key=token, model=cur_model, provider="infomaniak", product_id=pid)
-                elif lower_m.startswith("mistral-") or lower_m.startswith("open-mistral-"):
-                    api_key = config.get("mistral_api_key", "")
-                    client = LLMClient(api_key=api_key, model=cur_model, provider="mistral")
-                else:
-                    api_key = config.get("gemini_api_key", "")
-                    client = LLMClient(api_key=api_key, model=cur_model, provider="gemini")
+                client = build_llm_client_from_config(cur_model, config)
 
                 try:
                     out = client.chat(messages=[{"role": "user", "content": user_prompt}], system_prompt=sys_prompt)

@@ -4723,6 +4723,12 @@ const BibleReader = {
     if (s.includes('sagesse vivante') || s === 'sv' || item?.total_books === 4) {
       return ['Job', 'Pro', 'Ecc', 'Sol'];
     }
+    if (s.includes('prophetie') || s.includes('prophétie') || s === 'pviv' || s === 'proviv' || s === 'prov' || item?.total_books === 17) {
+      return [
+        'Isa', 'Jer', 'Lam', 'Eze', 'Dan', 'Hos', 'Joe', 'Amo', 'Oba', 'Jon',
+        'Mic', 'Nah', 'Hab', 'Zep', 'Hag', 'Zec', 'Mal'
+      ];
+    }
     if (canon === 'AT' || s.includes('cahen') || s.includes('ancien testament') || s === 'gig') {
       return CANONICAL_BOOKS.slice(0, 39).map(b => b.code);
     }
@@ -5891,6 +5897,9 @@ const BibleReader = {
       emptyNotice.className = 'chapter-unavailable-notice';
       const bDisp = this.getBibleDisplayName(bibleName) || bibleName;
       const bFr = data.book_french || (typeof getFrenchBookName === 'function' ? getFrenchBookName(data.book) : data.book);
+      const firstB = this.getFirstBookForBible(bibleName);
+      const firstBName = typeof getFrenchBookName === 'function' ? getFrenchBookName(firstB) : firstB;
+      const canJump = firstB && firstB.toLowerCase() !== String(data.book).toLowerCase();
       emptyNotice.innerHTML = `
         <div class="empty-notice-box">
           <div class="empty-notice-icon">📖</div>
@@ -5898,8 +5907,22 @@ const BibleReader = {
           <div class="empty-notice-desc">
             Le livre de <strong>${this.escapeHtml(bFr)}</strong> n'est pas inclus dans <em>${this.escapeHtml(bDisp)}</em>.
           </div>
+          ${canJump ? `
+            <div style="margin-top: 14px;">
+              <button class="empty-notice-jump-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; background: var(--accent-blue, #2563eb); color: white; border: none; font-weight: 500; cursor: pointer; font-size: 13px;">
+                <span>Ouvrir ${this.escapeHtml(firstBName)}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+          ` : ''}
         </div>
       `;
+      if (canJump) {
+        emptyNotice.querySelector('.empty-notice-jump-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.navigateTo(firstB, 1);
+        });
+      }
       flow.appendChild(emptyNotice);
     }
 
@@ -6002,7 +6025,7 @@ const BibleReader = {
     LexiconViewer.load(word, strongCode);
   },
 
-  openBiblePicker(paneNum) {
+  async openBiblePicker(paneNum) {
     this.targetPaneForPicker = paneNum;
     const popover = document.getElementById('bible-version-picker-popover');
     const listEl = document.getElementById('version-list-items');
@@ -6020,6 +6043,16 @@ const BibleReader = {
     });
 
     listEl.innerHTML = '';
+
+    // Toujours actualiser avec les Bibles réellement installées en base
+    try {
+      const freshBibles = await API.getInstalledBibles();
+      if (freshBibles && freshBibles.length > 0) {
+        this.installedBibles = freshBibles;
+      }
+    } catch (e) {
+      console.warn('Erreur rafraîchissement Bibles:', e);
+    }
 
     const currentSelected = paneNum === 1 ? this.currentBible1 : this.currentBible2;
     const otherPaneSelected = paneNum === 1 ? this.currentBible2 : this.currentBible1;
@@ -6109,7 +6142,7 @@ const BibleReader = {
     document.getElementById('bible-version-picker-popover').classList.add('hidden');
   },
 
-  selectBibleVersion(versionName) {
+  selectBibleVersion(versionName, preferredBook = null) {
     this.closeBiblePicker();
     const item = this.getBibleInfo(versionName);
     const targetVersionName = item ? item.name : versionName;
@@ -6121,19 +6154,19 @@ const BibleReader = {
       const interBtn = document.getElementById('btn-toggle-interlinear');
       if (interBtn) interBtn.classList.toggle('active', this.pane1IsInterlinear || this.pane2IsInterlinear);
 
-      // Si le livre actuellement affiché n'est pas présent dans la nouvelle version (ex: Genèse dans une version NT uniquement comme Stapfer)
-      let targetBook = this.currentBook;
+      // Si le livre actuellement affiché n'est pas présent dans la nouvelle version (ex: Genèse dans une version prophétique ou NT uniquement)
+      let targetBook = preferredBook || this.currentBook;
       let targetChapter = this.currentChapter;
       let targetVerse = curV;
 
       if (!this.isBookAvailableInBible(targetVersionName, targetBook)) {
-        targetBook = this.getFirstBookForBible(targetVersionName);
+        targetBook = preferredBook || item?.first_book || this.getFirstBookForBible(targetVersionName);
         targetChapter = 1;
         targetVerse = 1;
-        this.currentBook = targetBook;
-        this.currentChapter = targetChapter;
-        this.selectedVerse = targetVerse;
       }
+      this.currentBook = targetBook;
+      this.currentChapter = targetChapter;
+      this.selectedVerse = targetVerse;
 
       TabsManager.updateActiveTab(targetVersionName, targetBook, targetChapter, this.pane1IsInterlinear, this.pane1InterlinearVersion);
       this.updatePaneHeader(1);
@@ -6148,10 +6181,10 @@ const BibleReader = {
     }
   },
 
-  switchVersion(versionName) {
+  switchVersion(versionName, preferredBook = null) {
     if (!versionName) return;
     this.targetPaneForPicker = 1;
-    this.selectBibleVersion(versionName);
+    this.selectBibleVersion(versionName, preferredBook);
   },
 
   goToNextChapter() {
