@@ -116,6 +116,7 @@ def recover_books_metadata():
     try:
         chroma_path = resolve_data_path('chroma_db')
         if os.path.exists(chroma_path):
+            import core.chroma_silencer
             import chromadb
             client = chromadb.PersistentClient(path=chroma_path)
             for col in client.list_collections():

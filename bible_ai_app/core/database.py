@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 import os
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
+import core.chroma_silencer
 import re
 import chromadb
 from chromadb.config import Settings

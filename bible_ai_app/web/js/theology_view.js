@@ -400,6 +400,7 @@ const TheologyView = {
     // Charger la table des matières (TOC)
     try {
       const tocData = await API.getTheologyBookToc(bookName);
+      if (this.currentBook !== bookName) return;
       this.tocList = tocData?.chapters || [];
 
       // Restaurer la traduction de la TOC si présente
@@ -499,6 +500,7 @@ const TheologyView = {
       this.renderLoadingArticle();
 
       const data = await API.getTheologyChapterContent(bookName, chapterId);
+      if (this.currentBook !== bookName || this.currentChapterId !== chapterId) return;
       this.currentChapterData = data;
 
       // Vérifier si une traduction en cache existe pour ce chapitre (en mémoire ou SQLite)

@@ -138,6 +138,25 @@ const ImportModal = {
       });
     }
 
+    // Toggle du Guide des Formats (replié par défaut)
+    const btnToggleGuide = document.getElementById('btn-toggle-format-guide');
+    const guideBody = document.getElementById('format-guide-body');
+    const guideText = document.getElementById('format-guide-toggle-text');
+    if (btnToggleGuide && guideBody) {
+      btnToggleGuide.addEventListener('click', () => {
+        const isHidden = guideBody.classList.contains('hidden');
+        if (isHidden) {
+          guideBody.classList.remove('hidden');
+          btnToggleGuide.classList.add('is-open');
+          if (guideText) guideText.textContent = 'Replier';
+        } else {
+          guideBody.classList.add('hidden');
+          btnToggleGuide.classList.remove('is-open');
+          if (guideText) guideText.textContent = 'Déplier';
+        }
+      });
+    }
+
     // Clics sur les indicateurs du stepper
     document.querySelectorAll('.wizard-step').forEach(stepEl => {
       stepEl.addEventListener('click', () => {
@@ -413,7 +432,17 @@ const ImportModal = {
     this.updateFooterButtonsUI();
 
     // 5. Ajustements selon l'étape
-    if (step === 2) {
+    if (step === 1) {
+      const dropzone = document.getElementById('import-dropzone');
+      const fileCard = document.getElementById('import-selected-file-card');
+      if (this.filePath) {
+        dropzone?.classList.add('hidden');
+        fileCard?.classList.remove('hidden');
+      } else {
+        dropzone?.classList.remove('hidden');
+        fileCard?.classList.add('hidden');
+      }
+    } else if (step === 2) {
       this.checkForDuplicates();
     } else if (step === 4) {
       this.updateStep4Display();
@@ -512,6 +541,8 @@ const ImportModal = {
       prevBtn?.classList.add('hidden');
       nextBtn?.classList.add('hidden');
       submitBtn?.classList.remove('hidden');
+      document.getElementById('import-classification-help-wrap')?.classList.add('hidden');
+      document.getElementById('import-classification-popover')?.classList.remove('pinned');
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span id="btn-submit-import-label">Enregistrer les Modifications</span>`;
@@ -569,6 +600,17 @@ const ImportModal = {
       submitBtn?.classList.add('hidden');
       document.getElementById('btn-cancel-import-modal')?.classList.add('hidden');
     }
+
+    // Aide classifications : visible UNIQUEMENT à la section Structure (étape 3)
+    const helpWrap = document.getElementById('import-classification-help-wrap');
+    if (helpWrap) {
+      if (this.currentStep === 3 && !this.isEditMode) {
+        helpWrap.classList.remove('hidden');
+      } else {
+        helpWrap.classList.add('hidden');
+      }
+    }
+    document.getElementById('import-classification-popover')?.classList.remove('pinned');
   },
 
   syncStep4WithMetadata() {
@@ -870,7 +912,21 @@ const ImportModal = {
       document.getElementById('import-rag-bookcode').value = '';
       document.getElementById('import-rag-embed').value = 'bge_multilingual_gemma2 (Infomaniak)';
 
+      document.getElementById('import-dropzone')?.classList.remove('hidden');
       document.getElementById('import-selected-file-card')?.classList.add('hidden');
+      document.getElementById('import-analyzing-card')?.classList.add('hidden');
+
+      // Guide des formats : replié par défaut
+      const guideBody = document.getElementById('format-guide-body');
+      const guideHeader = document.getElementById('btn-toggle-format-guide');
+      const guideText = document.getElementById('format-guide-toggle-text');
+      if (guideBody) guideBody.classList.add('hidden');
+      if (guideHeader) guideHeader.classList.remove('is-open');
+      if (guideText) guideText.textContent = 'Déplier';
+
+      document.getElementById('import-classification-help-wrap')?.classList.add('hidden');
+      document.getElementById('import-classification-popover')?.classList.remove('pinned');
+
       this.updateCoverPreview(null);
       this.renderChaptersList([]);
       this.updateResourceTypeUI('Théologie');
@@ -957,6 +1013,7 @@ const ImportModal = {
         analyzingCard.classList.remove('hidden');
       }
       if (fileCard) fileCard.classList.add('hidden');
+      document.getElementById('import-dropzone')?.classList.add('hidden');
       if (pickBtn) {
         pickBtn.disabled = true;
         pickBtn.innerHTML = `<div class="analyzing-spinner-ring" style="width: 16px; height: 16px; border-width: 2px;"></div><span>Analyse du document...</span>`;
@@ -965,6 +1022,10 @@ const ImportModal = {
       const res = await API.call('inspect_import_source', filePath);
       if (!res || !res.success) {
         alert(`Erreur lors de l'analyse du document : ${res?.error || 'Format non reconnu'}`);
+        if (!this.filePath) {
+          document.getElementById('import-dropzone')?.classList.remove('hidden');
+        }
+        if (analyzingCard) analyzingCard.classList.add('hidden');
         return;
       }
 
@@ -972,6 +1033,10 @@ const ImportModal = {
       this.fileName = res.file_name || fileName;
       this.fileSize = res.file_size || fileSize || 0;
       this.fileFormat = (res.format || fileFormat || '').toUpperCase();
+
+      // Masquer la zone d'upload une fois le document sélectionné
+      document.getElementById('import-dropzone')?.classList.add('hidden');
+      if (analyzingCard) analyzingCard.classList.add('hidden');
 
       // Afficher la fiche du fichier chargé à l'étape 1
       const badgeEl = document.getElementById('file-card-format-badge');

@@ -2344,6 +2344,21 @@ const GeoPassageHoverManager = {
   hideTimeout: null,
   clustersCache: {},
 
+  PERIOD_LABELS: {
+    patriarchs: 'Patriarches',
+    exodus: 'Exode & Désert',
+    conquest: 'Conquête & Juges',
+    united_monarchy: 'Monarchie unifiée',
+    monarchy: 'Monarchie',
+    divided_monarchy: 'Royaumes divisés',
+    exile: 'Exil à Babylone',
+    post_exile: 'Retour d\'exil',
+    prophets: 'Temps prophétique',
+    second_temple: 'Second Temple',
+    gospels: 'Évangiles',
+    apostolic: 'Époque apostolique'
+  },
+
   init() {
     if (!this.popoverEl) {
       this.popoverEl = document.getElementById('geo-passage-hover-popover');
@@ -2369,7 +2384,7 @@ const GeoPassageHoverManager = {
       document.querySelectorAll('.verse-item.geo-passage-highlighted').forEach(el => {
         el.classList.remove('geo-passage-highlighted');
       });
-    }, 220);
+    }, 240);
   },
 
   showForCluster(btnEl, clusterId) {
@@ -2396,6 +2411,7 @@ const GeoPassageHoverManager = {
       : `${bInfo.name} ${cluster.chapter}:${cluster.startVerse}–${cluster.endVerse}`;
 
     const clean = (s) => (s ? String(s).replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&apos;/g, "'").trim() : '');
+    
     const placesHtml = cluster.places.map(p => {
       const typeLabel = (typeof MapsView !== 'undefined' && MapsView.getTypeLabel) ? MapsView.getTypeLabel(p.place_type) : (p.place_type || 'Lieu');
       const badgeClass = `badge-type-${p.place_type || 'city'}`;
@@ -2403,6 +2419,68 @@ const GeoPassageHoverManager = {
       const ancName = clean(p.ancient_name);
       const modName = clean(p.modern_name);
       const comment = clean(p.comment);
+      const versesCount = parseInt(p.verses_count, 10) || 0;
+      const vChapterStr = p.verses_in_chapter ? String(p.verses_in_chapter).trim() : '';
+      const vChapterArr = vChapterStr 
+        ? [...new Set(vChapterStr.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n)))].sort((a, b) => a - b)
+        : [];
+
+      // Badges statistiques & occurrences
+      let statsHtml = '<div class="geo-pop-stats-row">';
+      if (versesCount > 0) {
+        statsHtml += `
+          <span class="geo-pop-stat-chip" title="Occurrences totales dans la Bible">
+            <svg viewBox="0 0 24 24" width="10.5" height="10.5" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span><strong>${versesCount}</strong> mention${versesCount > 1 ? 's' : ''} biblique${versesCount > 1 ? 's' : ''}</span>
+          </span>
+        `;
+      }
+      if (vChapterArr.length > 0) {
+        const vLabel = vChapterArr.length === 1 
+          ? `Verset ${vChapterArr[0]}`
+          : `Versets ${vChapterArr.join(', ')}`;
+        statsHtml += `
+          <span class="geo-pop-verse-chip" title="Présence dans ce chapitre">
+            <svg viewBox="0 0 24 24" width="10.5" height="10.5" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="9"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>${vLabel} de ce chapitre</span>
+          </span>
+        `;
+      }
+      statsHtml += '</div>';
+
+      // Périodes historiques / bibliques
+      let periodsHtml = '';
+      if (p.periods) {
+        const pList = String(p.periods).split(',').map(s => s.trim().toLowerCase()).filter(s => this.PERIOD_LABELS[s]);
+        if (pList.length > 0) {
+          const pills = pList.slice(0, 3).map(k => `<span class="geo-pop-period-pill">${this.PERIOD_LABELS[k]}</span>`).join('');
+          periodsHtml = `<div class="geo-pop-periods-row" title="Périodes bibliques">${pills}</div>`;
+        }
+      }
+
+      // Sous-titre toponyme antique / moderne
+      let subHtml = '';
+      if (ancName || modName) {
+        subHtml = `
+          <div class="geo-pop-place-sub">
+            ${ancName ? `<span class="geo-pop-sub-anc">Antique : <em>${ancName}</em></span>` : ''}
+            ${ancName && modName ? '<span class="geo-pop-sub-sep">•</span>' : ''}
+            ${modName ? `<span class="geo-pop-sub-mod">Moderne : <em>${modName}</em></span>` : ''}
+          </div>
+        `;
+      }
+
+      // Description / commentaire historique
+      let descHtml = '';
+      if (comment) {
+        descHtml = `<div class="geo-pop-place-desc">${comment}</div>`;
+      }
 
       return `
         <div class="geo-pop-place-row" data-place-id="${p.place_id}">
@@ -2410,8 +2488,26 @@ const GeoPassageHoverManager = {
             <span class="geo-pop-place-name">${nameFr}</span>
             <span class="geo-pop-place-type ${badgeClass}">${typeLabel}</span>
           </div>
-          ${ancName || modName ? `<div class="geo-pop-place-sub">${ancName ? `Antique : ${ancName}` : ''}${ancName && modName ? ' • ' : ''}${modName ? `Moderne : ${modName}` : ''}</div>` : ''}
-          ${comment ? `<div class="geo-pop-place-desc">${comment}</div>` : ''}
+          ${subHtml}
+          ${statsHtml}
+          ${periodsHtml}
+          ${descHtml}
+          <div class="geo-pop-place-actions">
+            <button type="button" class="geo-pop-sub-btn btn-lookup-dict" data-place-name="${nameFr}" title="Consulter l'article dans le Dictionnaire biblique">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span>Dictionnaire</span>
+            </button>
+            <button type="button" class="geo-pop-sub-btn btn-focus-map" data-place-id="${p.place_id}" title="Localiser précisément ce lieu sur la carte">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+              </svg>
+              <span>Localiser</span>
+            </button>
+          </div>
         </div>
       `;
     }).join('');
@@ -2419,10 +2515,10 @@ const GeoPassageHoverManager = {
     this.popoverEl.innerHTML = `
       <div class="geo-pop-header">
         <div class="geo-pop-header-title">
-          <svg class="geo-pop-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path>
-            <path d="M9 3v15"></path>
-            <path d="M15 6v15"></path>
+          <svg class="geo-pop-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
           </svg>
           <span>${rangeText}</span>
         </div>
@@ -2438,7 +2534,23 @@ const GeoPassageHoverManager = {
       </div>
     `;
 
-    // Événements de clic sur chaque lieu ou sur le bouton footer
+    // Événements de clic sur chaque bouton ou ligne
+    this.popoverEl.querySelectorAll('.btn-lookup-dict').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pName = btn.dataset.placeName;
+        this.openInDictionary(pName);
+      });
+    });
+
+    this.popoverEl.querySelectorAll('.btn-focus-map').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pId = btn.dataset.placeId;
+        this.navigateToMap(pId, cluster.book, cluster.chapter);
+      });
+    });
+
     this.popoverEl.querySelectorAll('.geo-pop-place-row').forEach(row => {
       row.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -2457,8 +2569,8 @@ const GeoPassageHoverManager = {
     this.popoverEl.classList.remove('hidden');
     const rect = btnEl.getBoundingClientRect();
     const popRect = this.popoverEl.getBoundingClientRect();
-    const popWidth = popRect.width || 350;
-    const popHeight = popRect.height || 220;
+    const popWidth = popRect.width || 380;
+    const popHeight = popRect.height || 260;
 
     let left = rect.left - popWidth - 12;
     if (left < 10) {
@@ -2471,6 +2583,28 @@ const GeoPassageHoverManager = {
 
     this.popoverEl.style.top = `${top}px`;
     this.popoverEl.style.left = `${left}px`;
+  },
+
+  openInDictionary(rawName) {
+    if (!rawName) return;
+    if (this.popoverEl) this.popoverEl.classList.add('hidden');
+    const cleanName = rawName.split('(')[0].split('&')[0].replace(/<[^>]+>/g, '').trim();
+    if (!cleanName) return;
+
+    App.switchView('dict');
+    document.querySelectorAll('.sidebar-menu .nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-dict')?.classList.add('active');
+
+    setTimeout(() => {
+      const searchInput = document.getElementById('dict-search-input');
+      if (searchInput) {
+        searchInput.value = cleanName;
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      if (typeof DictView !== 'undefined' && DictView.executeLookup) {
+        DictView.executeLookup(cleanName);
+      }
+    }, 120);
   },
 
   navigateToMap(placeId, bookCode, chapter) {

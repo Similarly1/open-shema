@@ -328,9 +328,17 @@ class BibleReaderMixin:
                                 geo_places_by_verse[vn].append({
                                     "place_id": p["place_id"],
                                     "name_fr": p["name_fr"],
+                                    "name_en": p.get("name_en", ""),
+                                    "ancient_name": p.get("ancient_name", ""),
+                                    "modern_name": p.get("modern_name", ""),
                                     "place_type": p.get("place_type", "city"),
-                                    "latitude": p["latitude"],
-                                    "longitude": p["longitude"]
+                                    "latitude": p.get("latitude"),
+                                    "longitude": p.get("longitude"),
+                                    "comment": p.get("comment", ""),
+                                    "verses_count": p.get("verses_count", 0),
+                                    "verses_in_chapter": p.get("verses_in_chapter", ""),
+                                    "periods": p.get("periods", ""),
+                                    "confidence": p.get("confidence", "")
                                 })
         except Exception as e:
             logger.warning(f"Erreur enrichissement géo pour {book_code} {ch_int}: {e}")

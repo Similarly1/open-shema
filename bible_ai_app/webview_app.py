@@ -11,7 +11,14 @@ import threading
 import logging
 import requests
 
-# Définir l'AppUserModelID explicite pour que la barre des tâches Windows affiche l'icône officielle
+# Ajouter le repertoire racine au PYTHONPATH
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+import core.chroma_silencer
+
+# Definir l'AppUserModelID explicite pour que la barre des taches Windows affiche l'icone officielle
 try:
     import ctypes
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Similarly.OpenShema.BibleApp.v1")
@@ -28,21 +35,127 @@ try:
         try:
             return _orig_interop(dll_name)
         except FileNotFoundError:
-            # Sécurité anti-crash pour les sondes multi-plateformes (win-arm64, win-x86)
+            # Securite anti-crash pour les sondes multi-plateformes (win-arm64, win-x86)
             app_root = os.path.dirname(os.path.abspath(__file__))
             fallback_dir = os.path.join(app_root, "_internal", "webview", "lib")
             if os.path.exists(fallback_dir):
                 return fallback_dir
             return app_root
     webview.util.interop_dll_path = _safe_interop_dll_path
+
+    # Patch de securisation du pont JavaScript pywebview contre les TypeError sur callbacks orphelins
+    def _patch_pywebview_js_bridge():
+        try:
+            import json as _json
+            import traceback as _traceback
+            from threading import Thread as _Thread
+            import urllib.parse as _urllib_parse
+
+            def _safe_js_bridge_call(window, func_name: str, param, value_id: str) -> None:
+                def _call():
+                    try:
+                        result = func(*func_params)
+                        result = _json.dumps(result).replace('\\', '\\\\').replace("'", "\\'")
+                        retval = f"{{value: '{result}'}}"
+                    except Exception as e:
+                        logger.error(_traceback.format_exc())
+                        error = {'message': str(e), 'name': type(e).__name__, 'stack': _traceback.format_exc()}
+                        result = _json.dumps(error).replace('\\', '\\\\').replace("'", "\\'")
+                        retval = f"{{isError: true, value: '{result}'}}"
+
+                    try:
+                        # Verifier l'existence de la fonction callback JS avant invocation
+                        safe_js = (
+                            f'if (window.pywebview && window.pywebview._returnValuesCallbacks && '
+                            f'window.pywebview._returnValuesCallbacks["{func_name}"] && '
+                            f'typeof window.pywebview._returnValuesCallbacks["{func_name}"]["{value_id}"] === "function") {{ '
+                            f'window.pywebview._returnValuesCallbacks["{func_name}"]["{value_id}"]({retval}); '
+                            f'}}'
+                        )
+                        window.evaluate_js(safe_js)
+                    except Exception as eval_err:
+                        logger.debug("Pywebview callback dropped (%s): %s", func_name, eval_err)
+
+                def get_nested_attribute(obj: object, attr_str: str):
+                    attributes = attr_str.split('.')
+                    for attr in attributes:
+                        obj = getattr(obj, attr, None)
+                        if obj is None:
+                            return None
+                    return obj
+
+                if func_name == 'pywebviewMoveWindow':
+                    window.move(*param)
+                    return
+
+                if func_name == 'pywebviewEventHandler':
+                    event = param['event']
+                    node_id = param['nodeId']
+                    element = window.dom._elements.get(node_id)
+                    if not element:
+                        return
+                    if event['type'] == 'drop':
+                        files = event['dataTransfer'].get('files', [])
+                        for file in files:
+                            path = [
+                                item
+                                for item in webview.util._dnd_state['paths']
+                                if _urllib_parse.unquote(item[0]) == file['name']
+                            ]
+                            if len(path) == 0:
+                                continue
+                            file['pywebviewFullPath'] = _urllib_parse.unquote(path[0][1])
+                            webview.util._dnd_state['paths'].remove(path[0])
+
+                    for handler in element._event_handlers.get(event['type'], []):
+                        thread = _Thread(target=handler, args=(event,))
+                        thread.start()
+                    return
+
+                if func_name == 'pywebviewAsyncCallback':
+                    value = _json.loads(param) if param is not None else None
+                    if callable(window._callbacks[value_id]):
+                        window._callbacks[value_id](value)
+                    else:
+                        logger.error(
+                            f'Async function executed and callback is not callable. Returned value {value}'
+                        )
+                    del window._callbacks[value_id]
+                    return
+
+                if func_name == 'pywebviewStateUpdate':
+                    window.state.__setattr__(param['key'], param['value'], False)
+                    return
+
+                if func_name == 'pywebviewStateDelete':
+                    special_key = '__pywebviewHaltUpdate__' + param
+                    delattr(window.state, special_key)
+                    return
+
+                func = window._functions.get(func_name) or get_nested_attribute(window._js_api, func_name)
+                if func is not None:
+                    try:
+                        func_params = param
+                        thread = _Thread(target=_call)
+                        thread.start()
+                    except Exception:
+                        logger.exception('Error occurred while evaluating function %s', func_name)
+                else:
+                    logger.error('Function %s() does not exist', func_name)
+
+            webview.util.js_bridge_call = _safe_js_bridge_call
+            try:
+                import webview.platforms.edgechromium as ec
+                ec.js_bridge_call = _safe_js_bridge_call
+            except Exception:
+                pass
+        except Exception as _patch_e:
+            logger.warning("Erreur securisation pont pywebview : %s", _patch_e)
+
+    _patch_pywebview_js_bridge()
 except ImportError:
     webview = None
 from typing import Dict, List, Any, Optional
-
-# Ajouter le répertoire racine au PYTHONPATH
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
 
 # Purge préventive des .pyc périmés (évite les crashs sur bytecode obsolète après modifications sources)
 def _purge_stale_pyc_caches(root: str):

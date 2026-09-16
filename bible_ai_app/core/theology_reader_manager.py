@@ -1,5 +1,6 @@
 import os
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
+import core.chroma_silencer
 import re
 import html
 import logging

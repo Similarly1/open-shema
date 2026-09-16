@@ -9524,63 +9524,71 @@
               </div>
             </div>
 
-            <!-- GUIDE DES FORMATS ACCEPTÉS -->
-            <div class="format-guide-section">
-              <div class="format-guide-title">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                <span>Guide des Formats Recommandés</span>
+            <!-- GUIDE DES FORMATS ACCEPTÉS (Replié par défaut) -->
+            <div class="format-guide-section" id="format-guide-section">
+              <div class="format-guide-header" id="btn-toggle-format-guide" title="Cliquer pour déplier ou replier le guide des formats">
+                <div class="format-guide-title" style="margin-bottom: 0;">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>Guide des Formats Recommandés</span>
+                </div>
+                <div class="format-guide-toggle-action">
+                  <span id="format-guide-toggle-text">Déplier</span>
+                  <svg id="format-guide-toggle-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
               </div>
               
-              <div class="format-cards-grid">
-                <!-- Carte EPUB -->
-                <div class="format-card highlight">
-                  <div class="format-card-header">
-                    <span class="format-badge epub">.EPUB</span>
-                    <span class="format-rec-tag">Recommandé</span>
+              <div class="format-guide-body hidden" id="format-guide-body">
+                <div class="format-cards-grid">
+                  <!-- Carte EPUB -->
+                  <div class="format-card highlight">
+                    <div class="format-card-header">
+                      <span class="format-badge epub">.EPUB</span>
+                      <span class="format-rec-tag">Recommandé</span>
+                    </div>
+                    <div class="format-card-name">Livre Numérique EPUB</div>
+                    <p class="format-card-desc">Idéal pour les Bibles, commentaires et traités de théologie. Extraction automatique de la table des matières, des métadonnées et de la couverture.</p>
                   </div>
-                  <div class="format-card-name">Livre Numérique EPUB</div>
-                  <p class="format-card-desc">Idéal pour les Bibles, commentaires et traités de théologie. Extraction automatique de la table des matières, des métadonnées et de la couverture.</p>
+
+                  <!-- Carte JSON -->
+                  <div class="format-card">
+                    <div class="format-card-header">
+                      <span class="format-badge json">.JSON</span>
+                      <span class="format-rec-tag">Structuré</span>
+                    </div>
+                    <div class="format-card-name">Données Structurées</div>
+                    <p class="format-card-desc">Format optimisé pour les Bibles verset par verset ou dictionnaires thématiques indexés.</p>
+                  </div>
+
+                  <!-- Carte DOCX / MD / TXT -->
+                  <div class="format-card">
+                    <div class="format-card-header">
+                      <span class="format-badge docx">.DOCX / .MD / .TXT</span>
+                      <span class="format-rec-tag">Texte & Notes</span>
+                    </div>
+                    <div class="format-card-name">Word, Markdown & Texte</div>
+                    <p class="format-card-desc">Compatible avec les documents d'étude, notes exégétiques et exports au format Word ou Markdown.</p>
+                  </div>
+
+                  <!-- Carte PDF -->
+                  <div class="format-card">
+                    <div class="format-card-header">
+                      <span class="format-badge pdf">.PDF</span>
+                      <span class="format-rec-tag">Documents</span>
+                    </div>
+                    <div class="format-card-name">Documents PDF</div>
+                    <p class="format-card-desc">Supporté avec extraction du sommaire, pagination, couverture automatique et vectorisation RAG.</p>
+                  </div>
                 </div>
 
-                <!-- Carte JSON -->
-                <div class="format-card">
-                  <div class="format-card-header">
-                    <span class="format-badge json">.JSON</span>
-                    <span class="format-rec-tag">Structuré</span>
+                <!-- Note Pédagogique sur les PDF -->
+                <div class="pdf-info-box">
+                  <div class="pdf-info-icon">ℹ️</div>
+                  <div class="pdf-info-content">
+                    <div class="pdf-info-title">Prise en charge du format PDF</div>
+                    <p class="pdf-info-text">
+                      Le format PDF est pris en charge avec extraction de la table des matières et génération automatique de la couverture. Pour une fluidité optimale de lecture continue et d'analyse IA, l'EPUB et le DOCX restent particulièrement recommandés en raison de leur mise en page dynamique.
+                    </p>
                   </div>
-                  <div class="format-card-name">Données Structurées</div>
-                  <p class="format-card-desc">Format optimisé pour les Bibles verset par verset ou dictionnaires thématiques indexés.</p>
-                </div>
-
-                <!-- Carte DOCX / MD / TXT -->
-                <div class="format-card">
-                  <div class="format-card-header">
-                    <span class="format-badge docx">.DOCX / .MD / .TXT</span>
-                    <span class="format-rec-tag">Texte & Notes</span>
-                  </div>
-                  <div class="format-card-name">Word, Markdown & Texte</div>
-                  <p class="format-card-desc">Compatible avec les documents d'étude, notes exégétiques et exports au format Word ou Markdown.</p>
-                </div>
-
-                <!-- Carte PDF -->
-                <div class="format-card">
-                  <div class="format-card-header">
-                    <span class="format-badge pdf">.PDF</span>
-                    <span class="format-rec-tag">Documents</span>
-                  </div>
-                  <div class="format-card-name">Documents PDF</div>
-                  <p class="format-card-desc">Supporté avec extraction du sommaire, pagination, couverture automatique et vectorisation RAG.</p>
-                </div>
-              </div>
-
-              <!-- Note Pédagogique sur les PDF -->
-              <div class="pdf-info-box">
-                <div class="pdf-info-icon">ℹ️</div>
-                <div class="pdf-info-content">
-                  <div class="pdf-info-title">Prise en charge du format PDF</div>
-                  <p class="pdf-info-text">
-                    Le format PDF est pris en charge avec extraction de la table des matières et génération automatique de la couverture. Pour une fluidité optimale de lecture continue et d'analyse IA, l'EPUB et le DOCX restent particulièrement recommandés en raison de leur mise en page dynamique.
-                  </p>
                 </div>
               </div>
 
@@ -9904,7 +9912,7 @@
         <div class="modal-footer" id="import-modal-footer">
           <div class="import-footer-left" style="display: flex; align-items: center; gap: 10px; position: relative;">
             <button class="btn-secondary" id="btn-cancel-import-modal">Annuler</button>
-            <div class="import-classification-help-wrap">
+            <div class="import-classification-help-wrap hidden" id="import-classification-help-wrap">
               <button type="button" class="btn-import-help" id="btn-import-help" aria-label="Aide sur les classifications RAG">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>

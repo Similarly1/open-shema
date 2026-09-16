@@ -133,7 +133,7 @@ class MapsManager:
 
         cur = conn.cursor()
         sql = """
-        SELECT DISTINCT p.*, GROUP_CONCAT(pv.verse, ', ') as verses_in_chapter
+        SELECT DISTINCT p.*, GROUP_CONCAT(DISTINCT pv.verse) as verses_in_chapter
         FROM places p
         JOIN place_verses pv ON p.place_id = pv.place_id
         WHERE pv.book = ? AND pv.chapter = ?
@@ -165,7 +165,8 @@ class MapsManager:
                     "verses_count": r["verses_count"],
                     "verses_in_chapter": r["verses_in_chapter"],
                     "verses": verses_list,
-                    "thumbnail_url": r["thumbnail_url"]
+                    "thumbnail_url": r["thumbnail_url"],
+                    "periods": r["periods"] if "periods" in r.keys() else ""
                 })
             return places
         except Exception as e:

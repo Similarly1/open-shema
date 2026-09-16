@@ -11,6 +11,7 @@ logging.getLogger("posthog").setLevel(logging.CRITICAL)
 # Ajout du chemin pour permettre les imports absolus depuis la racine du projet
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+import core.chroma_silencer
 from core.database import VectorDB
 from gui.app import App
 
