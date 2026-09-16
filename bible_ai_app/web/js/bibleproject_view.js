@@ -194,7 +194,7 @@ const BibleProjectView = {
 
       html += `
         <div class="bp-video-card ${isCurrentRange ? 'is-active-range' : ''} ${isPlaying ? 'is-playing' : ''}" data-yt-id="${v.yt_id}">
-          <div class="bp-video-thumb-wrap" onclick="BibleProjectView.playVideo('${v.yt_id}', '${this.escapeHtml(v.title)}', '${this.escapeHtml(v.description)}')">
+          <div class="bp-video-thumb-wrap" onclick="BibleProjectView.playVideo('${v.yt_id}')">
             <img src="${thumbUrl}" class="bp-video-thumb-img" alt="${this.escapeHtml(v.title)}" loading="lazy">
             <div class="bp-play-badge">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -203,11 +203,11 @@ const BibleProjectView = {
             ${isCurrentRange ? `<span class="bp-cur-chap-badge">Chap. ${this.currentChapter}</span>` : ''}
           </div>
           <div class="bp-video-meta">
-            <div class="bp-video-title" onclick="BibleProjectView.playVideo('${v.yt_id}', '${this.escapeHtml(v.title)}', '${this.escapeHtml(v.description)}')">${this.escapeHtml(v.title)}</div>
+            <div class="bp-video-title" onclick="BibleProjectView.playVideo('${v.yt_id}')">${this.escapeHtml(v.title)}</div>
             <div class="bp-video-desc">${this.escapeHtml(v.description || '')}</div>
             <div class="bp-video-footer">
               <span class="bp-video-range-pill">Chapitres ${v.chapters[0]} à ${v.chapters[1]}</span>
-              <button class="bp-btn-action-sm" onclick="BibleProjectView.playVideo('${v.yt_id}', '${this.escapeHtml(v.title)}', '${this.escapeHtml(v.description)}')">
+              <button class="bp-btn-action-sm" onclick="BibleProjectView.playVideo('${v.yt_id}')">
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 <span>${isPlaying ? 'En cours' : 'Regarder'}</span>
               </button>
@@ -245,7 +245,7 @@ const BibleProjectView = {
 
       html += `
         <div class="bp-poster-card ${isCurrentRange ? 'is-active-range' : ''}">
-          <div class="bp-poster-thumb-wrap loading" onclick="BibleProjectView.openPosterModal('${p.image_url}', '${p.pdf_url}', '${this.escapeHtml(p.title)}')">
+          <div class="bp-poster-thumb-wrap loading" onclick="BibleProjectView.openPosterModal('${p.image_url}')">
             <img src="${p.image_url}" class="bp-poster-thumb-img" alt="${this.escapeHtml(p.title)}" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('loading');" onerror="this.classList.add('loaded'); this.parentElement.classList.remove('loading');">
             <div class="bp-poster-zoom-overlay">
 
@@ -256,7 +256,7 @@ const BibleProjectView = {
           <div class="bp-poster-meta">
             <div class="bp-poster-title">${this.escapeHtml(p.title)}</div>
             <div class="bp-poster-actions-row">
-              <button type="button" class="bp-btn-view-poster" onclick="BibleProjectView.openPosterModal('${p.image_url}', '${p.pdf_url}', '${this.escapeHtml(p.title)}')">
+              <button type="button" class="bp-btn-view-poster" onclick="BibleProjectView.openPosterModal('${p.image_url}')">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                 <span>Visualiser</span>
               </button>
@@ -313,7 +313,7 @@ const BibleProjectView = {
         const isPlaying = this.currentPlayingYtId === w.yt_id;
 
         html += `
-          <div class="bp-word-card ${isPlaying ? 'is-playing' : ''}" onclick="BibleProjectView.playVideo('${w.yt_id}', '${this.escapeHtml(w.title)}', '${this.escapeHtml(w.description)}')">
+          <div class="bp-word-card ${isPlaying ? 'is-playing' : ''}" onclick="BibleProjectView.playVideo('${w.yt_id}')">
             <div class="bp-word-thumb">
               <img src="${thumbUrl}" alt="${this.escapeHtml(w.title)}" loading="lazy">
               <div class="bp-play-badge"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
@@ -397,7 +397,7 @@ const BibleProjectView = {
 
         html += `
           <div class="bp-theme-card ${isRelated ? 'is-related-theme' : ''} ${isPlaying ? 'is-playing' : ''}">
-            <div class="bp-theme-thumb-wrap" onclick="BibleProjectView.playVideo('${th.yt_id}', '${this.escapeHtml(th.title)}', '${this.escapeHtml(th.description)}')">
+            <div class="bp-theme-thumb-wrap" onclick="BibleProjectView.playVideo('${th.yt_id}')">
               <img src="${thumbUrl}" class="bp-theme-thumb-img" alt="${this.escapeHtml(th.title)}" loading="lazy">
               <div class="bp-play-badge">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -406,7 +406,7 @@ const BibleProjectView = {
               ${isRelated ? `<span class="bp-related-badge">Lié à ${this.currentBook}</span>` : ''}
             </div>
             <div class="bp-theme-meta">
-              <div class="bp-theme-title" onclick="BibleProjectView.playVideo('${th.yt_id}', '${this.escapeHtml(th.title)}', '${this.escapeHtml(th.description)}')">${this.escapeHtml(th.title)}</div>
+              <div class="bp-theme-title" onclick="BibleProjectView.playVideo('${th.yt_id}')">${this.escapeHtml(th.title)}</div>
               <div class="bp-theme-desc">${this.escapeHtml(th.description || '')}</div>
             </div>
           </div>
@@ -456,7 +456,7 @@ const BibleProjectView = {
 
     if (placeholder) {
       placeholder.innerHTML = `
-        <div class="bp-placeholder-preview" style="background-image: url('https://i.ytimg.com/vi/${ytId}/hqdefault.jpg')" onclick="BibleProjectView.playVideo('${ytId}', '${this.escapeHtml(title)}', '${this.escapeHtml(desc)}')">
+        <div class="bp-placeholder-preview" style="background-image: url('https://i.ytimg.com/vi/${ytId}/hqdefault.jpg')" onclick="BibleProjectView.playVideo('${ytId}')">
           <div class="bp-preview-play-btn">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
@@ -473,6 +473,26 @@ const BibleProjectView = {
 
   playVideo(ytId, title, desc) {
     this.currentPlayingYtId = ytId;
+    if (!title) {
+      const w = this.strongWordMap?.find(x => x.ytId === ytId);
+      if (w) {
+        title = w.title;
+        desc = w.description || `Analyse linguistique et biblique de ${w.title}`;
+      } else if (this.currentData?.videos) {
+        const v = this.currentData.videos.find(x => x.yt_id === ytId);
+        if (v) {
+          title = v.title;
+          desc = v.description;
+        }
+      }
+      if (!title && this.currentData?.themes) {
+        const th = this.currentData.themes.find(x => x.yt_id === ytId);
+        if (th) {
+          title = th.title;
+          desc = th.description;
+        }
+      }
+    }
     const placeholder = document.getElementById('bp-player-placeholder');
     const iframe = document.getElementById('bp-youtube-iframe');
     const infoBox = document.getElementById('bp-now-playing-info');
@@ -577,6 +597,13 @@ const BibleProjectView = {
   },
 
   openPosterModal(imageUrl, pdfUrl, title) {
+    if ((!pdfUrl || !title) && this.currentData?.posters) {
+      const p = this.currentData.posters.find(x => x.image_url === imageUrl);
+      if (p) {
+        pdfUrl = pdfUrl || p.pdf_url;
+        title = title || p.title;
+      }
+    }
     const modal = document.getElementById('bp-poster-modal');
     const titleEl = document.getElementById('bp-modal-poster-title');
     const dlBtn = document.getElementById('bp-poster-download-btn');

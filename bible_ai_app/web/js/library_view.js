@@ -99,14 +99,20 @@ const LibraryView = {
       const color = coverColors[Math.abs(this._hashCode(book.name)) % coverColors.length];
 
       const coverSrc = book.cover_data_url || book.cover_url || book.cover_path;
-      const safeTitle = (book.title || book.name || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      const previewTitle = (book.title || book.name || '').slice(0, 22);
+      const safeTitleAttr = this._escapeHtml(book.title || book.name || '');
+      const safeInitials = this._escapeHtml(initials);
+      const safePreviewTitle = this._escapeHtml(previewTitle);
+
       const coverHtml = coverSrc 
         ? `<div class="lib-cover has-img">
-             <img src="${coverSrc}" class="lib-cover-img" alt="${safeTitle}" onerror="this.style.display='none'; this.parentElement.classList.remove('has-img'); this.parentElement.style.backgroundColor='${color}'; this.parentElement.innerHTML='<span class=\\'cover-initials\\'>${initials}</span><span class=\\'cover-title-preview\\'>${safeTitle.slice(0, 22)}</span>';">
+             <img src="${this._escapeHtml(coverSrc)}" class="lib-cover-img" alt="${safeTitleAttr}"
+                  data-color="${color}" data-initials="${safeInitials}" data-title="${safePreviewTitle}"
+                  onerror="LibraryView.handleCoverError(this)">
            </div>`
         : `<div class="lib-cover" style="background-color: ${color};">
-             <span class="cover-initials">${initials}</span>
-             <span class="cover-title-preview">${safeTitle.slice(0, 22)}</span>
+             <span class="cover-initials">${safeInitials}</span>
+             <span class="cover-title-preview">${safePreviewTitle}</span>
            </div>`;
 
       card.innerHTML = `
@@ -262,6 +268,41 @@ const LibraryView = {
     if (typeof ImportModal !== 'undefined') {
       ImportModal.open(false);
     }
+  },
+
+  handleCoverError(img) {
+    if (!img || !img.parentElement) return;
+    const parent = img.parentElement;
+    const color = img.getAttribute('data-color') || '#1E293B';
+    const initials = img.getAttribute('data-initials') || 'B';
+    const title = img.getAttribute('data-title') || '';
+
+    img.style.display = 'none';
+    parent.classList.remove('has-img');
+    parent.style.backgroundColor = color;
+
+    parent.querySelectorAll('.cover-initials, .cover-title-preview').forEach(el => el.remove());
+
+    const initSpan = document.createElement('span');
+    initSpan.className = 'cover-initials';
+    initSpan.textContent = initials;
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'cover-title-preview';
+    titleSpan.textContent = title;
+
+    parent.appendChild(initSpan);
+    parent.appendChild(titleSpan);
+  },
+
+  _escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   },
 
   _hashCode(str) {

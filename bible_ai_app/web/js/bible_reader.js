@@ -3580,7 +3580,7 @@ const LexiconViewer = {
         <div style="font-size: 11.5px; font-weight: 700; color: #a855f7; margin-bottom: 14px;">Étude de mot BibleProject • ${bpStudy.orig || ''}</div>
         
         <div class="lex-bp-main-card">
-          <div class="lex-bp-main-thumb-wrap" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}', '${BibleProjectView.escapeHtml(bpStudy.title)}', '${BibleProjectView.escapeHtml(bpStudy.description)}')">
+          <div class="lex-bp-main-thumb-wrap" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}')">
             <img src="${bpStudy.thumbnail}" alt="${BibleProjectView.escapeHtml(bpStudy.title)}" loading="lazy">
             <div class="lex-bp-main-play-btn">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -3592,7 +3592,7 @@ const LexiconViewer = {
               ${BibleProjectView.escapeHtml(bpStudy.description || 'Découvrez la richesse et les nuances théologiques de ce terme dans les textes originaux.')}
             </p>
             <div style="margin-top: 14px; display: flex; gap: 8px;">
-              <button type="button" class="btn-primary" style="font-size: 12px; padding: 6px 14px; display: flex; align-items: center; gap: 6px;" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}', '${BibleProjectView.escapeHtml(bpStudy.title)}', '${BibleProjectView.escapeHtml(bpStudy.description)}')">
+              <button type="button" class="btn-primary" style="font-size: 12px; padding: 6px 14px; display: flex; align-items: center; gap: 6px;" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}')">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 <span>Lancer la vidéo dans Médias</span>
               </button>
@@ -4042,7 +4042,7 @@ const LexiconViewer = {
       const bpStudy = BibleProjectView.getWordStudyForStrong(strongCode, this.currentTerm);
       if (bpStudy) {
         bpVideoCardHtml = `
-          <div class="lex-bp-video-card" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}', '${BibleProjectView.escapeHtml(bpStudy.title)}', '${BibleProjectView.escapeHtml(bpStudy.description)}')" title="Regarder l'analyse vidéo BibleProject dans l'onglet Médias">
+          <div class="lex-bp-video-card" onclick="BibleProjectView.openAndPlayWordStudy('${bpStudy.ytId}')" title="Regarder l'analyse vidéo BibleProject dans l'onglet Médias">
             <div class="lex-bp-video-thumb">
               <img src="${bpStudy.thumbnail}" alt="${BibleProjectView.escapeHtml(bpStudy.title)}" loading="lazy">
               <div class="lex-bp-play-badge">
