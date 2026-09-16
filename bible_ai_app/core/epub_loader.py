@@ -267,6 +267,8 @@ class EpubLoader:
             is_part_regex = IS_PART_REGEX
 
             active_books_by_depth: Dict[int, Dict[str, str]] = {}
+            active_scopes_by_depth: Dict[int, str] = {}
+            current_section_scope: str = book_dominant_scope
             last_sibling_book: Optional[Dict[str, str]] = None
 
             classified_chapters = []
@@ -333,6 +335,16 @@ class EpubLoader:
                     for d in list(active_books_by_depth.keys()):
                         if d >= depth:
                             del active_books_by_depth[d]
+                    for d in list(active_scopes_by_depth.keys()):
+                        if d >= depth:
+                            del active_scopes_by_depth[d]
+
+                    # Mise à jour de la portée de section active lorsqu'une section/partie est rencontrée
+                    if is_section:
+                        if classification["corpus_scope"] in ["OT", "NT", "APOCRYPHA", "INTER"]:
+                            current_section_scope = classification["corpus_scope"]
+                        elif classification["corpus_scope"] == "GLOBAL" and depth == 0:
+                            current_section_scope = book_dominant_scope
 
                     is_continuation = bool(re.search(r'\b(part|partie|suite|tome|volume)\s*([2-9ivxlcdm]+)\b', norm_t, re.IGNORECASE))
 
@@ -370,8 +382,22 @@ class EpubLoader:
                         else:
                             last_sibling_book = None
 
-                    if classification["corpus_scope"] == "GLOBAL" and book_dominant_scope != "GLOBAL":
-                        classification["corpus_scope"] = book_dominant_scope
+                    # Enregistrement et propagation de la portée (scope)
+                    if classification["corpus_scope"] in ["OT", "NT", "APOCRYPHA", "INTER"]:
+                        active_scopes_by_depth[depth] = classification["corpus_scope"]
+                    elif classification["corpus_scope"] == "GLOBAL":
+                        # Recherche d'une portée parente dans un niveau hiérarchique supérieur (d < depth)
+                        parent_scope = None
+                        for d in sorted(active_scopes_by_depth.keys(), reverse=True):
+                            if d < depth:
+                                parent_scope = active_scopes_by_depth[d]
+                                break
+                        if parent_scope:
+                            classification["corpus_scope"] = parent_scope
+                        elif current_section_scope in ["OT", "NT", "APOCRYPHA", "INTER"]:
+                            classification["corpus_scope"] = current_section_scope
+                        elif book_dominant_scope != "GLOBAL":
+                            classification["corpus_scope"] = book_dominant_scope
                     if is_commentary and classification["source_type"] == "general" and classification["book_code"]:
                         classification["source_type"] = "commentary_verse"
                     elif is_archaeology and classification["source_type"] in ["general", "systematic_theology"]:
@@ -852,8 +878,25 @@ class EpubLoader:
             "son of god", "fils de dieu"
         ]
 
-        is_nt_theme = _has_word(["christ", "jesus", "messie", "messiah", "evangile", "gospel", "parole divine", "baptist", "baptiste", "son of man", "fils de l'homme", "apostle", "apotre"])
-        is_ot_theme = _has_word(["yahwe", "yahweh", "torah", "tanakh", "israel", "patriarch", "patriarchs", "patriarche", "patriarches", "prophet", "prophets", "prophete", "prophetes"])
+        is_nt_theme = _has_word([
+            "christ", "jesus", "messie", "messiah", "evangile", "evangiles", "gospel", "gospels", 
+            "parole divine", "baptist", "baptiste", "son of man", "fils de l'homme", "apostle", "apostles", 
+            "apotre", "apotres", "new covenant", "nouvelle alliance", "nouvel accord", "covenant of grace", 
+            "alliance de grace", "paul", "pauline", "paulinien", "paulinienne", "cross", "croix", 
+            "crucifixion", "resurrection", "résurrection", "pentecost", "pentecote", "pentecôte", 
+            "incarnation", "epistle", "epistles", "epitre", "epitres", "épître", "épîtres"
+        ])
+        is_ot_theme = _has_word([
+            "yahwe", "yahweh", "torah", "tanakh", "israel", "israël", "patriarch", "patriarchs", 
+            "patriarche", "patriarches", "prophet", "prophets", "prophete", "prophetes", "prophète", "prophètes", 
+            "old covenant", "ancienne alliance", "abraham", "isaac", "jacob", "exodus", "exode", 
+            "passover", "paque", "pâque", "red sea", "mer rouge", "sinai", "wilderness", "desert", 
+            "désert", "tabernacle", "ark of the covenant", "arche de l'alliance", "law of moses", 
+            "loi de moise", "loi de moïse", "giving of the law", "moses", "moise", "moïse", 
+            "promised land", "terre promise", "conquest", "conquete", "conquête", "judges", "juges", 
+            "monarchy", "monarchie", "david", "davidic", "solomon", "salomon", "exile", "babylon", 
+            "babylone", "first temple", "premier temple", "temple de salomon"
+        ])
 
         if _has_word(theol_keywords):
             sc = "NT" if is_nt_theme else ("OT" if is_ot_theme else default_scope)

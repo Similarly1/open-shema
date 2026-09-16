@@ -249,12 +249,23 @@ class PdfLoader:
                     classification["book_name"] = heur_cls.get("book_name")
                     classification["corpus_scope"] = heur_cls.get("corpus_scope", classification["corpus_scope"])
 
+            norm_t = strip_accents(ch_title)
+            is_sec = bool(ch.get("is_section_header", False))
+
             # Propagation contextuelle pour les sous-sections
             if classification["source_type"] not in ["appendix", "endnotes"]:
+                if is_sec:
+                    if classification["corpus_scope"] in ["OT", "NT", "APOCRYPHA", "INTER"]:
+                        current_active_scope = classification["corpus_scope"]
+                    elif classification["corpus_scope"] == "GLOBAL":
+                        current_active_scope = book_dominant_scope
+
                 if classification["book_code"]:
                     current_active_scope = classification["corpus_scope"]
                     current_active_book_code = classification["book_code"]
                     current_active_book_name = classification["book_name"]
+                elif classification["corpus_scope"] in ["OT", "NT", "APOCRYPHA", "INTER"]:
+                    current_active_scope = classification["corpus_scope"]
                 elif book_dominant_code:
                     classification["book_code"] = book_dominant_code
                     classification["book_name"] = book_dominant_name
@@ -281,8 +292,6 @@ class PdfLoader:
                         classification["book_code"] = current_active_book_code
                         classification["book_name"] = current_active_book_name
 
-            norm_t = strip_accents(ch_title)
-            is_sec = bool(ch.get("is_section_header", False))
             is_technical_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in TECHNICAL_BOILERPLATE_KEYWORDS)
             is_index_or_biblio = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in INDEX_BIBLIO_KEYWORDS)
 
