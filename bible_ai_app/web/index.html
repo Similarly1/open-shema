@@ -9652,6 +9652,47 @@
                   </div>
                 </div>
 
+                <!-- Section Classification & Portée RAG (visible en mode édition d'ouvrage) -->
+                <div class="edit-rag-section hidden" id="import-edit-rag-section" style="margin-top: 10px; padding: 9px 11px; border-radius: 8px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.22);">
+                  <div style="font-size: 11.5px; font-weight: 600; color: var(--accent-blue); display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="display: flex; align-items: center; gap: 5px;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                      <span>Classification Vectorielle RAG (Assistant IA)</span>
+                    </span>
+                    <span style="font-size: 10.5px; font-weight: normal; color: var(--text-muted);">Synchronisation automatique</span>
+                  </div>
+                  <div class="form-row two-cols">
+                    <div class="form-group">
+                      <label style="font-size: 11px;">Portée textuelle :</label>
+                      <select id="import-edit-rag-scope" class="select-field full-w" style="font-size: 11.5px;">
+                        <option value="GLOBAL">GLOBAL (Toute la Bible / Thème)</option>
+                        <option value="OT">AT (Ancien Testament)</option>
+                        <option value="NT">NT (Nouveau Testament)</option>
+                        <option value="BOTH">AT + NT (Les deux testaments)</option>
+                        <option value="INTER">INTER (Intertestamentaire)</option>
+                        <option value="APOCRYPHA">APO (Deutérocanoniques)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label style="font-size: 11px;">Type de source RAG :</label>
+                      <select id="import-edit-rag-stype" class="select-field full-w" style="font-size: 11.5px;">
+                        <option value="general">Général (Doctrine / Pastoral)</option>
+                        <option value="book_intro">Introduction de livre biblique</option>
+                        <option value="biblical_theology">Théologie biblique</option>
+                        <option value="systematic_theology">Théologie systématique</option>
+                        <option value="global_context">Contexte & Archéologie Global</option>
+                        <option value="ot_context">Contexte & Archéologie AT</option>
+                        <option value="nt_context">Contexte & Archéologie NT</option>
+                        <option value="commentary_verse">Commentaire verset par verset</option>
+                        <option value="dictionary">Dictionnaire / Définitions</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.3;">
+                    ⚡ Modifier la catégorie ou la portée synchronise immédiatement les fragments de cet ouvrage dans l'IA sans ré-indexation.
+                  </div>
+                </div>
+
               </div>
 
               <!-- Colonne Droite : Couverture & Outils -->

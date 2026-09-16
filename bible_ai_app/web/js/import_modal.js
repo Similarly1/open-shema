@@ -176,6 +176,42 @@ const ImportModal = {
       this.userModifiedRagType = false; // Réaligner automatiquement le type RAG
       this.syncStep4WithMetadata();
       this.checkForDuplicates();
+
+      if (this.isEditMode) {
+        const editRagSec = document.getElementById('import-edit-rag-section');
+        if (editRagSec) {
+          if (typeInput.value === 'Bible') {
+            editRagSec.classList.add('hidden');
+          } else {
+            editRagSec.classList.remove('hidden');
+          }
+        }
+      }
+    });
+
+    // Surveillance des modifications sur les champs RAG du mode Édition
+    document.getElementById('import-edit-rag-scope')?.addEventListener('change', () => {
+      const val = document.getElementById('import-edit-rag-scope').value;
+      const ragScope = document.getElementById('import-rag-scope');
+      if (ragScope) ragScope.value = val;
+      this.userModifiedRagScope = true;
+      const curType = document.getElementById('import-book-type')?.value;
+      if (curType === 'Archéologie & Histoire') {
+        const editStype = document.getElementById('import-edit-rag-stype');
+        const ragStype = document.getElementById('import-rag-stype');
+        let newStype = 'global_context';
+        if (val === 'NT') newStype = 'nt_context';
+        else if (val === 'OT') newStype = 'ot_context';
+        if (editStype) editStype.value = newStype;
+        if (ragStype) ragStype.value = newStype;
+      }
+    });
+
+    document.getElementById('import-edit-rag-stype')?.addEventListener('change', () => {
+      const val = document.getElementById('import-edit-rag-stype').value;
+      const ragStype = document.getElementById('import-rag-stype');
+      if (ragStype) ragStype.value = val;
+      this.userModifiedRagType = true;
     });
 
     // Surveillance des modifications manuelles sur les champs RAG de l'Étape 4
@@ -640,7 +676,17 @@ const ImportModal = {
         } else {
           stypeSelect.value = 'general';
         }
+        
+        const editStype = document.getElementById('import-edit-rag-stype');
+        if (editStype) editStype.value = stypeSelect.value;
       }
+    }
+    
+    // Assurer la synchronisation vers le sélecteur d'édition
+    const scVal = document.getElementById('import-rag-scope')?.value;
+    const editScopeEl = document.getElementById('import-edit-rag-scope');
+    if (editScopeEl && scVal && !this.userModifiedRagScope) {
+      editScopeEl.value = scVal;
     }
   },
 
@@ -789,10 +835,26 @@ const ImportModal = {
       document.getElementById('import-rag-bookcode').value = book.book_code || '';
       document.getElementById('import-rag-embed').value = book.embedding_model || 'bge_multilingual_gemma2 (Infomaniak)';
 
+      const editRagSec = document.getElementById('import-edit-rag-section');
+      if (editRagSec) {
+        if (book.type === 'Bible') {
+          editRagSec.classList.add('hidden');
+        } else {
+          editRagSec.classList.remove('hidden');
+          const editScope = document.getElementById('import-edit-rag-scope');
+          const editStype = document.getElementById('import-edit-rag-stype');
+          if (editScope) editScope.value = book.corpus_scope || 'GLOBAL';
+          if (editStype) editStype.value = book.source_type || 'general';
+        }
+      }
+
       this.updateCoverPreview(this.coverDataUrl || this.coverPath);
       this.updateResourceTypeUI(book.type || 'Théologie');
       this.goToStep(2);
     } else {
+      const editRagSec = document.getElementById('import-edit-rag-section');
+      if (editRagSec) editRagSec.classList.add('hidden');
+
       if (modalTitle) modalTitle.textContent = `Assistant d'Importation d'Ouvrages`;
       if (stepper) stepper.style.display = 'flex';
 
@@ -1684,8 +1746,12 @@ const ImportModal = {
       description: cleanHtml(document.getElementById('import-book-desc').value.trim()),
       type: document.getElementById('import-book-type').value,
       year: document.getElementById('import-book-year').value.trim(),
-      corpus_scope: document.getElementById('import-rag-scope').value,
-      source_type: document.getElementById('import-rag-stype').value,
+      corpus_scope: (this.isEditMode && document.getElementById('import-edit-rag-scope'))
+        ? document.getElementById('import-edit-rag-scope').value
+        : document.getElementById('import-rag-scope').value,
+      source_type: (this.isEditMode && document.getElementById('import-edit-rag-stype'))
+        ? document.getElementById('import-edit-rag-stype').value
+        : document.getElementById('import-rag-stype').value,
       book_code: document.getElementById('import-rag-bookcode').value || null,
       embedding_model: document.getElementById('import-rag-embed').value,
       file_path: this.filePath,
@@ -1718,7 +1784,11 @@ const ImportModal = {
         
         if (this.isEditMode) {
           this.close();
-          App.showToast('Métadonnées enregistrées avec succès !', 'success');
+          const syncCount = res.synced_chunks || 0;
+          const msg = syncCount > 0
+            ? `Métadonnées enregistrées (${syncCount} fragments mis à jour dans l'IA) !`
+            : 'Métadonnées enregistrées avec succès !';
+          App.showToast(msg, 'success');
           if (typeof LibraryView !== 'undefined' && typeof LibraryView.loadBooks === 'function') {
             LibraryView.loadBooks();
           }

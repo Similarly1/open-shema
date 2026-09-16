@@ -10,6 +10,10 @@ from core.bible_json_loader import BibleJsonLoader
 
 class VectorDB:
     def __init__(self, persist_directory="./data/chroma_db", api_keys=None):
+        if persist_directory == "./data/chroma_db" or not persist_directory:
+            app_data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "chroma_db")
+            if os.path.exists(app_data_dir) or not os.path.exists("./data/chroma_db"):
+                persist_directory = app_data_dir
         os.makedirs(persist_directory, exist_ok=True)
         self.client = chromadb.PersistentClient(
             path=persist_directory,

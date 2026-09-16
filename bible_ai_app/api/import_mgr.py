@@ -882,14 +882,91 @@ class ImportMixin:
         registry = load_books_metadata()
         
         if edit_mode:
+            old_meta = registry.get(old_name, {})
+            merged_meta = dict(old_meta)
+            for k, v in metadata.items():
+                if v is not None and v != "":
+                    merged_meta[k] = v
+                elif k not in merged_meta:
+                    merged_meta[k] = v
+            
             if old_name != name and old_name in registry:
                 del registry[old_name]
-            if name in registry:
-                registry[name].update(metadata)
-            else:
-                registry[name] = metadata
+            registry[name] = merged_meta
             save_books_metadata(registry)
-            return {"success": True, "edited": True, "name": name}
+
+            # Synchronisation immédiate des métadonnées des fragments dans ChromaDB
+            updated_chunks_count = 0
+            try:
+                from core.database import VectorDB
+                db = VectorDB(api_keys=self.config)
+                
+                models_to_check = [
+                    merged_meta.get("embedding_model"),
+                    old_meta.get("embedding_model"),
+                    "bge_multilingual_gemma2 (Infomaniak)",
+                    "gemini-embedding-2",
+                    "study_library"
+                ]
+                seen_colls = set()
+                names_to_match = list(set(filter(None, [old_name, name])))
+                
+                for mod in models_to_check:
+                    if not mod:
+                        continue
+                    try:
+                        coll = db.get_collection(mod)
+                        if coll.name in seen_colls:
+                            continue
+                        seen_colls.add(coll.name)
+                        
+                        for n in names_to_match:
+                            existing = coll.get(where={"name": n}, include=["metadatas"])
+                            if existing and existing.get("ids"):
+                                c_ids = existing["ids"]
+                                c_metas = existing["metadatas"]
+                                new_metas = []
+                                for m in c_metas:
+                                    cm = dict(m)
+                                    cm["name"] = name
+                                    cm["title"] = merged_meta.get("title", name)
+                                    if merged_meta.get("author"):
+                                        cm["author"] = merged_meta.get("author")
+                                    if merged_meta.get("type"):
+                                        cm["type"] = merged_meta.get("type")
+                                    if merged_meta.get("corpus_scope"):
+                                        cm["corpus_scope"] = merged_meta.get("corpus_scope")
+                                    if merged_meta.get("source_type"):
+                                        cm["source_type"] = merged_meta.get("source_type")
+                                    if merged_meta.get("book_code") is not None:
+                                        cm["book_code"] = merged_meta.get("book_code")
+                                    new_metas.append(cm)
+                                
+                                batch_size = 500
+                                for b_i in range(0, len(c_ids), batch_size):
+                                    coll.update(
+                                        ids=c_ids[b_i:b_i + batch_size],
+                                        metadatas=new_metas[b_i:b_i + batch_size]
+                                    )
+                                updated_chunks_count += len(c_ids)
+                                logger.info(f"[ChromaDB] Métadonnées de {len(c_ids)} fragments synchronisées pour '{name}' dans {coll.name}")
+                    except Exception as ce:
+                        logger.warning(f"Erreur vérification collection {mod}: {ce}")
+            except Exception as e:
+                logger.error(f"Erreur synchronisation ChromaDB en mode édition : {e}", exc_info=True)
+
+            try:
+                from core.theology_reader_manager import TheologyReaderManager
+                TheologyReaderManager.invalidate_cache()
+            except Exception:
+                pass
+
+            return {
+                "success": True, 
+                "edited": True, 
+                "name": name, 
+                "synced_chunks": updated_chunks_count
+            }
             
         file_path = payload.get("file_path", "")
         if not file_path or not os.path.exists(file_path):
