@@ -27,6 +27,7 @@ from core.epub_loader import (
     TECHNICAL_BOILERPLATE_KEYWORDS, 
     INTRO_KEYWORDS, 
     APPENDIX_KEYWORDS, 
+    INDEX_BIBLIO_KEYWORDS,
     IS_PART_REGEX
 )
 
@@ -283,6 +284,7 @@ class PdfLoader:
             norm_t = strip_accents(ch_title)
             is_sec = bool(ch.get("is_section_header", False))
             is_technical_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in TECHNICAL_BOILERPLATE_KEYWORDS)
+            is_index_or_biblio = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in INDEX_BIBLIO_KEYWORDS)
 
             include_default = True
             if is_sec:
@@ -290,10 +292,13 @@ class PdfLoader:
                 classification["source_type"] = "general"
             elif is_technical_boilerplate or classification["source_type"] == "endnotes":
                 include_default = False
+            elif is_index_or_biblio:
+                include_default = False
+                classification["source_type"] = "appendix"
             elif classification["source_type"] == "book_intro":
                 include_default = True
             elif classification["source_type"] == "appendix":
-                # Annexe utile (abréviations, contributeurs, bibliographie)
+                # Annexe utile (abréviations, études thématiques)
                 include_default = char_count > 30 or total_pages <= 3
             elif char_count < 30 and total_pages > 3:
                 include_default = False

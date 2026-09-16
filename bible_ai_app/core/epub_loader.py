@@ -86,15 +86,21 @@ INTRO_KEYWORDS = [
 APPENDIX_KEYWORDS = [
     "abbreviations", "abreviations", "contributors", "contributeurs", 
     "remerciements", "acknowledgments", "dedicace", "dedication", 
-    "bibliographie", "bibliography", "index", "author index", "subject index",
-    "master index", "cartes", "maps", "tableaux", "charts", "chronologie", "timeline",
+    "cartes", "maps", "tableaux", "charts", "chronologie", "timeline",
     "timelines", "reading plan", "plan de lecture", "concordance", "glossaire", "glossary",
     "questionnaire", "credits", "notes d'etude", "study notes", "cross-references",
-    "references croisees", "features of", "works cited", "works-cited"
+    "references croisees", "features of"
+]
+
+# Mots-clés pour les index alphabétiques et bibliographies brutes (décochés par défaut pour éviter la pollution RAG)
+INDEX_BIBLIO_KEYWORDS = [
+    "index", "indices", "author index", "authors index", "subject index", "subjects index",
+    "scripture index", "general index", "master index", "ancient sources", "sources index",
+    "bibliographie", "bibliography", "works cited", "works-cited", "ouvrages cites"
 ]
 
 # Rétrocompatibilité : ensemble complet des pages annexes/front-matter
-BOILERPLATE_KEYWORDS = TECHNICAL_BOILERPLATE_KEYWORDS + INTRO_KEYWORDS + APPENDIX_KEYWORDS
+BOILERPLATE_KEYWORDS = TECHNICAL_BOILERPLATE_KEYWORDS + INTRO_KEYWORDS + APPENDIX_KEYWORDS + INDEX_BIBLIO_KEYWORDS
 
 class EpubLoader:
     """
@@ -376,19 +382,23 @@ class EpubLoader:
                         else:
                             classification["source_type"] = "global_context"
                 
-                # Déterminer si inclus par défaut
                 is_technical_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in TECHNICAL_BOILERPLATE_KEYWORDS)
+                is_index_or_biblio = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in INDEX_BIBLIO_KEYWORDS)
                 
                 # Règle d'inclusion par défaut :
                 # - Les sections / parties sont TOUJOURS incluses pour préserver la structure
-                # - Le boilerplate technique (copyright, couv, table des matières) est décoché d'office
+                # - Le boilerplate technique (copyright, couverture, table des matières) est décoché d'office
+                # - Les index alphabétiques et bibliographies sont décochés d'office (inutiles / polluants pour l'IA)
                 # - Les notes de fin sont décochées d'office
-                # - Les introductions, annexes utiles (abréviations, contributeurs) et chapitres de contenu sont cochés d'office
+                # - Les introductions, préfaces, annexes d'études thématiques et chapitres de contenu sont cochés d'office
                 if is_section:
                     include_default = True
                     classification["source_type"] = "general"
                 elif is_technical_boilerplate or classification["source_type"] == "endnotes":
                     include_default = False
+                elif is_index_or_biblio:
+                    include_default = False
+                    classification["source_type"] = "appendix"
                 elif classification["source_type"] == "book_intro":
                     include_default = True
                 elif classification["book_code"] is not None:
@@ -684,8 +694,12 @@ class EpubLoader:
         if _has_word(INTRO_KEYWORDS):
             return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "book_intro"}
 
-        # 1c. Annexes et outils de référence (Abréviations, Contributeurs, Bibliographie, Index...)
+        # 1c. Annexes et outils de référence (Abréviations, Cartes, Chronologies...)
         if _has_word(APPENDIX_KEYWORDS):
+            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
+
+        # 1d. Index alphabétiques et Bibliographies
+        if _has_word(INDEX_BIBLIO_KEYWORDS):
             return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
 
         # 2. Détection prioritaire des introductions de groupes de livres (sections globales)
