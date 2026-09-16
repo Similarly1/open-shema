@@ -41,6 +41,114 @@ BOOKS_DEUTERO = [
 
 ALL_BOOKS = BOOKS_OT + BOOKS_NT + BOOKS_DEUTERO
 
+# Groupes et ensembles canoniques (Option B : Complète / Avancée)
+CANONICAL_GROUPS = {
+    # Ancien Testament
+    "GRP_PENTATEUCH": {
+        "name": "Pentateuque / Torah (Genèse à Deutéronome)",
+        "scope": "OT",
+        "testament": "OT",
+        "books": ["Gen", "Exo", "Lev", "Num", "Deu"]
+    },
+    "GRP_OT_HISTORICAL": {
+        "name": "Livres Historiques (Josué à Esther)",
+        "scope": "OT",
+        "testament": "OT",
+        "books": ["Jos", "Jdg", "Rut", "1Sa", "2Sa", "1Ki", "2Ki", "1Ch", "2Ch", "Ezr", "Neh", "Est"]
+    },
+    "GRP_WISDOM": {
+        "name": "Livres Poétiques & Sagesse (Job à Cantique)",
+        "scope": "OT",
+        "testament": "OT",
+        "books": ["Job", "Psa", "Pro", "Ecc", "Sol"]
+    },
+    "GRP_PROPHETS_ALL": {
+        "name": "Tous les Prophètes (Ésaïe à Malachie)",
+        "scope": "OT",
+        "testament": "OT",
+        "books": ["Isa", "Jer", "Lam", "Eze", "Dan", "Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal"]
+    },
+    "GRP_MAJOR_PROPHETS": {
+        "name": "Grands Prophètes (Ésaïe à Daniel)",
+        "scope": "OT",
+        "testament": "OT",
+        "books": ["Isa", "Jer", "Lam", "Eze", "Dan"]
+    },
+    "GRP_MINOR_PROPHETS": {
+        "name": "Petits Prophètes / Les Douze (Osée à Malachie)",
+        "scope": "OT",
+        "testament": "OT",
+        "books": ["Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal"]
+    },
+    # Nouveau Testament
+    "GRP_GOSPELS": {
+        "name": "Les 4 Évangiles (Matthieu à Jean)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["Mat", "Mar", "Luk", "Joh"]
+    },
+    "GRP_SYNOPTICS": {
+        "name": "Évangiles Synoptiques (Matthieu, Marc, Luc)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["Mat", "Mar", "Luk"]
+    },
+    "GRP_GOSPELS_ACTS": {
+        "name": "Évangiles et Actes (Matthieu aux Actes)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["Mat", "Mar", "Luk", "Joh", "Act"]
+    },
+    "GRP_PAULINE": {
+        "name": "Épîtres Pauliniennes (Romains à Philémon)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["Rom", "1Co", "2Co", "Gal", "Eph", "Phi", "Col", "1Th", "2Th", "1Ti", "2Ti", "Tit", "Phm"]
+    },
+    "GRP_PASTORAL": {
+        "name": "Épîtres Pastorales (1-2 Timothée, Tite)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["1Ti", "2Ti", "Tit"]
+    },
+    "GRP_PRISON": {
+        "name": "Épîtres de la Captivité (Éphésiens à Philémon)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["Eph", "Phi", "Col", "Phm"]
+    },
+    "GRP_GENERAL_EPISTLES": {
+        "name": "Épîtres Générales / Catholiques (Hébreux à Jude)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["Heb", "Jam", "1Pe", "2Pe", "1Jo", "2Jo", "3Jo", "Jud"]
+    },
+    "GRP_JOHANNINE": {
+        "name": "Écrits Johanniques (Jean, 1-2-3 Jean, Apocalypse)",
+        "scope": "NT",
+        "testament": "NT",
+        "books": ["Joh", "1Jo", "2Jo", "3Jo", "Rev"]
+    }
+}
+
+def get_books_for_group(group_code: str) -> list:
+    """Retourne la liste des codes standards des livres appartenant à un groupe canonique."""
+    if not group_code:
+        return []
+    grp = CANONICAL_GROUPS.get(group_code)
+    return grp["books"] if grp else []
+
+def get_groups_for_book(book_code: str) -> list:
+    """Retourne la liste des codes de groupes contenant un livre donné."""
+    if not book_code:
+        return []
+    std_code = book_code.strip()
+    return [g_code for g_code, g_info in CANONICAL_GROUPS.items() if std_code in g_info.get("books", [])]
+
+def is_canonical_group(code: str) -> bool:
+    """Indique si un code correspond à un ensemble canonique multi-livres."""
+    return bool(code and code in CANONICAL_GROUPS)
+
 # Mapping des noms et abréviations vers les codes standards
 BOOK_MAPPING_RAW = {
     # Ancien Testament
@@ -139,11 +247,16 @@ BOOK_MAPPING_RAW = {
 BOOK_MAPPING = {strip_accents(k): v for k, v in BOOK_MAPPING_RAW.items()}
 
 def get_standard_book_code(book_name_or_code: str) -> str:
-    """Retourne le code standard (ex: 'Joh') pour n'importe quelle entrée."""
-    key = strip_accents(book_name_or_code)
+    """Retourne le code standard (ex: 'Joh', 'GRP_PAULINE') pour n'importe quelle entrée."""
+    if not book_name_or_code:
+        return ""
+    str_code = str(book_name_or_code).strip()
+    if str_code.startswith("GRP_"):
+        return str_code
+    key = strip_accents(str_code)
     # Remplacer les espaces multiples
     key = re.sub(r'\s+', ' ', key)
-    return BOOK_MAPPING.get(key, book_name_or_code.capitalize())
+    return BOOK_MAPPING.get(key, str_code.capitalize())
 
 def normalize_reference(user_input: str) -> str:
     """
@@ -278,13 +391,17 @@ REVERSE_BOOK_MAPPING = {
 }
 
 def get_french_book_name(book_code: str) -> str:
+    if not book_code:
+        return ""
+    if book_code in CANONICAL_GROUPS:
+        return CANONICAL_GROUPS[book_code]["name"]
     return REVERSE_BOOK_MAPPING.get(book_code, book_code)
 
 def is_valid_book_code(book_code: str) -> bool:
-    """Vérifie si le code correspond à un livre biblique canonique ou deutérocanonique reconnu."""
+    """Vérifie si le code correspond à un livre biblique canonique ou à un ensemble canonique reconnu."""
     if not book_code:
         return False
-    return book_code in REVERSE_BOOK_MAPPING
+    return book_code in REVERSE_BOOK_MAPPING or book_code in CANONICAL_GROUPS
 
 
 def resolve_book_input(query: str, all_books: list = None) -> str:

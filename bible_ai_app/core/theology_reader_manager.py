@@ -50,6 +50,13 @@ class TheologyReaderManager:
         cls._passage_theology_cache.clear()
         cls._bible_book_index = None
         try:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            cache_path = os.path.join(base_dir, "data", "cache", "theology_bible_book_index.json")
+            if os.path.exists(cache_path):
+                os.remove(cache_path)
+        except Exception as _silent_e:
+            logger.debug("Erreur purge index disque : %s", _silent_e)
+        try:
             from core.epub_loader import EpubLoader
             EpubLoader.invalidate_cache()
         except Exception as _silent_e:
@@ -1001,7 +1008,7 @@ Règles de style :
             except Exception as _silent_e:
                 logger.debug("Erreur ignoree : %s", _silent_e)
 
-        from core.reference_parser import get_standard_book_code, get_french_book_name
+        from core.reference_parser import get_standard_book_code, get_french_book_name, CANONICAL_GROUPS, get_books_for_group
         from api._utils import get_cover_data_url
 
         index = {}
@@ -1023,10 +1030,18 @@ Règles de style :
                 cov_p = b_meta.get("cover_path")
                 cov_url = get_cover_data_url(cov_p) if (cov_p and get_cover_data_url) else None
 
+                b_code_global = b_meta.get("book_code")
+                global_grp_books = []
+                if b_code_global:
+                    if b_code_global in CANONICAL_GROUPS:
+                        global_grp_books = [b.upper() for b in CANONICAL_GROUPS[b_code_global]["books"]]
+                    else:
+                        global_grp_books = [(get_standard_book_code(b_code_global) or b_code_global).upper()]
+
                 for ch in toc_data.get("chapters", []):
                     if ch.get("is_section_header"):
                         continue
-                    ch_bcode = (ch.get("book_code") or "").upper()
+                    ch_bcode = ch.get("book_code") or ""
                     ch_title = ch.get("title", "")
                     cid = ch.get("chapter_id", 1)
 
@@ -1041,9 +1056,22 @@ Règles de style :
                     }
 
                     if ch_bcode:
-                        if ch_bcode not in index:
-                            index[ch_bcode] = []
-                        index[ch_bcode].append(item)
+                        if ch_bcode in CANONICAL_GROUPS:
+                            for gb in CANONICAL_GROUPS[ch_bcode]["books"]:
+                                gb_u = gb.upper()
+                                if gb_u not in index:
+                                    index[gb_u] = []
+                                index[gb_u].append(item)
+                        else:
+                            norm_ch_code = (get_standard_book_code(ch_bcode) or ch_bcode).upper()
+                            if norm_ch_code not in index:
+                                index[norm_ch_code] = []
+                            index[norm_ch_code].append(item)
+                    elif global_grp_books:
+                        for gb_u in global_grp_books:
+                            if gb_u not in index:
+                                index[gb_u] = []
+                            index[gb_u].append(item)
                     else:
                         for code, fr_name in [("GEN", "Genèse"), ("EXO", "Exode"), ("LEV", "Lévitique"), ("NUM", "Nombres"), ("DEU", "Deutéronome"),
                                               ("MAT", "Matthieu"), ("MRK", "Marc"), ("LUK", "Luc"), ("JHN", "Jean"), ("ACT", "Actes"),

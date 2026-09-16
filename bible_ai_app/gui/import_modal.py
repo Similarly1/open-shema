@@ -10,7 +10,7 @@ from core.bible_json_loader import BibleJsonLoader
 from core.epub_loader import EpubLoader
 from core.pdf_loader import PdfLoader
 from core.book_classifier import BookClassifier
-from core.reference_parser import REVERSE_BOOK_MAPPING, BOOK_MAPPING
+from core.reference_parser import REVERSE_BOOK_MAPPING, BOOK_MAPPING, CANONICAL_GROUPS
 from gui.google_books_picker import BookMetadataPickerModal
 
 class ImportTab(ctk.CTkScrollableFrame):
@@ -236,12 +236,18 @@ class ImportTab(ctk.CTkScrollableFrame):
         lbl_bcode.pack(anchor="w")
         
         bible_book_options = ["(Aucun - Thème transversal ou multi-livres)"]
+        # Ensembles canoniques
+        for g_code, g_info in CANONICAL_GROUPS.items():
+            bible_book_options.append(f"{g_code} - {g_info['name']}")
+        # Livres individuels
         for code, fr_name in sorted(REVERSE_BOOK_MAPPING.items(), key=lambda x: x[1]):
             bible_book_options.append(f"{code} - {fr_name}")
             
         cur_bcode = self.edit_meta.get("book_code")
         default_bcode_val = "(Aucun - Thème transversal ou multi-livres)"
-        if cur_bcode and cur_bcode in REVERSE_BOOK_MAPPING:
+        if cur_bcode and cur_bcode in CANONICAL_GROUPS:
+            default_bcode_val = f"{cur_bcode} - {CANONICAL_GROUPS[cur_bcode]['name']}"
+        elif cur_bcode and cur_bcode in REVERSE_BOOK_MAPPING:
             default_bcode_val = f"{cur_bcode} - {REVERSE_BOOK_MAPPING[cur_bcode]}"
             
         self.book_code_var = ctk.StringVar(value=default_bcode_val)
@@ -487,7 +493,9 @@ class ImportTab(ctk.CTkScrollableFrame):
             self.source_type_var.set(res["source_type"])
         if "book_code" in res:
             b_code = res["book_code"]
-            if b_code and b_code in REVERSE_BOOK_MAPPING:
+            if b_code and b_code in CANONICAL_GROUPS:
+                self.book_code_var.set(f"{b_code} - {CANONICAL_GROUPS[b_code]['name']}")
+            elif b_code and b_code in REVERSE_BOOK_MAPPING:
                 self.book_code_var.set(f"{b_code} - {REVERSE_BOOK_MAPPING[b_code]}")
             else:
                 self.book_code_var.set("(Aucun - Thème transversal ou multi-livres)")

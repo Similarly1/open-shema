@@ -261,14 +261,38 @@ const ImportModal = {
       }
     });
 
+    const resolveScopeFromBookCode = (bCode) => {
+      if (!bCode) return null;
+      if (typeof CANONICAL_GROUPS !== 'undefined') {
+        const grp = CANONICAL_GROUPS.find(g => g.code === bCode);
+        if (grp) return grp.scope;
+      }
+      if (typeof CANONICAL_BOOKS !== 'undefined') {
+        const idx = CANONICAL_BOOKS.findIndex(b => b.code.toLowerCase() === bCode.toLowerCase());
+        if (idx !== -1) return idx < 39 ? 'OT' : 'NT';
+      }
+      return null;
+    };
+
     document.getElementById('import-rag-bookcode')?.addEventListener('change', () => {
       this.userModifiedRagBook = true;
       const bCode = document.getElementById('import-rag-bookcode')?.value;
-      if (bCode && !this.userModifiedRagScope && typeof CANONICAL_BOOKS !== 'undefined') {
-        const idx = CANONICAL_BOOKS.findIndex(b => b.code.toLowerCase() === bCode.toLowerCase());
-        if (idx !== -1) {
+      if (bCode && !this.userModifiedRagScope) {
+        const deducedScope = resolveScopeFromBookCode(bCode);
+        if (deducedScope) {
           const scSelect = document.getElementById('import-rag-scope');
-          if (scSelect) scSelect.value = idx < 39 ? 'OT' : 'NT';
+          if (scSelect) scSelect.value = deducedScope;
+        }
+      }
+    });
+
+    document.getElementById('import-edit-rag-bookcode')?.addEventListener('change', () => {
+      const bCode = document.getElementById('import-edit-rag-bookcode')?.value;
+      if (bCode) {
+        const deducedScope = resolveScopeFromBookCode(bCode);
+        if (deducedScope) {
+          const scSelect = document.getElementById('import-edit-rag-scope');
+          if (scSelect) scSelect.value = deducedScope;
         }
       }
     });
@@ -642,10 +666,18 @@ const ImportModal = {
       const scopeSelect = document.getElementById('import-rag-scope');
       
       if (scopeSelect) {
-        if (currentBookCode && typeof CANONICAL_BOOKS !== 'undefined') {
-          const idx = CANONICAL_BOOKS.findIndex(b => b.code.toLowerCase() === currentBookCode.toLowerCase());
-          if (idx !== -1) {
-            scopeSelect.value = idx < 39 ? 'OT' : 'NT';
+        if (currentBookCode) {
+          let deducedScope = null;
+          if (typeof CANONICAL_GROUPS !== 'undefined') {
+            const grp = CANONICAL_GROUPS.find(g => g.code === currentBookCode);
+            if (grp) deducedScope = grp.scope;
+          }
+          if (!deducedScope && typeof CANONICAL_BOOKS !== 'undefined') {
+            const idx = CANONICAL_BOOKS.findIndex(b => b.code.toLowerCase() === currentBookCode.toLowerCase());
+            if (idx !== -1) deducedScope = idx < 39 ? 'OT' : 'NT';
+          }
+          if (deducedScope) {
+            scopeSelect.value = deducedScope;
           }
         } else {
           // Analyser les chapitres actifs
@@ -818,18 +850,52 @@ const ImportModal = {
   },
 
   populateBookDropdown() {
-    const select = document.getElementById('import-rag-bookcode');
-    if (!select) return;
-    select.innerHTML = `<option value="">(Aucun - Thème transversal ou multi-livres)</option>`;
-    
-    if (typeof CANONICAL_BOOKS !== 'undefined') {
-      CANONICAL_BOOKS.forEach(b => {
-        const opt = document.createElement('option');
-        opt.value = b.code;
-        opt.textContent = `${b.code} - ${b.name}`;
-        select.appendChild(opt);
-      });
-    }
+    const selects = [
+      document.getElementById('import-rag-bookcode'),
+      document.getElementById('import-edit-rag-bookcode')
+    ].filter(Boolean);
+
+    selects.forEach(select => {
+      let html = `<option value="">(Aucun - Thème transversal ou multi-livres)</option>`;
+
+      if (typeof CANONICAL_GROUPS !== 'undefined') {
+        const otGroups = CANONICAL_GROUPS.filter(g => g.scope === 'OT');
+        if (otGroups.length > 0) {
+          html += `<optgroup label="📚 Ensembles canoniques - Ancien Testament">`;
+          otGroups.forEach(g => {
+            html += `<option value="${g.code}">${g.name}</option>`;
+          });
+          html += `</optgroup>`;
+        }
+
+        const ntGroups = CANONICAL_GROUPS.filter(g => g.scope === 'NT');
+        if (ntGroups.length > 0) {
+          html += `<optgroup label="✝️ Ensembles canoniques - Nouveau Testament">`;
+          ntGroups.forEach(g => {
+            html += `<option value="${g.code}">${g.name}</option>`;
+          });
+          html += `</optgroup>`;
+        }
+      }
+
+      if (typeof CANONICAL_BOOKS !== 'undefined') {
+        const otBooks = CANONICAL_BOOKS.slice(0, 39);
+        html += `<optgroup label="📜 Livres individuels - Ancien Testament">`;
+        otBooks.forEach(b => {
+          html += `<option value="${b.code}">${b.code} - ${b.name}</option>`;
+        });
+        html += `</optgroup>`;
+
+        const ntBooks = CANONICAL_BOOKS.slice(39);
+        html += `<optgroup label="📖 Livres individuels - Nouveau Testament">`;
+        ntBooks.forEach(b => {
+          html += `<option value="${b.code}">${b.code} - ${b.name}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+
+      select.innerHTML = html;
+    });
   },
 
   async open(editMode = false, book = null) {
@@ -852,8 +918,11 @@ const ImportModal = {
       this.installedBooksList = [];
     }
 
+    // Peupler les sélecteurs de livres / ensembles canoniques
+    this.populateBookDropdown();
+
     const modalTitle = document.getElementById('import-modal-title');
-    const stepper = document.getElementById('import-wizard-stepper');
+    const stepper = document.querySelector('.import-stepper');
     const cancelBtn = document.getElementById('btn-cancel-import-modal');
     if (cancelBtn) cancelBtn.classList.remove('hidden');
 
@@ -881,8 +950,10 @@ const ImportModal = {
           editRagSec.classList.remove('hidden');
           const editScope = document.getElementById('import-edit-rag-scope');
           const editStype = document.getElementById('import-edit-rag-stype');
+          const editBk = document.getElementById('import-edit-rag-bookcode');
           if (editScope) editScope.value = book.corpus_scope || 'GLOBAL';
           if (editStype) editStype.value = book.source_type || 'general';
+          if (editBk) editBk.value = book.book_code || '';
         }
       }
 
@@ -1819,7 +1890,9 @@ const ImportModal = {
       source_type: (this.isEditMode && document.getElementById('import-edit-rag-stype'))
         ? document.getElementById('import-edit-rag-stype').value
         : document.getElementById('import-rag-stype').value,
-      book_code: document.getElementById('import-rag-bookcode').value || null,
+      book_code: (this.isEditMode && document.getElementById('import-edit-rag-bookcode'))
+        ? (document.getElementById('import-edit-rag-bookcode').value || null)
+        : (document.getElementById('import-rag-bookcode').value || null),
       embedding_model: document.getElementById('import-rag-embed').value,
       file_path: this.filePath,
       cover_path: this.coverPath,

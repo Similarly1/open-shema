@@ -1206,7 +1206,8 @@ class ImportMixin:
                             "chunk_id": f"{name}_ch_{i}",
                             "type": metadata.get("type", "Théologie"),
                             "corpus_scope": metadata.get("corpus_scope", "GLOBAL"),
-                            "source_type": metadata.get("source_type", "general")
+                            "source_type": metadata.get("source_type", "general"),
+                            "book_code": metadata.get("book_code")
                         }
                     })
             except Exception as e:

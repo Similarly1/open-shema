@@ -76,6 +76,96 @@ const CANONICAL_BOOKS = [
   { name: "Apocalypse", code: "Rev", abbr: "Ap", chapters: 22 }
 ];
 
+// 1b. GROUPES ET ENSEMBLES CANONIQUES (Option B : Complète / Avancée)
+const CANONICAL_GROUPS = [
+  // Ancien Testament
+  {
+    code: "GRP_PENTATEUCH",
+    name: "Pentateuque / Torah (Genèse à Deutéronome)",
+    scope: "OT",
+    books: ["Gen", "Exo", "Lev", "Num", "Deu"]
+  },
+  {
+    code: "GRP_OT_HISTORICAL",
+    name: "Livres Historiques (Josué à Esther)",
+    scope: "OT",
+    books: ["Jos", "Jdg", "Rut", "1Sa", "2Sa", "1Ki", "2Ki", "1Ch", "2Ch", "Ezr", "Neh", "Est"]
+  },
+  {
+    code: "GRP_WISDOM",
+    name: "Livres Poétiques & Sagesse (Job à Cantique)",
+    scope: "OT",
+    books: ["Job", "Psa", "Pro", "Ecc", "Sol"]
+  },
+  {
+    code: "GRP_PROPHETS_ALL",
+    name: "Tous les Prophètes (Ésaïe à Malachie)",
+    scope: "OT",
+    books: ["Isa", "Jer", "Lam", "Eze", "Dan", "Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal"]
+  },
+  {
+    code: "GRP_MAJOR_PROPHETS",
+    name: "Grands Prophètes (Ésaïe à Daniel)",
+    scope: "OT",
+    books: ["Isa", "Jer", "Lam", "Eze", "Dan"]
+  },
+  {
+    code: "GRP_MINOR_PROPHETS",
+    name: "Petits Prophètes / Les Douze (Osée à Malachie)",
+    scope: "OT",
+    books: ["Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal"]
+  },
+  // Nouveau Testament
+  {
+    code: "GRP_GOSPELS",
+    name: "Les 4 Évangiles (Matthieu à Jean)",
+    scope: "NT",
+    books: ["Mat", "Mar", "Luk", "Joh"]
+  },
+  {
+    code: "GRP_SYNOPTICS",
+    name: "Évangiles Synoptiques (Matthieu, Marc, Luc)",
+    scope: "NT",
+    books: ["Mat", "Mar", "Luk"]
+  },
+  {
+    code: "GRP_GOSPELS_ACTS",
+    name: "Évangiles et Actes (Matthieu aux Actes)",
+    scope: "NT",
+    books: ["Mat", "Mar", "Luk", "Joh", "Act"]
+  },
+  {
+    code: "GRP_PAULINE",
+    name: "Épîtres Pauliniennes (Romains à Philémon)",
+    scope: "NT",
+    books: ["Rom", "1Co", "2Co", "Gal", "Eph", "Phi", "Col", "1Th", "2Th", "1Ti", "2Ti", "Tit", "Phm"]
+  },
+  {
+    code: "GRP_PASTORAL",
+    name: "Épîtres Pastorales (1-2 Timothée, Tite)",
+    scope: "NT",
+    books: ["1Ti", "2Ti", "Tit"]
+  },
+  {
+    code: "GRP_PRISON",
+    name: "Épîtres de la Captivité (Éphésiens à Philémon)",
+    scope: "NT",
+    books: ["Eph", "Phi", "Col", "Phm"]
+  },
+  {
+    code: "GRP_GENERAL_EPISTLES",
+    name: "Épîtres Générales / Catholiques (Hébreux à Jude)",
+    scope: "NT",
+    books: ["Heb", "Jam", "1Pe", "2Pe", "1Jo", "2Jo", "3Jo", "Jud"]
+  },
+  {
+    code: "GRP_JOHANNINE",
+    name: "Écrits Johanniques (Jean, 1-2-3 Jean, Apocalypse)",
+    scope: "NT",
+    books: ["Joh", "1Jo", "2Jo", "3Jo", "Rev"]
+  }
+];
+
 function getBookInfo(bookCode) {
   const b = CANONICAL_BOOKS.find(item => item.code.toLowerCase() === (bookCode || '').toLowerCase());
   return b || { name: bookCode, code: bookCode, abbr: bookCode, chapters: 50 };

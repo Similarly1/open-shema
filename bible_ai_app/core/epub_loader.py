@@ -512,7 +512,63 @@ class EpubLoader:
         "ecclesiastique": ("Sir", "Siracide", "APOCRYPHA"),
         "baruch": ("Bar", "Baruch", "APOCRYPHA"),
         "priere de manasse": ("Man", "Prière de Manassé", "APOCRYPHA"),
-        "prayer of manasseh": ("Man", "Prière de Manassé", "APOCRYPHA")
+        "prayer of manasseh": ("Man", "Prière de Manassé", "APOCRYPHA"),
+
+        # Ensembles canoniques (Option B)
+        "pentateuque": ("GRP_PENTATEUCH", "Pentateuque", "OT"),
+        "pentateuch": ("GRP_PENTATEUCH", "Pentateuque", "OT"),
+        "torah": ("GRP_PENTATEUCH", "Torah", "OT"),
+        "cinq livres de moise": ("GRP_PENTATEUCH", "Pentateuque", "OT"),
+        "five books of moses": ("GRP_PENTATEUCH", "Pentateuque", "OT"),
+        "livres historiques": ("GRP_OT_HISTORICAL", "Livres Historiques", "OT"),
+        "historical books": ("GRP_OT_HISTORICAL", "Livres Historiques", "OT"),
+        "livres de sagesse": ("GRP_WISDOM", "Livres de Sagesse", "OT"),
+        "wisdom literature": ("GRP_WISDOM", "Livres de Sagesse", "OT"),
+        "livres poetiques": ("GRP_WISDOM", "Livres Poétiques", "OT"),
+        "poetic books": ("GRP_WISDOM", "Livres Poétiques", "OT"),
+        "poesie hebraique": ("GRP_WISDOM", "Livres Poétiques", "OT"),
+        "grands prophetes": ("GRP_MAJOR_PROPHETS", "Grands Prophètes", "OT"),
+        "major prophets": ("GRP_MAJOR_PROPHETS", "Grands Prophètes", "OT"),
+        "petits prophetes": ("GRP_MINOR_PROPHETS", "Petits Prophètes", "OT"),
+        "minor prophets": ("GRP_MINOR_PROPHETS", "Petits Prophètes", "OT"),
+        "douze prophetes": ("GRP_MINOR_PROPHETS", "Petits Prophètes", "OT"),
+        "the twelve": ("GRP_MINOR_PROPHETS", "Petits Prophètes", "OT"),
+        "the twelve prophets": ("GRP_MINOR_PROPHETS", "Petits Prophètes", "OT"),
+        "livre des douze": ("GRP_MINOR_PROPHETS", "Petits Prophètes", "OT"),
+        "prophetes": ("GRP_PROPHETS_ALL", "Tous les Prophètes", "OT"),
+        "prophets": ("GRP_PROPHETS_ALL", "Tous les Prophètes", "OT"),
+        "quatre evangiles": ("GRP_GOSPELS", "Les 4 Évangiles", "NT"),
+        "four gospels": ("GRP_GOSPELS", "Les 4 Évangiles", "NT"),
+        "evangiles synoptiques": ("GRP_SYNOPTICS", "Évangiles Synoptiques", "NT"),
+        "synoptiques": ("GRP_SYNOPTICS", "Évangiles Synoptiques", "NT"),
+        "synoptics": ("GRP_SYNOPTICS", "Évangiles Synoptiques", "NT"),
+        "synoptic gospels": ("GRP_SYNOPTICS", "Évangiles Synoptiques", "NT"),
+        "evangiles et actes": ("GRP_GOSPELS_ACTS", "Évangiles et Actes", "NT"),
+        "gospels and acts": ("GRP_GOSPELS_ACTS", "Évangiles et Actes", "NT"),
+        "epitres pauliniennes": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "pauline epistles": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "epitres de paul": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "letters of paul": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "lettres de paul": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "corpus paulinien": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "paul epistles": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "pauliniennes": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "paulinienne": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "pauline": ("GRP_PAULINE", "Épîtres Pauliniennes", "NT"),
+        "epitres pastorales": ("GRP_PASTORAL", "Épîtres Pastorales", "NT"),
+        "pastoral epistles": ("GRP_PASTORAL", "Épîtres Pastorales", "NT"),
+        "pastorales": ("GRP_PASTORAL", "Épîtres Pastorales", "NT"),
+        "epitres de la captivite": ("GRP_PRISON", "Épîtres de la Captivité", "NT"),
+        "prison epistles": ("GRP_PRISON", "Épîtres de la Captivité", "NT"),
+        "captivite": ("GRP_PRISON", "Épîtres de la Captivité", "NT"),
+        "epitres generales": ("GRP_GENERAL_EPISTLES", "Épîtres Générales", "NT"),
+        "general epistles": ("GRP_GENERAL_EPISTLES", "Épîtres Générales", "NT"),
+        "epitres catholiques": ("GRP_GENERAL_EPISTLES", "Épîtres Générales", "NT"),
+        "catholic epistles": ("GRP_GENERAL_EPISTLES", "Épîtres Générales", "NT"),
+        "ecrits johanniques": ("GRP_JOHANNINE", "Écrits Johanniques", "NT"),
+        "johannine literature": ("GRP_JOHANNINE", "Écrits Johanniques", "NT"),
+        "johanniques": ("GRP_JOHANNINE", "Écrits Johanniques", "NT"),
+        "johannine": ("GRP_JOHANNINE", "Écrits Johanniques", "NT")
     }
 
     @classmethod
@@ -576,6 +632,10 @@ class EpubLoader:
                 res = _lookup(w)
                 if res:
                     return res
+
+        # Si le titre mentionne explicitement Paul (ex: "Paul: A Man of Grace and Grit", "Theology of Paul")
+        if "paul" in words:
+            return {"book_code": "GRP_PAULINE", "book_name": "Épîtres Pauliniennes", "corpus_scope": "NT"}
 
         return None
 
@@ -1038,8 +1098,10 @@ class EpubLoader:
 
                 zip_file = ch.get("zip_file", "")
                 ch_title = ch.get("title", "")
-                book_code = ch.get("book_code")
-                corpus_scope = ch.get("corpus_scope", "GLOBAL")
+                book_code = ch.get("book_code") or metadata.get("book_code")
+                corpus_scope = ch.get("corpus_scope") or metadata.get("corpus_scope", "GLOBAL")
+                if corpus_scope == "GLOBAL" and metadata.get("corpus_scope") and metadata.get("corpus_scope") != "GLOBAL":
+                    corpus_scope = metadata.get("corpus_scope")
                 source_type = ch.get("source_type", "general")
 
                 if not zip_file or zip_file not in z.namelist():

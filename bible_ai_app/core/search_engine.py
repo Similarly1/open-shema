@@ -35,7 +35,22 @@ CORPUS_DEFINITIONS = {
     "POETIC": ("Poétiques & Sagesse (5 livres)", ["Job", "Psa", "Pro", "Ecc", "Sol"]),
     "PROPHETS": ("Prophètes (17 livres)", ["Isa", "Jer", "Lam", "Eze", "Dan", "Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal"]),
     "GOSPELS_ACTS": ("Évangiles & Actes (5 livres)", ["Mat", "Mar", "Luk", "Joh", "Act"]),
-    "EPISTLES": ("Épîtres & Apocalypse (22 livres)", ["Rom", "1Co", "2Co", "Gal", "Eph", "Phi", "Col", "1Th", "2Th", "1Ti", "2Ti", "Tit", "Phm", "Heb", "Jam", "1Pe", "2Pe", "1Jo", "2Jo", "3Jo", "Jud", "Rev"])
+    "EPISTLES": ("Épîtres & Apocalypse (22 livres)", ["Rom", "1Co", "2Co", "Gal", "Eph", "Phi", "Col", "1Th", "2Th", "1Ti", "2Ti", "Tit", "Phm", "Heb", "Jam", "1Pe", "2Pe", "1Jo", "2Jo", "3Jo", "Jud", "Rev"]),
+    # Groupes canoniques Option B
+    "GRP_PENTATEUCH": ("Pentateuque / Torah (Genèse à Deutéronome)", ["Gen", "Exo", "Lev", "Num", "Deu"]),
+    "GRP_OT_HISTORICAL": ("Livres Historiques (Josué à Esther)", ["Jos", "Jdg", "Rut", "1Sa", "2Sa", "1Ki", "2Ki", "1Ch", "2Ch", "Ezr", "Neh", "Est"]),
+    "GRP_WISDOM": ("Livres Poétiques & Sagesse (Job à Cantique)", ["Job", "Psa", "Pro", "Ecc", "Sol"]),
+    "GRP_PROPHETS_ALL": ("Tous les Prophètes (Ésaïe à Malachie)", ["Isa", "Jer", "Lam", "Eze", "Dan", "Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal"]),
+    "GRP_MAJOR_PROPHETS": ("Grands Prophètes (Ésaïe à Daniel)", ["Isa", "Jer", "Lam", "Eze", "Dan"]),
+    "GRP_MINOR_PROPHETS": ("Petits Prophètes / Les Douze (Osée à Malachie)", ["Hos", "Joe", "Amo", "Oba", "Jon", "Mic", "Nah", "Hab", "Zep", "Hag", "Zec", "Mal"]),
+    "GRP_GOSPELS": ("Les 4 Évangiles (Matthieu à Jean)", ["Mat", "Mar", "Luk", "Joh"]),
+    "GRP_SYNOPTICS": ("Évangiles Synoptiques (Matthieu, Marc, Luc)", ["Mat", "Mar", "Luk"]),
+    "GRP_GOSPELS_ACTS": ("Évangiles et Actes (Matthieu aux Actes)", ["Mat", "Mar", "Luk", "Joh", "Act"]),
+    "GRP_PAULINE": ("Épîtres Pauliniennes (Romains à Philémon)", ["Rom", "1Co", "2Co", "Gal", "Eph", "Phi", "Col", "1Th", "2Th", "1Ti", "2Ti", "Tit", "Phm"]),
+    "GRP_PASTORAL": ("Épîtres Pastorales (1-2 Timothée, Tite)", ["1Ti", "2Ti", "Tit"]),
+    "GRP_PRISON": ("Épîtres de la Captivité (Éphésiens à Philémon)", ["Eph", "Phi", "Col", "Phm"]),
+    "GRP_GENERAL_EPISTLES": ("Épîtres Générales / Catholiques (Hébreux à Jude)", ["Heb", "Jam", "1Pe", "2Pe", "1Jo", "2Jo", "3Jo", "Jud"]),
+    "GRP_JOHANNINE": ("Écrits Johanniques (Jean, 1-2-3 Jean, Apocalypse)", ["Joh", "1Jo", "2Jo", "3Jo", "Rev"])
 }
 
 FRENCH_BOOK_NAMES = {

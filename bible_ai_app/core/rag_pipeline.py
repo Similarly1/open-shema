@@ -340,6 +340,30 @@ class RAGPipeline:
                         except Exception as e:
                             logger.error("[RAGPipeline] Erreur récupération lexique Strong : %s", e)
 
+                    # Récupérer les ouvrages théologiques liés à ce livre ou groupe canonique
+                    try:
+                        from core.theology_reader_manager import TheologyReaderManager
+                        theo_passages = TheologyReaderManager.get_theology_for_passage(b_code, ch or 1, v_num or 1, limit=4)
+                        for tm in theo_passages:
+                            b_n = tm.get("book_name")
+                            if active_sources and b_n not in active_sources:
+                                continue
+                            content = tm.get("snippet") or tm.get("chapter_title", "")
+                            if content:
+                                raw_candidates.append({
+                                    "id": f"theo_{b_n}_{tm.get('chapter_id', 1)}",
+                                    "text": f"### Extrait théologique [{tm.get('book_title', b_n)} - {tm.get('chapter_title', '')}] :\n{content}",
+                                    "metadata": {
+                                        "type": "Théologie",
+                                        "name": b_n,
+                                        "author": tm.get("book_author", ""),
+                                        "title": tm.get("book_title", b_n)
+                                    },
+                                    "vector_score": 0.95
+                                })
+                    except Exception as _silent_e:
+                        logger.debug("Erreur récupération théologie pour passage : %s", _silent_e)
+
         t_retrieval_ms = (time.time() - t_retrieval_0) * 1000
         _notify("retrieval", f"Recherche terminée ({len(raw_candidates)} extraits trouvés)", "done")
 

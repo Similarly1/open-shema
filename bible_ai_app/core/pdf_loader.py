@@ -543,8 +543,10 @@ class PdfLoader:
             ch_title = ch.get("title", f"Section {ch_id}")
             start_pg = ch.get("start_page", 1)
             end_pg = ch.get("end_page", total_pages)
-            book_code = ch.get("book_code")
-            corpus_scope = ch.get("corpus_scope", "GLOBAL")
+            book_code = ch.get("book_code") or metadata.get("book_code")
+            corpus_scope = ch.get("corpus_scope") or metadata.get("corpus_scope", "GLOBAL")
+            if corpus_scope == "GLOBAL" and metadata.get("corpus_scope") and metadata.get("corpus_scope") != "GLOBAL":
+                corpus_scope = metadata.get("corpus_scope")
             source_type = ch.get("source_type", "general")
 
             # Extraction et nettoyage des paragraphes pour ce chapitre

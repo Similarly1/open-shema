@@ -28,7 +28,7 @@ Règles de décision :
    * "nt_context", "ot_context" ou "global_context" pour l'histoire, la culture, l'archéologie d'un testament ou de toute la Bible.
    * "systematic_theology" pour la dogmatique (Grudem, Calvin Institutio, etc.).
    * "dictionary" pour les lexiques, dictionnaires, encyclopédies.
-- book_code : Si et seulement si le livre traite d'un SEUL livre de la Bible (ex: "Commentaire sur l'épître aux Romains" -> "ROM"). Sinon "null".
+- book_code : Si le livre traite d'un SEUL livre de la Bible (ex: "Commentaire sur Romains" -> "ROM"), ou d'un ENSEMBLE canonique reconnu parmi (GRP_PENTATEUCH, GRP_OT_HISTORICAL, GRP_WISDOM, GRP_PROPHETS_ALL, GRP_MAJOR_PROPHETS, GRP_MINOR_PROPHETS, GRP_GOSPELS, GRP_SYNOPTICS, GRP_GOSPELS_ACTS, GRP_PAULINE, GRP_PASTORAL, GRP_PRISON, GRP_GENERAL_EPISTLES, GRP_JOHANNINE). Sinon "null".
 """
 
     @classmethod
@@ -97,12 +97,24 @@ Règles de décision :
         sans appel réseau / LLM.
         """
         from core.epub_loader import EpubLoader
-        # Détection du livre biblique depuis le titre
-        res = EpubLoader.classify_chapter_title(title)
+        from core.reference_parser import CANONICAL_GROUPS
         
         full_text = f"{title} {description}".lower()
-        
-        # Si un livre biblique précis a été détecté
+
+        # 1. Détection via detect_book_from_title (gère livres individuels et ensembles canoniques)
+        t_detect = EpubLoader.detect_book_from_title(title)
+        if t_detect and t_detect.get("book_code"):
+            b_code = t_detect["book_code"]
+            is_comm = any(w in full_text for w in ["commentaire", "explication", "vers par vers", "notes", "exposition", "expository"])
+            return {
+                "corpus_scope": t_detect.get("corpus_scope", "GLOBAL"),
+                "source_type": "commentary_verse" if is_comm else ("biblical_theology" if b_code.startswith("GRP_") else "book_intro"),
+                "book_code": b_code,
+                "confidence": "high"
+            }
+
+        # 2. Détection par classify_chapter_title
+        res = EpubLoader.classify_chapter_title(title)
         if res.get("book_code"):
             return {
                 "corpus_scope": res["corpus_scope"],
@@ -111,7 +123,7 @@ Règles de décision :
                 "confidence": "high"
             }
             
-        # Si c'est une théologie systématique / dogmatique
+        # 3. Si c'est une théologie systématique / dogmatique
         if any(w in full_text for w in ["systematique", "dogmatique", "institution", "doctrine chretienne", "grudem", "berkhof"]):
             return {
                 "corpus_scope": "GLOBAL",
@@ -120,7 +132,7 @@ Règles de décision :
                 "confidence": "medium"
             }
             
-        # Si c'est un dictionnaire ou glossaire
+        # 4. Si c'est un dictionnaire ou glossaire
         if any(w in full_text for w in ["dictionnaire", "lexique", "encyclopedie", "vocabulaire"]):
             return {
                 "corpus_scope": "GLOBAL",
@@ -129,7 +141,30 @@ Règles de décision :
                 "confidence": "high"
             }
             
-        # Si c'est le Nouveau Testament uniquement
+        # 5. Détection directe d'ensembles canoniques par mots-clés dans la description ou titre
+        grp_keywords = [
+            ("GRP_PENTATEUCH", "OT", ["pentateuque", "torah", "cinq livres de moise", "five books of moses"]),
+            ("GRP_PAULINE", "NT", ["paulinien", "pauline", "epitres de paul", "lettres de paul"]),
+            ("GRP_SYNOPTICS", "NT", ["synoptique", "synoptics", "synoptic"]),
+            ("GRP_PASTORAL", "NT", ["pastorales", "pastoral epistles"]),
+            ("GRP_PRISON", "NT", ["captivite", "prison epistles"]),
+            ("GRP_MINOR_PROPHETS", "OT", ["petits prophetes", "minor prophets", "livre des douze", "douze prophetes"]),
+            ("GRP_MAJOR_PROPHETS", "OT", ["grands prophetes", "major prophets"]),
+            ("GRP_WISDOM", "OT", ["livres de sagesse", "wisdom literature", "poetiques"]),
+            ("GRP_GOSPELS", "NT", ["quatre evangiles", "four gospels"]),
+            ("GRP_JOHANNINE", "NT", ["johannique", "johannine"]),
+            ("GRP_GENERAL_EPISTLES", "NT", ["epitres generales", "general epistles", "epitres catholiques"])
+        ]
+        for g_code, g_scope, kw_list in grp_keywords:
+            if any(kw in full_text for kw in kw_list):
+                return {
+                    "corpus_scope": g_scope,
+                    "source_type": "biblical_theology",
+                    "book_code": g_code,
+                    "confidence": "high"
+                }
+
+        # 6. Si c'est le Nouveau Testament uniquement
         if any(w in full_text for w in ["nouveau testament", "epitre", "evangile"]) and not any(w in full_text for w in ["ancien testament", "toute la bible"]):
             return {
                 "corpus_scope": "NT",
@@ -138,8 +173,8 @@ Règles de décision :
                 "confidence": "medium"
             }
 
-        # Si c'est l'Ancien Testament uniquement
-        if any(w in full_text for w in ["ancien testament", "pentateuque", "tanakh", "hebreu"]) and not any(w in full_text for w in ["nouveau testament", "toute la bible"]):
+        # 7. Si c'est l'Ancien Testament uniquement
+        if any(w in full_text for w in ["ancien testament", "tanakh", "hebreu"]) and not any(w in full_text for w in ["nouveau testament", "toute la bible"]):
             return {
                 "corpus_scope": "OT",
                 "source_type": "ot_context",
