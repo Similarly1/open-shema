@@ -21,7 +21,14 @@ from core.reference_parser import (
 )
 from core.chunk_enricher import ChunkEnricher
 from core.book_classifier import BookClassifier
-from core.epub_loader import EpubLoader, BOILERPLATE_KEYWORDS
+from core.epub_loader import (
+    EpubLoader, 
+    BOILERPLATE_KEYWORDS, 
+    TECHNICAL_BOILERPLATE_KEYWORDS, 
+    INTRO_KEYWORDS, 
+    APPENDIX_KEYWORDS, 
+    IS_PART_REGEX
+)
 
 logger = logging.getLogger(__name__)
 
@@ -116,13 +123,16 @@ class PdfLoader:
                 else:
                     end_pg = total_pages
 
+                norm_t = strip_accents(t_title)
+                is_sec = bool(IS_PART_REGEX.match(norm_t) and not re.match(r'^(chapter|chapitre)\b', norm_t, re.IGNORECASE))
+
                 chapters.append({
                     "id": idx + 1,
                     "title": t_title or f"Section {idx + 1}",
                     "start_page": start_pg,
                     "end_page": min(end_pg, total_pages),
                     "depth": max(0, lvl - 1),
-                    "is_section_header": (lvl == 1 and (end_pg - start_pg > 1)),
+                    "is_section_header": is_sec,
                 })
         else:
             # TOC absente : détection heuristique des sections ou découpage par pages
@@ -189,9 +199,9 @@ class PdfLoader:
 
         if book_target:
             book_dominant_scope = book_target["corpus_scope"]
-        elif any(w in book_title_norm for w in _nt_title_kws):
+        elif any(re.search(r'\b' + re.escape(w) + r'\b', book_title_norm) for w in _nt_title_kws):
             book_dominant_scope = "NT"
-        elif any(w in book_title_norm for w in _ot_title_kws):
+        elif any(re.search(r'\b' + re.escape(w) + r'\b', book_title_norm) for w in _ot_title_kws):
             book_dominant_scope = "OT"
         else:
             book_dominant_scope = "GLOBAL"
@@ -271,11 +281,20 @@ class PdfLoader:
                         classification["book_name"] = current_active_book_name
 
             norm_t = strip_accents(ch_title)
-            is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
+            is_sec = bool(ch.get("is_section_header", False))
+            is_technical_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in TECHNICAL_BOILERPLATE_KEYWORDS)
 
             include_default = True
-            if classification["source_type"] == "appendix" or is_boilerplate:
+            if is_sec:
+                include_default = True
+                classification["source_type"] = "general"
+            elif is_technical_boilerplate or classification["source_type"] == "endnotes":
                 include_default = False
+            elif classification["source_type"] == "book_intro":
+                include_default = True
+            elif classification["source_type"] == "appendix":
+                # Annexe utile (abréviations, contributeurs, bibliographie)
+                include_default = char_count > 30 or total_pages <= 3
             elif char_count < 30 and total_pages > 3:
                 include_default = False
 
@@ -583,6 +602,7 @@ class PdfLoader:
                             "book_code": book_code,
                             "corpus_scope": corpus_scope,
                             "source_type": source_type,
+                            "is_section_header": ch.get("is_section_header", False),
                             "embedding_model": embed_model
                         }
                     })
@@ -616,6 +636,7 @@ class PdfLoader:
                         "book_code": book_code,
                         "corpus_scope": corpus_scope,
                         "source_type": source_type,
+                        "is_section_header": ch.get("is_section_header", False),
                         "embedding_model": embed_model
                     }
                 })

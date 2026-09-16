@@ -1647,6 +1647,12 @@ const ImportModal = {
 
   selectRagOnlyChapters() {
     this.chapters.forEach((ch, idx) => {
+      if (ch.is_section_header) {
+        ch.include = true;
+        const cb = document.getElementById(`ch-cb-${idx}`);
+        if (cb) cb.checked = true;
+        return;
+      }
       const isApp = ch.source_type === 'appendix' || ch.source_type === 'endnotes' || (ch.size && ch.size < 60) || (ch.size_chars && ch.size_chars < 60);
       ch.include = !isApp;
       const cb = document.getElementById(`ch-cb-${idx}`);

@@ -13,6 +13,7 @@ except ImportError:
     Settings = None
 from gui.library_utils import load_books_metadata
 from core.reference_parser import get_french_book_name, strip_accents
+from core.epub_loader import IS_PART_REGEX
 
 logger = logging.getLogger(__name__)
 
@@ -385,21 +386,26 @@ class TheologyReaderManager:
                 except Exception as e:
                     logger.debug(f"[TheologyReaderManager] Recherche TOC ChromaDB {col_name} : {e}")
 
-        is_part_regex = re.compile(
-            r'^((premier|premiere|deuxieme|troisieme|quatrieme|cinquieme|sixieme|septieme|huitieme|neuvieme|dixieme|[0-9]+(ere|eme|re|er|e)?)\s+(partie|section|volume|tome|livre)|(partie|part|section|volume|tome|livre|book)\s+([0-9ivxlcdm]+|[a-z]+))\b',
-            re.IGNORECASE
-        )
+        NON_SECTION_KEYWORDS = [
+            "abbreviation", "abbreviations", "abreviation", "abreviations",
+            "contributor", "contributors", "contributeur", "contributeurs",
+            "preface", "foreword", "avant-propos", "chapter", "chapitre"
+        ]
 
         # Si trouvé, ordonner la liste des chapitres
         sorted_chapters = []
         for cid in sorted(chapters_dict.keys(), key=lambda x: (int(x) if str(x).isdigit() else 999, str(x))):
             item = chapters_dict[cid]
             ctitle = item.get("title", "")
-            norm_title = strip_accents(ctitle)
-            is_part = bool(
-                item.get("is_section_header") or 
-                (is_part_regex.match(norm_title) and not re.match(r'^(chapter|chapitre)\b', norm_title, re.IGNORECASE))
-            )
+            norm_title = strip_accents(ctitle.lower())
+            is_non_sec = any(re.search(r'\b' + re.escape(kw) + r'\b', norm_title) for kw in NON_SECTION_KEYWORDS)
+            if is_non_sec:
+                is_part = False
+            else:
+                is_part = bool(
+                    item.get("is_section_header") or 
+                    IS_PART_REGEX.match(norm_title)
+                )
             item["is_section_header"] = is_part
             sorted_chapters.append(item)
 

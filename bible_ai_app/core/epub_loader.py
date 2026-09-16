@@ -49,26 +49,52 @@ APOCRYPHA_CODES = {
     "Lje", "Dag", "1Es", "2Es", "Man", "Ps2"
 }
 
-# Mots-clés pour ignorer les pages annexes / techniques / front-matter par défaut
-BOILERPLATE_KEYWORDS = [
+# Regex robuste pour détecter les titres de parties/sections (français et anglais)
+IS_PART_REGEX = re.compile(
+    r'^(?:'
+    r'(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|'
+    r'premier|premiere|première|deuxieme|deuxième|troisieme|troisième|quatrieme|quatrième|'
+    r'cinquieme|cinquième|sixieme|sixième|septieme|septième|huitieme|huitième|neuvieme|neuvième|dixieme|dixième|'
+    r'\d+(?:ere|ère|eme|ème|re|er|e|st|nd|rd|th)?)\s+(?:partie|part|section|volume|tome|livre|book)'
+    r'|'
+    r'(?:partie|part|section|volume|tome|livre|book)\s+(?:[0-9ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|un|deux|trois|quatre|cinq|[a-z])'
+    r'|'
+    r'(?:ancien|nouveau|old|new)\s+testament'
+    r')\b',
+    re.IGNORECASE
+)
+
+# Mots-clés pour identifier le boilerplate purement technique (décoché par défaut)
+TECHNICAL_BOILERPLATE_KEYWORDS = [
     # Français
-    "titre", "avertissement", "copyright", "droits", "preliminaires", 
-    "table des matieres", "sommaire", "table of contents", "toc", 
-    "questionnaire", "index", "couverture", "cover", "colophon",
-    "remerciements", "dedicace", "bibliographie", "annexe", "credits",
-    "cartes", "tableaux", "profils", "notes d'etude", "concordance",
-    "references croisees", "plan de lecture", "chronologie",
+    "copyright", "droits", "colophon", "table des matieres", "sommaire", 
+    "table of contents", "toc", "couverture", "cover", "titre", "page de titre",
+    "mentions legales", "page blanche",
     
     # Anglais
-    "contents", "ebook introduction", "contributors", "publisher",
-    "preface", "foreword", "about the", "acknowledgments", "dedication",
-    "abbreviations", "master index", "charts", "maps", "personality profiles",
-    "profiles", "study notes", "cross-references", "cross references",
-    "concordance", "reading plan", "timeline", "timelines", "features of",
-    "user guide", "how to use", "why the", "what is application",
-    "title page", "titlepage", "half title", "works cited", "works-cited",
-    "author index", "subject index", "share your thoughts"
+    "contents", "ebook introduction", "publisher",
+    "title page", "titlepage", "half title", "share your thoughts", "blank page"
 ]
+
+# Mots-clés pour les chapitres d'introduction (cochés par défaut, source_type = book_intro)
+INTRO_KEYWORDS = [
+    "preface", "foreword", "avant-propos", "how to use", "user guide", 
+    "guide d'utilisation", "mode d'emploi", "prolegomena", "introduction"
+]
+
+# Mots-clés pour les sections de référence / annexes utiles (cochées par défaut, source_type = appendix)
+APPENDIX_KEYWORDS = [
+    "abbreviations", "abreviations", "contributors", "contributeurs", 
+    "remerciements", "acknowledgments", "dedicace", "dedication", 
+    "bibliographie", "bibliography", "index", "author index", "subject index",
+    "master index", "cartes", "maps", "tableaux", "charts", "chronologie", "timeline",
+    "timelines", "reading plan", "plan de lecture", "concordance", "glossaire", "glossary",
+    "questionnaire", "credits", "notes d'etude", "study notes", "cross-references",
+    "references croisees", "features of", "works cited", "works-cited"
+]
+
+# Rétrocompatibilité : ensemble complet des pages annexes/front-matter
+BOILERPLATE_KEYWORDS = TECHNICAL_BOILERPLATE_KEYWORDS + INTRO_KEYWORDS + APPENDIX_KEYWORDS
 
 class EpubLoader:
     """
@@ -205,9 +231,9 @@ class EpubLoader:
             ]
             if book_target:
                 book_dominant_scope = book_target["corpus_scope"]
-            elif any(w in book_title_norm for w in _nt_title_kws):
+            elif any(re.search(r'\b' + re.escape(w) + r'\b', book_title_norm) for w in _nt_title_kws):
                 book_dominant_scope = "NT"
-            elif any(w in book_title_norm for w in _ot_title_kws):
+            elif any(re.search(r'\b' + re.escape(w) + r'\b', book_title_norm) for w in _ot_title_kws):
                 book_dominant_scope = "OT"
             else:
                 book_dominant_scope = "GLOBAL"
@@ -232,10 +258,7 @@ class EpubLoader:
                 root_stype = "general"
             metadata["source_type"] = root_stype
 
-            is_part_regex = re.compile(
-                r'^((premier|premiere|deuxieme|troisieme|quatrieme|cinquieme|sixieme|septieme|huitieme|neuvieme|dixieme|[0-9]+(ere|eme|re|er|e)?)\s+(partie|section|volume|tome|livre)|(partie|part|section|volume|tome|livre|book)\s+([0-9ivxlcdm]+|[a-z]+))\b',
-                re.IGNORECASE
-            )
+            is_part_regex = IS_PART_REGEX
 
             active_books_by_depth: Dict[int, Dict[str, str]] = {}
             last_sibling_book: Optional[Dict[str, str]] = None
@@ -354,19 +377,24 @@ class EpubLoader:
                             classification["source_type"] = "global_context"
                 
                 # Déterminer si inclus par défaut
-                is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
+                is_technical_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in TECHNICAL_BOILERPLATE_KEYWORDS)
                 
                 # Règle d'inclusion par défaut :
                 # - Les sections / parties sont TOUJOURS incluses pour préserver la structure
-                # - Tout livre ou chapitre de contenu (> 50 caractères) est coché d'office
-                # - Les annexes/notes de fin/front-matter/boilerplate sont décochés d'office
+                # - Le boilerplate technique (copyright, couv, table des matières) est décoché d'office
+                # - Les notes de fin sont décochées d'office
+                # - Les introductions, annexes utiles (abréviations, contributeurs) et chapitres de contenu sont cochés d'office
                 if is_section:
                     include_default = True
                     classification["source_type"] = "general"
-                elif classification["source_type"] in ["appendix", "endnotes"] or is_boilerplate:
+                elif is_technical_boilerplate or classification["source_type"] == "endnotes":
                     include_default = False
+                elif classification["source_type"] == "book_intro":
+                    include_default = True
                 elif classification["book_code"] is not None:
                     include_default = True
+                elif classification["source_type"] == "appendix":
+                    include_default = size_chars > 30 or size_chars == 0
                 else:
                     include_default = size_chars > 50 or size_chars == 0
 
@@ -481,8 +509,16 @@ class EpubLoader:
             or _has_word(["endnotes", "footnotes", "notes de fin", "notes de bas de page"])):
             return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "endnotes"}
 
-        # 1. Boilerplate / Front matter / Annexes
-        if _has_word(BOILERPLATE_KEYWORDS):
+        # 1a. Boilerplate technique (copyright, mentions legales, colophon, toc...)
+        if _has_word(TECHNICAL_BOILERPLATE_KEYWORDS):
+            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
+
+        # 1b. Préfaces et introductions générales (Préface, Introduction, How to use...)
+        if _has_word(INTRO_KEYWORDS):
+            return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "book_intro"}
+
+        # 1c. Annexes et outils de référence (Abréviations, Contributeurs, Bibliographie, Index...)
+        if _has_word(APPENDIX_KEYWORDS):
             return {"book_code": None, "book_name": None, "corpus_scope": "GLOBAL", "source_type": "appendix"}
 
         # 2. Détection prioritaire des introductions de groupes de livres (sections globales)
