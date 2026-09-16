@@ -69,11 +69,12 @@ TECHNICAL_BOILERPLATE_KEYWORDS = [
     # Français
     "copyright", "droits", "colophon", "table des matieres", "sommaire", 
     "table of contents", "toc", "couverture", "cover", "titre", "page de titre",
-    "mentions legales", "page blanche",
+    "mentions legales", "page blanche", "du meme auteur", "du même auteur", "autres ouvrages",
     
     # Anglais
     "contents", "contetns", "ebook introduction", "publisher",
-    "title page", "titlepage", "half title", "share your thoughts", "blank page"
+    "title page", "titlepage", "half title", "share your thoughts", "blank page",
+    "also by the author", "also by"
 ]
 
 # Mots-clés pour les chapitres d'introduction (cochés par défaut, source_type = book_intro)
@@ -186,7 +187,8 @@ class EpubLoader:
             is_syst_theol = any(w in book_title_norm for w in [
                 "systematic theology", "theologie systematique", "theologie dogmatique", 
                 "dogmatique", "dogmatics", "christian theology", "theologie chretienne",
-                "theology", "theologie", "doctrine", "doctrines", "biblical theology", "theologie biblique"
+                "theology", "theologie", "doctrine", "doctrines", "biblical theology", "theologie biblique",
+                "ethique", "ethique chretienne", "morale chretienne", "christian ethics", "ethics"
             ])
             is_dictionary = any(w in book_title_norm for w in [
                 "dictionary", "dictionnaire", "lexicon", "lexique", "encyclopedia", "encyclopedie"
@@ -194,7 +196,7 @@ class EpubLoader:
 
             is_essay = any(w in book_title_norm or w in book_desc_norm for w in [
                 "essai", "essais", "philosophie", "philosophe", "pensee chretienne", 
-                "pensee", "pensee religieuse", "relire le relie", "relier", "culture", "ethique", "humanisme"
+                "pensee religieuse", "relire le relie", "relier", "humanisme"
             ])
 
             if is_commentary:

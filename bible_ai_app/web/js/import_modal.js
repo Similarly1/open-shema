@@ -534,6 +534,19 @@ const ImportModal = {
           if (hasChanges) {
             this.renderChaptersList(this.chapters);
           }
+        } else if (selectedType === 'Théologie' && this.chapters && this.chapters.length > 0) {
+          let hasChanges = false;
+          this.chapters.forEach(ch => {
+            if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes' && ch.source_type !== 'book_intro') {
+              if (ch.source_type === 'essay' || ch.source_type === 'general' || ch.source_type === 'commentary_verse') {
+                ch.source_type = 'systematic_theology';
+                hasChanges = true;
+              }
+            }
+          });
+          if (hasChanges) {
+            this.renderChaptersList(this.chapters);
+          }
         } else if (selectedType === 'Apologétique' && this.chapters && this.chapters.length > 0) {
           let hasChanges = false;
           this.chapters.forEach(ch => {
@@ -1945,6 +1958,9 @@ const ImportModal = {
             ? `Métadonnées enregistrées (${syncCount} fragments mis à jour dans l'IA) !`
             : 'Métadonnées enregistrées avec succès !';
           App.showToast(msg, 'success');
+          if (typeof LibraryAdvisorModal !== 'undefined' && LibraryAdvisorModal.markDirty) {
+            LibraryAdvisorModal.markDirty();
+          }
           if (typeof LibraryView !== 'undefined' && typeof LibraryView.loadBooks === 'function') {
             LibraryView.loadBooks();
           }
@@ -1958,6 +1974,9 @@ const ImportModal = {
           // Afficher l'écran de succès animé
           this.showSuccessScreen(payload, res);
           
+          if (typeof LibraryAdvisorModal !== 'undefined' && LibraryAdvisorModal.markDirty) {
+            LibraryAdvisorModal.markDirty();
+          }
           if (typeof LibraryView !== 'undefined' && typeof LibraryView.loadBooks === 'function') {
             LibraryView.loadBooks();
           }

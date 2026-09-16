@@ -154,7 +154,8 @@ class PdfLoader:
         is_syst_theol = any(w in book_title_norm for w in [
             "systematic theology", "theologie systematique", "theologie dogmatique", 
             "dogmatique", "dogmatics", "christian theology", "theologie chretienne", 
-            "doctrine", "doctrines", "theology", "theologie", "biblical theology", "theologie biblique"
+            "doctrine", "doctrines", "theology", "theologie", "biblical theology", "theologie biblique",
+            "ethique", "ethique chretienne", "morale chretienne", "christian ethics", "ethics"
         ])
         is_dictionary = any(w in book_title_norm for w in [
             "dictionary", "dictionnaire", "lexicon", "lexique", "encyclopedia", "encyclopedie"
@@ -162,7 +163,7 @@ class PdfLoader:
 
         is_essay = any(w in book_title_norm or w in strip_accents(description.lower()) for w in [
             "essai", "essais", "philosophie", "philosophe", "pensee chretienne", 
-            "pensee", "pensee religieuse", "relire le relie", "relier", "culture", "ethique", "humanisme"
+            "pensee religieuse", "relire le relie", "relier", "humanisme"
         ])
 
         if is_commentary:
