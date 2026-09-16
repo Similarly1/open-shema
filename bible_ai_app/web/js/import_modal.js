@@ -496,10 +496,14 @@ const ImportModal = {
           let hasChanges = false;
           this.chapters.forEach(ch => {
             if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
+              const normTitle = (ch.title || '').toLowerCase();
+              const isIntroKw = /introduction|intro|preface|avant-propos|foreword|prolegomena/.test(normTitle);
               const hasVerse = /\b\d+[:\.]\d+/.test(ch.title);
-              if (hasVerse && (ch.source_type === 'general' || ch.source_type === 'systematic_theology')) {
-                ch.source_type = 'commentary_verse';
-                hasChanges = true;
+              if (!isIntroKw && (hasVerse || ch.book_code)) {
+                if (ch.source_type === 'general' || ch.source_type === 'systematic_theology' || ch.source_type === 'book_intro' || ch.source_type === 'essay') {
+                  ch.source_type = 'commentary_verse';
+                  hasChanges = true;
+                }
               }
             }
           });

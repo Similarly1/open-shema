@@ -179,6 +179,8 @@ class PdfLoader:
         else:
             detected_type = "Théologie"
 
+        is_intro_book = not is_commentary and any(w in book_title_norm for w in ["introduction", "intro", "guide", "survey", "handbook", "manuel"])
+
         # Détection d'un livre biblique spécifique dans le titre de l'ouvrage
         book_target = EpubLoader.detect_book_from_title(title)
         book_dominant_code = book_target["book_code"] if book_target else None
@@ -241,6 +243,7 @@ class PdfLoader:
             classification = EpubLoader.classify_chapter_title(
                 ch_title,
                 is_systematic_theology=is_syst_theol,
+                is_intro_book=is_intro_book,
                 book_dominant_scope=book_dominant_scope,
                 book_author=author,
                 is_commentary=is_commentary,

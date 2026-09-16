@@ -80,13 +80,14 @@ TECHNICAL_BOILERPLATE_KEYWORDS = [
 # Mots-clés pour les chapitres d'introduction (cochés par défaut, source_type = book_intro)
 INTRO_KEYWORDS = [
     "preface", "foreword", "avant-propos", "how to use", "user guide", 
-    "guide d'utilisation", "mode d'emploi", "prolegomena", "introduction"
+    "guide d'utilisation", "mode d'emploi", "prolegomena", "introduction",
+    "guidelines", "guidelines for using"
 ]
 
 # Mots-clés pour les sections de référence / annexes utiles (cochées par défaut, source_type = appendix)
 APPENDIX_KEYWORDS = [
     "abbreviations", "abreviations", "contributors", "contributeurs", 
-    "remerciements", "acknowledgments", "dedicace", "dedication", 
+    "remerciements", "acknowledgments", "acknowledgements", "dedicace", "dedication", 
     "cartes", "maps", "tableaux", "charts", "chronologie", "timeline",
     "timelines", "reading plan", "plan de lecture", "concordance", "glossaire", "glossary",
     "questionnaire", "credits", "notes d'etude", "study notes", "cross-references",
@@ -321,7 +322,7 @@ class EpubLoader:
                 norm_t = strip_accents(title)
                 is_section = bool(is_part_regex.match(norm_t))
 
-                is_intro_book = any(w in book_title_norm for w in ["introduction", "intro", "guide", "survey", "handbook", "manuel"])
+                is_intro_book = not is_commentary and any(w in book_title_norm for w in ["introduction", "intro", "guide", "survey", "handbook", "manuel"])
                 classification = cls.classify_chapter_title(
                     title, 
                     is_systematic_theology=is_syst_theol,
@@ -804,45 +805,45 @@ class EpubLoader:
         norm_ord = re.sub(r'\b(troisieme|3eme|3e)\b', '3', norm_ord)
         norm_ord = re.sub(r'\b(quatrieme|4eme|4e)\b', '4', norm_ord)
 
-        # Nettoyage des préfixes et des numérotations ordinales de chapitres (ex: "30. Micah" -> "micah")
-        clean_title = norm_ord
-        clean_title = re.sub(r'^(?:[0-9]+|[ivxlcdm]+)[\.\:\-\s]+', '', clean_title, flags=re.I).strip()
-        clean_title = re.sub(r'\b(l[\'’]|la|le|les|de|d[\'’]|du|des|au|aux|a|the|of|to|introduction|commentary|commentaire|commentaires|on|sur|regarding)\b', ' ', clean_title)
-        clean_title = re.sub(r'\b(evangile|epitre|lettre|livre|selon|gospel|epistle|letter|book)\b', ' ', clean_title)
-        clean_title = re.sub(r'\s+', ' ', clean_title).strip()
-
-        # Tester le code direct sur le titre nettoyé
+        # Tester le code direct sur le titre sans altération destructrice
         code = None
-        if clean_title in BOOK_MAPPING:
-            code = BOOK_MAPPING[clean_title]
-        elif norm_ord in BOOK_MAPPING:
+        if norm_ord in BOOK_MAPPING:
             code = BOOK_MAPPING[norm_ord]
         elif norm in BOOK_MAPPING:
             code = BOOK_MAPPING[norm]
-        elif any(sep in norm for sep in [":", "-", "—", "–"]):
-            # Détection de livre en sous-titre (ex: "THE GIFT OF I AM: DEUTERONOMY", "LAND, PART 1: JOSHUA")
-            segments = re.split(r'[:\-—–]', norm)
-            sub = segments[-1].strip()
-            clean_sub = re.sub(r'\b(l[\'’]|la|le|les|de|d[\'’]|du|des|au|aux|a|the|of|to|part|partie)\b', ' ', sub)
-            clean_sub = re.sub(r'[^\w\s]', '', clean_sub).strip()
-            clean_sub = re.sub(r'\s+', ' ', clean_sub).strip()
-            if clean_sub in BOOK_MAPPING:
-                code = BOOK_MAPPING[clean_sub]
-            else:
-                for sub_part in re.split(r'\b(?:and|et|ou|or)\b', clean_sub):
-                    sp = sub_part.strip()
-                    if sp in BOOK_MAPPING:
-                        code = BOOK_MAPPING[sp]
-                        break
+        else:
+            # Nettoyage des préfixes et des numérotations ordinales de chapitres (ex: "30. Micah" -> "micah", "Chapitre 1 : Genèse" -> "genese")
+            clean_title = norm_ord
+            clean_title = re.sub(r'^(?:chapitre|chapter|ch\.|part|partie)\s*(?:[0-9]+|[ivxlcdm]+)[\.\:\-\s]*', '', clean_title, flags=re.I).strip()
+            clean_title = re.sub(r'^(?:[0-9]+|[ivxlcdm]+)[\.\:\-]\s*', '', clean_title, flags=re.I).strip()
+            clean_title = re.sub(r'\b(l[\'’]|la|le|les|de|d[\'’]|du|des|au|aux|a|the|of|to|introduction|commentary|commentaire|commentaires|on|sur|regarding)\b', ' ', clean_title)
+            clean_title = re.sub(r'\b(evangile|epitre|lettre|livre|selon|gospel|epistle|letter|book)\b', ' ', clean_title)
+            clean_title = re.sub(r'\s+', ' ', clean_title).strip()
+
+            if clean_title in BOOK_MAPPING:
+                code = BOOK_MAPPING[clean_title]
+            elif any(sep in norm for sep in [":", "-", "—", "–"]):
+                # Détection de livre en sous-titre (ex: "THE GIFT OF I AM: DEUTERONOMY", "LAND, PART 1: JOSHUA")
+                segments = re.split(r'[:\-—–]', norm)
+                sub = segments[-1].strip()
+                clean_sub = re.sub(r'\b(l[\'’]|la|le|les|de|d[\'’]|du|des|au|aux|a|the|of|to|part|partie)\b', ' ', sub)
+                clean_sub = re.sub(r'[^\w\s]', '', clean_sub).strip()
+                clean_sub = re.sub(r'\s+', ' ', clean_sub).strip()
+                if clean_sub in BOOK_MAPPING:
+                    code = BOOK_MAPPING[clean_sub]
+                else:
+                    for sub_part in re.split(r'\b(?:and|et|ou|or)\b', clean_sub):
+                        sp = sub_part.strip()
+                        if sp in BOOK_MAPPING:
+                            code = BOOK_MAPPING[sp]
+                            break
 
         if code:
             fr_name = REVERSE_BOOK_MAPPING.get(code, code)
             scope = "OT" if code in OT_CODES else ("NT" if code in NT_CODES else ("APOCRYPHA" if code in APOCRYPHA_CODES else "GLOBAL"))
             is_intro = (
                 is_intro_book 
-                or any(kw in norm for kw in ["introduction", "intro", "preface"]) 
-                or clean_title == strip_accents(fr_name)
-                or clean_title in BOOK_MAPPING
+                or any(kw in norm for kw in ["introduction", "intro", "preface", "avant-propos", "foreword", "prolegomena"])
             )
             stype = "book_intro" if is_intro else ("commentary_verse" if is_commentary else ("essay" if is_essay else ("systematic_theology" if is_systematic_theology else "general")))
             return {
