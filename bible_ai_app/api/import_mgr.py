@@ -1095,8 +1095,7 @@ class ImportMixin:
             save_books_metadata(registry)
             TheologyReaderManager.invalidate_cache()
             
-            enable_ai = self.config.get("enable_ai", True)
-            if chunks and enable_ai:
+            if chunks:
                 task_id = f"import_{name}"
                 TaskManager.start_task(
                     task_id=task_id, 
@@ -1151,8 +1150,7 @@ class ImportMixin:
             save_books_metadata(registry)
             TheologyReaderManager.invalidate_cache()
 
-            enable_ai = self.config.get("enable_ai", True)
-            if chunks and enable_ai:
+            if chunks:
                 task_id = f"import_{name}"
                 TaskManager.start_task(
                     task_id=task_id,
@@ -1221,8 +1219,7 @@ class ImportMixin:
             save_books_metadata(registry)
             TheologyReaderManager.invalidate_cache()
 
-            enable_ai = self.config.get("enable_ai", True)
-            if chunks and enable_ai:
+            if chunks:
                 task_id = f"import_{name}"
                 TaskManager.start_task(
                     task_id=task_id, 

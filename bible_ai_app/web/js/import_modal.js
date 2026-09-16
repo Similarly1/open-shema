@@ -581,13 +581,10 @@ const ImportModal = {
       nextBtn?.classList.add('hidden');
       submitBtn?.classList.remove('hidden');
       
-      const isAI = App.isAIEnabled !== false;
       let labelText = "Lancer l'Importation & l'Indexation RAG";
 
       if (isBible) {
         labelText = 'Importer la Bible dans la Bibliothèque';
-      } else if (!isAI) {
-        labelText = 'Ajouter à la Bibliothèque (Local)';
       }
 
       if (submitBtn) {
@@ -735,14 +732,13 @@ const ImportModal = {
   updateStep4Display() {
     this.syncStep4WithMetadata();
     const isBible = document.getElementById('import-book-type')?.value === 'Bible';
-    const isAI = App.isAIEnabled !== false;
     
     const ragContent = document.getElementById('import-step-4-rag-content');
     const localContent = document.getElementById('import-step-4-local-content');
     const step4Title = document.getElementById('wizard-step-4-title');
     const step4Subtitle = document.getElementById('wizard-step-4-subtitle');
 
-    if (isBible || !isAI) {
+    if (isBible) {
       ragContent?.classList.add('hidden');
       localContent?.classList.remove('hidden');
       if (step4Title) step4Title.textContent = 'Finalisation';
