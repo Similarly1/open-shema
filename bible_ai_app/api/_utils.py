@@ -86,7 +86,7 @@ from core.notes_manager import NotesManager
 from core.config import (
     load_config, save_config,
     DEFAULT_NOTE_TITLE_SYSTEM_PROMPT, DEFAULT_NOTE_TAGS_SYSTEM_PROMPT,
-    DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT
+    DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT, DEFAULT_LIBRARY_ADVISOR_SYSTEM_PROMPT
 )
 from core.sermons_manager import SermonsManager
 from core.highlights_manager import HighlightsManager

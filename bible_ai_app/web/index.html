@@ -1834,9 +1834,9 @@
             <h1 class="view-title">BIBLIOTHÈQUE</h1>
             <p class="view-subtitle" id="lib-count-subtitle">Chargement de votre bibliothèque...</p>
           </div>
-          <div class="view-actions">
-            <input type="text" id="lib-search-input" class="search-field" placeholder="Filtrer par titre ou auteur...">
-            <select id="lib-type-filter" class="select-field">
+          <div class="view-actions" style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+            <input type="text" id="lib-search-input" class="search-field" placeholder="Filtrer par titre ou auteur..." style="width: 175px; flex-shrink: 1;">
+            <select id="lib-type-filter" class="select-field" style="width: 160px; flex-shrink: 1;">
               <option value="Tous">Toutes les catégories</option>
               <option value="openshema">Pack Open Shema</option>
               <option value="Bible">Bibles</option>
@@ -1848,29 +1848,29 @@
               <option value="Essais & Pensée chrétienne">Essais & Pensée chrétienne</option>
               <option value="Livre / Autre">Autres livres</option>
             </select>
-            <button class="btn-secondary" id="btn-lib-advisor" style="display: flex; align-items: center; gap: 6px;" title="Conseils de lecture et suggestions d'équilibrage bibliographique">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="btn-secondary" id="btn-lib-advisor" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; padding: 0 12px;" title="Conseils de lecture et suggestions d'équilibrage bibliographique">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                 <circle cx="12" cy="12" r="10"/>
                 <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
               </svg>
-              <span>Conseils &amp; Équilibrage</span>
+              <span>Conseils de lecture</span>
             </button>
-            <button class="btn-secondary" id="btn-lib-open-store" style="display: flex; align-items: center; gap: 6px;" title="Parcourir le catalogue gratuit Open Shema et rechercher des e-books chrétiens">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="btn-secondary" id="btn-lib-open-store" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; padding: 0 12px;" title="Parcourir le catalogue gratuit Open Shema et rechercher des e-books chrétiens">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                 <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              <span>Catalogue & E-books</span>
+              <span>Catalogue e-books</span>
             </button>
-            <button class="btn-primary" id="btn-lib-import" style="display: flex; align-items: center; gap: 6px;">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="btn-primary" id="btn-lib-import" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; padding: 0 14px;" title="Importer un livre (EPUB, PDF, DOCX)">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              <span>Importer un Ouvrage</span>
+              <span>Importer</span>
             </button>
           </div>
         </header>
@@ -11854,6 +11854,152 @@ Recevons ce don gratuit dans la prière.</code></pre>
     </div>
   </div>
 
+  <!-- ===================================================== -->
+  <!-- MODAL : CONSEILLER DE LECTURE & ÉQUILIBRAGE           -->
+  <!-- ===================================================== -->
+  <div id="modal-library-advisor" class="modal-overlay hidden" style="z-index: 1050;">
+    <div class="modal-card advisor-modal-card">
+      
+      <!-- En-tête -->
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 16px 24px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); color: var(--accent-blue, #3B82F6); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 17px; font-weight: 600;">Conseils de Lecture &amp; Équilibrage</h3>
+            <span style="font-size: 12px; color: var(--text-secondary);" id="advisor-subtitle">Diagnostic bibliographique et recommandations personnalisées</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn-secondary btn-sm" id="btn-advisor-refresh" title="Actualiser l'analyse et les conseils" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; padding: 6px 12px; height: 32px; font-weight: 500;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Actualiser</span>
+          </button>
+          <button type="button" class="btn-icon-subtle" id="btn-close-advisor-modal" title="Fermer (Échap)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Corps du modal scrollable -->
+      <div class="modal-body" id="advisor-modal-body" style="overflow-y: auto; padding: 24px; flex: 1;">
+        
+        <!-- Spinner chargement initial -->
+        <div id="advisor-loading-state" style="text-align: center; padding: 60px 20px;">
+          <svg class="spin-icon" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue); display: inline-block; animation: modalSpin 0.85s linear infinite; transform-origin: center;">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+          </svg>
+          <h4 style="margin: 18px 0 8px 0; font-size: 15px;">Analyse de votre bibliothèque en cours...</h4>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">Évaluation de la répartition canonique, des thématiques et détection des angles morts.</p>
+        </div>
+
+        <!-- Contenu dynamique une fois chargé (Disposition 2 colonnes) -->
+        <div id="advisor-content-wrapper" class="advisor-content-grid hidden">
+          
+          <!-- COLONNE GAUCHE : Diagnostic & Bilan de collection -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            
+            <!-- Bandeau diagnostic -->
+            <div style="background: var(--card-bg-subtle, rgba(255,255,255,0.03)); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px;">
+              <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue); flex-shrink: 0; margin-top: 2px;">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="16" x2="12" y2="12"/>
+                  <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 6px;">Diagnostic de votre collection</div>
+                  <div id="advisor-diagnostic-text" style="font-size: 13px; line-height: 1.55; color: var(--text-primary);"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Répartition Canonique -->
+            <div style="background: var(--card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Répartition Canonique</span>
+                <span id="advisor-canonical-counts" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;"></span>
+              </div>
+              <div style="height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; display: flex; margin-bottom: 10px;">
+                <div id="advisor-bar-ot" style="background: #D97706; height: 100%; transition: width 0.3s;" title="Ancien Testament"></div>
+                <div id="advisor-bar-nt" style="background: #2563EB; height: 100%; transition: width 0.3s;" title="Nouveau Testament"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11.5px;">
+                <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 2px; background: #D97706; display: inline-block;"></span> <span id="advisor-ot-legend">Ancien Testament</span></span>
+                <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 2px; background: #2563EB; display: inline-block;"></span> <span id="advisor-nt-legend">Nouveau Testament</span></span>
+              </div>
+            </div>
+
+            <!-- Auteurs les plus présents -->
+            <div style="background: var(--card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px;">
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Auteurs les plus présents</div>
+              <div id="advisor-top-authors" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+            </div>
+
+            <!-- Alerte livres incomplets (si applicable) -->
+            <div id="advisor-incomplete-alert" class="hidden" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: flex-start; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span id="advisor-incomplete-msg" style="font-size: 12px; color: var(--text-primary); line-height: 1.45;"></span>
+              </div>
+              <button type="button" class="btn-secondary btn-sm" id="btn-advisor-go-library" style="align-self: flex-start; font-size: 11.5px;">Compléter les fiches</button>
+            </div>
+
+          </div>
+
+          <!-- COLONNE DROITE : Recommandations (Approfondissement & Équilibrage) -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Section 1 : Approfondissement -->
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #2563EB;">
+                  <path d="m18 15-6-6-6 6"/>
+                </svg>
+                <h4 style="margin: 0; font-size: 13.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Pour approfondir vos lectures actuelles</h4>
+              </div>
+              <div id="advisor-deepening-container" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </div>
+
+            <!-- Section 2 : Équilibrage / Angles morts -->
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10B981;">
+                  <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                  <path d="M7 21h10"/>
+                  <path d="M12 3v18"/>
+                  <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+                </svg>
+                <h4 style="margin: 0; font-size: 13.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Pour équilibrer votre bibliothèque (Angles morts)</h4>
+              </div>
+              <div id="advisor-balance-container" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Pied de modal -->
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding: 14px 24px;">
+        <span style="font-size: 12px; color: var(--text-secondary);">Recherchez ces titres en e-book sur les librairies chrétiennes partenaires ou sur le web.</span>
+        <button type="button" class="btn-secondary" id="btn-advisor-close-footer">Fermer</button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Conteneurs Globaux pour Notifications et Tâches de fond -->
   <div id="global-tasks-overlay" class="tasks-overlay hidden"></div>
   <div id="app-toast-container"></div>
@@ -11869,6 +12015,7 @@ Recevons ce don gratuit dans la prière.</code></pre>
   <script src="js/commentaries_view.js?v=5.2"></script>
   <script src="js/import_modal.js"></script>
   <script src="js/open_shema_store_modal.js"></script>
+  <script src="js/library_advisor_modal.js"></script>
   <script src="js/report_typo_modal.js"></script>
   <script src="js/library_view.js"></script>
   <script src="js/settings_view.js?v=5.2"></script>

@@ -1783,6 +1783,9 @@ const OpenShemaStore = {
                 BibleReader.updatePaneHeader(2);
               }
             }
+            if (typeof LibraryAdvisorModal !== 'undefined' && LibraryAdvisorModal.markDirty) {
+              LibraryAdvisorModal.markDirty();
+            }
             if (typeof LibraryView !== 'undefined' && LibraryView.loadBooks) {
               LibraryView.loadBooks();
             }

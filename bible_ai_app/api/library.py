@@ -538,4 +538,14 @@ class LibraryMixin:
             logger.error(f"[LibraryMixin] Erreur envoi signalement coquille: {e}")
             return {"success": False, "error": str(e)}
 
+    def get_library_advisor_profile(self) -> Dict[str, Any]:
+        """Retourne le profil statistique et la détection des angles morts de la bibliothèque."""
+        from core.library_advisor import LibraryAdvisorManager
+        return LibraryAdvisorManager.analyze_profile()
+
+    def get_library_advice(self, force_refresh: bool = False) -> Dict[str, Any]:
+        """Retourne les recommandations d'approfondissement et d'équilibrage bibliographique."""
+        from core.library_advisor import LibraryAdvisorManager
+        return LibraryAdvisorManager.get_advice(force_refresh=bool(force_refresh))
+
 

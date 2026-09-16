@@ -162,3 +162,8 @@ def save_books_metadata(data):
     except Exception as e:
         logger.error(f"Erreur lors de la sauvegarde de {path}: {e}")
     _LIBRARY_CACHE = None  # Invalider le cache après toute écriture
+    try:
+        from core.library_advisor import LibraryAdvisorManager
+        LibraryAdvisorManager.invalidate_memory_cache()
+    except Exception:
+        pass

@@ -680,6 +680,41 @@ Exemple :
   ]
 }`,
 
+  DEFAULT_LIBRARY_ADVISOR_SYSTEM_PROMPT: `Tu es un bibliothécaire théologique, documentaliste et mentor intellectuel chrétien de premier plan.
+Ton rôle est d'analyser la bibliothèque d'un utilisateur (pasteur, étudiant, enseignant ou chrétien engagé) afin de dresser un bilan constructif et de lui recommander des ouvrages de référence pertinents.
+
+RÈGLES IMPÉRATIVES :
+1. AUCUN ÉMOJI : Ta réponse ne doit contenir AUCUN émoji. Utilise un style typographique sobre, digne et soigné.
+2. DOUBLE OBJECTIF :
+   - Approfondissement : suggérer 2 ou 3 ouvrages incontournables qui prolongent ses thèmes ou auteurs de prédilection.
+   - Équilibrage : identifier les angles morts de sa collection (ex: absence de littérature sapientiale, manque de théologie de l'Ancien Testament, absence d'ouvrages d'herméneutique, manque d'exégèse historico-critique ou de théologie pratique) et proposer 2 ou 3 ouvrages majeurs pour rééquilibrer sa formation.
+3. OUVRAGES RÉELS & ACCESSIBLES : Propose uniquement des ouvrages publiés existants, de préférence disponibles en français (éditeurs reconnus : BLF Éditions, Publications Chrétiennes, Excelsis, Éditions Clé, Éditions Olivétan / Bibli'O, Cerf, Labor et Fides, etc.).
+4. FORMAT DE SORTIE : Réponds STRICTEMENT en JSON valide (aucun préambule, aucune balise \`\`\`json).
+
+Schéma JSON attendu :
+{
+  "diagnostic": "Synthèse bienveillante et percutante de 2 à 3 phrases décrivant le profil de lecture, ses points forts et ses déséquilibres majeurs.",
+  "strengths_summary": "Description concise des domaines et sensibilités bien représentés dans sa collection.",
+  "gaps_summary": "Description concise des corpus ou disciplines sous-représentés ou absents.",
+  "deepening_recommendations": [
+    {
+      "title": "Titre exact de l'ouvrage",
+      "author": "Nom complet de l'auteur",
+      "publisher": "Éditeur de référence",
+      "rationale": "Une à deux phrases expliquant pourquoi ce livre approfondira remarquablement ses lectures actuelles."
+    }
+  ],
+  "balance_recommendations": [
+    {
+      "title": "Titre exact de l'ouvrage",
+      "author": "Nom complet de l'auteur",
+      "publisher": "Éditeur de référence",
+      "target_gap": "Angle mort ciblé (ex: Littérature sapientiale, Théologie de l'Ancien Testament, Herméneutique biblique, Éthique chrétienne)",
+      "rationale": "Une à deux phrases expliquant en quoi ce livre apportera l'équilibre nécessaire à son travail d'étude."
+    }
+  ]
+}`,
+
   PROMPT_CONFIGS: {
     theological_profile: {
       title: 'System Prompt — Passeport Herméneutique (« Mon Église »)',
@@ -820,6 +855,13 @@ Exemple :
       fieldId: 'cfg-prompt-audio-studio-axes',
       badgeId: 'badge-audio-studio-axes-status',
       label: 'Studio Audio — Axes & Questions'
+    },
+    library_advisor: {
+      title: 'System Prompt — Conseiller de Lecture & Équilibrage Bibliographique',
+      defaultProp: 'DEFAULT_LIBRARY_ADVISOR_SYSTEM_PROMPT',
+      fieldId: 'cfg-prompt-library-advisor',
+      badgeId: 'badge-library-advisor-status',
+      label: 'Conseiller de Lecture'
     }
   },
 
@@ -1871,6 +1913,12 @@ Exemple :
     if (c.audio_studio_script_fallback_model && document.getElementById('cfg-audio-script-fallback-model')) {
       document.getElementById('cfg-audio-script-fallback-model').value = c.audio_studio_script_fallback_model;
     }
+    if (c.library_advisor_model && document.getElementById('cfg-library-advisor-model')) {
+      document.getElementById('cfg-library-advisor-model').value = c.library_advisor_model;
+    }
+    if (c.library_advisor_fallback_model && document.getElementById('cfg-library-advisor-fallback-model')) {
+      document.getElementById('cfg-library-advisor-fallback-model').value = c.library_advisor_fallback_model;
+    }
     const curModel = c.curator_model || c.rag_curation_model;
     if (curModel && document.getElementById('cfg-curator-model')) {
       document.getElementById('cfg-curator-model').value = curModel;
@@ -1999,7 +2047,9 @@ Exemple :
     'cfg-audio-axes-model': 'audio_studio_axes_model',
     'cfg-audio-axes-fallback-model': 'audio_studio_axes_fallback_model',
     'cfg-audio-script-model': 'audio_studio_script_model',
-    'cfg-audio-script-fallback-model': 'audio_studio_script_fallback_model'
+    'cfg-audio-script-fallback-model': 'audio_studio_script_fallback_model',
+    'cfg-library-advisor-model': 'library_advisor_model',
+    'cfg-library-advisor-fallback-model': 'library_advisor_fallback_model'
   },
 
   getSelectedModel(configKey) {
@@ -2544,7 +2594,8 @@ Exemple :
       { primary: 'cfg-mindmap-ai-model', fallback: 'cfg-mindmap-ai-fallback-model', label: 'Mind Map' },
       { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' },
       { primary: 'cfg-audio-axes-model', fallback: 'cfg-audio-axes-fallback-model', label: 'Studio Audio (Axes & Questions)' },
-      { primary: 'cfg-audio-script-model', fallback: 'cfg-audio-script-fallback-model', label: 'Studio Audio (Rédaction Script)' }
+      { primary: 'cfg-audio-script-model', fallback: 'cfg-audio-script-fallback-model', label: 'Studio Audio (Rédaction Script)' },
+      { primary: 'cfg-library-advisor-model', fallback: 'cfg-library-advisor-fallback-model', label: 'Conseiller de Lecture' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -2598,7 +2649,8 @@ Exemple :
       { primary: 'cfg-mindmap-ai-model', fallback: 'cfg-mindmap-ai-fallback-model', label: 'Mind Map' },
       { primary: 'cfg-curator-model', fallback: 'cfg-curator-fallback-model', label: 'Curateur RAG' },
       { primary: 'cfg-audio-axes-model', fallback: 'cfg-audio-axes-fallback-model', label: 'Studio Audio (Axes & Questions)' },
-      { primary: 'cfg-audio-script-model', fallback: 'cfg-audio-script-fallback-model', label: 'Studio Audio (Rédaction Script)' }
+      { primary: 'cfg-audio-script-model', fallback: 'cfg-audio-script-fallback-model', label: 'Studio Audio (Rédaction Script)' },
+      { primary: 'cfg-library-advisor-model', fallback: 'cfg-library-advisor-fallback-model', label: 'Conseiller de Lecture' }
     ];
 
     pairs.forEach(({ primary, fallback, label }) => {
@@ -3121,6 +3173,17 @@ Exemple :
         document.getElementById('cfg-audio-script-fallback-model').value = fb;
       }
       newCfg.audio_studio_script_fallback_model = fb;
+    }
+    if (document.getElementById('cfg-library-advisor-model')) {
+      newCfg.library_advisor_model = document.getElementById('cfg-library-advisor-model').value;
+    }
+    if (document.getElementById('cfg-library-advisor-fallback-model')) {
+      let fb = document.getElementById('cfg-library-advisor-fallback-model').value;
+      if (fb === newCfg.library_advisor_model) {
+        fb = this.getSmartFallbackModel(newCfg.library_advisor_model, document.getElementById('cfg-library-advisor-fallback-model'));
+        document.getElementById('cfg-library-advisor-fallback-model').value = fb;
+      }
+      newCfg.library_advisor_fallback_model = fb;
     }
 
     // Sauvegarde miroir immédiate de tous les choix de modèles dans localStorage

@@ -34,12 +34,24 @@ const LibraryView = {
       }
     });
 
+    document.getElementById('btn-lib-advisor')?.addEventListener('click', () => {
+      if (typeof LibraryAdvisorModal !== 'undefined') {
+        LibraryAdvisorModal.open();
+      }
+    });
+
     this.loadBooks();
   },
 
   async loadBooks() {
     try {
+      const prevLength = this.books ? this.books.length : null;
       this.books = await API.call('get_library_books') || [];
+      if (prevLength !== null && prevLength !== this.books.length) {
+        if (typeof LibraryAdvisorModal !== 'undefined' && LibraryAdvisorModal.markDirty) {
+          LibraryAdvisorModal.markDirty();
+        }
+      }
       this.render();
     } catch (e) {
       console.error('Erreur chargement bibliothèque:', e);
@@ -244,6 +256,9 @@ const LibraryView = {
 
         if (confirmed) {
           await API.call('delete_book', book.name);
+          if (typeof LibraryAdvisorModal !== 'undefined' && LibraryAdvisorModal.markDirty) {
+            LibraryAdvisorModal.markDirty();
+          }
           if (typeof App !== 'undefined' && App.showToast) {
             App.showToast(`« ${bookDisplayName} » a été supprimé`);
           }

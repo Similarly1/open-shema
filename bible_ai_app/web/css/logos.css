@@ -40386,6 +40386,43 @@ body.window-detached-mode #app-splash-loader,
   pointer-events: none !important;
 }
 
+/* ==========================================================================
+   CONSEILLER DE LECTURE & ÉQUILIBRAGE (Modal & Grille 2 Colonnes)
+   ========================================================================== */
+.advisor-modal-card {
+  max-width: 1140px;
+  width: 92vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
 
+.advisor-content-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+  align-items: start;
+}
 
+@media (max-width: 960px) {
+  .advisor-content-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
 
+.advisor-book-card {
+  background: var(--card-bg-subtle, rgba(255, 255, 255, 0.025));
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 13px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.advisor-book-card:hover {
+  border-color: var(--accent-blue, #3B82F6);
+  background: var(--card-bg-hover, rgba(255, 255, 255, 0.04));
+}
