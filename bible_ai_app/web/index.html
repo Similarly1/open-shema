@@ -1833,6 +1833,9 @@
               <option value="Commentaire">Commentaires</option>
               <option value="Dictionnaire">Dictionnaires</option>
               <option value="Théologie">Théologie</option>
+              <option value="Archéologie & Histoire">Archéologie & Histoire</option>
+              <option value="Apologétique">Apologétique</option>
+              <option value="Livre / Autre">Autres livres</option>
             </select>
             <button class="btn-secondary" id="btn-lib-open-store" style="display: flex; align-items: center; gap: 6px;" title="Parcourir le catalogue gratuit Open Shema et rechercher des e-books chrétiens">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -7617,6 +7620,25 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Section Histoire & Encyclopédie (Wikipédia) -->
+                <div class="drawer-wiki-section" id="maps-drawer-wiki-section">
+                  <div class="wiki-section-header">
+                    <div class="wiki-section-title-wrap">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                      </svg>
+                      <h4 class="drawer-section-title">HISTOIRE & ARCHÉOLOGIE</h4>
+                    </div>
+                    <span class="wiki-source-tag">Wikipédia</span>
+                  </div>
+                  
+                  <div id="maps-wiki-content" class="maps-wiki-content">
+                    <!-- Rendu dynamique Wikipédia -->
+                  </div>
+                </div>
               </div>
             </aside>
           </section>
@@ -9616,8 +9638,10 @@
                     <label>Type de ressource :</label>
                     <select id="import-book-type" class="select-field full-w">
                       <option value="Théologie">Théologie</option>
-                      <option value="Bible">Bible</option>
                       <option value="Commentaire">Commentaire</option>
+                      <option value="Archéologie & Histoire">Archéologie & Histoire</option>
+                      <option value="Apologétique">Apologétique</option>
+                      <option value="Bible">Bible</option>
                       <option value="Dictionnaire">Dictionnaire</option>
                       <option value="Livre / Autre">Livre / Autre</option>
                     </select>

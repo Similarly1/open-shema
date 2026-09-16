@@ -144,6 +144,13 @@ class EpubLoader:
             is_commentary = any(w in book_title_norm for w in [
                 "commentary", "commentaire", "commentaires", "expository", "exegetical", "homiletical"
             ])
+            is_archaeology = any(w in book_title_norm for w in [
+                "archeologie", "archaeology", "histoire", "history", "geographie", "geography", 
+                "atlas", "fouilles", "qumran", "manuscrits"
+            ])
+            is_apologetics = any(w in book_title_norm for w in [
+                "apologetique", "apologetics", "defense de la foi", "defendre la foi"
+            ])
             is_syst_theol = any(w in book_title_norm for w in [
                 "systematic theology", "theologie systematique", "theologie dogmatique", 
                 "dogmatique", "dogmatics", "christian theology", "theologie chretienne",
@@ -153,7 +160,17 @@ class EpubLoader:
                 "dictionary", "dictionnaire", "lexicon", "lexique", "encyclopedia", "encyclopedie"
             ])
 
-            detected_type = "Commentaire" if is_commentary else ("Dictionnaire" if is_dictionary else "Théologie")
+            if is_commentary:
+                detected_type = "Commentaire"
+            elif is_archaeology:
+                detected_type = "Archéologie & Histoire"
+            elif is_apologetics:
+                detected_type = "Apologétique"
+            elif is_dictionary:
+                detected_type = "Dictionnaire"
+            else:
+                detected_type = "Théologie"
+
             metadata["type"] = detected_type
 
             # Détection d'un livre biblique spécifique dans le titre de l'ouvrage
@@ -256,7 +273,8 @@ class EpubLoader:
                     book_author=metadata.get("author", ""),
                     is_commentary=is_commentary,
                     book_dominant_code=book_dominant_code,
-                    book_dominant_name=book_dominant_name
+                    book_dominant_name=book_dominant_name,
+                    is_archaeology=is_archaeology
                 )
                 
                 # Détection complémentaire par nom de fichier (ex: note.html, notes.xhtml, endnotes.html)
@@ -312,6 +330,8 @@ class EpubLoader:
                         classification["corpus_scope"] = book_dominant_scope
                     if is_commentary and classification["source_type"] == "general" and classification["book_code"]:
                         classification["source_type"] = "commentary_verse"
+                    elif is_archaeology and classification["source_type"] in ["general", "systematic_theology"]:
+                        classification["source_type"] = "nt_context" if classification["corpus_scope"] == "NT" else "ot_context"
                 
                 # Déterminer si inclus par défaut
                 is_boilerplate = any(re.search(r'\b' + re.escape(strip_accents(kw)) + r'\b', norm_t) for kw in BOILERPLATE_KEYWORDS)
@@ -414,7 +434,8 @@ class EpubLoader:
         book_author: str = "",
         is_commentary: bool = False,
         book_dominant_code: Optional[str] = None,
-        book_dominant_name: Optional[str] = None
+        book_dominant_name: Optional[str] = None,
+        is_archaeology: bool = False
     ) -> Dict[str, Any]:
         """
         Détecte automatiquement le livre biblique, le corpus et le type RAG à partir du titre du chapitre.
@@ -557,7 +578,14 @@ class EpubLoader:
 
         # 5. Détection thématique générale par mots entiers
         default_scope = book_dominant_scope if book_dominant_scope in ["OT", "NT", "APOCRYPHA", "INTER"] else "GLOBAL"
-        default_stype = "commentary_verse" if is_commentary else ("systematic_theology" if is_systematic_theology else "general")
+        if is_commentary:
+            default_stype = "commentary_verse"
+        elif is_archaeology:
+            default_stype = "nt_context" if default_scope == "NT" else "ot_context"
+        elif is_systematic_theology:
+            default_stype = "systematic_theology"
+        else:
+            default_stype = "general"
         default_code = book_dominant_code
         default_name = book_dominant_name
 

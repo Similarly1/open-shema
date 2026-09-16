@@ -352,6 +352,32 @@ const ImportModal = {
           if (hasChanges) {
             this.renderChaptersList(this.chapters);
           }
+        } else if (selectedType === 'Archéologie & Histoire' && this.chapters && this.chapters.length > 0) {
+          let hasChanges = false;
+          this.chapters.forEach(ch => {
+            if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
+              if (ch.source_type === 'general' || ch.source_type === 'systematic_theology' || ch.source_type === 'commentary_verse') {
+                ch.source_type = (ch.corpus_scope === 'NT') ? 'nt_context' : 'ot_context';
+                hasChanges = true;
+              }
+            }
+          });
+          if (hasChanges) {
+            this.renderChaptersList(this.chapters);
+          }
+        } else if (selectedType === 'Apologétique' && this.chapters && this.chapters.length > 0) {
+          let hasChanges = false;
+          this.chapters.forEach(ch => {
+            if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
+              if (ch.source_type === 'commentary_verse') {
+                ch.source_type = 'general';
+                hasChanges = true;
+              }
+            }
+          });
+          if (hasChanges) {
+            this.renderChaptersList(this.chapters);
+          }
         }
         this.goToStep(3);
       }

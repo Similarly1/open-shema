@@ -133,6 +133,13 @@ class PdfLoader:
         is_commentary = any(w in book_title_norm for w in [
             "commentary", "commentaire", "commentaires", "expository", "exegetical", "homiletical"
         ])
+        is_archaeology = any(w in book_title_norm for w in [
+            "archeologie", "archaeology", "histoire", "history", "geographie", "geography", 
+            "atlas", "fouilles", "qumran", "manuscrits"
+        ])
+        is_apologetics = any(w in book_title_norm for w in [
+            "apologetique", "apologetics", "defense de la foi", "defendre la foi"
+        ])
         is_syst_theol = any(w in book_title_norm for w in [
             "systematic theology", "theologie systematique", "theologie dogmatique", 
             "dogmatique", "dogmatics", "christian theology", "theologie chretienne", 
@@ -142,7 +149,16 @@ class PdfLoader:
             "dictionary", "dictionnaire", "lexicon", "lexique", "encyclopedia", "encyclopedie"
         ])
 
-        detected_type = "Commentaire" if is_commentary else ("Dictionnaire" if is_dictionary else "Théologie")
+        if is_commentary:
+            detected_type = "Commentaire"
+        elif is_archaeology:
+            detected_type = "Archéologie & Histoire"
+        elif is_apologetics:
+            detected_type = "Apologétique"
+        elif is_dictionary:
+            detected_type = "Dictionnaire"
+        else:
+            detected_type = "Théologie"
 
         # Détection d'un livre biblique spécifique dans le titre de l'ouvrage
         book_target = EpubLoader.detect_book_from_title(title)
@@ -210,7 +226,8 @@ class PdfLoader:
                 book_author=author,
                 is_commentary=is_commentary,
                 book_dominant_code=book_dominant_code,
-                book_dominant_name=book_dominant_name
+                book_dominant_name=book_dominant_name,
+                is_archaeology=is_archaeology
             )
 
             # Si le titre ne donne rien de précis, tester un rapide scan sur le premier paragraphe
@@ -233,6 +250,10 @@ class PdfLoader:
                     classification["corpus_scope"] = book_dominant_scope
                     if is_commentary and classification["source_type"] == "general":
                         classification["source_type"] = "commentary_verse"
+                    elif is_archaeology and classification["source_type"] in ["general", "systematic_theology"]:
+                        classification["source_type"] = "nt_context" if classification["corpus_scope"] == "NT" else "ot_context"
+                elif is_archaeology and classification["source_type"] in ["general", "systematic_theology"]:
+                    classification["source_type"] = "nt_context" if classification["corpus_scope"] == "NT" else "ot_context"
                 elif classification["corpus_scope"] == "GLOBAL" and current_active_scope != "GLOBAL":
                     classification["corpus_scope"] = current_active_scope
                     if not classification["book_code"] and current_active_book_code:

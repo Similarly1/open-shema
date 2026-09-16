@@ -145,7 +145,7 @@ const LibraryView = {
         const fPath = (book.file_path || '').toLowerCase();
         const isEbook = fPath.endsWith('.epub') || fPath.endsWith('.pdf') || (book.chapters_count > 0 && !book.dict_id);
 
-        if (isEbook || bType.includes('théo') || bType.includes('theo') || bType.includes('étude') || bType.includes('etude')) {
+        if (isEbook || bType.includes('théo') || bType.includes('theo') || bType.includes('archéo') || bType.includes('archeo') || bType.includes('apolog') || bType.includes('hist') || bType.includes('étude') || bType.includes('etude') || bType.includes('livre')) {
           if (typeof TheologyView !== 'undefined') {
             TheologyView.openBook(book.name);
           }
