@@ -35,6 +35,11 @@ _LAST_ACTIVE_PASSAGE = ("Gen", 1, 1)
 _COMM_LOCK = threading.Lock()
 _IS_CREATING_COMM_WINDOW = False
 
+_DETACHED_WINDOWS: Dict[str, Any] = {}
+_DETACHED_MAXIMIZED: Dict[str, bool] = {}
+_DETACHED_RESTORE_BOUNDS: Dict[str, tuple] = {}
+_DETACHED_LOCK = threading.Lock()
+
 def set_global_window(win):
     global _GLOBAL_WINDOW
     _GLOBAL_WINDOW = win
@@ -402,17 +407,28 @@ class WindowMixin:
         return {"success": True, "is_fullscreen": _IS_FULLSCREEN}
 
     def close_window(self):
-        global _GLOBAL_WINDOW, _COMMENTARY_WINDOW
+        global _GLOBAL_WINDOW, _COMMENTARY_WINDOW, _DETACHED_WINDOWS, _DETACHED_LOCK
         
         # Copier les références et réinitialiser l'état global
         comm_win = _COMMENTARY_WINDOW
         _COMMENTARY_WINDOW = None
         main_win = _GLOBAL_WINDOW
         _GLOBAL_WINDOW = None
+        
+        with _DETACHED_LOCK:
+            detached_to_close = list(_DETACHED_WINDOWS.values())
+            _DETACHED_WINDOWS.clear()
 
         def _do_async_close():
             # Laisser 50ms au callback RPC JS de pywebview pour se terminer proprement sans ObjectDisposedException
             time.sleep(0.05)
+            
+            for d_win in detached_to_close:
+                try:
+                    d_win.destroy()
+                except Exception as e:
+                    logger.debug("Erreur destruction fenêtre détachée: %s", e)
+
             if comm_win:
                 try:
                     comm_win.destroy()
@@ -728,3 +744,248 @@ class WindowMixin:
             except Exception as e:
                 logger.debug(f"Erreur evaluate_js navigate_main: {e}")
         return {"success": True}
+
+    # =========================================================================
+    # GESTION UNIVERSELLE DES PAGES EN FENÊTRES DÉTACHÉES (MULTI-ÉCRAN / SECOND ÉCRAN)
+    # =========================================================================
+
+    def is_detached_window_open(self, view_id: str) -> Dict[str, Any]:
+        """Indique si une fenêtre détachée est déjà ouverte pour cette vue."""
+        global _DETACHED_WINDOWS, _DETACHED_LOCK
+        with _DETACHED_LOCK:
+            return {"is_open": view_id in _DETACHED_WINDOWS}
+
+    def open_detached_window(self, view_id: str, title: str = "") -> Dict[str, Any]:
+        """
+        Ouvre n'importe quelle vue de l'application dans une nouvelle fenêtre indépendante.
+        Place automatiquement sur le second écran si présent, sinon en fenêtre cascade sur l'écran 1.
+        Garantit l'anti-doublon pour une même vue.
+        """
+        global _DETACHED_WINDOWS, _DETACHED_MAXIMIZED, _DETACHED_RESTORE_BOUNDS, _DETACHED_LOCK
+        if not view_id:
+            return {"success": False, "error": "view_id invalide"}
+
+        clean_view = view_id.replace("view-", "")
+        with _DETACHED_LOCK:
+            # 1. Vérification anti-doublon : ramener au premier plan si déjà ouverte
+            if clean_view in _DETACHED_WINDOWS:
+                existing_win = _DETACHED_WINDOWS[clean_view]
+                try:
+                    existing_win.restore()
+                    existing_win.show()
+                    if hasattr(existing_win, 'native') and existing_win.native and user32:
+                        hwnd = existing_win.native.Handle.ToInt32()
+                        user32.SetForegroundWindow(hwnd)
+                    return {"success": True, "already_open": True, "view_id": clean_view}
+                except Exception as ex:
+                    logger.warning(f"Erreur réactivation fenêtre détachée [{clean_view}]: {ex}")
+                    _DETACHED_WINDOWS.pop(clean_view, None)
+
+        try:
+            # 2. Détection des écrans
+            monitors = get_monitors_layout()
+            second_monitor = None
+            for m in monitors:
+                if not m.get("is_primary"):
+                    second_monitor = m
+                    break
+
+            on_second_screen = False
+            if second_monitor:
+                wx = second_monitor["x"]
+                wy = second_monitor["y"]
+                ww = second_monitor["width"]
+                wh = second_monitor["height"]
+                on_second_screen = True
+                _DETACHED_MAXIMIZED[clean_view] = True
+                _DETACHED_RESTORE_BOUNDS[clean_view] = (wx + 40, wy + 40, ww - 80, wh - 80)
+            else:
+                main_wx, main_wy, main_ww, main_wh = get_work_area()
+                with _DETACHED_LOCK:
+                    count = len(_DETACHED_WINDOWS)
+                cascade_offset = (count % 6) * 35
+                ww = min(1480, max(1100, int(main_ww * 0.86)))
+                wh = min(980, max(750, int(main_wh * 0.88)))
+                wx = main_wx + max(0, (main_ww - ww) // 2) + cascade_offset
+                wy = main_wy + max(0, (main_wh - wh) // 2) + cascade_offset
+                on_second_screen = False
+                _DETACHED_MAXIMIZED[clean_view] = False
+                _DETACHED_RESTORE_BOUNDS[clean_view] = (wx, wy, ww, wh)
+
+            # 3. URL de chargement en mode détaché
+            import urllib.parse
+            html_path = os.path.join(current_dir, "web", "index.html")
+            encoded_view = urllib.parse.quote(clean_view)
+            url_with_params = f"{html_path}?view={encoded_view}&mode=detached"
+
+            # 4. Détection du thème pour le fond natif
+            bg_color = "#0F172A"
+            try:
+                cfg = getattr(self, 'config', {}) or {}
+                theme = cfg.get('theme', 'dark')
+                reading_bg = cfg.get('reading_bg', 'auto')
+                if theme == 'light' or reading_bg in ('white', 'sepia'):
+                    bg_color = "#F8FAFC"
+            except Exception:
+                pass
+
+            target_bounds = (wx, wy, ww, wh)
+            display_title = f"Open Shema — {title}" if title else f"Open Shema — {clean_view.capitalize()}"
+
+            def on_detached_shown(*args, **kwargs):
+                try:
+                    with _DETACHED_LOCK:
+                        win = _DETACHED_WINDOWS.get(clean_view)
+                    if win and hasattr(win, 'native') and win.native:
+                        hwnd = win.native.Handle.ToInt32()
+                        _apply_window_icon(hwnd)
+                        GWL_STYLE = -16
+                        WS_THICKFRAME = 0x00040000
+                        if user32:
+                            current_style = user32.GetWindowLongW(hwnd, GWL_STYLE)
+                            user32.SetWindowLongW(hwnd, GWL_STYLE, current_style | WS_THICKFRAME)
+                            twx, twy, tww, twh = target_bounds
+                            user32.SetWindowPos(hwnd, 0, twx, twy, tww, twh, 0x0040 | 0x0020)
+                except Exception as sh_err:
+                    logger.warning(f"Erreur on_detached_shown [{clean_view}]: {sh_err}")
+
+            def on_detached_closed():
+                with _DETACHED_LOCK:
+                    _DETACHED_WINDOWS.pop(clean_view, None)
+                    _DETACHED_MAXIMIZED.pop(clean_view, None)
+                    _DETACHED_RESTORE_BOUNDS.pop(clean_view, None)
+                logger.info(f"Fenêtre détachée [{clean_view}] fermée.")
+
+            # 5. Création de la fenêtre
+            new_win = webview.create_window(
+                title=display_title,
+                url=url_with_params,
+                js_api=self,
+                x=wx,
+                y=wy,
+                width=ww,
+                height=wh,
+                min_size=(750, 500),
+                frameless=True,
+                easy_drag=False,
+                background_color=bg_color
+            )
+            new_win.events.shown += on_detached_shown
+            new_win.events.closed += on_detached_closed
+
+            with _DETACHED_LOCK:
+                _DETACHED_WINDOWS[clean_view] = new_win
+
+            return {
+                "success": True,
+                "created": True,
+                "view_id": clean_view,
+                "on_second_screen": on_second_screen,
+                "bounds": {"x": wx, "y": wy, "width": ww, "height": wh}
+            }
+        except Exception as e:
+            logger.error(f"Erreur création fenêtre détachée [{clean_view}]: {e}")
+            return {"success": False, "error": str(e)}
+
+    def close_detached_window(self, view_id: str) -> Dict[str, Any]:
+        """Ferme la fenêtre détachée d'une vue sans quitter l'application principale."""
+        global _DETACHED_WINDOWS, _DETACHED_LOCK
+        clean_view = (view_id or "").replace("view-", "")
+        with _DETACHED_LOCK:
+            win = _DETACHED_WINDOWS.pop(clean_view, None)
+
+        if win:
+            def _do_close():
+                time.sleep(0.05)
+                try:
+                    win.destroy()
+                except Exception as e:
+                    logger.debug(f"Erreur fermeture fenêtre détachée [{clean_view}]: {e}")
+            threading.Thread(target=_do_close, daemon=True).start()
+            return {"success": True, "closed": True}
+        return {"success": False, "error": "Fenêtre introuvable"}
+
+    def minimize_detached_window(self, view_id: str) -> Dict[str, Any]:
+        """Minimise la fenêtre détachée spécifiée."""
+        global _DETACHED_WINDOWS, _DETACHED_LOCK
+        clean_view = (view_id or "").replace("view-", "")
+        with _DETACHED_LOCK:
+            win = _DETACHED_WINDOWS.get(clean_view)
+        if win:
+            try:
+                win.minimize()
+                return {"success": True}
+            except Exception as e:
+                logger.warning(f"Erreur minimize [{clean_view}]: {e}")
+        return {"success": False}
+
+    def maximize_detached_window(self, view_id: str) -> Dict[str, Any]:
+        """Bascule l'agrandissement de la fenêtre détachée sur son écran actuel."""
+        global _DETACHED_WINDOWS, _DETACHED_MAXIMIZED, _DETACHED_RESTORE_BOUNDS, _DETACHED_LOCK
+        clean_view = (view_id or "").replace("view-", "")
+        with _DETACHED_LOCK:
+            win = _DETACHED_WINDOWS.get(clean_view)
+        if not win:
+            return {"success": False}
+
+        hwnd = None
+        try:
+            if hasattr(win, 'native') and win.native:
+                hwnd = win.native.Handle.ToInt32()
+        except Exception:
+            pass
+
+        if not hwnd or not user32:
+            return {"success": False}
+
+        try:
+            MONITOR_DEFAULTTONEAREST = 2
+            hmon = user32.MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
+            mi = MONITORINFO()
+            mi.cbSize = ctypes.sizeof(MONITORINFO)
+            if not user32.GetMonitorInfoW(hmon, ctypes.byref(mi)):
+                return {"success": False}
+
+            rc = mi.rcWork if (mi.rcWork.right - mi.rcWork.left) > 0 else mi.rcMonitor
+            is_max = _DETACHED_MAXIMIZED.get(clean_view, False)
+
+            if is_max:
+                _DETACHED_MAXIMIZED[clean_view] = False
+                prev_bounds = _DETACHED_RESTORE_BOUNDS.get(clean_view)
+                if prev_bounds and rc.left <= prev_bounds[0] < rc.right:
+                    rx, ry, rw, rh = prev_bounds
+                else:
+                    mw = rc.right - rc.left
+                    mh = rc.bottom - rc.top
+                    rw = int(mw * 0.85)
+                    rh = int(mh * 0.85)
+                    rx = rc.left + int((mw - rw) / 2)
+                    ry = rc.top + int((mh - rh) / 2)
+                user32.SetWindowPos(hwnd, 0, rx, ry, rw, rh, 0x0040 | 0x0020)
+                new_state = False
+            else:
+                try:
+                    curr_rect = RECT()
+                    user32.GetWindowRect(hwnd, ctypes.byref(curr_rect))
+                    w = curr_rect.right - curr_rect.left
+                    h = curr_rect.bottom - curr_rect.top
+                    if w > 400 and h > 300:
+                        _DETACHED_RESTORE_BOUNDS[clean_view] = (curr_rect.left, curr_rect.top, w, h)
+                except Exception:
+                    pass
+
+                _DETACHED_MAXIMIZED[clean_view] = True
+                mw = rc.right - rc.left
+                mh = rc.bottom - rc.top
+                user32.SetWindowPos(hwnd, 0, rc.left, rc.top, mw, mh, 0x0040 | 0x0020)
+                new_state = True
+
+            try:
+                win.evaluate_js(f"window.App && window.App.updateWindowState && window.App.updateWindowState({str(new_state).lower()})")
+            except Exception:
+                pass
+
+            return {"success": True, "is_maximized": new_state}
+        except Exception as e:
+            logger.error(f"Erreur maximize [{clean_view}]: {e}")
+            return {"success": False, "error": str(e)}

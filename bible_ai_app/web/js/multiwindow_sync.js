@@ -51,6 +51,32 @@ const MultiwindowSync = {
         this.broadcastCurrentState();
         break;
 
+      case 'PASSAGE_NAVIGATED':
+        if (typeof App !== 'undefined' && App.isDetachedMode) {
+          const b = data.book;
+          const ch = parseInt(data.chapter, 10);
+          const v = parseInt(data.verse, 10) || 1;
+          const activeView = App.activeView || App.detachedViewId;
+
+          if (activeView === 'passage-study' && typeof PassageStudyView !== 'undefined' && PassageStudyView.loadPassage) {
+            PassageStudyView.loadPassage(`${data.bookFrench || b} ${ch}`);
+          } else if (activeView === 'commentaries' && typeof CommentariesView !== 'undefined' && CommentariesView.loadCommentariesForPassage) {
+            CommentariesView.loadCommentariesForPassage(b, ch, v);
+          } else if (activeView === 'articles' && typeof ArticlesView !== 'undefined' && ArticlesView.loadDrawerArticles) {
+            ArticlesView.loadDrawerArticles(b, ch);
+          }
+        }
+        break;
+
+      case 'VERSE_CHANGED':
+        if (typeof App !== 'undefined' && App.isDetachedMode) {
+          const activeView = App.activeView || App.detachedViewId;
+          if (activeView === 'commentaries' && typeof CommentariesView !== 'undefined' && CommentariesView.highlightVerse) {
+            CommentariesView.highlightVerse(parseInt(data.verse, 10));
+          }
+        }
+        break;
+
       default:
         break;
     }

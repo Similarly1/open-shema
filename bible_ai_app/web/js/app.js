@@ -6,6 +6,8 @@
 const App = {
   activeView: 'bible',
   isAIEnabled: true,
+  isDetachedMode: false,
+  detachedViewId: null,
 
   switchDrawerTab(tabId) {
     const tabBtn = document.querySelector(`.drawer-tab[data-drawer-tab="${tabId}"]`);
@@ -15,14 +17,54 @@ const App = {
   },
 
   async init() {
+    // Détection immédiate du mode détaché (fenêtre indépendante pour une vue spécifique)
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const detachedView = urlParams.get('view');
+      const isDetached = urlParams.get('mode') === 'detached';
+      if (isDetached && detachedView) {
+        this.isDetachedMode = true;
+        this.detachedViewId = detachedView.replace('view-', '');
+        document.body.classList.add('window-detached-mode');
+
+        const titleMap = {
+          'bible': 'Bible',
+          'passage-study': 'Guide de Passage',
+          'commentaries': 'Commentaires exégétiques',
+          'theology': 'Théologie & Études',
+          'articles': 'Articles de Blogs',
+          'dict': 'Dictionnaires & Lexiques',
+          'library': 'Bibliothèque',
+          'search': 'Recherche',
+          'ai': "Assistant d'Étude",
+          'audio-studio': 'Studio Audio & Podcasts',
+          'notes': 'Notes d’Étude',
+          'sermons': 'Mes Prédications',
+          'sermon-editor': 'Studio de Prédication',
+          'illustrations': "Banque d'Illustrations",
+          'maps': 'Cartes Bibliques',
+          'settings': 'Paramètres'
+        };
+        const viewTitle = titleMap[this.detachedViewId] || this.detachedViewId;
+        document.title = `Open Shema — ${viewTitle}`;
+
+        const appNameEl = document.querySelector('.topbar-app-name');
+        if (appNameEl) {
+          appNameEl.innerHTML = `<svg class="topbar-app-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> <span class="brand-title">Open Shema</span> <span class="topbar-detached-tag">/ ${viewTitle}</span>`;
+        }
+      }
+    } catch (e) {
+      console.warn('[App.init] Erreur détection mode détaché:', e);
+    }
 
     // 0. Initialisation immédiate de l'IA, du thème, de la typographie et du menu latéral
     this.initAIState();
     this.initThemeAndFont();
     this.initSidebarConfig();
+    this.initSidebarDetachButtons();
 
-    // Vérifier si premier lancement : si oui, ouvrir immédiatement le Wizard et masquer le splash
-    if (typeof FirstRunWizard !== 'undefined' && window.pywebview && window.pywebview.api && window.pywebview.api.is_first_run) {
+    // Vérifier si premier lancement (uniquement dans la fenêtre principale, JAMAIS en mode détaché)
+    if (!this.isDetachedMode && typeof FirstRunWizard !== 'undefined' && window.pywebview && window.pywebview.api && window.pywebview.api.is_first_run) {
       try {
         const res = await window.pywebview.api.is_first_run();
         if (res && res.is_first_run) {
@@ -276,13 +318,24 @@ const App = {
     // 5b. Contrôles de Fenêtre Personnalisés (Barre sans bordure Windows)
     document.getElementById('win-btn-min')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      API.minimizeWindow();
+      if (this.isDetachedMode && this.detachedViewId) {
+        API.minimizeDetachedWindow(this.detachedViewId);
+      } else {
+        API.minimizeWindow();
+      }
     });
     document.getElementById('win-btn-max')?.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const res = await API.maximizeWindow();
-      if (res && typeof res.is_maximized === 'boolean') {
-        this.updateWindowState(res.is_maximized);
+      if (this.isDetachedMode && this.detachedViewId) {
+        const res = await API.maximizeDetachedWindow(this.detachedViewId);
+        if (res && typeof res.is_maximized === 'boolean') {
+          this.updateWindowState(res.is_maximized);
+        }
+      } else {
+        const res = await API.maximizeWindow();
+        if (res && typeof res.is_maximized === 'boolean') {
+          this.updateWindowState(res.is_maximized);
+        }
       }
     });
     document.getElementById('win-btn-fs')?.addEventListener('click', async (e) => {
@@ -300,7 +353,11 @@ const App = {
     });
     document.getElementById('win-btn-close')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      API.closeWindow();
+      if (this.isDetachedMode && this.detachedViewId) {
+        API.closeDetachedWindow(this.detachedViewId);
+      } else {
+        API.closeWindow();
+      }
     });
 
     // Raccourcis clavier F11 et Échap pour basculer / quitter le plein écran
@@ -563,6 +620,87 @@ const App = {
     if (typeof SettingsView !== 'undefined' && SettingsView.updateNavCustomizerState) {
       SettingsView.updateNavCustomizerState(merged);
     }
+
+    // 4. Mettre à jour les boutons de détachement sur les éléments du menu
+    this.initSidebarDetachButtons();
+  },
+
+  initSidebarDetachButtons() {
+    const navButtons = document.querySelectorAll(
+      '.sidebar-menu .nav-item, .sidebar-menu .nav-sub-item, .sidebar-footer .nav-item'
+    );
+    const titleMap = {
+      'bible': 'Bible',
+      'passage-study': 'Guide de Passage',
+      'commentaries': 'Commentaires exégétiques',
+      'theology': 'Théologie & Études',
+      'articles': 'Articles de Blogs',
+      'dict': 'Dictionnaires & Lexiques',
+      'library': 'Bibliothèque',
+      'search': 'Recherche',
+      'ai': "Assistant d'Étude",
+      'audio-studio': 'Studio Audio & Podcasts',
+      'notes': 'Notes d’Étude',
+      'sermons': 'Mes Prédications',
+      'sermon-editor': 'Studio de Prédication',
+      'illustrations': "Banque d'Illustrations",
+      'maps': 'Cartes Bibliques',
+      'settings': 'Paramètres'
+    };
+
+    navButtons.forEach(btn => {
+      if (btn.querySelector('.btn-detach-nav')) return;
+
+      const viewId = btn.dataset.view || btn.dataset.navId || btn.id.replace('nav-', '').replace('sub-', '');
+      if (!viewId || viewId === 'about') return;
+
+      const title = titleMap[viewId] || btn.getAttribute('title') || btn.querySelector('.nav-label, .nav-sub-label')?.textContent?.trim() || viewId;
+
+      const detachBtn = document.createElement('span');
+      detachBtn.className = 'btn-detach-nav';
+      detachBtn.title = `Ouvrir ${title} dans une nouvelle fenêtre`;
+      detachBtn.setAttribute('aria-label', `Ouvrir ${title} dans une nouvelle fenêtre`);
+      detachBtn.setAttribute('role', 'button');
+      detachBtn.setAttribute('tabindex', '0');
+      // SVG épuré sans aucun émoji
+      detachBtn.innerHTML = `
+        <svg class="detach-nav-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      `;
+
+      const triggerOpen = async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        try {
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`Ouverture de ${title} dans une nouvelle fenêtre...`, 2000);
+          }
+          const res = await API.openDetachedWindow(viewId, title);
+          if (res && res.already_open && typeof App !== 'undefined' && App.showToast) {
+            App.showToast(`${title} est déjà ouvert (ramené au premier plan)`, 2500);
+          }
+        } catch (err) {
+          console.error('Erreur openDetachedWindow:', err);
+        }
+      };
+
+      detachBtn.addEventListener('click', triggerOpen);
+      detachBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          triggerOpen(e);
+        }
+      });
+
+      const chevron = btn.querySelector('.nav-chevron-btn');
+      if (chevron) {
+        btn.insertBefore(detachBtn, chevron);
+      } else {
+        btn.appendChild(detachBtn);
+      }
+    });
   },
 
   initThemeAndFont() {
@@ -743,7 +881,7 @@ const App = {
     if (this._isPreloadingDone) return;
 
     const wizardOverlay = document.getElementById('first-run-wizard-overlay');
-    if (wizardOverlay && !wizardOverlay.classList.contains('hidden')) {
+    if (!this.isDetachedMode && wizardOverlay && !wizardOverlay.classList.contains('hidden')) {
       console.log('[App] FirstRunWizard actif, suspension du pipeline de préchargement.');
       return;
     }
@@ -808,6 +946,9 @@ const App = {
     } finally {
       clearTimeout(safetyTimer);
       this.hideSplash();
+      if (this.isDetachedMode && this.detachedViewId) {
+        this.switchView(this.detachedViewId);
+      }
     }
   },
 

@@ -43,6 +43,10 @@ const FirstRunWizard = {
   },
 
   async init() {
+    // Ne jamais lancer l'assistant de premier démarrage sur une fenêtre détachée
+    if (window.location.search.includes('mode=detached') || (typeof App !== 'undefined' && App.isDetachedMode)) {
+      return;
+    }
     try {
       if (window.pywebview && window.pywebview.api && window.pywebview.api.is_first_run) {
         const res = await window.pywebview.api.is_first_run();
@@ -56,6 +60,9 @@ const FirstRunWizard = {
   },
 
   async show() {
+    if (window.location.search.includes('mode=detached') || (typeof App !== 'undefined' && App.isDetachedMode)) {
+      return;
+    }
     const splash = document.getElementById('app-splash-loader');
     if (splash) {
       splash.style.display = 'none';

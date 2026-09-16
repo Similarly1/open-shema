@@ -1187,5 +1187,110 @@
     "format": "pdf",
     "chapters_count": 27,
     "chunks_count": 1350
+  },
+  "PCAET": {
+    "name": "PCAET",
+    "title": "Pauline Christology: An Exegetical-Theological Study",
+    "author": "Gordon D. Fee",
+    "description": "",
+    "year": "2010",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\PCAET.png",
+    "type": "Théologie",
+    "corpus_scope": "NT",
+    "source_type": "systematic_theology",
+    "book_code": "GRP_PAULINE",
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\ebooks\\Pauline Christology An Exegetical-Theological Study (Gordon D. Fee) (Z-Library).pdf",
+    "format": "pdf",
+    "chapters_count": 150,
+    "chunks_count": 1220
+  },
+  "WOTOT": {
+    "name": "WOTOT",
+    "title": "Women of the Old Testament",
+    "author": "Gladys Hunt",
+    "description": "",
+    "year": "2024",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\WOTOT.png",
+    "type": "Théologie",
+    "corpus_scope": "OT",
+    "source_type": "systematic_theology",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\ebooks\\Women of the Old Testament (Gladys Hunt) (Z-Library).pdf",
+    "format": "pdf",
+    "chapters_count": 17,
+    "chunks_count": 58
+  },
+  "Sin and Temptation": {
+    "name": "Sin and Temptation",
+    "title": "Overcoming Sin and Temptation",
+    "author": "Foreword by John Piper",
+    "description": "The providence of God is his purposeful sovereignty by which he will be completely successful in the achievement of his ultimate goal for the universe. God’s providence carries his plans into action, guides all things toward his ultimate goal, and leads to the final consummation.\n\nJohn Piper draws on a lifetime of theological reflection, biblical study, and practical ministry to lead readers on a stunning tour of the sightings of God’s providence — from Genesis to Revelation — to discover the all-encompassing reality of God’s purposeful sovereignty over all of creation and all of history.",
+    "year": "2023",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\Sin_and_Temptation.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "systematic_theology",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "file_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\ebooks\\Overcoming Sin and Temptation (Foreword by John Piper) (Kapic, Kelly M.Owen, JohnPiper, JohnTaylor etc.) (Z-Library).pdf",
+    "format": "pdf",
+    "chapters_count": 71,
+    "chunks_count": 539
+  },
+  "EAMTF": {
+    "name": "EAMTF",
+    "title": "Être assis, Marcher Tenir ferme",
+    "author": "Watchman Nee",
+    "description": "",
+    "year": "2015",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\EAMTF.png",
+    "type": "Théologie",
+    "corpus_scope": "GLOBAL",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 6,
+    "chunks_count": 69,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\Watchman-Nee-Etre-assis-marcher-tenir-ferme.epub"
+  },
+  "LÉG": {
+    "name": "LÉG",
+    "title": "L'Église glorieuse",
+    "author": "Watchman Nee",
+    "description": "",
+    "year": "2017",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\L_G.png",
+    "type": "Théologie",
+    "corpus_scope": "NT",
+    "source_type": "general",
+    "book_code": null,
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 43,
+    "chunks_count": 348,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\Watchman-Nee-L-Eglise-glorieuse.epub"
+  },
+  "LDDN": {
+    "name": "LDDN",
+    "title": "Le destin des nations",
+    "author": "Daniel Arnold",
+    "description": "Le destin des nations – Une étude littéraire du livre de Daniel  Ce commentaire présente une analyse historique, littéraire et prophétique d’un livre biblique exceptionnel: celui de Daniel. Il relève les parallèles avec l’histoire de Babel, de Joseph et d’Ezéchiel. Il souligne les similitudes et les contrastes avec l’Apocalypse. Il s’efforce d’expliquer les multiples énigmes du livre à la lumière de l’ensemble. Il montre comment l’aspect bilingue du texte (hébreu-araméen) unit l’ouvrage et l’explique.  Points forts:   + écrit par un passionné  + propose une analyse originale   + signale les autres interprétations  Thèmes:  * Daniel  * Babylone  * Nebucadnetsar  * langues bibliques  * Antichrist  * Israël  * Apocalypse",
+    "year": "2021",
+    "cover_path": "C:\\Users\\adrie\\Documents\\antigravity\\peaceful-mendeleev\\bible_ai_app\\data\\covers\\LDDN.png",
+    "type": "Commentaire",
+    "corpus_scope": "OT",
+    "source_type": "commentary_verse",
+    "book_code": "Dan",
+    "embedding_model": "bge_multilingual_gemma2 (Infomaniak)",
+    "active": true,
+    "chapters_count": 19,
+    "chunks_count": 479,
+    "file_path": "C:\\Users\\adrie\\kDrive\\Documents\\Théologie\\Ressources externes\\Ebooks\\destin-des-nations-une-etude-litteraire-du-livre-de-daniel.epub"
   }
 }

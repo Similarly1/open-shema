@@ -217,6 +217,26 @@ const API = {
     return await this.call('close_window');
   },
 
+  async openDetachedWindow(viewId, title = '') {
+    return await this.call('open_detached_window', viewId, title);
+  },
+
+  async closeDetachedWindow(viewId) {
+    return await this.call('close_detached_window', viewId);
+  },
+
+  async minimizeDetachedWindow(viewId) {
+    return await this.call('minimize_detached_window', viewId);
+  },
+
+  async maximizeDetachedWindow(viewId) {
+    return await this.call('maximize_detached_window', viewId);
+  },
+
+  async isDetachedWindowOpen(viewId) {
+    return await this.call('is_detached_window_open', viewId);
+  },
+
   async openCommentaryWindow(bookCode = 'Gen', chapterNum = 1, verseNum = 1) {
     return await this.call('open_commentary_window', bookCode, parseInt(chapterNum), parseInt(verseNum));
   },
