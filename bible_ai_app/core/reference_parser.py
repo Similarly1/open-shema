@@ -131,7 +131,7 @@ BOOK_MAPPING_RAW = {
     "daniel grec": "Dag", "dag": "Dag",
     "3 esdras": "1Es", "1es": "1Es", "3esd": "1Es",
     "4 esdras": "2Es", "2es": "2Es", "4esd": "2Es",
-    "priere de manasse": "Man", "prière de manassé": "Man", "man": "Man",
+    "priere de manasse": "Man", "prière de manassé": "Man", "prayer of manasseh": "Man", "manasse": "Man", "manasseh": "Man", "pr man": "Man", "prman": "Man",
     "psaume 151": "Ps2", "ps2": "Ps2", "psa 151": "Ps2"
 }
 

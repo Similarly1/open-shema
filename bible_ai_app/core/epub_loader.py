@@ -72,7 +72,7 @@ TECHNICAL_BOILERPLATE_KEYWORDS = [
     "mentions legales", "page blanche",
     
     # Anglais
-    "contents", "ebook introduction", "publisher",
+    "contents", "contetns", "ebook introduction", "publisher",
     "title page", "titlepage", "half title", "share your thoughts", "blank page"
 ]
 
@@ -419,6 +419,102 @@ class EpubLoader:
         cls._inspect_cache[cache_key] = metadata
         return metadata
 
+    BOOK_TITLE_MAPPING: Dict[str, Tuple[str, str, str]] = {
+        # AT / OT
+        "genese": ("Gen", "Genèse", "OT"), "genesis": ("Gen", "Genèse", "OT"),
+        "exode": ("Exo", "Exode", "OT"), "exodus": ("Exo", "Exode", "OT"),
+        "levitique": ("Lev", "Lévitique", "OT"), "leviticus": ("Lev", "Lévitique", "OT"),
+        "nombres": ("Num", "Nombres", "OT"), "numbers": ("Num", "Nombres", "OT"),
+        "deuteronome": ("Deu", "Deutéronome", "OT"), "deuteronomy": ("Deu", "Deutéronome", "OT"),
+        "josue": ("Jos", "Josué", "OT"), "joshua": ("Jos", "Josué", "OT"),
+        "juges": ("Jdg", "Juges", "OT"), "judges": ("Jdg", "Juges", "OT"),
+        "ruth": ("Rut", "Ruth", "OT"),
+        "1 samuel": ("1Sa", "1 Samuel", "OT"), "2 samuel": ("2Sa", "2 Samuel", "OT"), "samuel": ("1Sa", "1 Samuel", "OT"),
+        "1 rois": ("1Ki", "1 Rois", "OT"), "2 rois": ("2Ki", "2 Rois", "OT"),
+        "1 kings": ("1Ki", "1 Rois", "OT"), "2 kings": ("2Ki", "2 Rois", "OT"),
+        "1 chroniques": ("1Ch", "1 Chroniques", "OT"), "2 chroniques": ("2Ch", "2 Chroniques", "OT"),
+        "1 chronicles": ("1Ch", "1 Chroniques", "OT"), "2 chronicles": ("2Ch", "2 Chroniques", "OT"),
+        "chroniques": ("1Ch", "1 Chroniques", "OT"), "chronicles": ("1Ch", "1 Chroniques", "OT"),
+        "esdras": ("Ezr", "Esdras", "OT"), "ezra": ("Ezr", "Esdras", "OT"),
+        "nehemie": ("Neh", "Néhémie", "OT"), "nehemiah": ("Neh", "Néhémie", "OT"),
+        "esther": ("Est", "Esther", "OT"),
+        "job": ("Job", "Job", "OT"),
+        "psaumes": ("Psa", "Psaumes", "OT"), "psalms": ("Psa", "Psaumes", "OT"),
+        "psaume": ("Psa", "Psaumes", "OT"), "psalm": ("Psa", "Psaumes", "OT"),
+        "proverbes": ("Pro", "Proverbes", "OT"), "proverbs": ("Pro", "Proverbes", "OT"),
+        "ecclesiaste": ("Ecc", "Ecclésiaste", "OT"), "ecclesiastes": ("Ecc", "Ecclésiaste", "OT"),
+        "qohelet": ("Ecc", "Ecclésiaste", "OT"),
+        "cantique des cantiques": ("Sol", "Cantique des Cantiques", "OT"),
+        "song of solomon": ("Sol", "Cantique des Cantiques", "OT"),
+        "song of songs": ("Sol", "Cantique des Cantiques", "OT"),
+        "cantique": ("Sol", "Cantique des Cantiques", "OT"),
+        "esaie": ("Isa", "Ésaïe", "OT"), "isaiah": ("Isa", "Ésaïe", "OT"),
+        "jeremie": ("Jer", "Jérémie", "OT"), "jeremiah": ("Jer", "Jérémie", "OT"),
+        "lamentations": ("Lam", "Lamentations", "OT"),
+        "ezechiel": ("Eze", "Ézéchiel", "OT"), "ezekiel": ("Eze", "Ézéchiel", "OT"),
+        "daniel": ("Dan", "Daniel", "OT"),
+        "osee": ("Hos", "Osée", "OT"), "hosea": ("Hos", "Osée", "OT"),
+        "joel": ("Joe", "Joël", "OT"),
+        "amos": ("Amo", "Amos", "OT"),
+        "abdias": ("Oba", "Abdias", "OT"), "obadiah": ("Oba", "Abdias", "OT"),
+        "jonas": ("Jon", "Jonas", "OT"), "jonah": ("Jon", "Jonas", "OT"),
+        "michee": ("Mic", "Michée", "OT"), "micah": ("Mic", "Michée", "OT"),
+        "nahum": ("Nah", "Nahum", "OT"),
+        "habacuc": ("Hab", "Habacuc", "OT"), "habakkuk": ("Hab", "Habacuc", "OT"),
+        "sophonie": ("Zep", "Sophonie", "OT"), "zephaniah": ("Zep", "Sophonie", "OT"),
+        "aggee": ("Hag", "Aggée", "OT"), "haggai": ("Hag", "Aggée", "OT"),
+        "zacharie": ("Zec", "Zacharie", "OT"), "zechariah": ("Zec", "Zacharie", "OT"),
+        "malachie": ("Mal", "Malachie", "OT"), "malachi": ("Mal", "Malachie", "OT"),
+
+        # NT
+        "matthieu": ("Mat", "Matthieu", "NT"), "matthew": ("Mat", "Matthieu", "NT"),
+        "marc": ("Mar", "Marc", "NT"), "mark": ("Mar", "Marc", "NT"),
+        "luc": ("Luk", "Luc", "NT"), "luke": ("Luk", "Luc", "NT"),
+        "jean": ("Joh", "Jean", "NT"), "john": ("Joh", "Jean", "NT"),
+        "actes": ("Act", "Actes", "NT"), "acts": ("Act", "Actes", "NT"),
+        "actes des apotres": ("Act", "Actes", "NT"), "acts of the apostles": ("Act", "Actes", "NT"),
+        "romains": ("Rom", "Romains", "NT"), "romans": ("Rom", "Romains", "NT"),
+        "1 corinthiens": ("1Co", "1 Corinthiens", "NT"), "2 corinthiens": ("2Co", "2 Corinthiens", "NT"),
+        "corinthiens": ("1Co", "1 Corinthiens", "NT"),
+        "1 corinthians": ("1Co", "1 Corinthiens", "NT"), "2 corinthians": ("2Co", "2 Corinthiens", "NT"),
+        "corinthians": ("1Co", "1 Corinthiens", "NT"),
+        "galates": ("Gal", "Galates", "NT"), "galatians": ("Gal", "Galates", "NT"),
+        "ephesiens": ("Eph", "Éphésiens", "NT"), "ephesians": ("Eph", "Éphésiens", "NT"),
+        "philippiens": ("Phi", "Philippiens", "NT"), "philippians": ("Phi", "Philippiens", "NT"),
+        "colossiens": ("Col", "Colossiens", "NT"), "colossians": ("Col", "Colossiens", "NT"),
+        "1 thessaloniciens": ("1Th", "1 Thessaloniciens", "NT"), "2 thessaloniciens": ("2Th", "2 Thessaloniciens", "NT"),
+        "thessaloniciens": ("1Th", "1 Thessaloniciens", "NT"),
+        "1 thessalonians": ("1Th", "1 Thessaloniciens", "NT"), "2 thessalonians": ("2Th", "2 Thessaloniciens", "NT"),
+        "thessalonians": ("1Th", "1 Thessaloniciens", "NT"),
+        "1 timothee": ("1Ti", "1 Timothée", "NT"), "2 timothee": ("2Ti", "2 Timothée", "NT"),
+        "timothee": ("1Ti", "1 Timothée", "NT"),
+        "1 timothy": ("1Ti", "1 Timothée", "NT"), "2 timothy": ("2Ti", "2 Timothée", "NT"),
+        "timothy": ("1Ti", "1 Timothée", "NT"),
+        "tite": ("Tit", "Tite", "NT"), "titus": ("Tit", "Tite", "NT"),
+        "philemon": ("Phm", "Philémon", "NT"),
+        "hebreux": ("Heb", "Hébreux", "NT"), "hebrews": ("Heb", "Hébreux", "NT"),
+        "jacques": ("Jam", "Jacques", "NT"), "james": ("Jam", "Jacques", "NT"),
+        "1 pierre": ("1Pe", "1 Pierre", "NT"), "2 pierre": ("2Pe", "2 Pierre", "NT"),
+        "1 peter": ("1Pe", "1 Pierre", "NT"), "2 peter": ("2Pe", "2 Pierre", "NT"),
+        "1 jean": ("1Jo", "1 Jean", "NT"), "2 jean": ("2Jo", "2 Jean", "NT"), "3 jean": ("3Jo", "3 Jean", "NT"),
+        "1 john": ("1Jo", "1 Jean", "NT"), "2 john": ("2Jo", "2 Jean", "NT"), "3 john": ("3Jo", "3 Jean", "NT"),
+        "jude": ("Jud", "Jude", "NT"),
+        "apocalypse": ("Rev", "Apocalypse", "NT"), "revelation": ("Rev", "Apocalypse", "NT"),
+
+        # Apocryphes (intitulés complets uniquement)
+        "tobie": ("Tob", "Tobie", "APOCRYPHA"), "tobit": ("Tob", "Tobie", "APOCRYPHA"),
+        "judith": ("Jdt", "Judith", "APOCRYPHA"),
+        "1 maccabees": ("1Ma", "1 Maccabées", "APOCRYPHA"), "2 maccabees": ("2Ma", "2 Maccabées", "APOCRYPHA"),
+        "maccabees": ("1Ma", "1 Maccabées", "APOCRYPHA"),
+        "sagesse de salomon": ("Wis", "Sagesse de Salomon", "APOCRYPHA"),
+        "wisdom of solomon": ("Wis", "Sagesse de Salomon", "APOCRYPHA"),
+        "siracide": ("Sir", "Siracide", "APOCRYPHA"), "sirach": ("Sir", "Siracide", "APOCRYPHA"),
+        "ecclesiastique": ("Sir", "Siracide", "APOCRYPHA"),
+        "baruch": ("Bar", "Baruch", "APOCRYPHA"),
+        "priere de manasse": ("Man", "Prière de Manassé", "APOCRYPHA"),
+        "prayer of manasseh": ("Man", "Prière de Manassé", "APOCRYPHA")
+    }
+
     @classmethod
     def detect_book_from_title(cls, title: str) -> Optional[Dict[str, str]]:
         """
@@ -430,12 +526,17 @@ class EpubLoader:
         if not title:
             return None
         norm = strip_accents(title.lower())
+        has_commentary_context = bool(re.search(
+            r'\b(commentary|commentaire|commentaires|expository|exegetical|homiletical|critical|'
+            r'exposition|studies|epitre|epistles|epitres|epistle|letter|lettre|gospel|evangile|'
+            r'book of|livre de)\b', norm
+        ))
         # Nettoyer les termes fréquents de type de livre / préfixes
         clean = re.sub(
             r'\b(commentary|commentaire|commentaires|expository|exegetical|homiletical|critical|'
             r'introduction|theology|theologie|survey|study|guide|handbook|manuel|'
             r'book|livre|epitre|epistles|epitres|epistle|letter|lettre|gospel|evangile|'
-            r'on|sur|de|des|du|d[\'’]|l[\'’]|la|le|les|the|an|a|edition|volume|part|vol|tome|series)\b',
+            r'according to|selon|on|sur|de|des|du|d[\'’]|l[\'’]|la|le|les|the|an|a|of|aux|edition|volume|part|vol|tome|series)\b',
             ' ', norm
         )
         clean = re.sub(r'[^\w\s]', ' ', clean)
@@ -443,10 +544,8 @@ class EpubLoader:
 
         def _lookup(candidate: str) -> Optional[Dict[str, str]]:
             c = candidate.strip()
-            if c in BOOK_MAPPING:
-                code = BOOK_MAPPING[c]
-                name = REVERSE_BOOK_MAPPING.get(code, code)
-                scope = "OT" if code in OT_CODES else ("NT" if code in NT_CODES else ("APOCRYPHA" if code in APOCRYPHA_CODES else "GLOBAL"))
+            if c in cls.BOOK_TITLE_MAPPING:
+                code, name, scope = cls.BOOK_TITLE_MAPPING[c]
                 return {"book_code": code, "book_name": name, "corpus_scope": scope}
             return None
 
@@ -463,9 +562,17 @@ class EpubLoader:
             if res:
                 return res
 
-        # 3. Tester chaque mot significatif (longueur >= 3 pour éviter 'in', 'at', etc.)
+        # 3. Tester chaque mot significatif
+        # Noms ambigus (prénoms courants d'auteurs ou noms communs: john, jean, james, jacques, peter, pierre, mark, marc, luke, luc, job)
+        # On ne les associe à un livre biblique QUE s'il y a un contexte explicite de commentaire/livre biblique ou si le titre nettoyé se résume au livre.
+        AMBIGUOUS_NAMES = {'john', 'jean', 'james', 'jacques', 'peter', 'pierre', 'mark', 'marc', 'luke', 'luc', 'job'}
         for w in words:
-            if len(w) >= 3:
+            if w in AMBIGUOUS_NAMES:
+                if has_commentary_context or clean == w:
+                    res = _lookup(w)
+                    if res:
+                        return res
+            else:
                 res = _lookup(w)
                 if res:
                     return res
