@@ -521,7 +521,7 @@ const ImportModal = {
           if (hasChanges) {
             this.renderChaptersList(this.chapters);
           }
-        } else if (selectedType === 'Apologétique' && this.chapters && this.chapters.length > 0) {
+        } else if ((selectedType === 'Apologétique' || selectedType === 'Essais & Pensée chrétienne') && this.chapters && this.chapters.length > 0) {
           let hasChanges = false;
           this.chapters.forEach(ch => {
             if (ch.source_type !== 'appendix' && ch.source_type !== 'endnotes') {
@@ -740,7 +740,7 @@ const ImportModal = {
           } else {
             stypeSelect.value = 'systematic_theology';
           }
-        } else if (selectedType === 'Apologétique') {
+        } else if (selectedType === 'Apologétique' || selectedType === 'Essais & Pensée chrétienne') {
           stypeSelect.value = dominantType || 'general';
         } else if (dominantType) {
           stypeSelect.value = dominantType;

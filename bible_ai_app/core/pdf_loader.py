@@ -160,12 +160,19 @@ class PdfLoader:
             "dictionary", "dictionnaire", "lexicon", "lexique", "encyclopedia", "encyclopedie"
         ])
 
+        is_essay = any(w in book_title_norm or w in strip_accents(description.lower()) for w in [
+            "essai", "essais", "philosophie", "philosophe", "pensee chretienne", 
+            "pensee", "pensee religieuse", "relire le relie", "relier", "culture", "ethique", "humanisme"
+        ])
+
         if is_commentary:
             detected_type = "Commentaire"
         elif is_archaeology:
             detected_type = "Archéologie & Histoire"
         elif is_apologetics:
             detected_type = "Apologétique"
+        elif is_essay:
+            detected_type = "Essais & Pensée chrétienne"
         elif is_dictionary:
             detected_type = "Dictionnaire"
         else:
