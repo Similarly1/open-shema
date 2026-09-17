@@ -201,8 +201,11 @@ const OpenShemaStore = {
     }
     await this.fetchCommunityBooks();
     await this.fetchGutenbergBooks();
-    await this.fetchCCELBooks();
-    this._populateInitialUnifiedResults();
+    if (this.searchQuery) {
+      this._filterLocalModulesInstant();
+    } else {
+      this._populateInitialUnifiedResults();
+    }
     this._updateFacetCounts();
     this.renderUnifiedHub();
     return this.catalogData;
@@ -242,10 +245,12 @@ const OpenShemaStore = {
   },
 
   async fetchInitialShowcase() {
+    if (this.searchQuery && this.searchQuery.trim().length > 0) return;
     try {
       const officialModules = (this.catalogData && this.catalogData.modules) ? this.catalogData.modules : [];
       const res = await API.call('search_unified_hub', '', officialModules);
       if (res) {
+        if (this.searchQuery && this.searchQuery.trim().length > 0) return;
         if (Array.isArray(res.open_shema_results) && res.open_shema_results.length > 0) {
           this.unifiedResults.open_shema = res.open_shema_results;
         }
@@ -369,33 +374,45 @@ const OpenShemaStore = {
 
     this.activeCategory = targetCat;
     this.activeTypeFilter = targetType;
-    if (searchQuery) {
-      this.searchQuery = searchQuery;
-    }
+    this.searchQuery = (searchQuery || '').trim();
 
-    await this.refreshInstalledCache();
-
-    // Si les modules ne sont pas encore chargés en mémoire, les charger
-    if (!this.catalogData || !this.catalogData.modules || this.catalogData.modules.length === 0) {
-      await this.fetchCatalog();
-    } else {
-      this._populateInitialUnifiedResults();
-    }
-
-    this._updateCategoryPills();
-    this.renderUnifiedHub();
-
+    // 1. Mise a jour SYNCHRONE immediate du champ de recherche
     const searchInput = modal.querySelector('#store-unified-search-input');
     if (searchInput) {
+      searchInput.value = this.searchQuery;
+      setTimeout(() => {
+        try {
+          searchInput.focus();
+        } catch (e) {}
+      }, 30);
+    }
+
+    // 2. Mise a jour synchrone des facettes / pills
+    this._updateCategoryPills();
+
+    // 3. Rendu immediat : si recherche, filtrer instantanement et executer sans debounce
+    if (this.searchQuery) {
+      this._filterLocalModulesInstant();
+      this.renderUnifiedHub();
+      this._handleSearchInput(true);
+    } else {
+      this._populateInitialUnifiedResults();
+      this.renderUnifiedHub();
+    }
+
+    // 4. En arriere-plan : actualiser le cache des installes et le catalogue si necessaire
+    await this.refreshInstalledCache();
+
+    if (!this.catalogData || !this.catalogData.modules || this.catalogData.modules.length === 0) {
+      await this.fetchCatalog();
       if (this.searchQuery) {
-        searchInput.value = this.searchQuery;
-        this._handleSearchInput(true);
-      } else {
-        searchInput.value = '';
-        // Chargement immédiat des e-books librairies et gutenberg
-        await this.fetchInitialShowcase();
+        this._filterLocalModulesInstant();
+        this.renderUnifiedHub();
       }
-      setTimeout(() => searchInput.focus(), 50);
+    }
+
+    if (!this.searchQuery) {
+      await this.fetchInitialShowcase();
     }
   },
 
@@ -734,6 +751,7 @@ const OpenShemaStore = {
   _handleSearchInput(force = false) {
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
     }
 
     this._filterLocalModulesInstant();
@@ -745,12 +763,12 @@ const OpenShemaStore = {
       return;
     }
 
-    this.searchDebounceTimer = setTimeout(async () => {
+    const runSearch = async () => {
       this._showSearchSpinner(true);
       try {
         const officialModules = (this.catalogData && this.catalogData.modules) ? this.catalogData.modules : [];
         const res = await API.call('search_unified_hub', query, officialModules);
-        if (res) {
+        if (res && this.searchQuery === query) {
           if (Array.isArray(res.open_shema_results)) {
             this.unifiedResults.open_shema = res.open_shema_results;
           }
@@ -767,11 +785,19 @@ const OpenShemaStore = {
       } catch (err) {
         console.warn('Erreur recherche unifiée réseau:', err);
       } finally {
-        this._showSearchSpinner(false);
-        this._updateFacetCounts();
-        this.renderUnifiedHub();
+        if (this.searchQuery === query) {
+          this._showSearchSpinner(false);
+          this._updateFacetCounts();
+          this.renderUnifiedHub();
+        }
       }
-    }, 300);
+    };
+
+    if (force) {
+      runSearch();
+    } else {
+      this.searchDebounceTimer = setTimeout(runSearch, 300);
+    }
   },
 
   _showSearchSpinner(show) {

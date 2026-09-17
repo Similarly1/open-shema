@@ -4177,125 +4177,75 @@
                 </div>
               </div>
 
-              <!-- Carte : Paramètres Studio Audio & Synthèse Vocale -->
-              <div class="settings-card" id="card-audio-studio-settings" style="margin-top: 18px;">
+              <!-- Carte : Paramètres Lecture Audio de l'Assistant d'Étude IA -->
+              <div class="settings-card" id="card-ai-answer-voice-settings" style="margin-top: 18px;">
                 <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-orange, #ea580c);"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><path d="M2 10v3"/><path d="M22 10v3"/></svg>
-                  <span>Studio Audio &amp; Podcasts (Synthèse Vocale)</span>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #3b82f6);"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                  <span>Lecture Audio de l'Assistant d'Étude IA (Streaming)</span>
                 </div>
                 <p class="card-desc" style="margin-bottom: 14px;">
-                  Configurez le moteur de voix par défaut, l'attribution des voix neuronales pour chaque rôle et les paramètres d'ancrage RAG des émissions.
+                  Activez l'écoute instantanée (&lt; 400ms) de vos études bibliques générées par l'assistant IA. Choisissez le moteur vocal, le timbre de la voix et la vitesse de lecture par défaut.
                 </p>
 
-                <!-- Moteur Vocal Principal -->
+                <!-- Moteur Vocal Assistant -->
                 <div class="form-group" style="margin-bottom: 16px;">
-                  <label for="cfg-audio-studio-engine">Moteur de synthèse vocale par défaut :</label>
-                  <select id="cfg-audio-studio-engine" class="select-field full-w" style="height: 38px;">
-                    <option value="edge_tts" selected>Microsoft Edge-TTS (Neural — 100% Gratuit, illimité, sans clé)</option>
-                    <option value="gemini_tts">Google Gemini Flash TTS (Voix Google expressives / Clé Google API)</option>
+                  <label for="cfg-ai-answer-voice-engine">Moteur de synthèse vocale :</label>
+                  <select id="cfg-ai-answer-voice-engine" class="select-field full-w" style="height: 38px;">
+                    <option value="edge_tts" selected>Microsoft Edge-TTS (Neural — 100% Gratuit, sans clé)</option>
                     <option value="voxtral">Mistral Voxtral (Voix expressive / Clé API Mistral)</option>
-                    <option value="mixed">Mix Multi-Moteurs (Personnalisation par locuteur)</option>
+                    <option value="gemini_tts">Google Gemini Flash TTS (Voix Google expressives / Clé API Google)</option>
                   </select>
                 </div>
 
-                <!-- Duo de Voix Edge-TTS -->
-                <div class="form-row two-cols" style="margin-bottom: 12px;">
-                  <div class="form-group">
-                    <label for="cfg-audio-studio-voice-a">Voix Locuteur A (Animatrice) :</label>
-                    <select id="cfg-audio-studio-voice-a" class="select-field full-w">
-                      <option value="fr-FR-DeniseNeural" selected>Denise (Française, vive &amp; claire — Recommandée)</option>
-                      <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française, naturelle)</option>
-                      <option value="fr-FR-EloiseNeural">Éloïse (Française, douce)</option>
-                      <option value="fr-BE-CharlineNeural">Charline (Belge, posée)</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="cfg-audio-studio-voice-b">Voix Locuteur B (Exégète) :</label>
-                    <select id="cfg-audio-studio-voice-b" class="select-field full-w">
-                      <option value="fr-FR-HenriNeural" selected>Henri (Français, posé &amp; érudit — Recommandé)</option>
-                      <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, expressif)</option>
-                      <option value="fr-CH-FabriceNeural">Fabrice (Suisse, posé)</option>
-                      <option value="fr-CA-AntoineNeural">Antoine (Canadien)</option>
-                    </select>
-                  </div>
+                <!-- Voix Edge-TTS -->
+                <div class="form-group" id="row-ai-voice-edge" style="margin-bottom: 16px;">
+                  <label for="cfg-ai-answer-voice-edge">Voix francophone (Edge-TTS) :</label>
+                  <select id="cfg-ai-answer-voice-edge" class="select-field full-w" style="height: 38px;">
+                    <option value="fr-CH-FabriceNeural" selected>Fabrice (Suisse — Masculine, posé, net &amp; précis — Recommandé)</option>
+                    <option value="fr-FR-DeniseNeural">Denise (Française — Féminine, vive &amp; claire)</option>
+                    <option value="fr-FR-HenriNeural">Henri (Français — Masculine, posé &amp; érudit)</option>
+                    <option value="fr-FR-VivienneMultilingualNeural">Vivienne (Française — Féminine, naturelle &amp; douce)</option>
+                    <option value="fr-FR-RemyMultilingualNeural">Rémy (Français — Masculine, chaleureux &amp; dynamique)</option>
+                    <option value="fr-FR-EloiseNeural">Éloïse (Française — Féminine, calme)</option>
+                    <option value="fr-BE-CharlineNeural">Charline (Belge — Féminine, posée)</option>
+                    <option value="fr-CA-AntoineNeural">Antoine (Canadien — Masculine, posé)</option>
+                  </select>
                 </div>
 
-                <!-- Voix Chronique Solo & Pause -->
-                <div class="form-row two-cols" style="margin-bottom: 16px;">
-                  <div class="form-group">
-                    <label for="cfg-audio-studio-voice-solo">Voix Chronique Solo (1 Voix) :</label>
-                    <select id="cfg-audio-studio-voice-solo" class="select-field full-w">
-                      <option value="fr-FR-HenriNeural" selected>Henri (Français, posé &amp; érudit)</option>
-                      <option value="fr-FR-DeniseNeural">Denise (Française, claire)</option>
-                      <option value="fr-FR-RemyMultilingualNeural">Rémy (Français, dynamique)</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="cfg-audio-studio-pause-ms">Pause entre les répliques (ms) :</label>
-                    <input type="number" id="cfg-audio-studio-pause-ms" class="text-field full-w" min="100" max="2000" step="50" value="350">
-                  </div>
+                <!-- Voix Mistral Voxtral -->
+                <div class="form-group" id="row-ai-voice-voxtral" style="margin-bottom: 16px; display: none;">
+                  <label for="cfg-ai-answer-voice-voxtral">Intonation de voix (Mistral Voxtral) :</label>
+                  <select id="cfg-ai-answer-voice-voxtral" class="select-field full-w" style="height: 38px;">
+                    <option value="Marie - Neutral" selected>Marie - Neutre (naturelle, posée &amp; claire — Recommandée)</option>
+                    <option value="Marie - Curious">Marie - Curieuse (interrogative, vivante)</option>
+                    <option value="Marie - Happy">Marie - Joyeuse (chaleureuse, engageante)</option>
+                    <option value="Marie - Enthusiastic">Marie - Enthousiaste (dynamique)</option>
+                    <option value="Marie - Grave">Marie - Grave (méditative, solennelle)</option>
+                    <option value="Marie - Serious">Marie - Ferme (sérieuse)</option>
+                  </select>
                 </div>
 
-                <!-- Ambiance Musicale & Jingle par Défaut -->
-                <div class="form-row two-cols" style="margin-bottom: 16px;">
-                  <div class="form-group">
-                    <label for="cfg-audio-studio-bg-music">Ambiance musicale par défaut :</label>
-                    <select id="cfg-audio-studio-bg-music" class="select-field full-w">
-                      <option value="bed_cozy_jazz_study" selected>Étude &amp; Méditation (Nappe Jazz Douce)</option>
-                      <option value="jingle_simplicity_acoustic">Acoustique Épurée (Guitare &amp; Piano)</option>
-                      <option value="stinger_lofi_rain">Pluie &amp; Calme Lo-Fi</option>
-                      <option value="none">Aucune musique par défaut</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="cfg-audio-studio-jingle-intro">Jingle d'introduction par défaut :</label>
-                    <select id="cfg-audio-studio-jingle-intro" class="select-field full-w">
-                      <option value="jingle_piano_solemn" selected>Piano Recueilli (Intro Solennelle)</option>
-                      <option value="jingle_inspiring_clean">Moderne &amp; Lumineux</option>
-                      <option value="jingle_vibe_chronicle">Chronique &amp; Récit</option>
-                      <option value="jingle_upbeat_pop">Dynamique &amp; Entraînant</option>
-                      <option value="none">Aucun jingle par défaut</option>
-                    </select>
-                  </div>
+                <!-- Voix Google Gemini Flash TTS -->
+                <div class="form-group" id="row-ai-voice-gemini" style="margin-bottom: 16px; display: none;">
+                  <label for="cfg-ai-answer-voice-gemini">Voix (Google Gemini Flash TTS) :</label>
+                  <select id="cfg-ai-answer-voice-gemini" class="select-field full-w" style="height: 38px;">
+                    <option value="Charon" selected>Charon (Masculine, grave, profonde &amp; érudite — Recommandé FR)</option>
+                    <option value="Puck">Puck (Masculine, engageante, naturelle &amp; fluide — Recommandé FR)</option>
+                    <option value="Aoede">Aoede (Féminine, posée, chaleureuse — Recommandée FR)</option>
+                    <option value="Kore">Kore (Féminine, claire, douce &amp; expressive — Recommandée FR)</option>
+                    <option value="Fenrir">Fenrir (Masculine, dynamique, chaleureuse &amp; articulée)</option>
+                  </select>
                 </div>
 
-                <!-- Options Avancées Voxtral & Curation RAG -->
-                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
-                  <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    <span>Options Avancées Mistral &amp; RAG</span>
-                  </div>
-
-                  <div class="form-row two-cols">
-                    <div class="form-group">
-                      <label for="cfg-audio-studio-context-depth">Profondeur de contexte par source :</label>
-                      <select id="cfg-audio-studio-context-depth" class="select-field full-w">
-                        <option value="0">Éclair (~250 tokens / source)</option>
-                        <option value="1" selected>Équilibré (~600 tokens / source — Recommandé)</option>
-                        <option value="2">Approfondi (~1200 tokens / source)</option>
-                        <option value="3">Exhaustif (~2000 tokens / source)</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="cfg-audio-studio-voxtral-voice">Identifiant Voix Voxtral (si payant) :</label>
-                      <input type="text" id="cfg-audio-studio-voxtral-voice" class="text-field full-w" placeholder="default ou ID custom">
-                    </div>
-                  </div>
-
-                  <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; color: var(--text-primary);">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                      <input type="checkbox" id="cfg-audio-studio-voxtral-modulate" checked style="accent-color: var(--accent-orange);">
-                      <span>Différencier les rôles par intonation sur Mistral Voxtral</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                      <input type="checkbox" id="cfg-audio-studio-enable-rerank" checked style="accent-color: var(--accent-orange);">
-                      <span>Reranking sémantique local BGE-M3 avant scénarisation</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                      <input type="checkbox" id="cfg-audio-studio-enable-curator" style="accent-color: var(--accent-orange);">
-                      <span>Passer les extraits par le LLM Curateur intermédiaire</span>
-                    </label>
-                  </div>
+                <!-- Vitesse de lecture par défaut -->
+                <div class="form-group" style="margin-bottom: 8px;">
+                  <label for="cfg-ai-answer-playback-speed">Vitesse de lecture par défaut :</label>
+                  <select id="cfg-ai-answer-playback-speed" class="select-field full-w" style="height: 38px;">
+                    <option value="0.85">0.85x — Posé &amp; Méditatif</option>
+                    <option value="1.0" selected>1.0x — Débit Naturel (Standard)</option>
+                    <option value="1.15">1.15x — Dynamique</option>
+                    <option value="1.25">1.25x — Rapide</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -4421,7 +4371,7 @@
                       <span style="font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(185, 82, 50, 0.12); color: #B95232; border: 1px solid rgba(185, 82, 50, 0.25);">Florent Varak</span>
                     </div>
                     <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-                      201 épisodes audio &amp; transcriptions réconciliés • <span id="upvr-chunks-count-label">~800</span> fragments d'enseignement RAG
+                      <span id="upvr-episodes-count-label">506</span> épisodes audio &amp; transcriptions réconciliés • <span id="upvr-chunks-count-label">1 778</span> fragments d'enseignement RAG
                     </div>
                   </div>
                 </div>
@@ -5228,224 +5178,283 @@
             <section class="as-wizard-pane is-active" id="as-step-1-pane">
               <div class="as-step1-container">
                 <div class="as-step1-hero">
+                  <div class="as-studio-badge">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                    <span>Studio de Production Audio</span>
+                  </div>
                   <h2 class="as-step1-heading">Créer un nouvel épisode audio</h2>
                   <p class="as-step1-subheading">Sélectionnez votre passage ou thème, choisissez l'angle herméneutique et configurez votre émission.</p>
                 </div>
 
                 <!-- Conteneur des cartes de configuration (masqué pendant la rédaction du script) -->
                 <div class="as-step1-cards" id="as-step1-cards">
-                  <!-- 1. Saisie du Sujet ou Passage -->
-                  <div class="as-card as-card-primary">
-                  <div class="as-card-header">
-                    <span class="as-card-title">1. Passage ou Sujet d'Étude</span>
-                    <div style="display: flex; gap: 8px;">
-                      <button type="button" class="audio-studio-addon-btn" id="btn-audio-studio-book-picker" title="Choisir un livre et chapitre">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
-                        <span>Passage</span>
+
+                  <!-- 1. Format d'Émission (Choix Studio Majeur) -->
+                  <div class="as-format-selector-section">
+                    <div class="as-section-label">
+                      <span class="as-section-tag">Format d'émission</span>
+                      <span class="as-section-hint">Structure narrative de la session audio</span>
+                    </div>
+                    <div class="as-format-cards-grid">
+                      <button type="button" class="as-format-card active" id="btn-audio-format-dialogue" data-format="dialogue" title="Générer un échange à deux intervenants">
+                        <div class="as-format-card-radio"></div>
+                        <div class="as-format-card-icon">
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <div class="as-format-card-content">
+                          <div class="as-format-card-title">Dialogue (2 voix)</div>
+                          <div class="as-format-card-desc">Conversation dynamique entre un animateur curieux et un exégète rigoureux</div>
+                        </div>
+                        <span class="as-format-card-badge">Recommandé</span>
                       </button>
-                      <button type="button" class="audio-studio-addon-icon-btn" id="btn-audio-studio-sync-bible" title="Synchroniser avec le lecteur biblique actif">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+
+                      <button type="button" class="as-format-card" id="btn-audio-format-solo" data-format="solo" title="Générer une chronique théologique continue">
+                        <div class="as-format-card-radio"></div>
+                        <div class="as-format-card-icon">
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                        </div>
+                        <div class="as-format-card-content">
+                          <div class="as-format-card-title">Chronique Solo</div>
+                          <div class="as-format-card-desc">Exposé théologique fluide, immersion narrative ou méditation continue</div>
+                        </div>
                       </button>
                     </div>
                   </div>
 
-                  <div class="as-subject-input-wrap">
-                    <svg class="audio-studio-search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="audio-studio-subject-input" class="audio-studio-input"
-                      placeholder="Ex : Romains 8:28-39, La résurrection en 1 Corinthiens 15, Les alliances divines..." autocomplete="off">
-                  </div>
-
-                  <!-- Co-construction : Suggestion d'axes / questions clés (plan d'attaque) -->
-                  <div class="as-focal-questions-block">
-                    <div class="as-focal-actions">
-                      <button type="button" class="btn-secondary btn-sm as-btn-suggest-axes" id="btn-as-suggest-axes">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                        <span>Suggérer des axes / questions clés</span>
-                      </button>
-                      <span class="as-focal-hint">Optionnel : permet d'orienter précisément les répliques avant rédaction</span>
+                  <!-- 2. Omnibar Sujet ou Passage -->
+                  <div class="as-card as-card-omnibar">
+                    <div class="as-card-header">
+                      <span class="as-card-title">Sujet ou Passage d'Étude</span>
+                      <span class="as-card-tip">Texte biblique, concept théologique ou personnage</span>
                     </div>
 
-                    <!-- Conteneur des axes suggérés (masqué par défaut) -->
-                    <div class="as-focal-container hidden" id="as-focal-container">
-                      <div class="as-focal-list" id="as-focal-list">
-                        <!-- Injecté dynamiquement par JS -->
+                    <div class="as-omnibar-input-wrap">
+                      <div class="as-omnibar-left-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
                       </div>
-                      <div class="as-focal-add-wrap">
-                        <button type="button" class="btn-text btn-sm" id="btn-as-add-focal-question" style="font-size: 11.5px; color: var(--accent-orange); display: inline-flex; align-items: center; gap: 4px; background: transparent; border: none; cursor: pointer; padding: 4px 0;">
-                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                          <span>Ajouter un axe personnalisé</span>
+                      <input type="text" id="audio-studio-subject-input" class="as-omnibar-input"
+                        placeholder="Ex : Romains 8:28-39, La Sainte Cène, La résurrection en 1 Cor 15..." autocomplete="off">
+                      <div class="as-omnibar-actions">
+                        <button type="button" class="as-omnibar-btn" id="btn-audio-studio-book-picker" title="Choisir un livre et chapitre">
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+                          <span>Passage</span>
+                        </button>
+                        <button type="button" class="as-omnibar-icon-btn" id="btn-audio-studio-sync-bible" title="Synchroniser avec le lecteur biblique actif">
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                         </button>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                <!-- 2. Modes d'Étude Théologique -->
-                <div class="as-card">
-                  <div class="as-card-header">
-                    <span class="as-card-title">2. Mode &amp; Angle Herméneutique</span>
-                    <span class="as-card-tip">Identique aux modes de l'Assistant IA</span>
-                  </div>
-
-                  <div class="as-modes-grid" id="as-modes-grid">
-                    <!-- Mode Auto -->
-                    <div class="as-mode-chip active" data-mode="auto">
-                      <div class="as-mode-chip-icon">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                      </div>
-                      <div class="as-mode-chip-body">
-                        <div class="as-mode-chip-title">Détection Automatique</div>
-                        <div class="as-mode-chip-desc">L'IA adapte l'angle herméneutique en équilibrant exégèse, histoire et doctrine.</div>
+                    <!-- Suggestions thématiques rapides en 1 clic -->
+                    <div class="as-quick-suggestions-wrap">
+                      <span class="as-quick-suggestions-label">Suggestions :</span>
+                      <div class="as-quick-suggestions-list">
+                        <button type="button" class="as-quick-pill" data-topic="Romains 8:28-39">Romains 8:28-39</button>
+                        <button type="button" class="as-quick-pill" data-topic="La Sainte Cène : Mémorial et Présence">La Sainte Cène</button>
+                        <button type="button" class="as-quick-pill" data-topic="Genèse 1 — Création et Ordre Divin">Genèse 1 (Création)</button>
+                        <button type="button" class="as-quick-pill" data-topic="Psaume 23 — L'Éternel est mon berger">Psaume 23</button>
+                        <button type="button" class="as-quick-pill" data-topic="Jean 1:1-18 — Le Logos incarné">Jean 1:1-18</button>
                       </div>
                     </div>
 
-                    <!-- Mode Exégèse -->
-                    <div class="as-mode-chip" data-mode="exegesis">
-                      <div class="as-mode-chip-icon">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                      </div>
-                      <div class="as-mode-chip-body">
-                        <div class="as-mode-chip-title">Exégèse Approfondie</div>
-                        <div class="as-mode-chip-desc">Structure textuelle, chiasmes, syntaxe, flux logique verset par verset.</div>
-                      </div>
-                    </div>
-
-                    <!-- Mode Historique -->
-                    <div class="as-mode-chip" data-mode="historical">
-                      <div class="as-mode-chip-icon">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="2" y1="20" x2="22" y2="20"></line><line x1="6" y1="20" x2="6" y2="4"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="2" y1="4" x2="22" y2="4"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="14" y1="20" x2="14" y2="4"></line></svg>
-                      </div>
-                      <div class="as-mode-chip-body">
-                        <div class="as-mode-chip-title">Contexte Historique</div>
-                        <div class="as-mode-chip-desc">Arrière-plan gréco-romain/proche-oriental, archéologie, cadre impérial.</div>
-                      </div>
-                    </div>
-
-                    <!-- Mode Immersion Narrative -->
-                    <div class="as-mode-chip" data-mode="immersion">
-                      <div class="as-mode-chip-icon">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                      </div>
-                      <div class="as-mode-chip-body">
-                        <div class="as-mode-chip-title">Immersion Narrative</div>
-                        <div class="as-mode-chip-desc">Drame en 3 actes (McKee, Bailey), immersion sensorielle et tension Ier siècle avant la lecture.</div>
-                      </div>
-                    </div>
-
-                    <!-- Mode Théologie -->
-                    <div class="as-mode-chip" data-mode="theology">
-                      <div class="as-mode-chip-icon">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                      </div>
-                      <div class="as-mode-chip-body">
-                        <div class="as-mode-chip-title">Théologie &amp; Doctrine</div>
-                        <div class="as-mode-chip-desc">Débats doctrinaux, réformateurs et confessions de foi historiques.</div>
-                      </div>
-                    </div>
-
-                    <!-- Mode Lexical -->
-                    <div class="as-mode-chip" data-mode="lexical">
-                      <div class="as-mode-chip-icon">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
-                      </div>
-                      <div class="as-mode-chip-body">
-                        <div class="as-mode-chip-title">Analyse Lexicale (Grec / Hébreu)</div>
-                        <div class="as-mode-chip-desc">Racines Strong, nuances morphologiques, Septante et sens contextuel.</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 3. Sources Documentaires & Paramètres RAG -->
-                <div class="as-card">
-                  <div class="as-card-header">
-                    <span class="as-card-title">3. Sources Documentaires &amp; Corpus RAG</span>
-                  </div>
-
-                  <div class="as-step1-format-row">
-                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Structure du script :</label>
-                    <div class="audio-studio-format-pill">
-                      <button type="button" class="format-btn active" id="btn-audio-format-dialogue" data-format="dialogue" title="Générer un échange à deux intervenants">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        <span>Dialogue (2 voix)</span>
-                      </button>
-                      <button type="button" class="format-btn" id="btn-audio-format-solo" data-format="solo" title="Générer une chronique théologique continue">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <span>Chronique Solo</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Accordéon Dépliable des Sources RAG -->
-                  <details class="as-sources-details" id="as-sources-details">
-                    <summary class="as-sources-summary">
-                      <span>Corpus documentaires et profondeur RAG</span>
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </summary>
-                    <div class="as-sources-content">
-                      <div class="audio-studio-sources-grid" style="margin-top: 10px;">
-                        <label><input type="checkbox" id="as-opt-src-bibles" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Bibles</span></label>
-                        <label><input type="checkbox" id="as-opt-src-comms" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Commentaires</span></label>
-                        <label><input type="checkbox" id="as-opt-src-dict" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Dictionnaires</span></label>
-                        <label><input type="checkbox" id="as-opt-src-articles" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Articles</span></label>
-                        <label><input type="checkbox" id="as-opt-src-notes" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Notes (.md)</span></label>
-                        <label><input type="checkbox" id="as-opt-src-upvr" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Textes UPVR</span></label>
-                        <label style="grid-column: span 2;"><input type="checkbox" id="as-opt-src-theology" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Ouvrages de théologie</span></label>
+                    <!-- Co-construction : Suggestion d'axes / questions clés (plan d'attaque) -->
+                    <div class="as-focal-questions-block">
+                      <div class="as-focal-actions">
+                        <button type="button" class="as-btn-sparkle" id="btn-as-suggest-axes">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                          <span>Suggérer des axes herméneutiques clés</span>
+                        </button>
+                        <span class="as-focal-hint">Optionnel : permet de co-construire les questions et répliques avant rédaction</span>
                       </div>
 
-                      <div style="margin-top: 14px;">
-                        <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-                          <span>Profondeur du Contexte / Source</span>
-                        </label>
-                        <input type="range" id="as-opt-context-depth" class="ctx-depth-range-input" min="0" max="3" step="1" value="1">
-                        <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
-                          <span>Éclair</span>
-                          <span>Équilibré</span>
-                          <span>Approfondi</span>
-                          <span>Exhaustif</span>
+                      <!-- Conteneur des axes suggérés (masqué par défaut) -->
+                      <div class="as-focal-container hidden" id="as-focal-container">
+                        <div class="as-focal-list" id="as-focal-list">
+                          <!-- Injecté dynamiquement par JS -->
                         </div>
-                        <div id="as-ctx-depth-card" style="background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px;">
-                          <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span id="as-ctx-depth-tokens" style="font-size: 12px; font-weight: 700; color: var(--accent-orange);">~600 tokens / source</span>
-                            <span id="as-ctx-depth-time" style="font-size: 11px; font-weight: 600; color: var(--text-muted);">≈ 30–60 s</span>
+                        <div class="as-focal-add-wrap">
+                          <button type="button" class="btn-text btn-sm" id="btn-as-add-focal-question" style="font-size: 11.5px; color: var(--accent-orange); display: inline-flex; align-items: center; gap: 4px; background: transparent; border: none; cursor: pointer; padding: 4px 0;">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Ajouter un axe personnalisé</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 3. Presets de Modes Théologiques -->
+                  <div class="as-card as-card-modes">
+                    <div class="as-card-header">
+                      <span class="as-card-title">Angle Herméneutique</span>
+                      <span class="as-card-tip">Chaque angle module l'érudition, le ton et le vocabulaire de l'émission</span>
+                    </div>
+
+                    <div class="as-modes-grid" id="as-modes-grid">
+                      <!-- Mode Auto -->
+                      <div class="as-mode-chip active" data-mode="auto" data-preset="gold">
+                        <div class="as-mode-chip-header">
+                          <div class="as-mode-chip-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
                           </div>
-                          <div id="as-ctx-depth-desc" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
-                            Bon compromis rapidité de génération et richesse doctrinale.
-                          </div>
+                          <span class="as-mode-chip-badge">Équilibré</span>
+                        </div>
+                        <div class="as-mode-chip-body">
+                          <div class="as-mode-chip-title">Détection Automatique</div>
+                          <div class="as-mode-chip-desc">L'IA équilibre fluidité d'écoute, contexte historique, analyse textuelle et portée théologique.</div>
                         </div>
                       </div>
 
-                      <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 12px;">
-                        <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
-                          <input type="checkbox" id="as-opt-rerank" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
-                          <span>Reranking sémantique local (BGE-M3)</span>
-                        </label>
-                        <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
-                          <input type="checkbox" id="as-opt-curator" style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
-                          <span>LLM Curateur intermédiaire</span>
-                        </label>
-                        <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
-                          <input type="checkbox" id="as-opt-profile" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
-                          <span>Inclure le profil théologique (« Mon Église »)</span>
-                        </label>
+                      <!-- Mode Exégèse -->
+                      <div class="as-mode-chip" data-mode="exegesis" data-preset="sapphire">
+                        <div class="as-mode-chip-header">
+                          <div class="as-mode-chip-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                          </div>
+                          <span class="as-mode-chip-badge">Structure</span>
+                        </div>
+                        <div class="as-mode-chip-body">
+                          <div class="as-mode-chip-title">Exégèse Approfondie</div>
+                          <div class="as-mode-chip-desc">Chiasmes, structure littéraire, syntaxe originale et progression logique verset par verset.</div>
+                        </div>
+                      </div>
+
+                      <!-- Mode Historique -->
+                      <div class="as-mode-chip" data-mode="historical" data-preset="emerald">
+                        <div class="as-mode-chip-header">
+                          <div class="as-mode-chip-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="2" y1="20" x2="22" y2="20"></line><line x1="6" y1="20" x2="6" y2="4"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="2" y1="4" x2="22" y2="4"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="14" y1="20" x2="14" y2="4"></line></svg>
+                          </div>
+                          <span class="as-mode-chip-badge">Archéologie</span>
+                        </div>
+                        <div class="as-mode-chip-body">
+                          <div class="as-mode-chip-title">Contexte Historique</div>
+                          <div class="as-mode-chip-desc">Monde gréco-romain et proche-oriental, archéologie, mentalités et cadre impérial.</div>
+                        </div>
+                      </div>
+
+                      <!-- Mode Immersion Narrative -->
+                      <div class="as-mode-chip" data-mode="immersion" data-preset="amethyst">
+                        <div class="as-mode-chip-header">
+                          <div class="as-mode-chip-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                          </div>
+                          <span class="as-mode-chip-badge">Drame Audio</span>
+                        </div>
+                        <div class="as-mode-chip-body">
+                          <div class="as-mode-chip-title">Immersion Narrative</div>
+                          <div class="as-mode-chip-desc">Dramaturgie en 3 actes, immersion sensorielle, bruits d'époque et tension dramatique.</div>
+                        </div>
+                      </div>
+
+                      <!-- Mode Théologie -->
+                      <div class="as-mode-chip" data-mode="theology" data-preset="rose">
+                        <div class="as-mode-chip-header">
+                          <div class="as-mode-chip-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                          </div>
+                          <span class="as-mode-chip-badge">Dogmatique</span>
+                        </div>
+                        <div class="as-mode-chip-body">
+                          <div class="as-mode-chip-title">Théologie &amp; Doctrine</div>
+                          <div class="as-mode-chip-desc">Débats doctrinaux, réformateurs, conciles et confessions de foi historiques.</div>
+                        </div>
+                      </div>
+
+                      <!-- Mode Lexical -->
+                      <div class="as-mode-chip" data-mode="lexical" data-preset="cyan">
+                        <div class="as-mode-chip-header">
+                          <div class="as-mode-chip-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                          </div>
+                          <span class="as-mode-chip-badge">Grec &amp; Hébreu</span>
+                        </div>
+                        <div class="as-mode-chip-body">
+                          <div class="as-mode-chip-title">Analyse Lexicale</div>
+                          <div class="as-mode-chip-desc">Racines Strong, nuances morphologiques, Septante et sens contextuel en langue d'origine.</div>
+                        </div>
                       </div>
                     </div>
-                  </details>
-                </div>
-              </div><!-- fin as-step1-cards -->
+                  </div>
 
-              <!-- Bouton d'action principal Étape 1 & Suivi du raisonnement IA -->
-              <div class="as-step1-cta-wrap">
-                <!-- Bandeau récapitulatif compact affiché pendant la génération -->
-                <div class="as-step1-active-summary" id="as-step1-active-summary" style="display: none;"></div>
+                  <!-- 4. Sources Documentaires & Paramètres RAG (Raffiné) -->
+                  <div class="as-card as-card-sources">
+                    <!-- Accordéon Dépliable des Sources RAG -->
+                    <details class="as-sources-details" id="as-sources-details">
+                      <summary class="as-sources-summary">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+                          <span style="font-weight: 600; color: var(--text-primary);">Corpus documentaires &amp; RAG</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <span class="as-sources-summary-badge">7 sources actives</span>
+                          <svg class="as-details-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                      </summary>
+                      <div class="as-sources-content">
+                        <div class="audio-studio-sources-grid" style="margin-top: 14px;">
+                          <label><input type="checkbox" id="as-opt-src-bibles" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Bibles</span></label>
+                          <label><input type="checkbox" id="as-opt-src-comms" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Commentaires</span></label>
+                          <label><input type="checkbox" id="as-opt-src-dict" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Dictionnaires</span></label>
+                          <label><input type="checkbox" id="as-opt-src-articles" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Articles</span></label>
+                          <label><input type="checkbox" id="as-opt-src-notes" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Notes (.md)</span></label>
+                          <label><input type="checkbox" id="as-opt-src-upvr" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Textes UPVR</span></label>
+                          <label style="grid-column: span 2;"><input type="checkbox" id="as-opt-src-theology" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;"> <span>Ouvrages de théologie</span></label>
+                        </div>
 
-                <button type="button" class="btn-primary as-btn-generate-main" id="btn-audio-studio-generate">
+                        <div style="margin-top: 16px;">
+                          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                            <span>Profondeur du Contexte / Source</span>
+                          </label>
+                          <input type="range" id="as-opt-context-depth" class="ctx-depth-range-input" min="0" max="3" step="1" value="1">
+                          <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+                            <span>Éclair</span>
+                            <span>Équilibré</span>
+                            <span>Approfondi</span>
+                            <span>Exhaustif</span>
+                          </div>
+                          <div id="as-ctx-depth-card" style="background: var(--bg-surface, rgba(0,0,0,0.2)); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                              <span id="as-ctx-depth-tokens" style="font-size: 12px; font-weight: 700; color: var(--accent-orange);">~600 tokens / source</span>
+                              <span id="as-ctx-depth-time" style="font-size: 11px; font-weight: 600; color: var(--text-muted);">≈ 30–60 s</span>
+                            </div>
+                            <div id="as-ctx-depth-desc" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                              Bon compromis rapidité de génération et richesse doctrinale.
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 14px;">
+                          <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                            <input type="checkbox" id="as-opt-rerank" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                            <span>Reranking sémantique local (BGE-M3)</span>
+                          </label>
+                          <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                            <input type="checkbox" id="as-opt-curator" style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                            <span>LLM Curateur intermédiaire</span>
+                          </label>
+                          <label style="font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                            <input type="checkbox" id="as-opt-profile" checked style="accent-color: var(--accent-orange); width: 14px; height: 14px;">
+                            <span>Inclure le profil théologique (« Mon Église »)</span>
+                          </label>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+                </div><!-- fin as-step1-cards -->
+
+                <!-- Bouton d'action principal Étape 1 & Suivi du raisonnement IA -->
+                <div class="as-step1-cta-wrap">
+                  <!-- Bandeau récapitulatif compact affiché pendant la génération -->
+                  <div class="as-step1-active-summary" id="as-step1-active-summary" style="display: none;"></div>
+
+                  <button type="button" class="btn-primary as-btn-generate-main" id="btn-audio-studio-generate">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
                     </svg>
                     <span>Rédiger le script (Étape 2)</span>
+                    <span class="as-btn-shortcut-hint">Ctrl+Enter</span>
                   </button>
 
                   <!-- Écran de raisonnement et progression par étapes (identique à l'Assistant IA) -->
@@ -11940,6 +11949,30 @@ Recevons ce don gratuit dans la prière.</code></pre>
             <div style="background: var(--card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px;">
               <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Auteurs les plus présents</div>
               <div id="advisor-top-authors" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+            </div>
+
+            <!-- Profil théologique & Cadre d'étude -->
+            <div id="advisor-theological-card" style="background: var(--card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Profil Herméneutique
+                </span>
+                <span id="advisor-role-badge" style="font-size: 11px; padding: 2px 7px; border-radius: 4px; background: rgba(59, 130, 246, 0.12); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.25); font-weight: 500;">Étude perso</span>
+              </div>
+              <div id="advisor-theological-details" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+
+            <!-- Flux de blogs & Outils intégrés -->
+            <div id="advisor-blogs-card" style="background: var(--card-bg-subtle, rgba(255,255,255,0.02)); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10B981;"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+                  Flux RSS &amp; Outils
+                </span>
+                <span id="advisor-blog-badge" style="font-size: 11px; padding: 2px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25); font-weight: 500;">2/2 flux actifs</span>
+              </div>
+              <div id="advisor-blogs-details" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; display: flex; flex-direction: column; gap: 4px;"></div>
             </div>
 
             <!-- Alerte livres incomplets (si applicable) -->

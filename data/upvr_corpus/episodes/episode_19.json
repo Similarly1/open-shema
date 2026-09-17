@@ -1,0 +1,61 @@
+{
+  "episode_number": 19,
+  "titre_proper": "Quelle est la meilleure traduction de la Bible ?",
+  "question_auditeur": "Face à la multiplicité des versions bibliques disponibles, laquelle est la plus fiable et la plus recommandée pour une étude sérieuse et une lecture quotidienne ?",
+  "these_centrale": "Il n'existe pas de traduction parfaite, car seule l'Écriture originale est inspirée ; la meilleure Bible est donc celle que vous lisez régulièrement avec assiduité.",
+  "resume_analytique": "Florent Varak souligne que si l'inspiration divine ne concerne que les textes originaux (hébreu, araméen et grec), la transmission du texte biblique à travers les siècles est d'une fiabilité exceptionnelle. Les différences entre les traductions modernes découlent soit de choix textuels (manuscrits de base), soit de méthodes de traduction (équivalence formelle ou dynamique). Plutôt que de chercher une version unique, l'auteur encourage à utiliser la diversité des traductions comme un outil d'étude pour enrichir sa compréhension, tout en mettant en garde contre les versions biaisées par des agendas théologiques sectaires.",
+  "points_cles": [
+    "L'inspiration divine est limitée aux textes originaux ; les traductions, bien que fidèles, restent des outils humains (2 Timothée 3:16).",
+    "La transmission textuelle est extrêmement précise, avec une incertitude minime (0,1 à 0,3 %) qui n'affecte aucun point fondamental de la foi chrétienne.",
+    "La diversité des méthodes de traduction (littérale vs dynamique) est une richesse qui permet de saisir différentes nuances du texte original.",
+    "Il est nécessaire d'écarter les traductions produites par des mouvements sectaires qui imposent leurs préjugés théologiques au texte."
+  ],
+  "applications_pastorales": [
+    "Ne vous laissez pas paralyser par le choix d'une version : choisissez-en une sérieuse et lisez-la quotidiennement.",
+    "Utilisez des outils numériques pour comparer plusieurs traductions lors de vos études bibliques afin d'approfondir votre compréhension des nuances du texte.",
+    "Variez votre lecture annuelle en changeant de version pour éviter la routine et découvrir de nouvelles perspectives sur des passages familiers."
+  ],
+  "passages": {
+    "primaire": [
+      "2 Timothée 3:16",
+      "2 Pierre 1:21"
+    ],
+    "secondaires": [
+      "Jean 8",
+      "Marc 16",
+      "1 Jean 5"
+    ]
+  },
+  "themes": [
+    "Doctrine de l'Écriture",
+    "Lecture de la Bible",
+    "Critique textuelle",
+    "Herméneutique"
+  ],
+  "source_url": "https://toutpoursagloire.com/podcasts/un-pasteur-vous-repond/meilleure-traduction-de-bible/",
+  "audio_url": "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/248173564&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false",
+  "youtube_url": "",
+  "date_published": "2016-02-24T05:45:00+00:00",
+  "categories_web": [
+    "Thèmes",
+    "Église",
+    "Évangélisation et Mission",
+    "Membre",
+    "Musique et Louange",
+    "Pasteur et Ancien",
+    "Prédicateur et Enseignant",
+    "Famille",
+    "Célibat",
+    "Époux/Épouse",
+    "Homme/Femme",
+    "Père/Mère",
+    "Société",
+    "Citoyen",
+    "Travail",
+    "Voisin et Ami",
+    "DOCTRINE DE L'ÉCRITURE",
+    "LECTURE DE LA BIBLE"
+  ],
+  "transcription_type": "benevole",
+  "has_word_notes": true
+}

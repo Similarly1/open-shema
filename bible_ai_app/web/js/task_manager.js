@@ -36,7 +36,13 @@ const TaskManager = {
         const list = await API.getBackgroundTasks();
         if (Array.isArray(list)) {
           list.forEach(task => {
-            if (task && (task.status === 'running' || task.status === 'pending')) {
+            if (!task || !task.id) return;
+            // Ignorer les tâches audio studio (qui disposent de leur propre UI intégrée)
+            if (task.id === 'audio_studio_script_gen' || task.id.startsWith('audio_studio_') || task.id.startsWith('audio_synth_')) {
+              this.dismissTask(task.id);
+              return;
+            }
+            if (task.status === 'running' || task.status === 'pending') {
               this.handleTaskEvent('task_updated', task);
             }
           });
@@ -49,6 +55,15 @@ const TaskManager = {
 
   handleTaskEvent(eventType, taskData) {
     if (!taskData || !taskData.id) return;
+
+    // Ignorer et purger toute notification liée au studio audio
+    if (taskData.id === 'audio_studio_script_gen' || taskData.id.startsWith('audio_studio_') || taskData.id.startsWith('audio_synth_')) {
+      const existing = document.getElementById(`task-card-${taskData.id}`);
+      if (existing) existing.remove();
+      delete this.tasks[taskData.id];
+      this.updateContainerVisibility();
+      return;
+    }
     
     this.tasks[taskData.id] = taskData;
     this.renderTaskCard(taskData);

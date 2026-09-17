@@ -280,46 +280,61 @@ class InfomaniakClient:
 
     def embeddings(self, texts, model="bge_multilingual_gemma2"):
         import time
-        sub_batch_size = 20
-        all_embeddings = []
         clean_model = model.replace("infomaniak/", "").replace(" (Infomaniak)", "").strip()
         if not clean_model:
             clean_model = "bge_multilingual_gemma2"
             
+        # Lots de 8 éléments pour préserver les connexions TCP et éviter les IncompleteRead / timeouts du proxy
+        sub_batch_size = 8 if "gemma2" in clean_model else 12
+        all_embeddings = []
         url = f"{self.base_url}/embeddings"
-        for i in range(0, len(texts), sub_batch_size):
-            batch = texts[i:i + sub_batch_size]
+
+        def _embed_sub_batch(sub_items, retry_depth=0):
+            if not sub_items:
+                return []
             payload = {
                 "model": clean_model,
-                "input": batch
+                "input": sub_items
             }
-            
-            success = False
             last_err = None
-            for attempt in range(5):
+            max_attempts = 5
+            for attempt in range(max_attempts):
                 try:
-                    response = self.session.post(url, headers=self.headers, json=payload, timeout=60)
+                    # Timeout à 90s pour laisser le temps au GPU de calculer sans coupure prématurée
+                    response = self.session.post(url, headers=self.headers, json=payload, timeout=90)
                     response.raise_for_status()
                     data = response.json()
-                    embs = [item["embedding"] for item in data.get("data", [])]
-                    all_embeddings.extend(embs)
-                    success = True
-                    break
+                    return [item["embedding"] for item in data.get("data", [])]
                 except Exception as e:
                     last_err = str(e)
-                    time.sleep(1.5 * (attempt + 1))
-                    # Réinitialiser la session HTTP en cas de socket interrompu
+                    # Fermer et recréer la session HTTP pour purger tout socket TCP corrompu
                     try:
                         self.session.close()
-                    except Exception as _silent_e:
-                        logger.debug("Erreur ignoree : %s", _silent_e)
+                    except Exception:
+                        pass
                     self.session = requests.Session()
                     
-            if not success:
-                raise Exception(f"Erreur d'embedding Infomaniak ({clean_model}) après 5 tentatives : {last_err}")
-                
+                    # Découpage adaptatif : si le sous-lot a échoué et contient plusieurs items,
+                    # on le scinde en deux moitiés pour soulager l'API Infomaniak
+                    if len(sub_items) > 1 and attempt >= 1:
+                        mid = len(sub_items) // 2
+                        logger.warning(f"[Infomaniak] Découpage adaptatif du lot ({len(sub_items)} -> {mid} + {len(sub_items)-mid}) suite à: {last_err}")
+                        time.sleep(1.0)
+                        part1 = _embed_sub_batch(sub_items[:mid], retry_depth=retry_depth + 1)
+                        part2 = _embed_sub_batch(sub_items[mid:], retry_depth=retry_depth + 1)
+                        return part1 + part2
+
+                    sleep_time = min(2.0 * (attempt + 1), 15.0)
+                    time.sleep(sleep_time)
+
+            raise Exception(f"Erreur d'embedding Infomaniak ({clean_model}) après {max_attempts} tentatives : {last_err}")
+
+        for i in range(0, len(texts), sub_batch_size):
+            batch = texts[i:i + sub_batch_size]
+            batch_embs = _embed_sub_batch(batch)
+            all_embeddings.extend(batch_embs)
             time.sleep(0.1)
-                
+
         return all_embeddings
 
 class LLMClient:

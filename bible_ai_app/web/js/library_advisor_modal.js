@@ -22,7 +22,8 @@ const LibraryAdvisorModal = {
     check: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
     info: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
     author: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
-    clock: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`
+    clock: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    search: `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`
   },
 
   markDirty() {
@@ -250,6 +251,76 @@ const LibraryAdvisorModal = {
       }
     }
 
+    // 3b. Profil herméneutique & Cadre ministériel
+    const theolCard = document.getElementById('advisor-theological-card');
+    const roleBadge = document.getElementById('advisor-role-badge');
+    const theolDetails = document.getElementById('advisor-theological-details');
+    if (theolDetails) {
+      const tp = profile.theological_profile || {};
+      if (roleBadge) {
+        roleBadge.textContent = tp.user_role_label || 'Étude personnelle';
+      }
+      const levelLabel = tp.greek_hebrew_level === 'debutant' ? 'Débutant (translittéré)' : (tp.greek_hebrew_level === 'intermediaire' ? 'Intermédiaire' : 'Avancé');
+      theolDetails.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span>Tradition / Sensibilité :</span>
+          <strong style="color: var(--text-primary);">${this.escapeHtml(tp.tradition || 'Évangélique')}</strong>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span>Langues bibliques :</span>
+          <span style="color: var(--text-primary);">${this.escapeHtml(levelLabel)}</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span>Contexte :</span>
+          <span style="color: var(--text-primary);">${this.escapeHtml(tp.country_culture || 'Suisse romande / France')}</span>
+        </div>
+      `;
+    }
+
+    // 3c. Flux RSS & Outils installés
+    const blogBadge = document.getElementById('advisor-blog-badge');
+    const blogDetails = document.getElementById('advisor-blogs-details');
+    if (blogDetails) {
+      const bs = profile.blog_status || {};
+      const enabledCount = bs.enabled_sources_count ?? 2;
+      const totalSources = bs.total_sources || 2;
+      if (blogBadge) {
+        blogBadge.textContent = `${enabledCount}/${totalSources} flux actif${enabledCount > 1 ? 's' : ''}`;
+        if (enabledCount === 2) {
+          blogBadge.style.background = 'rgba(16, 185, 129, 0.12)';
+          blogBadge.style.color = '#10B981';
+          blogBadge.style.borderColor = 'rgba(16, 185, 129, 0.25)';
+        } else if (enabledCount === 1) {
+          blogBadge.style.background = 'rgba(245, 158, 11, 0.12)';
+          blogBadge.style.color = '#F59E0B';
+          blogBadge.style.borderColor = 'rgba(245, 158, 11, 0.25)';
+        } else {
+          blogBadge.style.background = 'rgba(239, 68, 68, 0.12)';
+          blogBadge.style.color = '#EF4444';
+          blogBadge.style.borderColor = 'rgba(239, 68, 68, 0.25)';
+        }
+      }
+
+      const biblesCount = (profile.installed_bibles || []).length;
+      const commCount = (profile.installed_commentaries || []).length;
+      const totalArticles = bs.total_articles || 0;
+      const sourcesListStr = (bs.enabled_sources || []).map(s => this.escapeHtml(s)).join(', ') || 'Aucun flux activé';
+
+      blogDetails.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span>Articles stockés :</span>
+          <strong style="color: var(--text-primary);">${totalArticles} article${totalArticles > 1 ? 's' : ''}</strong>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted); line-height: 1.35;">
+          ${sourcesListStr}
+        </div>
+        <div style="border-top: 1px dashed var(--border-color); margin-top: 4px; padding-top: 4px; display: flex; align-items: center; justify-content: space-between; font-size: 11.5px;">
+          <span>Outils intégrés :</span>
+          <span style="color: var(--accent-blue); font-weight: 500;">${biblesCount} Bible(s) • ${commCount} commentaire(s)</span>
+        </div>
+      `;
+    }
+
     // 4. Alerte sur les livres incomplets
     const incompleteAlert = document.getElementById('advisor-incomplete-alert');
     const incompleteMsg = document.getElementById('advisor-incomplete-msg');
@@ -272,7 +343,7 @@ const LibraryAdvisorModal = {
         deepContainer.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); margin: 0;">Aucune recommandation d'approfondissement supplémentaire.</p>`;
       } else {
         deepening.forEach(rec => {
-          deepContainer.appendChild(this.buildBookRecommendationCard(rec, false));
+          deepContainer.appendChild(this.buildRecommendationCard(rec, false));
         });
       }
     }
@@ -286,84 +357,125 @@ const LibraryAdvisorModal = {
         balanceContainer.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); margin: 0;">Votre bibliothèque présente un excellent équilibre global.</p>`;
       } else {
         balance.forEach(rec => {
-          balanceContainer.appendChild(this.buildBookRecommendationCard(rec, true));
+          balanceContainer.appendChild(this.buildRecommendationCard(rec, true));
         });
       }
     }
   },
 
-  buildBookRecommendationCard(book, isBalance = false) {
+  buildRecommendationCard(rec, isBalance = false) {
     const card = document.createElement('div');
     card.className = 'advisor-book-card';
 
-    const title = book.title || 'Ouvrage sans titre';
-    const author = book.author || 'Auteur non renseigné';
-    const publisher = book.publisher ? `<span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">(${this.escapeHtml(book.publisher)})</span>` : '';
-    const rationale = book.rationale || '';
-    const gapBadge = isBalance && book.target_gap ? `
+    const axisTitle = rec.axis_title || rec.title || "Axe de lecture recommandé";
+    const rationale = rec.rationale || "";
+    const authors = Array.isArray(rec.benchmark_authors) && rec.benchmark_authors.length > 0
+      ? rec.benchmark_authors
+      : (rec.author ? [rec.author] : []);
+    const keywords = Array.isArray(rec.search_keywords) && rec.search_keywords.length > 0
+      ? rec.search_keywords
+      : authors.slice(0, 3);
+
+    const gapBadge = isBalance && rec.target_gap ? `
       <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 7px; border-radius: 4px;">
-        ${this.icons.balance} ${this.escapeHtml(book.target_gap)}
+        ${this.icons.balance} ${this.escapeHtml(rec.target_gap)}
       </span>
     ` : '';
+
+    const authorsLine = authors.length > 0 ? `
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent-blue, #3B82F6); font-weight: 500; margin-top: 2px;">
+        ${this.icons.author}
+        <span>Auteurs de repère : <strong>${this.escapeHtml(authors.join(', '))}</strong></span>
+      </div>
+    ` : '';
+
+    // Tags / puces de recherche cliquables
+    const chipsHtml = keywords.map(kw => `
+      <button type="button" class="advisor-search-chip" data-keyword="${this.escapeHtml(kw)}" title="Rechercher « ${this.escapeHtml(kw)} » dans le catalogue Open Shema et les librairies e-books" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--accent-blue, #60A5FA); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.18s ease; font-family: inherit;">
+        ${this.icons.search}
+        <span>${this.escapeHtml(kw)}</span>
+      </button>
+    `).join('');
 
     card.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 220px;">
           <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 4px;">
-            <strong style="font-size: 13.5px; color: var(--text-primary); font-weight: 600; line-height: 1.35;">${this.escapeHtml(title)}</strong>
+            <strong style="font-size: 14px; color: var(--text-primary); font-weight: 600; line-height: 1.35;">${this.escapeHtml(axisTitle)}</strong>
             ${gapBadge}
           </div>
-          <div style="font-size: 12px; color: var(--accent-blue, #3B82F6); font-weight: 500;">
-            ${this.escapeHtml(author)}${publisher}
-          </div>
+          ${authorsLine}
         </div>
         <div style="display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;">
-          <button type="button" class="btn-secondary btn-sm btn-advisor-store" title="Rechercher en e-book dans les librairies partenaires Open Shema" style="display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; height: 28px; padding: 0 10px; font-size: 12px;">
-            ${this.icons.bookstore}
-            <span>E-book</span>
-          </button>
-          <button type="button" class="btn-ghost btn-sm btn-advisor-web" title="Rechercher sur Google Livres / Web" style="display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; height: 28px; padding: 0 10px; font-size: 12px;">
+          <button type="button" class="btn-ghost btn-sm btn-advisor-web" title="Rechercher cet axe sur Google Livres / Web" style="display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; height: 28px; padding: 0 10px; font-size: 12px;">
             ${this.icons.external}
             <span>Web</span>
           </button>
-          <button type="button" class="btn-ghost btn-sm btn-advisor-copy" title="Copier la référence au presse-papier" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;">
+          <button type="button" class="btn-ghost btn-sm btn-advisor-copy" title="Copier l'intitulé et les mots-clés" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;">
             ${this.icons.copy}
           </button>
         </div>
       </div>
+
       <div style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); border-top: 1px dashed var(--border-color); padding-top: 8px;">
         ${this.escapeHtml(rationale)}
       </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px;">
+        <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px;">
+          ${this.icons.bookstore} Lancer la recherche e-books :
+        </span>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          ${chipsHtml}
+        </div>
+      </div>
     `;
 
-    // Action 1 : Recherche E-book dans OpenShemaStore
-    card.querySelector('.btn-advisor-store')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.close();
-      if (typeof OpenShemaStore !== 'undefined' && OpenShemaStore.open) {
-        OpenShemaStore.open('bookstores', `${title} ${author}`.trim());
-      }
+    // Événements sur les chips de recherche : clic -> ouvre le catalogue unifié avec ce mot-clé !
+    card.querySelectorAll('.advisor-search-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const kw = chip.dataset.keyword;
+        this.close();
+        setTimeout(() => {
+          if (typeof OpenShemaStore !== 'undefined' && OpenShemaStore.open) {
+            OpenShemaStore.open('all', kw);
+          }
+        }, 30);
+      });
+      chip.addEventListener('mouseenter', () => {
+        chip.style.background = 'rgba(59, 130, 246, 0.22)';
+        chip.style.borderColor = 'rgba(59, 130, 246, 0.6)';
+        chip.style.transform = 'translateY(-1px)';
+      });
+      chip.addEventListener('mouseleave', () => {
+        chip.style.background = 'rgba(59, 130, 246, 0.1)';
+        chip.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+        chip.style.transform = 'translateY(0)';
+      });
     });
 
-    // Action 2 : Recherche Web (Google Livres)
+    // Action Web
     card.querySelector('.btn-advisor-web')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      const q = encodeURIComponent(`livre "${title}" "${author}"`);
+      const firstKw = keywords[0] || axisTitle;
+      const q = encodeURIComponent(`livre chrétien "${firstKw}"`);
       const url = `https://www.google.com/search?q=${q}`;
       window.open(url, '_blank');
     });
 
-    // Action 3 : Copier la référence
+    // Action Copier
     const copyBtn = card.querySelector('.btn-advisor-copy');
     copyBtn?.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const refText = `${title} — ${author}`;
+      const refText = `${axisTitle} (Mots-clés : ${keywords.join(', ')})`;
       try {
         await navigator.clipboard.writeText(refText);
         copyBtn.innerHTML = LibraryAdvisorModal.icons.check;
         copyBtn.style.color = '#10B981';
         if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast(`« ${title} » copié au presse-papier`);
+          App.showToast(`Axe « ${axisTitle} » copié au presse-papier`);
         }
         setTimeout(() => {
           copyBtn.innerHTML = LibraryAdvisorModal.icons.copy;

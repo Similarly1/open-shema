@@ -1090,6 +1090,11 @@ class AiMixin:
     def save_theological_profile(self, profile_data: Dict[str, Any], generate_summary: bool = True) -> Dict[str, Any]:
         """Enregistre le profil et génère optionnellement une synthèse doctrinale IA."""
         self.config = load_config()
+        try:
+            from core.library_advisor import LibraryAdvisorManager
+            LibraryAdvisorManager.invalidate_memory_cache()
+        except Exception:
+            pass
         if generate_summary:
             summary = AISessionManager.generate_theological_profile_summary(profile_data, config=self.config)
             return {"success": True, "profile": AISessionManager.get_user_profile(), "summary": summary}
@@ -1314,6 +1319,72 @@ class AiMixin:
             return {"success": False, "error": "Fichier introuvable"}
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    # =========================================================================
+    # LECTURE AUDIO STREAMING DES RÉPONSES DE L'ASSISTANT D'ÉTUDE IA
+    # =========================================================================
+
+    def ai_tts_prepare_sentences(self, text: str) -> Dict[str, Any]:
+        """
+        Nettoie le Markdown d'une réponse IA et la découpe en phrases normalisées
+        pour la synthèse vocale pipelinée (< 400ms).
+        """
+        try:
+            from core.ai_tts_service import split_into_sentences
+            sentences = split_into_sentences(text)
+            return {
+                "success": True,
+                "sentences": sentences,
+                "count": len(sentences)
+            }
+        except Exception as e:
+            logger.error("[AiMixin] Erreur ai_tts_prepare_sentences : %s", e)
+            return {"success": False, "error": str(e), "sentences": []}
+
+    def ai_tts_synthesize_sentence(
+        self,
+        sentence: str,
+        voice: Optional[str] = None,
+        engine: Optional[str] = None,
+        speed: Optional[float] = None
+    ) -> Dict[str, Any]:
+        """
+        Synthétise une phrase unitaire avec le moteur spécifié (Edge-TTS, Voxtral, Gemini TTS)
+        et renvoie un Data URL base64 prêt pour la lecture instantanée dans le navigateur.
+        """
+        try:
+            from core.ai_tts_service import synthesize_sentence
+            self.config = load_config()
+            ok, data_url, err = synthesize_sentence(
+                sentence=sentence,
+                voice=voice,
+                engine=engine,
+                speed=speed,
+                cfg=self.config
+            )
+            return {
+                "success": ok,
+                "audio_data_url": data_url,
+                "error": err
+            }
+        except Exception as e:
+            logger.error("[AiMixin] Erreur ai_tts_synthesize_sentence : %s", e)
+            return {"success": False, "audio_data_url": "", "error": str(e)}
+
+    def ai_tts_get_config(self) -> Dict[str, Any]:
+        """Retourne la configuration active et les voix disponibles pour la lecture audio IA."""
+        try:
+            from core.ai_tts_service import get_ai_tts_config
+            self.config = load_config()
+            cfg_data = get_ai_tts_config(self.config)
+            return {
+                "success": True,
+                "config": cfg_data
+            }
+        except Exception as e:
+            logger.error("[AiMixin] Erreur ai_tts_get_config : %s", e)
+            return {"success": False, "error": str(e)}
+
 
 
 

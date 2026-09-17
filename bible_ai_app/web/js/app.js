@@ -976,6 +976,9 @@ const App = {
   switchView(viewName) {
     if (!viewName) return;
     const cleanViewName = viewName.startsWith('view-') ? viewName.substring(5) : viewName;
+    if (this.activeView === 'settings' && cleanViewName !== 'settings' && typeof SettingsView !== 'undefined' && SettingsView.save) {
+      SettingsView.save(true);
+    }
     this.activeView = cleanViewName;
     if (typeof NotificationManager !== 'undefined') {
       NotificationManager.clearBadge(cleanViewName);

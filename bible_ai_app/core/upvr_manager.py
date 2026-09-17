@@ -545,10 +545,13 @@ class UPVRManager:
             try:
                 collection = vector_db.get_collection(embedding_model)
                 if collection:
-                    res = collection.get(where={"source_type": "pastoral_upvr"}, include=[])
-                    if res and res.get("ids"):
-                        indexed_count = len(res["ids"])
-                        is_vectorized = (indexed_count >= total_chunks)
+                    all_chunks = self.get_all_rag_chunks()
+                    all_ids = [c["id"] for c in all_chunks]
+                    if all_ids:
+                        res = collection.get(ids=all_ids, include=[])
+                        if res and res.get("ids"):
+                            indexed_count = len(res["ids"])
+                            is_vectorized = (indexed_count >= total_chunks)
             except Exception as e:
                 logger.debug(f"[UPVRManager] get_rag_status collection check: {e}")
 

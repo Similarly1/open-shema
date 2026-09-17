@@ -11,10 +11,13 @@ Expose au frontend JavaScript toutes les méthodes nécessaires pour piloter le 
 
 import os
 import sys
+import shutil
 import base64
 import logging
 import threading
 from typing import Dict, List, Any, Optional
+
+import webview
 
 logger = logging.getLogger("api_audio_studio")
 
@@ -327,17 +330,6 @@ class AudioStudioMixin:
                 except Exception as _e_prog:
                     logger.debug("[audio_studio_generate_script] evaluate_js error: %s", _e_prog)
 
-                try:
-                    from core.task_manager import TaskManager
-                    TaskManager.push_event("task_progress", {
-                        "task_id": "audio_studio_script_gen",
-                        "title": "Rédaction Studio Audio",
-                        "progress": pct,
-                        "message": msg
-                    })
-                except Exception:
-                    pass
-
             res = PodcastEngine.generate_script(
                 subject_or_ref=str(subject_or_ref),
                 format_type=str(format_type),
@@ -388,23 +380,10 @@ class AudioStudioMixin:
                     win = get_global_window()
                     if win:
                         import json as _json
-                        # json.dumps() produit un littéral JS sûr (guillemets doubles, séquences
-                        # d'échappement complètes) sans risque d'injection JS.
                         safe_msg = _json.dumps(str(msg))
                         win.evaluate_js(f"window.AudioStudioView && window.AudioStudioView.updateSynthesisProgress({int(pct)}, {safe_msg})")
                 except Exception as _e_prog:
                     logger.debug("[audio_studio_synthesize] evaluate_js error: %s", _e_prog)
-
-                try:
-                    from core.task_manager import TaskManager
-                    TaskManager.push_event("task_progress", {
-                        "task_id": f"audio_synth_{podcast_id}",
-                        "title": "Synthèse Studio Audio",
-                        "progress": pct,
-                        "message": msg
-                    })
-                except Exception:
-                    pass
 
             record = PodcastEngine.synthesize_audio(
                 podcast_id=podcast_id,
@@ -416,9 +395,12 @@ class AudioStudioMixin:
 
             # Préparer le Data URL audio pour lecture directe
             audio_data_url = self._get_audio_data_url_internal(podcast_id)
+            record_copy = dict(record)
+            if audio_data_url:
+                record_copy["audio_data_url"] = audio_data_url
             return {
                 "success": True,
-                "podcast": record,
+                "podcast": record_copy,
                 "audio_url": audio_data_url
             }
         except Exception as e:
@@ -426,16 +408,20 @@ class AudioStudioMixin:
             return {"success": False, "error": str(e)}
 
     def audio_studio_get_history(self) -> Dict[str, Any]:
-        """Retourne la liste des épisodes enregistrés dans l'historique."""
+        """Retourne la liste des épisodes enregistrés dans l'historique avec vérification de présence audio."""
         try:
             items = PodcastHistory.load_all()
+            pod_dir = get_podcasts_dir()
+            for it in items:
+                af = it.get("audio_file")
+                it["has_audio"] = bool(af and os.path.exists(os.path.join(pod_dir, af)))
             return {"success": True, "items": items}
         except Exception as e:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_history : %s", e)
             return {"success": False, "items": []}
 
     def audio_studio_get_podcast(self, podcast_id: Any) -> Dict[str, Any]:
-        """Retourne les métadonnées et le script complet d'un épisode avec son audio."""
+        """Retourne les métadonnées et le script complet d'un épisode avec son audio en Data URL."""
         try:
             if isinstance(podcast_id, dict):
                 podcast_id = podcast_id.get("podcast_id", "")
@@ -446,9 +432,55 @@ class AudioStudioMixin:
                 return {"success": False, "error": "Épisode introuvable."}
             
             audio_url = self._get_audio_data_url_internal(podcast_id)
-            return {"success": True, "podcast": record, "audio_url": audio_url}
+            record_copy = dict(record)
+            if audio_url:
+                record_copy["audio_data_url"] = audio_url
+            return {"success": True, "podcast": record_copy, "audio_url": audio_url}
         except Exception as e:
             logger.error("[AudioStudioMixin] Erreur audio_studio_get_podcast : %s", e)
+            return {"success": False, "error": str(e)}
+
+    def audio_studio_save_mp3(self, podcast_id: Any) -> Dict[str, Any]:
+        """Ouvre une boîte de dialogue native pour enregistrer le fichier MP3 sur l'ordinateur de l'utilisateur."""
+        try:
+            if isinstance(podcast_id, dict):
+                podcast_id = podcast_id.get("podcast_id", "")
+            podcast_id = str(podcast_id)
+
+            src_path = self.audio_studio_get_audio_file_path(podcast_id)
+            if not src_path or not os.path.exists(src_path):
+                return {"success": False, "error": "Fichier audio MP3 introuvable sur le disque."}
+
+            record = PodcastHistory.get(podcast_id) or {}
+            title = record.get("title", "episode_podcast")
+            clean_title = "".join(c for c in title if c.isalnum() or c in (" ", "-", "_")).strip().replace(" ", "_")
+            if not clean_title:
+                clean_title = f"podcast_{podcast_id}"
+            default_filename = f"{clean_title}.mp3"
+
+            win = get_global_window()
+            if not win:
+                return {"success": False, "error": "Fenêtre de l'application introuvable."}
+
+            save_path = win.create_file_dialog(
+                webview.SAVE_DIALOG,
+                save_filename=default_filename,
+                file_types=('Fichiers Audio MP3 (*.mp3)', 'Tous les fichiers (*.*)')
+            )
+            if not save_path:
+                return {"cancelled": True}
+            
+            if isinstance(save_path, (list, tuple)):
+                if not save_path:
+                    return {"cancelled": True}
+                dest_path = str(save_path[0])
+            else:
+                dest_path = str(save_path)
+
+            shutil.copy2(src_path, dest_path)
+            return {"success": True, "saved_path": dest_path}
+        except Exception as e:
+            logger.error("[AudioStudioMixin] Erreur audio_studio_save_mp3 : %s", e)
             return {"success": False, "error": str(e)}
 
     def audio_studio_delete_podcast(self, podcast_id: Any) -> Dict[str, Any]:

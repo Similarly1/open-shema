@@ -323,6 +323,9 @@ class PodcastEngine:
         3: 12
     }
 
+    _voxtral_voices_cache: Optional[list] = None
+    _voxtral_voices_cache_time: float = 0.0
+
     @classmethod
     def fetch_voxtral_voices(cls, api_key: str) -> list:
         """
@@ -332,6 +335,9 @@ class PodcastEngine:
         """
         if not api_key:
             return cls.VOXTRAL_DEFAULT_VOICES
+        now = time.time()
+        if cls._voxtral_voices_cache and (now - cls._voxtral_voices_cache_time) < 300.0:
+            return cls._voxtral_voices_cache
         try:
             import httpx
             url = f"{cls.VOXTRAL_API_BASE}/audio/voices?limit=100"
@@ -399,6 +405,8 @@ class PodcastEngine:
                 return cls.VOXTRAL_DEFAULT_VOICES
 
             logger.info("[PodcastEngine] %d voix Voxtral françaises chargées depuis l'API Mistral.", len(voices))
+            cls._voxtral_voices_cache = voices
+            cls._voxtral_voices_cache_time = time.time()
             return voices
         except Exception as e_fetch:
             logger.debug("[PodcastEngine] Impossible de charger les voix Mistral : %s", e_fetch)
@@ -2791,11 +2799,26 @@ class PodcastEngine:
             return v_clean
         if re.match(r'^[0-9a-fA-F-]{32,36}$', v_clean):
             return v_clean
-        vl = voices_list or cls.VOXTRAL_DEFAULT_VOICES
+        vl = voices_list or cls._voxtral_voices_cache or cls.VOXTRAL_DEFAULT_VOICES
         for v in vl:
             if v.get("name", "").strip().lower() == v_clean.lower() or v.get("id", "").strip().lower() == v_clean.lower():
                 return v.get("id")
         req_low = v_clean.lower()
+        if vl:
+            emotion_mapping = [
+                (("neutre", "neutral", "normal", "default"), ("neutre", "neutral")),
+                (("grave", "sad", "méditative", "meditative", "solennelle"), ("grave", "sad", "méditative")),
+                (("joyeuse", "happy", "vivante", "chaleureuse"), ("joyeuse", "happy")),
+                (("enthousiaste", "enthusiastic", "dynamique", "excited"), ("enthousiaste", "enthusiastic", "excited")),
+                (("curieuse", "curious", "interrogative", "vive"), ("curieuse", "curious")),
+                (("ferme", "serious", "sérieuse", "serieuse", "angry"), ("ferme", "serious", "sérieuse", "serieuse")),
+            ]
+            for req_keywords, voice_keywords in emotion_mapping:
+                if any(kw in req_low for kw in req_keywords):
+                    for v in vl:
+                        v_str = (v.get("name", "") + " " + v.get("id", "")).lower()
+                        if any(vk in v_str for vk in voice_keywords):
+                            return v.get("id")
         if any(w in req_low for w in ("grave", "sad", "homme", "male", "oliver", "henri", "jacques", "exégète", "scholar", "ferme", "angry")):
             return "gb_oliver_neutral"
         if any(w in req_low for w in ("curious", "curieuse", "happy", "joyeuse", "excited", "enthousiaste", "vive")):

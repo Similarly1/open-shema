@@ -266,6 +266,25 @@ const AudioStudioView = {
     el.btnSuggestAxes?.addEventListener('click', () => this.suggestFocusQuestions());
     el.btnAddFocalQuestion?.addEventListener('click', () => this.addCustomFocalQuestion());
 
+    // Suggestions thématiques rapides (chips 1-clic)
+    document.querySelectorAll('.as-quick-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const topic = pill.dataset.topic;
+        if (topic && el.subjectInput) {
+          el.subjectInput.value = topic;
+          el.subjectInput.focus();
+        }
+      });
+    });
+
+    // Raccourci Ctrl+Entrée pour générer le script
+    el.subjectInput?.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        this.generateScript();
+      }
+    });
+
     // 1. Sélecteur de format Dialogue / Solo (Étape 1 et Étape 2)
     el.btnFormatDialogue?.addEventListener('click', () => this.setFormat('dialogue'));
     el.btnFormatSolo?.addEventListener('click', () => this.setFormat('solo'));
@@ -2152,6 +2171,9 @@ const AudioStudioView = {
     } else if (step === 3) {
       this.resetStep2InputState();
       this.renderKaraokeView();
+      if (this.currentPodcast?.audio_data_url && this.elements.html5Player && (!this.elements.html5Player.src || this.elements.html5Player.src === '')) {
+        this.loadAudioInPlayer(this.currentPodcast.audio_data_url);
+      }
     }
   },
 
@@ -2504,6 +2526,13 @@ const AudioStudioView = {
     } else if (!isSuccess && el.step1ReasoningBox) {
       el.step1ReasoningBox.style.display = 'none';
     }
+
+    // Nettoyer toute notification de tâche flottante résiduelle
+    if (typeof TaskManager !== 'undefined' && typeof TaskManager.dismissTask === 'function') {
+      TaskManager.dismissTask('audio_studio_script_gen');
+    }
+    const legacyCard = document.getElementById('task-card-audio_studio_script_gen');
+    if (legacyCard) legacyCard.remove();
   },
 
   updateSynthesisProgress(pct, msg) {
@@ -2536,6 +2565,13 @@ const AudioStudioView = {
 
     if (this.isGenerating) return;
     this.isGenerating = true;
+
+    // Nettoyer toute notification de tâche d'arrière-plan résiduelle
+    if (typeof TaskManager !== 'undefined' && typeof TaskManager.dismissTask === 'function') {
+      TaskManager.dismissTask('audio_studio_script_gen');
+    }
+    const legacyCard = document.getElementById('task-card-audio_studio_script_gen');
+    if (legacyCard) legacyCard.remove();
 
     // Masquer les éléments de saisie du haut pour focaliser sur l'avancement et empêcher toute modification
     el.step1Pane?.classList.add('is-generating');
@@ -3265,8 +3301,12 @@ const AudioStudioView = {
     }
 
     // Mettre à jour l'état du lecteur si l'audio existe déjà
-    if (p.audio_data_url || p.audio_file) {
-      this.loadAudioInPlayer(p.audio_data_url);
+    const audioUrl = p.audio_data_url;
+    if (audioUrl) {
+      this.loadAudioInPlayer(audioUrl);
+      if (el.btnDownload) el.btnDownload.disabled = false;
+      if (el.btnExportNote) el.btnExportNote.disabled = false;
+    } else if (p.audio_file) {
       if (el.btnDownload) el.btnDownload.disabled = false;
       if (el.btnExportNote) el.btnExportNote.disabled = false;
     } else {
@@ -3876,10 +3916,14 @@ const AudioStudioView = {
         this.targetSynthesisPct = 100;
 
         this.currentPodcast = res.podcast;
+        const audioUrl = res.audio_url || res.podcast?.audio_data_url;
+        if (audioUrl) {
+          this.currentPodcast.audio_data_url = audioUrl;
+        }
         this.renderScript();
 
-        if (res.audio_url) {
-          this.loadAudioInPlayer(res.audio_url);
+        if (audioUrl) {
+          this.loadAudioInPlayer(audioUrl);
         }
 
         if (el.progressPct) el.progressPct.textContent = '100%';
@@ -3891,6 +3935,10 @@ const AudioStudioView = {
         }, 2200);
 
         this.loadHistory();
+        if (typeof TaskManager !== 'undefined' && typeof TaskManager.dismissTask === 'function') {
+          TaskManager.dismissTask(`audio_synth_${this.currentPodcast.id}`);
+          TaskManager.dismissTask('audio_studio_script_gen');
+        }
         this.goToStep(3); // Aller automatiquement à l'étape 3 : Régie d'écoute & Karaoké !
 
         if (typeof NotificationManager !== 'undefined') {
@@ -3956,8 +4004,13 @@ const AudioStudioView = {
     const el = this.elements;
     if (!el.html5Player || !audioUrl) return;
 
-    el.html5Player.src = audioUrl;
-    el.html5Player.load();
+    if (el.html5Player.src !== audioUrl) {
+      el.html5Player.src = audioUrl;
+      el.html5Player.load();
+    }
+    if (this.currentPodcast?.duration_seconds && el.timeDuration) {
+      el.timeDuration.textContent = this.formatTime(this.currentPodcast.duration_seconds);
+    }
     if (el.playerStatus) el.playerStatus.textContent = 'Prêt à la lecture';
     if (el.btnDownload) el.btnDownload.disabled = false;
     if (el.btnExportNote) el.btnExportNote.disabled = false;
@@ -3966,8 +4019,12 @@ const AudioStudioView = {
   togglePlay() {
     const audio = this.elements.html5Player;
     if (!audio || !audio.src) {
-      this.showErrorToast("Aucun fichier audio n'est chargé. Veuillez d'abord synthétiser le script.");
-      return;
+      if (this.currentPodcast?.audio_data_url) {
+        this.loadAudioInPlayer(this.currentPodcast.audio_data_url);
+      } else {
+        this.showErrorToast("Aucun fichier audio n'est chargé. Veuillez d'abord synthétiser le script.");
+        return;
+      }
     }
 
     if (audio.paused) {
@@ -4227,11 +4284,26 @@ const AudioStudioView = {
   // TÉLÉCHARGEMENT & EXPORT EN NOTE
   // =========================================================================
 
-  downloadMp3() {
+  async downloadMp3() {
     const p = this.currentPodcast;
     if (!p) return;
 
-    const dataUrl = p.audio_data_url;
+    if (p.id) {
+      try {
+        const res = await API.call('audio_studio_save_mp3', { podcast_id: p.id });
+        if (res) {
+          if (res.cancelled) return;
+          if (res.success) {
+            this.showSuccessToast("Épisode MP3 téléchargé avec succès.");
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('[AudioStudioView] Fallback downloadMp3 via lien HTML:', err);
+      }
+    }
+
+    const dataUrl = p.audio_data_url || this.elements.html5Player?.src;
     if (!dataUrl) {
       this.showErrorToast("L'audio n'est pas encore disponible pour le téléchargement.");
       return;
@@ -4301,7 +4373,7 @@ const AudioStudioView = {
 
         const dateStr = it.created_at ? new Date(it.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
         const durStr = (it.duration_seconds && it.duration_seconds > 0) ? this.formatTime(it.duration_seconds) : `${it.turns_count || 0} répliques`;
-        const hasAudio = Boolean(it.audio_file || it.audio_data_url);
+        const hasAudio = Boolean(it.has_audio !== undefined ? it.has_audio : (it.audio_file || it.audio_data_url));
 
         itemEl.innerHTML = `
           <div class="audio-studio-history-item-content" style="flex: 1; min-width: 0; cursor: pointer;">
@@ -4352,6 +4424,11 @@ const AudioStudioView = {
       const res = await API.call('audio_studio_get_podcast', { podcast_id: podcastId });
       if (res && res.success && res.podcast) {
         this.currentPodcast = res.podcast;
+        const audioUrl = res.audio_url || res.podcast.audio_data_url;
+        if (audioUrl) {
+          this.currentPodcast.audio_data_url = audioUrl;
+        }
+
         this.setFormat(res.podcast.format || 'dialogue');
         if (res.podcast.study_mode) {
           this.setStudyMode(res.podcast.study_mode);
@@ -4365,12 +4442,18 @@ const AudioStudioView = {
         const hasSfx = this.activeAudioEvents.some(e => e.type === 'sfx');
         if (this.elements.checkMusicJingle) this.elements.checkMusicJingle.checked = hasMusic;
         if (this.elements.checkSfxAuto) this.elements.checkSfxAuto.checked = hasSfx;
+
         this.renderScript();
+
+        if (audioUrl) {
+          this.loadAudioInPlayer(audioUrl);
+        }
+
         this.loadHistory();
         this.toggleHistoryDrawer(false);
 
         // Si l'audio existe, aller directement à l'étape 3, sinon aller à l'étape 2
-        if (res.podcast.audio_file || res.podcast.audio_data_url) {
+        if (audioUrl || res.podcast.audio_file) {
           this.goToStep(3);
         } else {
           this.goToStep(2);

@@ -188,6 +188,11 @@ class ContentMixin:
             from core.articles_manager import ArticlesManager
             manager = ArticlesManager.get_instance()
             manager.toggle_source(source_id, is_enabled)
+            try:
+                from core.library_advisor import LibraryAdvisorManager
+                LibraryAdvisorManager.invalidate_memory_cache()
+            except Exception:
+                pass
             return {"success": True, "source_id": source_id, "is_enabled": is_enabled}
         except Exception as e:
             logger.error(f"Erreur API toggle_article_source: {e}")

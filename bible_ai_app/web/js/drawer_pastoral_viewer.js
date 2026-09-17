@@ -331,6 +331,7 @@ const DrawerPastoralViewer = {
     const secPassages = ep.passages_secondaires || [];
     const audioUrl = ep.audio_url || '';
     const mp3Url = ep.mp3_url || '';
+    const youtubeUrl = ep.youtube_url || '';
     const duration = ep.duration || '';
 
     const questionAuditeurHtml = ep.question_auditeur ? `
@@ -340,6 +341,16 @@ const DrawerPastoralViewer = {
           <span>Question de l'auditeur</span>
         </div>
         <div class="pastoral-question-body">« ${this.escapeHtml(ep.question_auditeur)} »</div>
+      </div>
+    ` : '';
+
+    const theseHtml = these ? `
+      <div class="apj-these-box">
+        <div class="apj-these-title">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Thèse pastorale centrale</span>
+        </div>
+        <div class="apj-these-text">${this.escapeHtml(these)}</div>
       </div>
     ` : '';
 
@@ -378,10 +389,11 @@ const DrawerPastoralViewer = {
     ` : '';
 
     const illustrHtml = (illustr.titre || illustr.resume) ? `
-      <div class="apj-modal-section apj-illustr-box" style="margin-top: 14px;">
-        <div class="apj-sec-title apj-sec-illustr">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span>Illustration &amp; Analogie : ${this.escapeHtml(illustr.titre || 'Analogie')}</span>
+      <div class="apj-modal-section" style="margin-top: 14px;">
+        <div class="apj-sec-title">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Illustration ou métaphore</span>
+          ${illustr.titre ? `<span class="apj-sec-subtitle"> — ${this.escapeHtml(illustr.titre)}</span>` : ''}
         </div>
         <div class="apj-sec-content">${this.escapeHtml(illustr.resume || '')}</div>
       </div>
@@ -398,6 +410,7 @@ const DrawerPastoralViewer = {
       mp3Url.includes('.mp3') ||
       mp3Url.includes('anchor.fm') ||
       mp3Url.includes('cloudfront.net') ||
+      mp3Url.includes('transistor.fm') ||
       mp3Url.includes('.m4a') ||
       mp3Url.includes('.wav') ||
       (!mp3Url.includes('soundcloud.com') && !mp3Url.includes('/player'))
@@ -414,7 +427,13 @@ const DrawerPastoralViewer = {
             ${duration ? `<span class="pastoral-audio-duration-badge">${this.escapeHtml(duration)}</span>` : ''}
           </div>
           <audio controls preload="none" src="${this.escapeHtml(mp3Url)}"></audio>
-          <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 6px;">
+          <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 6px; flex-wrap: wrap;">
+            ${youtubeUrl ? `
+              <a href="#" class="pastoral-audio-ext-link" data-ext-url="${this.escapeHtml(youtubeUrl)}" style="color: #ef4444; display: inline-flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>Vidéo YouTube ↗</span>
+              </a>
+            ` : ''}
             ${sourceUrl ? `
               <a href="#" class="pastoral-audio-ext-link" data-ext-url="${this.escapeHtml(sourceUrl)}">
                 <span>Article &amp; podcast sur ${sourceBrand} ↗</span>

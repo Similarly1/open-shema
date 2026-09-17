@@ -1,6 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 import os
+import time
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 import core.chroma_silencer
 import re
@@ -42,12 +43,13 @@ class VectorDB:
             
         collection = self.get_collection(embedding_model)
         
-        # Détection des fragments déjà indexés pour reprise instantanée sans recalculer
+        # Détection instantanée des fragments déjà indexés par clé primaire B-Tree (< 0.1s)
         existing_ids = set()
         try:
-            doc_name = chunks[0]["metadata"].get("name") if chunks else None
-            if doc_name:
-                existing_data = collection.get(where={"name": doc_name}, include=[])
+            candidate_ids = [c["id"] for c in chunks]
+            if candidate_ids:
+                # Interrogation par IDs (clé primaire indexée) au lieu d'un scan complet non indexé
+                existing_data = collection.get(ids=candidate_ids, include=[])
                 if existing_data and existing_data.get("ids"):
                     existing_ids = set(existing_data["ids"])
         except Exception:
@@ -84,7 +86,7 @@ class VectorDB:
                     clean_m[k] = str(v)
             metadatas.append(clean_m)
         
-        batch_size = 20 if ("gemini" in embedding_model or "infomaniak" in embedding_model or "bge" in embedding_model) else 50
+        batch_size = 10 if ("infomaniak" in embedding_model or "bge" in embedding_model or "mini_lm" in embedding_model) else (20 if "gemini" in embedding_model else 50)
         total_remaining = len(texts)
         
         if embedding_model == "study_library":
@@ -131,13 +133,27 @@ class VectorDB:
             end = min(i + batch_size, total_remaining)
             batch_texts = texts[i:end]
             
-            embeddings = llm.get_embeddings(batch_texts, model=embedding_model)
-            collection.add(
-                embeddings=embeddings,
-                documents=batch_texts,
-                metadatas=metadatas[i:end],
-                ids=ids[i:end]
-            )
+            # Retry robuste par lot pour absorber toute instabilité transitoire de connexion
+            batch_success = False
+            batch_err = None
+            for batch_attempt in range(3):
+                try:
+                    embeddings = llm.get_embeddings(batch_texts, model=embedding_model)
+                    collection.add(
+                        embeddings=embeddings,
+                        documents=batch_texts,
+                        metadatas=metadatas[i:end],
+                        ids=ids[i:end]
+                    )
+                    batch_success = True
+                    break
+                except Exception as e:
+                    batch_err = e
+                    logger.warning(f"[VectorDB] Tentative {batch_attempt+1}/3 échouée sur lot d'embedding : {e}. Nouvelle tentative dans 3s...")
+                    time.sleep(3.0 * (batch_attempt + 1))
+
+            if not batch_success:
+                raise Exception(f"Échec d'indexation du lot d'embedding ({end}/{total_remaining}) : {batch_err}")
             if progress_callback:
                 current_done = already_done + end
                 pct = int((current_done / total_all) * 100)

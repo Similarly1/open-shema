@@ -680,37 +680,61 @@ Exemple :
   ]
 }`,
 
-  DEFAULT_LIBRARY_ADVISOR_SYSTEM_PROMPT: `Tu es un bibliothécaire théologique, documentaliste et mentor intellectuel chrétien de premier plan.
-Ton rôle est d'analyser la bibliothèque d'un utilisateur (pasteur, étudiant, enseignant ou chrétien engagé) afin de dresser un bilan constructif et de lui recommander des ouvrages de référence pertinents.
+  DEFAULT_LIBRARY_ADVISOR_SYSTEM_PROMPT: `Tu es un mentor spirituel, intellectuel et théologique chrétien, profondément bienveillant, cultivé et attentif, doublé d'un conseiller documentaire de premier plan.
+Tu t'adresses DIRECTEMENT à ton interlocuteur (pasteur, responsable d'église, étudiant en théologie ou chrétien passionné par la Parole de Dieu) pour l'encourager dans son cheminement, valoriser la richesse de ses lectures actuelles, et lui proposer avec tact, fraternité et enthousiasme des pistes stimulantes pour approfondir et équilibrer sa bibliothèque d'e-books.
 
 RÈGLES IMPÉRATIVES :
-1. AUCUN ÉMOJI : Ta réponse ne doit contenir AUCUN émoji. Utilise un style typographique sobre, digne et soigné.
-2. DOUBLE OBJECTIF :
-   - Approfondissement : suggérer 2 ou 3 ouvrages incontournables qui prolongent ses thèmes ou auteurs de prédilection.
-   - Équilibrage : identifier les angles morts de sa collection (ex: absence de littérature sapientiale, manque de théologie de l'Ancien Testament, absence d'ouvrages d'herméneutique, manque d'exégèse historico-critique ou de théologie pratique) et proposer 2 ou 3 ouvrages majeurs pour rééquilibrer sa formation.
-3. OUVRAGES RÉELS & ACCESSIBLES : Propose uniquement des ouvrages publiés existants, de préférence disponibles en français (éditeurs reconnus : BLF Éditions, Publications Chrétiennes, Excelsis, Éditions Clé, Éditions Olivétan / Bibli'O, Cerf, Labor et Fides, etc.).
-4. FORMAT DE SORTIE : Réponds STRICTEMENT en JSON valide (aucun préambule, aucune balise \`\`\`json).
+1. TON DIRECT, CHALEUREUX ET FRATERNEL (VOUVOIEMENT STRICT) :
+   - Adresse-toi TOUJOURS directement à la personne en la vouvoyant avec chaleur, bienveillance et fraternité (« Vous », « Votre démarche », « Vos lectures », « Votre ministère / étude »).
+   - INTERDICTION FORMELLE de parler de la personne à la troisième personne (« l'utilisateur », « le lecteur », « il », « sa collection », « sa foi »).
+   - Adopte une posture de compagnon de route stimulant et encourageant : salue la vitalité de son engagement dans les Écritures, formule le diagnostic comme une appréciation vivante, fraternelle et valorisante, et présente les suggestions comme de belles invitations à enrichir sa réflexion.
+
+2. AUCUN ÉMOJI :
+   - Ta réponse ne doit contenir STRICTEMENT AUCUN émoji. L'expression de la chaleur humaine et fraternelle s'exprime entièrement par la qualité du vocabulaire, l'élégance de la langue française et la délicatesse pastorale.
+
+3. PRISE EN COMPTE DU PROFIL THÉOLOGIQUE ET MINISTÉRIEL :
+   - Adapte la technicité des recommandations à son niveau linguistique : si la personne débute en grec/hébreu, privilégie des ouvrages pédagogiques avec translittérations claires (ex: Gordon Fee, D.A. Carson, Alfred Kuen, Henri Blocher) plutôt que des grammaires ou apparats hyper-techniques.
+   - Respecte et nourris sa sensibilité ou tradition théologique (ex: réformée, baptiste, etc.) tout en lui ouvrant avec délicatesse des perspectives stimulantes d'autres traditions historiques solides.
+   - Prends en compte son rôle (étude personnelle, prédication, animation biblique, études théologiques).
+
+4. ANTI-DOUBLON ABSOLU AVEC LES RESSOURCES DÉJÀ INSTALLÉES :
+   - La personne dispose déjà d'une panoplie de Bibles et de nombreux modules de commentaires classiques (ex: Calvin, Matthew Henry, John Gill, Albert Barnes, Godet, Scofield, Robertson, JFB...).
+   - Interdiction formelle de lui suggérer des ouvrages ou commentaires classiques qu'elle possède déjà dans son application !
+   - Oriente expressément tes recommandations vers des commentaires exégétiques contemporains (20e-21e s.), des monographies thématiques spécialisées et des traités de théologie biblique modernes.
+
+5. PRISE EN COMPTE DES ARTICLES DE BLOG ET FLUX RSS (TOUT POUR SA GLOIRE & ÉVANGILE 21) :
+   - Si la personne est abonnée aux 2 flux de blogs (TPSG + E21), ses besoins en réflexion pastorale, éthique contemporaine et vie chrétienne pratique sont déjà alimentés au quotidien. Privilégie alors dans ses e-books des monographies de fond, de la théologie systématique approfondie et de l'exégèse universitaire solide pour ancrer sa réflexion.
+   - Si 0 ou 1 seul flux est actif, identifie avec tact les éventuels manques pratiques ou éthiques dans ses lectures et propose des ouvrages de référence pour y remédier.
+
+6. DOUBLE OBJECTIF D'ORIENTATION :
+   - Approfondissement : identifier 2 ou 3 axes d'approfondissement majeurs dans la continuité de ses thèmes de cœur ou auteurs de prédilection.
+   - Équilibrage : identifier 2 ou 3 axes d'équilibrage ciblant précisément ses angles morts statistiques (ex: poésie et sagesse de l'AT, prophètes pré-exiliques, herméneutique et méthode exégétique, théologie systématique, éthique chrétienne et pastorale).
+
+7. MOTS-CLÉS DE RECHERCHE OPTIMISÉS POUR E-BOOKS :
+   - Pour chaque axe, fournis un intitulé d'axe clair, 2 à 4 auteurs de repère incontournables (non présents dans ses doublons), et 3 à 4 mots-clés ou termes de recherche concis et percutants (ex: "Herméneutique", "Exégèse", "Gordon Fee", "Psaumes", "Sagesse", "Blocher"). Ces mots-clés doivent être idéaux pour être tapés directement dans un moteur de recherche de catalogue e-book chrétien.
+
+8. FORMAT DE SORTIE : Réponds STRICTEMENT en JSON valide (aucun préambule, aucune balise \`\`\`json).
 
 Schéma JSON attendu :
 {
-  "diagnostic": "Synthèse bienveillante et percutante de 2 à 3 phrases décrivant le profil de lecture, ses points forts et ses déséquilibres majeurs.",
-  "strengths_summary": "Description concise des domaines et sensibilités bien représentés dans sa collection.",
-  "gaps_summary": "Description concise des corpus ou disciplines sous-représentés ou absents.",
+  "diagnostic": "Diagnostic chaleureux, personnel et encourageant (2 à 3 phrases) s'adressant directement à la personne (« Vous ») pour saluer la vitalité de sa démarche, mettre en valeur ses forces et lui proposer avec enthousiasme de nouveaux horizons pour son étude.",
+  "strengths_summary": "Description concise et valorisante des domaines et sensibilités qui font la richesse de votre collection et de vos outils actuels.",
+  "gaps_summary": "Pistes douces et stimulantes pour ouvrir de nouvelles perspectives sur des corpus ou disciplines encore peu explorés par vous.",
   "deepening_recommendations": [
     {
-      "title": "Titre exact de l'ouvrage",
-      "author": "Nom complet de l'auteur",
-      "publisher": "Éditeur de référence",
-      "rationale": "Une à deux phrases expliquant pourquoi ce livre approfondira remarquablement ses lectures actuelles."
+      "axis_title": "Intitulé explicite de l'axe d'approfondissement (ex: Exégèse textuelle et épîtres pauliniennes)",
+      "rationale": "Une à deux phrases chaleureuses s'adressant directement à vous pour expliquer en quoi cet axe nourrira magnifiquement votre réflexion actuelle.",
+      "benchmark_authors": ["Gordon Fee", "Douglas Moo", "F.F. Bruce"],
+      "search_keywords": ["Épîtres", "Exégèse", "Gordon Fee", "Moo"]
     }
   ],
   "balance_recommendations": [
     {
-      "title": "Titre exact de l'ouvrage",
-      "author": "Nom complet de l'auteur",
-      "publisher": "Éditeur de référence",
-      "target_gap": "Angle mort ciblé (ex: Littérature sapientiale, Théologie de l'Ancien Testament, Herméneutique biblique, Éthique chrétienne)",
-      "rationale": "Une à deux phrases expliquant en quoi ce livre apportera l'équilibre nécessaire à son travail d'étude."
+      "axis_title": "Intitulé explicite de l'axe d'équilibrage (ex: Littérature sapientiale et poésie de l'Ancien Testament)",
+      "target_gap": "Angle mort ciblé (ex: Littérature sapientiale (Psaumes & Sagesse), Herméneutique biblique, Éthique chrétienne)",
+      "rationale": "Une à deux phrases chaleureuses s'adressant directement à vous pour vous inviter à explorer ce domaine complémentaire.",
+      "benchmark_authors": ["Derek Kidner", "Tremper Longman", "Henri Blocher"],
+      "search_keywords": ["Psaumes", "Sagesse", "Proverbes", "Kidner"]
     }
   ]
 }`,
@@ -1049,6 +1073,24 @@ Schéma JSON attendu :
     // Changement de police en direct
     document.getElementById('cfg-font-family')?.addEventListener('change', (e) => {
       App.applyFontFamily(e.target.value);
+    });
+
+    // Lecture Audio Assistant IA — bascule de visibilité des voix et auto-sauvegarde immédiate
+    const audioSettingIds = [
+      'cfg-ai-answer-voice-engine',
+      'cfg-ai-answer-voice-edge',
+      'cfg-ai-answer-voice-voxtral',
+      'cfg-ai-answer-voice-gemini',
+      'cfg-ai-answer-playback-speed'
+    ];
+
+    audioSettingIds.forEach(id => {
+      document.getElementById(id)?.addEventListener('change', () => {
+        if (id === 'cfg-ai-answer-voice-engine') {
+          this.updateAiVoiceEngineVisibility();
+        }
+        this.save();
+      });
     });
 
     // Notes & Dossier Markdown
@@ -1946,43 +1988,34 @@ Schéma JSON attendu :
       document.getElementById('cfg-articles-sync-freq-select').value = val;
     }
 
-    // Studio Audio & Podcast
-    if (document.getElementById('cfg-audio-studio-engine')) {
-      document.getElementById('cfg-audio-studio-engine').value = c.audio_studio_engine || 'edge_tts';
+
+    // Lecture Audio de l'Assistant d'Étude IA
+    if (document.getElementById('cfg-ai-answer-voice-engine')) {
+      document.getElementById('cfg-ai-answer-voice-engine').value = c.ai_answer_voice_engine || 'edge_tts';
     }
-    if (document.getElementById('cfg-audio-studio-voice-a')) {
-      document.getElementById('cfg-audio-studio-voice-a').value = c.audio_studio_voice_speaker_a || 'fr-FR-VivienneMultilingualNeural';
+    if (document.getElementById('cfg-ai-answer-voice-edge')) {
+      document.getElementById('cfg-ai-answer-voice-edge').value = c.ai_answer_voice_edge || 'fr-CH-FabriceNeural';
     }
-    if (document.getElementById('cfg-audio-studio-voice-b')) {
-      document.getElementById('cfg-audio-studio-voice-b').value = c.audio_studio_voice_speaker_b || 'fr-CH-FabriceNeural';
+    if (document.getElementById('cfg-ai-answer-voice-voxtral')) {
+      document.getElementById('cfg-ai-answer-voice-voxtral').value = c.ai_answer_voice_voxtral || 'Marie - Neutral';
     }
-    if (document.getElementById('cfg-audio-studio-voice-solo')) {
-      document.getElementById('cfg-audio-studio-voice-solo').value = c.audio_studio_voice_solo || 'fr-CH-FabriceNeural';
+    if (document.getElementById('cfg-ai-answer-voice-gemini')) {
+      document.getElementById('cfg-ai-answer-voice-gemini').value = c.ai_answer_voice_gemini || 'Charon';
     }
-    if (document.getElementById('cfg-audio-studio-pause-ms')) {
-      document.getElementById('cfg-audio-studio-pause-ms').value = c.audio_studio_pause_ms || 350;
+    const speedEl = document.getElementById('cfg-ai-answer-playback-speed');
+    if (speedEl) {
+      const speedNum = parseFloat(c.ai_answer_playback_speed ?? 1.0);
+      let matched = false;
+      for (let i = 0; i < speedEl.options.length; i++) {
+        if (Math.abs(parseFloat(speedEl.options[i].value) - speedNum) < 0.01) {
+          speedEl.selectedIndex = i;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) speedEl.value = '1.0';
     }
-    if (document.getElementById('cfg-audio-studio-voxtral-voice')) {
-      document.getElementById('cfg-audio-studio-voxtral-voice').value = c.audio_studio_voxtral_voice || 'default';
-    }
-    if (document.getElementById('cfg-audio-studio-voxtral-modulate')) {
-      document.getElementById('cfg-audio-studio-voxtral-modulate').checked = c.audio_studio_voxtral_modulate !== false;
-    }
-    if (document.getElementById('cfg-audio-studio-context-depth')) {
-      document.getElementById('cfg-audio-studio-context-depth').value = c.audio_studio_context_depth ?? 1;
-    }
-    if (document.getElementById('cfg-audio-studio-enable-rerank')) {
-      document.getElementById('cfg-audio-studio-enable-rerank').checked = c.audio_studio_enable_rerank !== false;
-    }
-    if (document.getElementById('cfg-audio-studio-enable-curator')) {
-      document.getElementById('cfg-audio-studio-enable-curator').checked = !!c.audio_studio_enable_curator;
-    }
-    if (document.getElementById('cfg-audio-studio-bg-music')) {
-      document.getElementById('cfg-audio-studio-bg-music').value = c.audio_studio_bg_music || 'bed_cozy_jazz_study';
-    }
-    if (document.getElementById('cfg-audio-studio-jingle-intro')) {
-      document.getElementById('cfg-audio-studio-jingle-intro').value = c.audio_studio_jingle_intro || 'jingle_piano_solemn';
-    }
+    this.updateAiVoiceEngineVisibility();
 
     // Chargement des prompts système (Modes de chat & Outils dédiés)
     Object.values(this.PROMPT_CONFIGS).forEach(cfg => {
@@ -2021,6 +2054,17 @@ Schéma JSON attendu :
         notifContainer.style.pointerEvents = (nSettings.enabled !== false) ? 'auto' : 'none';
       }
     }
+  },
+
+  updateAiVoiceEngineVisibility() {
+    const engine = document.getElementById('cfg-ai-answer-voice-engine')?.value || 'edge_tts';
+    const rowEdge = document.getElementById('row-ai-voice-edge');
+    const rowVoxtral = document.getElementById('row-ai-voice-voxtral');
+    const rowGemini = document.getElementById('row-ai-voice-gemini');
+
+    if (rowEdge) rowEdge.style.display = (engine === 'edge_tts') ? '' : 'none';
+    if (rowVoxtral) rowVoxtral.style.display = (engine === 'voxtral') ? '' : 'none';
+    if (rowGemini) rowGemini.style.display = (engine === 'gemini_tts') ? '' : 'none';
   },
 
   MODEL_PAIR_CONFIG_KEYS: {
@@ -2870,6 +2914,7 @@ Schéma JSON attendu :
   async loadUpvrRagStatus() {
     const badge = document.getElementById('upvr-status-badge');
     const chunksLabel = document.getElementById('upvr-chunks-count-label');
+    const epsLabel = document.getElementById('upvr-episodes-count-label');
     const btn = document.getElementById('btn-vectorize-upvr');
     const btnText = document.getElementById('btn-vectorize-upvr-text');
     const modelSelect = document.getElementById('upvr-embed-model-select');
@@ -2885,6 +2930,10 @@ Schéma JSON attendu :
         badge.style.color = '#ef4444';
         btn.disabled = true;
         return;
+      }
+
+      if (epsLabel && status.total_episodes) {
+        epsLabel.textContent = `${status.total_episodes}`;
       }
 
       if (chunksLabel && status.total_chunks) {
@@ -2978,7 +3027,7 @@ Schéma JSON attendu :
     }, 800);
   },
 
-  async save() {
+  async save(silent = false) {
     const newCfg = { ...this.config };
     newCfg.enable_ai = document.getElementById('cfg-enable-ai')?.checked !== false;
     const activePill = document.querySelector('.theme-mode-pill.active');
@@ -3210,42 +3259,22 @@ Schéma JSON attendu :
       }
     }
 
-    // Studio Audio & Podcast
-    if (document.getElementById('cfg-audio-studio-engine')) {
-      newCfg.audio_studio_engine = document.getElementById('cfg-audio-studio-engine').value;
+
+    // Lecture Audio de l'Assistant d'Étude IA
+    if (document.getElementById('cfg-ai-answer-voice-engine')) {
+      newCfg.ai_answer_voice_engine = document.getElementById('cfg-ai-answer-voice-engine').value;
     }
-    if (document.getElementById('cfg-audio-studio-voice-a')) {
-      newCfg.audio_studio_voice_speaker_a = document.getElementById('cfg-audio-studio-voice-a').value;
+    if (document.getElementById('cfg-ai-answer-voice-edge')) {
+      newCfg.ai_answer_voice_edge = document.getElementById('cfg-ai-answer-voice-edge').value;
     }
-    if (document.getElementById('cfg-audio-studio-voice-b')) {
-      newCfg.audio_studio_voice_speaker_b = document.getElementById('cfg-audio-studio-voice-b').value;
+    if (document.getElementById('cfg-ai-answer-voice-voxtral')) {
+      newCfg.ai_answer_voice_voxtral = document.getElementById('cfg-ai-answer-voice-voxtral').value;
     }
-    if (document.getElementById('cfg-audio-studio-voice-solo')) {
-      newCfg.audio_studio_voice_solo = document.getElementById('cfg-audio-studio-voice-solo').value;
+    if (document.getElementById('cfg-ai-answer-voice-gemini')) {
+      newCfg.ai_answer_voice_gemini = document.getElementById('cfg-ai-answer-voice-gemini').value;
     }
-    if (document.getElementById('cfg-audio-studio-pause-ms')) {
-      newCfg.audio_studio_pause_ms = parseInt(document.getElementById('cfg-audio-studio-pause-ms').value, 10) || 350;
-    }
-    if (document.getElementById('cfg-audio-studio-voxtral-voice')) {
-      newCfg.audio_studio_voxtral_voice = document.getElementById('cfg-audio-studio-voxtral-voice').value.trim() || 'default';
-    }
-    if (document.getElementById('cfg-audio-studio-voxtral-modulate')) {
-      newCfg.audio_studio_voxtral_modulate = document.getElementById('cfg-audio-studio-voxtral-modulate').checked;
-    }
-    if (document.getElementById('cfg-audio-studio-context-depth')) {
-      newCfg.audio_studio_context_depth = parseInt(document.getElementById('cfg-audio-studio-context-depth').value, 10) || 1;
-    }
-    if (document.getElementById('cfg-audio-studio-enable-rerank')) {
-      newCfg.audio_studio_enable_rerank = document.getElementById('cfg-audio-studio-enable-rerank').checked;
-    }
-    if (document.getElementById('cfg-audio-studio-enable-curator')) {
-      newCfg.audio_studio_enable_curator = document.getElementById('cfg-audio-studio-enable-curator').checked;
-    }
-    if (document.getElementById('cfg-audio-studio-bg-music')) {
-      newCfg.audio_studio_bg_music = document.getElementById('cfg-audio-studio-bg-music').value;
-    }
-    if (document.getElementById('cfg-audio-studio-jingle-intro')) {
-      newCfg.audio_studio_jingle_intro = document.getElementById('cfg-audio-studio-jingle-intro').value;
+    if (document.getElementById('cfg-ai-answer-playback-speed')) {
+      newCfg.ai_answer_playback_speed = parseFloat(document.getElementById('cfg-ai-answer-playback-speed').value) || 1.0;
     }
 
     // Sérialisation des prompts système
@@ -3303,9 +3332,13 @@ Schéma JSON attendu :
       if (typeof DrawerNotes !== 'undefined' && DrawerNotes.renderList) {
         DrawerNotes.renderList();
       }
-      App.showToast('Paramètres enregistrés avec succès !');
+      if (!silent) {
+        App.showToast('Paramètres enregistrés avec succès !');
+      }
     } catch (e) {
-      alert(`Erreur d'enregistrement : ${e}`);
+      if (!silent) {
+        alert(`Erreur d'enregistrement : ${e}`);
+      }
     }
   },
 

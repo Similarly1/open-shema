@@ -478,6 +478,7 @@ const AIStudyView = {
   // =========================================================================
 
   async startNewSession() {
+    this.stopAudioPlayback();
     this.currentSessionId = null;
     this.currentMessages = [];
     this.hasUserSentMessage = false;
@@ -719,6 +720,7 @@ const AIStudyView = {
 
   async switchSession(sessionId) {
     if (this.currentSessionId === sessionId) return;
+    this.stopAudioPlayback();
     if (this.isGenerating) {
       console.warn("Impossible de changer de session pendant la génération.");
       return;
@@ -792,6 +794,18 @@ const AIStudyView = {
                       <svg class="icon-check" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     </span>
                     <span class="copy-label">Copier</span>
+                  </button>
+
+                  <button class="ai-footer-action-btn btn-listen-answer tooltip" data-tooltip="Écouter l'étude en streaming audio (< 400ms)">
+                    <span class="listen-icon-wrap">
+                      <svg class="icon-speaker" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                      <span class="listen-wave-bars">
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                      </span>
+                    </span>
+                    <span class="listen-label">Écouter</span>
                   </button>
 
                   <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans vos Notes (.md)">
@@ -1814,6 +1828,18 @@ const AIStudyView = {
               <span class="copy-label">Copier</span>
             </button>
 
+            <button class="ai-footer-action-btn btn-listen-answer tooltip" data-tooltip="Écouter l'étude en streaming audio (< 400ms)">
+              <span class="listen-icon-wrap">
+                <svg class="icon-speaker" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                <span class="listen-wave-bars">
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                </span>
+              </span>
+              <span class="listen-label">Écouter</span>
+            </button>
+
             <button class="ai-footer-action-btn btn-export-notes" title="Enregistrer dans vos Notes (.md)">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
               <span>Enregistrer</span>
@@ -2563,6 +2589,13 @@ const AIStudyView = {
       }
     });
 
+    // 1.5 Bouton Écouter la réponse en streaming audio (< 400ms)
+    const listenBtn = messageEl.querySelector('.btn-listen-answer');
+    listenBtn?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await this.toggleAudioPlayback(messageEl, rawAnswer, listenBtn);
+    });
+
     // 2. Bouton Enregistrer dans les Notes (.md)
     const exportNotesBtn = messageEl.querySelector('.btn-export-notes');
     exportNotesBtn?.addEventListener('click', async () => {
@@ -2637,6 +2670,222 @@ const AIStudyView = {
     if (typeof MindMapPreviewModal !== 'undefined') {
       await MindMapPreviewModal.open(rawAnswer, passageRef, userQuestion, sourceBtn);
     }
+  },
+
+  // =========================================================================
+  // GESTIONNAIRE DE STREAMING AUDIO DES RÉPONSES IA (< 400ms)
+  // =========================================================================
+
+  audioPlayer: {
+    activeBtn: null,
+    activeMessageEl: null,
+    audioElement: null,
+    sentences: [],
+    currentIndex: 0,
+    isStreaming: false,
+    abortController: false,
+    audioCache: new Map(),
+    prefetchPromiseMap: new Map(),
+  },
+
+  async toggleAudioPlayback(messageEl, rawAnswer, listenBtn) {
+    // Si on clique sur le bouton en cours de lecture : arrêt immédiat
+    if (this.audioPlayer.isStreaming && this.audioPlayer.activeBtn === listenBtn) {
+      this.stopAudioPlayback();
+      return;
+    }
+
+    // Si un autre message était en train de jouer, on l'arrête proprement
+    if (this.audioPlayer.isStreaming) {
+      this.stopAudioPlayback();
+    }
+
+    if (!rawAnswer || !rawAnswer.trim()) {
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast("Aucun texte à lire.");
+      }
+      return;
+    }
+
+    const ap = this.audioPlayer;
+    ap.activeBtn = listenBtn;
+    ap.activeMessageEl = messageEl;
+    ap.abortController = false;
+    ap.isStreaming = true;
+    ap.currentIndex = 0;
+    ap.audioCache.clear();
+    ap.prefetchPromiseMap.clear();
+
+    listenBtn.classList.add('is-loading');
+    const label = listenBtn.querySelector('.listen-label');
+    if (label) label.textContent = 'Préparation...';
+
+    try {
+      // 1. Préparer le découpage en phrases sur le backend
+      const prepRes = await API.call('ai_tts_prepare_sentences', rawAnswer);
+      if (ap.abortController) return;
+
+      if (!prepRes || !prepRes.success || !prepRes.sentences || prepRes.sentences.length === 0) {
+        throw new Error(prepRes?.error || "Impossible de découper le texte en phrases.");
+      }
+
+      ap.sentences = prepRes.sentences;
+      listenBtn.classList.remove('is-loading');
+      listenBtn.classList.add('is-playing');
+      if (label) label.textContent = 'Arrêter';
+
+      // 2. Fonction de récupération unitaire avec cache et promesse
+      const fetchSentence = (index) => {
+        if (index < 0 || index >= ap.sentences.length) return Promise.resolve(null);
+        if (ap.audioCache.has(index)) {
+          return Promise.resolve(ap.audioCache.get(index));
+        }
+        if (ap.prefetchPromiseMap.has(index)) {
+          return ap.prefetchPromiseMap.get(index);
+        }
+        const p = (async () => {
+          try {
+            const res = await API.call('ai_tts_synthesize_sentence', ap.sentences[index]);
+            if (res && res.success && res.audio_data_url) {
+              ap.audioCache.set(index, res.audio_data_url);
+              return res.audio_data_url;
+            } else if (res && res.error) {
+              console.warn(`[AiStudyAudio] Erreur synthèse phrase ${index}:`, res.error);
+            }
+          } catch (e) {
+            console.warn(`[AiStudyAudio] Erreur synthèse phrase ${index}:`, e);
+          }
+          return null;
+        })();
+        ap.prefetchPromiseMap.set(index, p);
+        return p;
+      };
+
+      // Pré-fetcher la phrase suivante en avance (pipeline 1 phrase pour fluidité optimale sans saturer l'API)
+      const triggerPrefetch = (fromIdx) => {
+        if (fromIdx < ap.sentences.length) {
+          fetchSentence(fromIdx);
+        }
+      };
+
+      let consecutiveFailures = 0;
+
+      // Fonction de lecture récursive phrase par phrase
+      const playNext = async () => {
+        if (ap.abortController || !ap.isStreaming) return;
+
+        if (ap.currentIndex >= ap.sentences.length) {
+          // Fin de la lecture complète normale
+          this.stopAudioPlayback();
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast("Lecture de l'étude terminée.");
+          }
+          return;
+        }
+
+        const idx = ap.currentIndex;
+        if (label && ap.isStreaming) {
+          label.textContent = `Arrêter (${idx + 1}/${ap.sentences.length})`;
+        }
+
+        // Déclencher le pré-téléchargement de la phrase suivante en arrière-plan
+        triggerPrefetch(idx + 1);
+
+        const audioUrl = await fetchSentence(idx);
+        if (ap.abortController || !ap.isStreaming) return;
+
+        if (!audioUrl) {
+          consecutiveFailures++;
+          if (consecutiveFailures >= 2 || idx === 0) {
+            this.stopAudioPlayback();
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast("Impossible de synthétiser l'audio. Vérifiez votre clé API ou essayez Edge-TTS.");
+            }
+            return;
+          }
+          // Passer à la phrase suivante
+          ap.currentIndex++;
+          playNext();
+          return;
+        }
+
+        consecutiveFailures = 0;
+
+        if (!ap.audioElement) {
+          ap.audioElement = new Audio();
+        }
+
+        ap.audioElement.src = audioUrl;
+        ap.audioElement.onended = () => {
+          ap.currentIndex++;
+          playNext();
+        };
+        ap.audioElement.onerror = (e) => {
+          console.warn(`[AiStudyAudio] Erreur lecture phrase ${idx}:`, e);
+          consecutiveFailures++;
+          if (consecutiveFailures >= 2 || idx === 0) {
+            this.stopAudioPlayback();
+            if (typeof App !== 'undefined' && App.showToast) {
+              App.showToast("Erreur de décodage audio du navigateur.");
+            }
+            return;
+          }
+          ap.currentIndex++;
+          playNext();
+        };
+
+        try {
+          await ap.audioElement.play();
+        } catch (playErr) {
+          console.warn("[AiStudyAudio] Erreur play:", playErr);
+          consecutiveFailures++;
+          if (consecutiveFailures >= 2 || idx === 0) {
+            this.stopAudioPlayback();
+            return;
+          }
+          ap.currentIndex++;
+          playNext();
+        }
+      };
+
+      // Lancer la lecture dès la première phrase prête (< 400ms)
+      playNext();
+
+    } catch (err) {
+      console.error("[AiStudyAudio] Erreur:", err);
+      this.stopAudioPlayback();
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast(`Erreur lecture audio : ${err.message || err}`);
+      }
+    }
+  },
+
+  stopAudioPlayback() {
+    const ap = this.audioPlayer;
+    ap.abortController = true;
+    ap.isStreaming = false;
+
+    if (ap.audioElement) {
+      try {
+        ap.audioElement.pause();
+        ap.audioElement.currentTime = 0;
+        ap.audioElement.src = '';
+        ap.audioElement.onended = null;
+        ap.audioElement.onerror = null;
+      } catch (e) {}
+      ap.audioElement = null;
+    }
+
+    if (ap.activeBtn) {
+      ap.activeBtn.classList.remove('is-loading', 'is-playing');
+      const label = ap.activeBtn.querySelector('.listen-label');
+      if (label) label.textContent = 'Écouter';
+      ap.activeBtn = null;
+    }
+
+    ap.activeMessageEl = null;
+    ap.sentences = [];
+    ap.currentIndex = 0;
   },
 
   formatCurrentTime() {
