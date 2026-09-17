@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/Similarly1/open-shema/releases/tag/v0.3.0"><img src="https://img.shields.io/badge/Version-v0.3.0-blue.svg" alt="Version v0.3.0"></a>
-  <img src="https://img.shields.io/badge/Microsoft%20Store-Bient%C3%B4t%20Disponible-0078D4?logo=windows&logoColor=white" alt="Microsoft Store Bientôt Disponible">
+  <a href="https://apps.microsoft.com/detail/9NXC16S8DHT3"><img src="https://img.shields.io/badge/Microsoft%20Store-Disponible-0078D4?logo=windows&logoColor=white" alt="Disponible sur Microsoft Store"></a>
   <img src="https://img.shields.io/badge/Taille-~321%20Mo%20(All%C3%A9g%C3%A9e)-green" alt="Taille allégée">
   <img src="https://img.shields.io/badge/Licence-MIT-blue.svg" alt="License MIT">
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+">
@@ -279,16 +279,18 @@ Open Shema a été pensé pour que **l'utilisateur ne soit jamais prisonnier de 
 
 ---
 
-## 🚀 Téléchargement & Démarrage
+## 🚀 Téléchargement & Installation
+ 
+### 🏪 1. Microsoft Store (Recommandé — Installation en 1 clic)
+- **Lien web officiel :** [Obtenir Open Shema sur le Microsoft Store](https://apps.microsoft.com/detail/9NXC16S8DHT3)
+- **Lien protocole direct (Windows) :** [`ms-windows-store://pdp/?productid=9NXC16S8DHT3`](ms-windows-store://pdp/?productid=9NXC16S8DHT3) (ouvre directement l'application Windows Store)
+- **Avantages :** Installation certifiée en un clic, mises à jour silencieuses et automatiques gérées par Windows, intégration propre au menu Démarrer.
 
-### ⚡ 1. Version Portable Autonome (Disponible Immédiatement)
+### ⚡ 2. Version Portable Autonome (.zip depuis GitHub)
 - **Téléchargement direct :** Téléchargez l'archive [`OpenShema.zip` (~321 Mo)](https://github.com/Similarly1/open-shema/releases/download/v0.3.0/OpenShema.zip) depuis la [Release v0.3.0](https://github.com/Similarly1/open-shema/releases/tag/v0.3.0).
 - **Aucune installation requise :** Décompressez l'archive où vous le souhaitez (disque dur, clé USB, dossier personnel).
 - **Lancement immédiat :** Double-cliquez sur `OpenShema.exe` pour démarrer.
 - **Mises à jour :** L'application intègre son propre système de vérification et de mise à jour automatique.
-
-### 🏪 2. Microsoft Store *(Bientôt Disponible — En cours de déploiement)*
-> ⏳ **Bientôt disponible :** Le paquet officiel certifié (`.msix`) a été préparé et est actuellement en cours de validation par Microsoft. L'arrivée sur le Store permettra prochainement d'installer Open Shema en un clic et de bénéficier des mises à jour silencieuses directement gérées par Windows.
 
 > 🪶 **Application Allégée & Assistant au Premier Démarrage (First Run Wizard)** :  
 > L'archive d'installation de base a été considérablement allégée (réduite de **556 Mo à ~321 Mo**). Au premier lancement, un assistant intuitif vous propose de choisir votre configuration (installation complète personnalisée ou mode épuré). Les grands corpus encyclopédiques (comme les 2 437 gravures du Dictionnaire Vigouroux) se téléchargent en un clic à la demande depuis le catalogue officiel `open-shema-data`.

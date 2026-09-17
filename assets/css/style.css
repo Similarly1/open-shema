@@ -735,6 +735,75 @@ h1, h2, h3, h4, .font-title {
   animation: heroEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.hero-btn-store {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 30px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0078d4 0%, #0284c7 50%, #005a9e 100%);
+  color: #ffffff !important;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 30px rgba(0, 120, 212, 0.45), 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-btn-store:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #0284c7 0%, #0078d4 50%, #075985 100%);
+  box-shadow: 0 0 40px rgba(2, 132, 199, 0.65), 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: #ffffff !important;
+}
+
+.hero-btn-store .store-win-icon {
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.hero-btn-portable {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  font-size: 1.02rem;
+  font-weight: 600;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  color: var(--text-main) !important;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.hero-btn-portable:hover {
+  transform: translateY(-2px);
+  background: rgba(24, 34, 53, 0.9);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan) !important;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+}
+
+[data-theme="light"] .hero-btn-portable {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .hero-btn-portable:hover {
+  background: #f8fafc;
+  border-color: #0284c7;
+  color: #0284c7 !important;
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.2);
+}
+
 .hero-btn-main {
   padding: 14px 32px;
   font-size: 1.05rem;
@@ -5795,6 +5864,206 @@ html:not([data-theme="light"]) .comm-ref-pill:hover {
   font-weight: 700;
   color: #C47B2B;
   padding: 0 4px;
+}
+
+/* --- Dual-Card Options Grid: Microsoft Store vs Portable GitHub --- */
+.installer-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  margin-bottom: 32px;
+  align-items: stretch;
+}
+
+.installer-options-grid .installer-card {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 36px 30px;
+  height: 100%;
+}
+
+.installer-options-grid .installer-badge-row {
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.installer-card-icon-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.installer-card-icon-header .store-brand-icon {
+  color: #0078d4;
+  flex-shrink: 0;
+}
+
+.installer-card-icon-header .portable-brand-icon {
+  color: var(--accent-cyan);
+  flex-shrink: 0;
+}
+
+.installer-card-icon-header .installer-title {
+  margin-bottom: 0;
+  font-size: 1.55rem;
+}
+
+.installer-card-store {
+  border: 1px solid rgba(0, 120, 212, 0.45);
+  box-shadow: 0 12px 36px rgba(0, 120, 212, 0.16), var(--shadow-md);
+  position: relative;
+  background: radial-gradient(circle at 100% 0%, rgba(0, 120, 212, 0.08) 0%, var(--bg-card) 60%);
+}
+
+.installer-card-store::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0078d4, #0284c7, #38bdf8);
+}
+
+.installer-card-portable::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-cyan), #3b82f6);
+}
+
+.installer-options-grid .installer-desc {
+  font-size: 0.96rem;
+  margin: 0 0 20px 0;
+  max-width: none;
+  line-height: 1.55;
+}
+
+.installer-benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 26px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  flex-grow: 1;
+}
+
+.installer-benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.91rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.installer-benefits-list li svg {
+  color: var(--accent-emerald);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.installer-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.installer-store-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 26px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0078d4 0%, #0284c7 50%, #005a9e 100%);
+  color: #ffffff !important;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 22px rgba(0, 120, 212, 0.4);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.installer-store-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #0284c7 0%, #0078d4 50%, #075985 100%);
+  box-shadow: 0 10px 30px rgba(0, 120, 212, 0.6);
+  color: #ffffff !important;
+}
+
+.installer-protocol-link {
+  font-size: 0.85rem;
+  color: #38bdf8;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.installer-protocol-link:hover {
+  color: #7dd3fc;
+  text-decoration: underline;
+}
+
+.installer-portable-btn-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 26px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main) !important;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.installer-portable-btn-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 860px) {
+  .installer-options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-theme="light"] .installer-card-store {
+  background: #ffffff;
+  border-color: rgba(0, 120, 212, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 120, 212, 0.1);
+}
+
+[data-theme="light"] .installer-protocol-link {
+  color: #0284c7;
+}
+
+[data-theme="light"] .installer-portable-btn-card {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .installer-portable-btn-card:hover {
+  background: #f1f5f9;
+  border-color: #0284c7;
+  color: #0284c7 !important;
 }
 
 /* --- 1-Click Windows Installer Hero Card --- */
