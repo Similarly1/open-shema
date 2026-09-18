@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/Similarly1/open-shema/releases/tag/v0.4.0"><img src="https://img.shields.io/badge/Version-v0.4.0-blue.svg" alt="Version v0.4.0"></a>
   <a href="https://apps.microsoft.com/detail/9NXC16S8DHT3"><img src="https://img.shields.io/badge/Microsoft%20Store-Disponible-0078D4?logo=windows&logoColor=white" alt="Disponible sur Microsoft Store"></a>
-  <img src="https://img.shields.io/badge/Taille-~321%20Mo%20(All%C3%A9g%C3%A9e)-green" alt="Taille allégée">
+  <img src="https://img.shields.io/badge/Taille-~585%20Mo-green" alt="Taille">
   <img src="https://img.shields.io/badge/Licence-MIT-blue.svg" alt="License MIT">
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/Interface-PyWebView%20%2F%20Edge%20WebView2-informational" alt="WebView2">
@@ -55,11 +55,11 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 ## 📑 Sommaire
 
 1. [🌟 Fonctionnalités Principales](#-fonctionnalités-principales)
-   - [📖 1. Lecteur Biblique, Langues Originales & Synopse](#-1-lecteur-biblique-langues-originales--synopse)
+   - [📖 1. Lecteur Biblique, Langues Originales & Hub de Comparaison / Synopse](#-1-lecteur-biblique-langues-originales--hub-de-comparaison--synopse)
    - [📚 2. Dictionnaires Historiques & Lexiques Originaux](#-2-dictionnaires-historiques--lexiques-originaux)
    - [💬 3. Bibliothèque de Commentaires & Multi-Fenêtrage](#-3-bibliothèque-de-commentaires--multi-fenêtrage)
    - [🔬 4. Atelier de Passage, Péricopes & Cartographie](#-4-atelier-de-passage-péricopes--cartographie)
-   - [🎙️ 5. Studio de Prédication, Banque d'Illustrations & Corpus UPVR](#-5-studio-de-prédication-banque-dillustrations--corpus-upvr)
+   - [🎙️ 5. Studio de Prédication, Podcasts Audio & Corpus UPVR](#-5-studio-de-prédication-podcasts-audio--corpus-upvr)
    - [📖 6. Espace Théologie & Flux d'Articles](#-6-espace-théologie--flux-darticles)
    - [🎨 7. Ressources Visuelles & BibleProject](#-7-ressources-visuelles--bibleproject)
    - [🧠 8. Assistant IA Exégétique & RAG Haute Précision](#-8-assistant-ia-exégétique--rag-haute-précision)
@@ -75,16 +75,18 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 ## 🌟 Fonctionnalités Principales
 
-### 📖 1. Lecteur Biblique, Langues Originales & Synopse
+### 📖 1. Lecteur Biblique, Langues Originales & Hub de Comparaison / Synopse
 
 * **Multi-Versions & Affichage Parallèle** : Comparez côte à côte plusieurs traductions contemporaines et historiques en lecture synchronisée.
+* **Hub Unifié de Comparaison Biblique** :
+  * Matrice comparative multi-colonnes fluide avec synchronisation instantanée du défilement et des sélections.
+  * Synopse des Évangiles intégrée en français avec mise en valeur des variantes textuelles et harmonie chronologique.
+  * Mode d'étude grand écran immersif avec repli automatique intelligent du volet de navigation gauche pour maximiser l'espace de lecture.
 * **Textes Sources Originaux** :
   * Textes massorétiques hébreux et araméens avec vocalisation et cantillation.
   * Textes grecs du Nouveau Testament et version grecque de la Septante (LXX).
 * **Interlinéaire Inversé Complet** :
   * Analyse mot à mot interactive : racine, lemme, code Strong, translittération phonétique et analyse morphosyntaxique intégrale (temps, voix, mode, cas, genre, nombre).
-* **Comparaison Synoptique Avancée** :
-  * Affichage synoptique automatique verset par verset avec calcul de similarité lexicale et surlignage des variantes de formulation.
 * **Surlignage Multicolore & Marqueurs** : Balisez vos textes selon vos propres thématiques avec mémorisation instantanée.
 
 ---
@@ -121,11 +123,15 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 ---
 
-### 🎙️ 5. Studio de Prédication, Banque d'Illustrations & Corpus UPVR
+### 🎙️ 5. Studio de Prédication, Podcasts Audio & Corpus UPVR
 
 > 🛡️ **Règle Fondamentale de Non-Délégation & Respect de la Patte Humaine** :  
 > Open Shema a été délibérément calibré pour **ne jamais rédiger de prédications toutes faites** ni se substituer au prédicateur. L'IA n'est pas là pour penser, méditer ou prier à votre place. La prédication vivante n'est pas une récitation lisse et aseptisée générée par un modèle statistique : c'est la Parole de Dieu proclamée par un serviteur imparfait, dépendant de la puissance du Saint-Esprit opérant dans la faiblesse humaine (1 Co 2.1-5, 2 Co 12.9). L'IA intervient exclusivement comme **assistant de laboratoire et miroir critique maïeutique** : elle fournit la matière brute exégétique, éprouve votre proposition centrale et vous accompagne sans jamais voler votre voix.
 
+* **🎧 Studio Audio & Podcasts Théologiques (Workflow en 3 étapes)** :
+  * **Étape 1 — Co-construction & Cadrage** : Choisissez entre une chronique solo ou un dialogue dynamique à deux voix. Définissez l'angle herméneutique (*Exégèse approfondie, Contexte historique, Théologie biblique, Application pastorale*), saisissez vos questions d'étude focales et mobilisez en un clic le RAG de vos commentaires et ouvrages personnels.
+  * **Étape 2 — Scripting, Normalisation & Habillage Sonore** : Génération de scripts immersifs avec distinction entre texte littéraire et oralisation phonétique optimisée. Intégrez des jingles, des musiques d'ambiance et des bruitages SFX contextuels avec atténuation automatique (*sidechain ducking* à -24dB/-30dB).
+  * **Étape 3 — Régie, Karaoké & Synthèse Vocale** : Catalogue de voix naturelles francophones (Edge-TTS, Mistral Voxtral, Google Gemini Flash TTS) avec pré-écoute instantanée dans les sélecteurs, mode régie et défilement synchronisé réplique par réplique.
 * **Atelier Homilétique Structuré & Matrice à Double Rive** :
   * Rédigez selon la méthode d'homilétique textuelle (David Helm, John Stott, Haddon Robinson) : *Passage source, Histoire du Salut en 8 étapes, PMT (Pensée Maîtresse du Texte - Rive 1), Le Pont (Tension Contemporaine), PMS (Pensée Maîtresse du Sermon - Rive 2), Objectif pastoral de transformation*.
 * **🔍 Évaluation & Audit Homilétique IA (Post-Rédaction)** :
@@ -137,7 +143,7 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 * **Mode Pupitre Live & Gestionnaire d'Archives** :
   * Présentation plein écran avec chronomètre discret pour la chaire, sans générer de diaporamas superficiels.
 * **🎙️ Corpus Pastoral « Un pasteur vous répond » (Florent Varak - UPVR)** :
-  * Intégration Deep RAG de centaines d'épisodes pastoraux transcrits et analysés.
+  * Intégration Deep RAG de 506 épisodes pastoraux transcrits et analysés.
   * **Lecteur audio streaming intégré** : Écoutez l'extrait audio MP3 officiel directement au sein de l'application pendant votre préparation de prédication ou d'étude.
   * Cartes de réponses pastorales épurées avec citations exactes et infobulles bibliques interactives.
 
