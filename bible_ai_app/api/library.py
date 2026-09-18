@@ -245,7 +245,7 @@ class LibraryMixin:
     def get_theology_books(self) -> List[Dict[str, Any]]:
         """Retourne tous les ouvrages de théologie indexés avec leurs métadonnées et couvertures."""
         from core.theology_reader_manager import TheologyReaderManager
-        return TheologyReaderManager.get_all_theology_books()
+        return TheologyReaderManager.get_all_theology_books(force_refresh=True)
 
     def get_theology_book_toc(self, book_name: str) -> Dict[str, Any]:
         """Récupère la table des matières ordonnée d'un ouvrage de théologie."""

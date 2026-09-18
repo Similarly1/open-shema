@@ -1170,6 +1170,136 @@ const DictView = {
     });
 
     this.applyDisplayPreferences();
+
+    // 6. Résolution asynchrone des gravures historiques (Base64 / Local AppData / Pack Vigouroux)
+    this.resolveArticleIllustrations(bodyEl, isVigouroux);
+  },
+
+  async resolveArticleIllustrations(container, isVigouroux) {
+    if (!container) return;
+    const wraps = container.querySelectorAll('.dict-article-img-wrap[data-img-src]');
+    if (!wraps.length) return;
+
+    let anyMissing = false;
+    for (const wrap of wraps) {
+      const relPath = wrap.dataset.imgSrc;
+      if (!relPath) continue;
+
+      const img = wrap.querySelector('img');
+      try {
+        if (typeof API !== 'undefined' && typeof API.call === 'function') {
+          const res = await API.call('get_dict_illustration', relPath);
+          if (res && res.success && res.data_url) {
+            if (img) {
+              img.src = res.data_url;
+              img.style.display = '';
+            }
+            wrap.dataset.imgResolvedSrc = res.data_url;
+            continue;
+          }
+        }
+      } catch (e) {
+        // En cas d'erreur API, passer en état manquant
+      }
+
+      // Si l'image n'a pas pu être résolue ou n'est pas trouvée
+      anyMissing = true;
+      this.renderMissingIllustrationState(wrap, isVigouroux);
+    }
+
+    if (isVigouroux && anyMissing) {
+      this.ensureVigourouxDownloadBanner(container);
+    }
+  },
+
+  renderMissingIllustrationState(wrap, isVigouroux) {
+    const img = wrap.querySelector('img');
+    if (img) {
+      img.style.display = 'none';
+    }
+    if (!wrap.querySelector('.dict-img-placeholder')) {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'dict-img-placeholder';
+      placeholder.style.cssText = 'padding: 20px 14px; text-align: center; background: rgba(0,0,0,0.03); border: 1px dashed var(--border-color, #ccc); border-radius: 6px; color: var(--text-secondary); width: 100%; box-sizing: border-box;';
+      placeholder.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="opacity: 0.55; margin-bottom: 6px; display: block; margin-left: auto; margin-right: auto;">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+        <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">Gravure historique non chargée</div>
+        <div style="font-size: 10.5px; opacity: 0.75; margin-top: 2px;">Pack d'images disponible au téléchargement</div>
+      `;
+      wrap.appendChild(placeholder);
+    }
+  },
+
+  ensureVigourouxDownloadBanner(container) {
+    const gallery = container.querySelector('.dict-illustrations-gallery');
+    if (!gallery || container.querySelector('#vigouroux-pack-download-banner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'vigouroux-pack-download-banner';
+    banner.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; margin: 18px 0; background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(99, 102, 241, 0.14)); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; width: 100%; box-sizing: border-box;';
+    banner.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 22px;">🏛️</span>
+        <div>
+          <div style="font-weight: 700; font-size: 13px; color: var(--text-primary);">Gravures du Dictionnaire Vigouroux</div>
+          <div style="font-size: 11.5px; color: var(--text-secondary);">Téléchargez le pack complet des 2 437 gravures d'époque (200 Mo) pour enrichir toutes les notices.</div>
+        </div>
+      </div>
+      <button id="btn-download-vigouroux-pack" style="padding: 8px 16px; font-size: 12px; font-weight: 600; background: #6366f1; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; transition: opacity 0.2s;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Télécharger le pack (200 Mo)
+      </button>
+    `;
+
+    gallery.parentNode.insertBefore(banner, gallery);
+
+    const btn = banner.querySelector('#btn-download-vigouroux-pack');
+    if (btn) {
+      btn.addEventListener('click', () => this.downloadVigourouxPack());
+    }
+  },
+
+  async downloadVigourouxPack() {
+    const btn = document.getElementById('btn-download-vigouroux-pack');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span style="display: inline-block; width: 12px; height: 12px; border: 2px solid #ffffff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px;"></span> Lancement...`;
+    }
+    try {
+      const res = await API.call('download_vigouroux_images_pack');
+      if (res && res.success) {
+        if (typeof showToast === 'function') {
+          showToast("Téléchargement du pack des gravures Vigouroux lancé !", "info");
+        } else if (typeof App !== 'undefined' && typeof App.showToast === 'function') {
+          App.showToast("Téléchargement du pack des gravures Vigouroux lancé !", "info");
+        }
+      } else {
+        const err = res?.error || 'Erreur inconnue';
+        if (typeof showToast === 'function') {
+          showToast("Erreur téléchargement : " + err, "error");
+        }
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "Réessayer le téléchargement";
+        }
+      }
+    } catch (e) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Réessayer le téléchargement";
+      }
+    }
+  },
+
+  onTaskCompleted(taskData) {
+    if (taskData?.name?.includes('Vigouroux') || taskData?.id?.includes('vigouroux')) {
+      // Recharger l'affichage de l'article pour appliquer les gravures téléchargées
+      this.renderSelectedSourceMatch();
+    }
   },
 
   formatArticleMarkdown(text, isVigouroux = false) {

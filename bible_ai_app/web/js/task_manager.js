@@ -82,6 +82,9 @@ const TaskManager = {
       if (typeof TheologyView !== 'undefined' && typeof TheologyView.loadBooksList === 'function') {
         TheologyView.loadBooksList();
       }
+      if (typeof DictView !== 'undefined' && typeof DictView.onTaskCompleted === 'function') {
+        DictView.onTaskCompleted(taskData);
+      }
     }
 
     this.checkPollingState();

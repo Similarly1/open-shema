@@ -381,6 +381,10 @@ const TheologyView = {
     }
   },
 
+  loadBooks(autoSelectDefault = true) {
+    return this.loadBooksList(autoSelectDefault);
+  },
+
   async selectBook(bookName, targetChapterId = null) {
     this.currentBook = bookName;
     this.showTranslatedVersion = false;
@@ -388,7 +392,11 @@ const TheologyView = {
     this.btnSummaryHeader?.classList.remove('active');
     this.closeSynthesisPanel();
 
-    const book = this.books.find(b => b.name === bookName || b.id === bookName || b.title === bookName) || { name: bookName, title: bookName };
+    if (!this.books || this.books.length === 0) {
+      await this.loadBooksList(false);
+    }
+
+    const book = (this.books || []).find(b => b.name === bookName || b.id === bookName || b.title === bookName) || { name: bookName, title: bookName };
 
     // Mettre à jour l'en-tête du sélecteur actif
     this.updateActiveBookHeader(book);

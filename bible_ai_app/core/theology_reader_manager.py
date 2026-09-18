@@ -4,6 +4,7 @@ import core.chroma_silencer
 import re
 import html
 import logging
+import sqlite3
 from typing import Dict, List, Any, Optional, Tuple
 try:
     import chromadb
@@ -75,6 +76,9 @@ class TheologyReaderManager:
             return cls._books_cache
 
         from api._utils import get_cover_data_url
+        from gui.library_utils import invalidate_library_cache
+        if force_refresh:
+            invalidate_library_cache()
         
         registry = load_books_metadata()
         theology_books = []
@@ -85,7 +89,9 @@ class TheologyReaderManager:
                 b_type in ["théologie", "theologie", "théologique", "theology", "étude", "etude", "doctrine", "introduction", "apologétique", "apologetique", "essais & pensée chrétienne", "essai", "essais", "pensée chrétienne"]
                 or meta.get("source_type") in ["systematic_theology", "biblical_theology", "general", "nt_context", "ot_context", "global_context", "book_intro", "essay"]
                 or meta.get("chapters_count", 0) > 0
-                or name in ["STGru", "Lire/Comprendre", "Paradoxes", "LirelaBibles", "NIV", "NIV Cultural", "MacArthur BC", "NIVArchaeo", "TSM"]
+                or name in ["STGru", "Lire/Comprendre", "Paradoxes", "LirelaBibles", "NIV", "NIV Cultural", "MacArthur BC", "NIVArchaeo", "TSM", "HODGE"]
+                or "hodge" in name.lower()
+                or "hodge" in str(meta.get("title", "")).lower()
             )
             
             # Ne pas inclure les Bibles simples dans les livres de théologie
@@ -101,6 +107,24 @@ class TheologyReaderManager:
                 year = meta.get("year") or ""
                 desc = meta.get("description") or ""
                 chapters_cnt = meta.get("chapters_count") or 0
+                
+                # Résolution dynamique du nombre de chapitres si manquant dans les métadonnées
+                if chapters_cnt == 0:
+                    cand_fp = cls._resolve_epub_path(name, meta)
+                    if cand_fp and os.path.exists(cand_fp) and cand_fp.lower().endswith(".sqlite"):
+                        try:
+                            import sqlite3
+                            norm_p = os.path.abspath(cand_fp).replace("\\", "/")
+                            with sqlite3.connect(f"file:///{norm_p}?mode=ro", uri=True) as sc_conn:
+                                row = sc_conn.execute("SELECT COUNT(*) FROM toc WHERE is_section_header = 0 OR is_section_header IS NULL").fetchone()
+                                if not row or not row[0]:
+                                    row = sc_conn.execute("SELECT COUNT(*) FROM sections").fetchone()
+                                if row and row[0]:
+                                    chapters_cnt = row[0]
+                                    meta["chapters_count"] = chapters_cnt
+                        except Exception:
+                            pass
+                
                 corpus_scope = meta.get("corpus_scope") or "GLOBAL"
                 source_type = meta.get("source_type") or "general"
                 embedding_model = meta.get("embedding_model") or "bge_multilingual_gemma2 (Infomaniak)"
@@ -129,11 +153,37 @@ class TheologyReaderManager:
         return theology_books
 
     @classmethod
+    def _open_sqlite(cls, fpath: str) -> sqlite3.Connection:
+        """Ouvre une connexion SQLite robuste en mode lecture seule pour compatibilité MSIX."""
+        import sqlite3
+        norm = os.path.abspath(fpath).replace("\\", "/")
+        try:
+            return sqlite3.connect(f"file:///{norm}?mode=ro", uri=True)
+        except Exception:
+            pass
+        return sqlite3.connect(fpath)
+
+    @classmethod
     def _resolve_epub_path(cls, book_name: str, book_meta: dict) -> str:
-        """Résout de manière résiliente le chemin vers le fichier EPUB ou PDF source."""
+        """Résout de manière résiliente le chemin vers le fichier EPUB, PDF ou SQLite source."""
+        from core.paths import get_user_data_path, get_bundle_data_path, resolve_data_path
+
         fpath = book_meta.get("file_path", "")
         if fpath and os.path.exists(fpath):
             return fpath
+
+        # Si le chemin mémorisé est relatif ou a changé de racine
+        if fpath:
+            fname = os.path.basename(fpath)
+            for sub in ["theology", "ebooks"]:
+                for resolver in [get_user_data_path, resolve_data_path, get_bundle_data_path]:
+                    try:
+                        cand = resolver(sub, fname)
+                        if cand and os.path.exists(cand):
+                            book_meta["file_path"] = cand
+                            return cand
+                    except Exception:
+                        pass
 
         candidate_dirs = []
 
@@ -144,7 +194,6 @@ class TheologyReaderManager:
             user_ebooks_dir = cfg.get("ebooks_dir", "")
             if user_ebooks_dir and os.path.isdir(user_ebooks_dir):
                 candidate_dirs.append(user_ebooks_dir)
-                # Sous-dossiers immédiats du répertoire ebooks configuré
                 for sub in os.listdir(user_ebooks_dir):
                     sub_path = os.path.join(user_ebooks_dir, sub)
                     if os.path.isdir(sub_path):
@@ -152,9 +201,15 @@ class TheologyReaderManager:
         except Exception as _silent_e:
             logger.debug("Erreur ignoree : %s", _silent_e)
 
-        # Fallback sur les dossiers data/theology/ et data/ebooks/ locaux à l'installation
+        # Fallback sur les dossiers utilisateur et bundle (MSIX Store friendly)
         _app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         candidate_dirs += [
+            get_user_data_path("theology"),
+            get_user_data_path("ebooks"),
+            resolve_data_path("theology"),
+            resolve_data_path("ebooks"),
+            get_bundle_data_path("theology"),
+            get_bundle_data_path("ebooks"),
             os.path.join(_app_root, "data", "theology"),
             os.path.join(_app_root, "data", "ebooks"),
             os.path.join(_app_root, "data"),
@@ -165,7 +220,7 @@ class TheologyReaderManager:
         clean_title = strip_accents(title)
 
         for cdir in candidate_dirs:
-            if not os.path.exists(cdir):
+            if not cdir or not os.path.exists(cdir):
                 continue
             try:
                 for fname in os.listdir(cdir):
@@ -218,7 +273,7 @@ class TheologyReaderManager:
                     import sqlite3
                     from api._utils import get_cover_data_url
                     cov_data_url = get_cover_data_url(book_meta.get("cover_path"))
-                    conn = sqlite3.connect(fpath)
+                    conn = cls._open_sqlite(fpath)
                     cur = conn.cursor()
                     cur.execute("SELECT order_index, volume_num, part_title, chapter_title, section_title, section_id FROM toc ORDER BY order_index")
                     rows = cur.fetchall()
@@ -475,16 +530,16 @@ class TheologyReaderManager:
         if fpath and os.path.exists(fpath) and fpath.lower().endswith(".sqlite"):
             try:
                 import sqlite3
-                conn = sqlite3.connect(fpath)
+                conn = cls._open_sqlite(fpath)
                 cur = conn.cursor()
                 cur.execute("""
-                SELECT order_index, section_title, content_markdown, part_title, chapter_title, volume_num, word_count 
+                SELECT order_index, section_title, content_markdown, part_title, chapter_title, volume_num, word_count, section_id, unique_id 
                 FROM sections 
                 WHERE order_index = ? OR id = ? OR section_id = ? OR unique_id = ?
                 """, (cid_query, cid_query, cid_query, cid_query))
                 row = cur.fetchone()
                 if row:
-                    ord_idx, s_title, c_markdown, p_title, c_title, v_num, w_cnt = row
+                    ord_idx, s_title, c_markdown, p_title, c_title, v_num, w_cnt, sec_id, u_id = row
                     main_chapter_title = c_title or s_title
                         
                     chapter_meta = {
@@ -507,6 +562,26 @@ class TheologyReaderManager:
                             "author": book_meta.get("author", ""),
                             "chapter_id": ord_idx
                         }, p_text))
+
+                    # Charger les notes de bas de page si la table notes existe
+                    try:
+                        cur.execute("""
+                        SELECT note_id, note_text 
+                        FROM notes 
+                        WHERE order_index = ? OR unique_id = ? OR section_id = ?
+                        ORDER BY id ASC
+                        """, (ord_idx, u_id, sec_id))
+                        for n_id, n_text in cur.fetchall():
+                            chunks.append((f"{book_name}_direct_fn_{n_id}", {
+                                "chapter_title": main_chapter_title,
+                                "section_title": s_title,
+                                "name": book_name,
+                                "title": book_meta.get("title", book_name),
+                                "author": book_meta.get("author", ""),
+                                "chapter_id": ord_idx
+                            }, f"[^{n_id}]: {n_text}"))
+                    except Exception:
+                        pass
                 conn.close()
             except Exception as e:
                 logger.warning(f"[TheologyReaderManager] Erreur lecture directe SQLite pour {book_name}: {e}")

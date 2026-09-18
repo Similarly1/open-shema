@@ -570,9 +570,26 @@ class ImportMixin:
                 except Exception as zip_err:
                     logger.warning(f"Erreur lors du téléchargement/extraction du pack d'images : {zip_err}")
 
+            # Comptage automatique des chapitres / sections pour les modules SQLite de théologie
+            chapters_count = 0
+            if m_type == "theology" and target_path and os.path.exists(target_path):
+                if target_path.lower().endswith(".sqlite"):
+                    try:
+                        import sqlite3
+                        norm_p = os.path.abspath(target_path).replace("\\", "/")
+                        with sqlite3.connect(f"file:///{norm_p}?mode=ro", uri=True) as ch_c:
+                            row = ch_c.execute("SELECT COUNT(*) FROM toc WHERE is_section_header = 0 OR is_section_header IS NULL").fetchone()
+                            if not row or not row[0]:
+                                row = ch_c.execute("SELECT COUNT(*) FROM sections").fetchone()
+                            if row and row[0]:
+                                chapters_count = row[0]
+                    except Exception as ch_cnt_err:
+                        logger.debug("Comptage chapitres SQLite théologie : %s", ch_cnt_err)
+
             registry = load_books_metadata()
             reg_key = m_abbr or m_id
             registry[reg_key] = {
+                "name": reg_key,
                 "title": m_title,
                 "author": module_data.get("author", "Open Shema"),
                 "description": module_data.get("description", ""),
@@ -584,6 +601,10 @@ class ImportMixin:
                 "folder_name": m_abbr,
                 "version_code": m_abbr,
                 "total_books": 66 if m_type == "bible" else 0,
+                "chapters_count": chapters_count,
+                "chunks_count": chapters_count,
+                "corpus_scope": "GLOBAL",
+                "source_type": "systematic_theology" if ("systematic" in (m_id or "").lower() or "hodge" in (m_id or "").lower()) else "general",
                 "embedding_model": "study_library",
                 "active": True,
                 "has_strongs": "strong" in module_data.get("features", [])
@@ -593,6 +614,12 @@ class ImportMixin:
             try:
                 from core.bible_json_loader import BibleJsonLoader
                 BibleJsonLoader.clear_cache()
+            except Exception:
+                pass
+
+            try:
+                from core.theology_reader_manager import TheologyReaderManager
+                TheologyReaderManager.invalidate_cache()
             except Exception:
                 pass
 

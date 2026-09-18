@@ -58,6 +58,117 @@ class ContentMixin:
                 logger.warning(f"Erreur lecture {p}: {e}")
         return {}
 
+    def get_dict_illustration(self, rel_path: str) -> Dict[str, Any]:
+        """Charge et retourne la Data URL Base64 d'une illustration de dictionnaire (Vigouroux, etc.)."""
+        if not rel_path:
+            return {"success": False, "data_url": None, "found": False}
+        fname = os.path.basename(rel_path)
+        from core.paths import get_user_data_path, get_bundle_data_path, resolve_data_path, get_bundle_dir
+        candidates = [
+            get_user_data_path("illustrations", "vigouroux", fname),
+            get_user_data_path("illustrations", fname),
+            resolve_data_path("illustrations", "vigouroux", fname),
+            resolve_data_path("illustrations", fname),
+            os.path.join(get_bundle_dir(), "web", "img", "vigouroux", fname),
+            os.path.join(get_bundle_dir(), "_internal", "web", "img", "vigouroux", fname),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web", "img", "vigouroux", fname),
+            os.path.join(get_bundle_dir(), "web", rel_path.replace("/", os.sep)),
+        ]
+        actual_path = next((p for p in candidates if p and os.path.exists(p)), None)
+        if not actual_path:
+            return {"success": False, "data_url": None, "found": False}
+
+        try:
+            import base64
+            ext = os.path.splitext(actual_path)[1].lower().replace('.', '')
+            mime = f"image/{ext}" if ext in ['png', 'webp', 'gif', 'jpg', 'jpeg'] else 'image/png'
+            with open(actual_path, "rb") as f:
+                encoded = base64.b64encode(f.read()).decode('ascii')
+            return {"success": True, "data_url": f"data:{mime};base64,{encoded}", "found": True}
+        except Exception as e:
+            logger.warning("Erreur chargement illustration %s: %s", rel_path, e)
+            return {"success": False, "data_url": None, "found": False}
+
+    def get_vigouroux_images_status(self) -> Dict[str, Any]:
+        """Vérifie si le pack de gravures Vigouroux est présent localement."""
+        from core.paths import get_user_data_path, get_bundle_dir
+        user_dir = get_user_data_path("illustrations", "vigouroux")
+        bundle_dir = os.path.join(get_bundle_dir(), "web", "img", "vigouroux")
+        internal_dir = os.path.join(get_bundle_dir(), "_internal", "web", "img", "vigouroux")
+        dev_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web", "img", "vigouroux")
+        
+        count = 0
+        for d in [user_dir, bundle_dir, internal_dir, dev_dir]:
+            if os.path.exists(d):
+                try:
+                    c = len([f for f in os.listdir(d) if f.lower().endswith(".png")])
+                    if c > count:
+                        count = c
+                except Exception:
+                    pass
+        return {
+            "installed": count >= 50,
+            "count": count,
+            "total_expected": 2437
+        }
+
+    def download_vigouroux_images_pack(self) -> Dict[str, Any]:
+        """Télécharge et extrait le pack complet des 2 437 gravures Vigouroux avec notification TaskManager."""
+        from core.task_manager import TaskManager
+        
+        def _run_download(task_ctx):
+            import urllib.request
+            import zipfile
+            import tempfile
+            from core.paths import get_user_data_path
+            from api._ssl_context import make_relaxed_ssl_context
+            
+            task_ctx.set_progress("Connexion au serveur des archives...", 0.05)
+            url = "https://github.com/Similarly1/open-shema-data/releases/download/v1.0.0/vigouroux_images.zip"
+            user_img_dir = get_user_data_path("illustrations", "vigouroux")
+            os.makedirs(user_img_dir, exist_ok=True)
+            
+            tmp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
+            tmp_zip_path = tmp_zip.name
+            tmp_zip.close()
+            
+            try:
+                task_ctx.set_progress("Téléchargement des 2 437 gravures (200 Mo)...", 0.10)
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+                with urllib.request.urlopen(req, timeout=300, context=make_relaxed_ssl_context(url)) as resp, open(tmp_zip_path, "wb") as out:
+                    total_size = int(resp.headers.get('content-length', 200739630))
+                    downloaded = 0
+                    chunk_size = 1024 * 512
+                    while True:
+                        chunk = resp.read(chunk_size)
+                        if not chunk:
+                            break
+                        out.write(chunk)
+                        downloaded += len(chunk)
+                        pct = 0.10 + 0.75 * (downloaded / max(total_size, 1))
+                        mb_done = downloaded // (1024 * 1024)
+                        mb_tot = total_size // (1024 * 1024)
+                        task_ctx.set_progress(f"Téléchargement : {mb_done} Mo / {mb_tot} Mo", min(pct, 0.85))
+                
+                task_ctx.set_progress("Décompression des 2 437 gravures...", 0.88)
+                with zipfile.ZipFile(tmp_zip_path, "r") as zf:
+                    zf.extractall(user_img_dir)
+                
+                task_ctx.set_progress("Gravures Vigouroux intégrées avec succès !", 1.0)
+                return {"success": True, "count": 2437}
+            finally:
+                try:
+                    os.remove(tmp_zip_path)
+                except OSError:
+                    pass
+        
+        task_id = TaskManager.run_task(
+            name="Pack Gravures Vigouroux (2 437 illustrations)",
+            worker_fn=_run_download,
+            description="Planches d'archéologie et gravures du Dictionnaire de la Bible F. Vigouroux"
+        )
+        return {"success": True, "task_id": task_id}
+
     def get_biblical_places(self, query: str = "", place_type: Optional[str] = None, limit: int = 250, period: Optional[str] = None, sort_by: Optional[str] = "mentions") -> List[Dict[str, Any]]:
         """Recherche des lieux bibliques avec filtre optionnel par type et par période."""
         try:
