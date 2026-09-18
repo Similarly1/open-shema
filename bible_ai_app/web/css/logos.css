@@ -6555,21 +6555,22 @@ body.theme-dark:not(.reading-bg-sepia):not(.reading-bg-white) .interlinear-block
 /* Popover Menu Interlinéaire Inversé (Style Logos) */
 .interlinear-options-popover {
   position: absolute;
-  top: 75px;
-  right: 210px;
+  top: calc(100% + 5px);
+  left: 0;
+  right: auto;
   width: 320px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background-color: var(--bg-card, #1e293b);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.14));
   border-radius: 10px;
-  box-shadow: var(--shadow-popover);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  z-index: 9999;
+  z-index: 1300;
   overflow: hidden;
-  animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: comparePopoverIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .interlinear-options-popover.hidden {
-  display: none;
+  display: none !important;
 }
 .interlinear-pop-header {
   padding: 10px 14px;
@@ -21700,16 +21701,20 @@ body.theme-dark .compare-item-badge-gospel.disabled {
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Thèmes clairs pour le popover */
+/* Thèmes clairs pour les popovers */
 body.reading-bg-white .compare-popover,
-body.theme-light .compare-popover {
+body.theme-light .compare-popover,
+body.reading-bg-white .interlinear-options-popover,
+body.theme-light .interlinear-options-popover {
   background-color: #ffffff;
   border-color: #cbd5e1;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
 }
 
 body.reading-bg-white .compare-popover-header,
-body.theme-light .compare-popover-header {
+body.theme-light .compare-popover-header,
+body.reading-bg-white .interlinear-pop-header,
+body.theme-light .interlinear-pop-header {
   background-color: #f8fafc;
   border-bottom-color: #e2e8f0;
 }

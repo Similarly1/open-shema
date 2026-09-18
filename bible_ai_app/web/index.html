@@ -1722,14 +1722,95 @@
             </div>
           </div>
 
-          <div class="toolbar-right" style="position: relative; z-index: 1200;">
-            <button class="tool-btn" id="btn-toggle-interlinear" title="Afficher les couches interlinéaires">
-              <span class="btn-icon" style="display: inline-flex; align-items: center;">
-                <svg class="btn-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
-              </span>
-              <span class="btn-text">Interlinéaire</span>
-              <span class="pill-arrow">▾</span>
-            </button>
+            <!-- Menu Interlinéaire Inversé ▾ -->
+            <div class="reader-dropdown-wrap" style="position: relative; display: inline-flex;">
+              <button class="tool-btn" id="btn-toggle-interlinear" title="Afficher les couches interlinéaires">
+                <span class="btn-icon" style="display: inline-flex; align-items: center;">
+                  <svg class="btn-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
+                </span>
+                <span class="btn-text">Interlinéaire</span>
+                <span class="pill-arrow">▾</span>
+              </button>
+
+              <!-- Popover Dédié Menu Interlinéaire Inversé (Style Logos) -->
+              <div class="interlinear-options-popover hidden" id="interlinear-options-popover">
+                <div class="interlinear-pop-header">
+                  <div class="interlinear-pop-title" style="display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
+                    <span>Interlinéaire Inversé</span>
+                  </div>
+                  <button class="context-close-btn" id="btn-close-interlinear-popover">✕</button>
+                </div>
+
+                <div class="interlinear-pop-body">
+                  <!-- Choix de la fenêtre cible (quand double vue active) -->
+                  <div class="interlinear-target-container" id="interlinear-target-container">
+                    <div class="pop-section-label" style="margin-bottom: 6px;">Appliquer à :</div>
+                    <div class="interlinear-target-pills">
+                      <button type="button" class="target-pane-pill active" id="btn-inter-target-1" data-pane="1">Gauche (1)</button>
+                      <button type="button" class="target-pane-pill" id="btn-inter-target-2" data-pane="2">Droite (2)</button>
+                      <button type="button" class="target-pane-pill" id="btn-inter-target-both" data-pane="both">Les deux</button>
+                    </div>
+                  </div>
+
+                  <!-- Switch Activation Rapide -->
+                  <div class="interlinear-toggle-row">
+                    <div class="toggle-text-block">
+                      <span class="toggle-title">Activer l'Interlinéaire</span>
+                      <span class="toggle-desc">Ruban mot à mot avec textes originaux</span>
+                    </div>
+                    <label class="switch-toggle">
+                      <input type="checkbox" id="interlinear-master-switch">
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+
+                  <div class="pop-divider"></div>
+
+                  <!-- Choix de la version source avec Strong -->
+                  <div class="pop-section-label">Version française de référence :</div>
+                  <div class="interlinear-version-selector-group">
+                    <label class="interlinear-radio-item active" id="lbl-inter-lsg">
+                      <input type="radio" name="interlinear-version-radio" value="LSG" checked>
+                      <div class="radio-details">
+                        <span class="radio-name">Louis Segond 1910</span>
+                        <span class="radio-tag">Balises Strong, Hébreu & Grec</span>
+                      </div>
+                    </label>
+                    <label class="interlinear-radio-item" id="lbl-inter-darby">
+                      <input type="radio" name="interlinear-version-radio" value="DARBY">
+                      <div class="radio-details">
+                        <span class="radio-name">Bible J.N. Darby</span>
+                        <span class="radio-tag">Traduction littérale avec Strong</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="pop-divider"></div>
+
+                  <!-- Couches d'affichage -->
+                  <div class="pop-section-label">Lignes affichées :</div>
+                  <div class="interlinear-layers-grid">
+                    <label class="display-opt-item">
+                      <span>Texte français</span>
+                      <input type="checkbox" id="inter-layer-surface" checked>
+                    </label>
+                    <label class="display-opt-item">
+                      <span>Texte original (Héb./Gr.)</span>
+                      <input type="checkbox" id="inter-layer-orig" checked>
+                    </label>
+                    <label class="display-opt-item">
+                      <span>Translittération</span>
+                      <input type="checkbox" id="inter-layer-translit" checked>
+                    </label>
+                    <label class="display-opt-item">
+                      <span>Code Strong (H/G)</span>
+                      <input type="checkbox" id="inter-layer-strong" checked>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Hub Unifié Comparer ▾ -->
             <div class="reader-dropdown-wrap" style="position: relative; display: inline-flex;">
@@ -9389,84 +9470,6 @@
       </div>
     </div>
 
-    <!-- Popover Dédié Menu Interlinéaire Inversé (Style Logos) -->
-    <div class="interlinear-options-popover hidden" id="interlinear-options-popover">
-      <div class="interlinear-pop-header">
-        <div class="interlinear-pop-title" style="display: flex; align-items: center; gap: 6px;">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
-          <span>Interlinéaire Inversé</span>
-        </div>
-        <button class="context-close-btn" id="btn-close-interlinear-popover">✕</button>
-      </div>
-
-      <div class="interlinear-pop-body">
-        <!-- Choix de la fenêtre cible (quand double vue active) -->
-        <div class="interlinear-target-container" id="interlinear-target-container">
-          <div class="pop-section-label" style="margin-bottom: 6px;">Appliquer à :</div>
-          <div class="interlinear-target-pills">
-            <button type="button" class="target-pane-pill active" id="btn-inter-target-1" data-pane="1">Gauche (1)</button>
-            <button type="button" class="target-pane-pill" id="btn-inter-target-2" data-pane="2">Droite (2)</button>
-            <button type="button" class="target-pane-pill" id="btn-inter-target-both" data-pane="both">Les deux</button>
-          </div>
-        </div>
-
-        <!-- Switch Activation Rapide -->
-        <div class="interlinear-toggle-row">
-          <div class="toggle-text-block">
-            <span class="toggle-title">Activer l'Interlinéaire</span>
-            <span class="toggle-desc">Ruban mot à mot avec textes originaux</span>
-          </div>
-          <label class="switch-toggle">
-            <input type="checkbox" id="interlinear-master-switch">
-            <span class="slider round"></span>
-          </label>
-        </div>
-
-        <div class="pop-divider"></div>
-
-        <!-- Choix de la version source avec Strong -->
-        <div class="pop-section-label">Version française de référence :</div>
-        <div class="interlinear-version-selector-group">
-          <label class="interlinear-radio-item active" id="lbl-inter-lsg">
-            <input type="radio" name="interlinear-version-radio" value="LSG" checked>
-            <div class="radio-details">
-              <span class="radio-name">Louis Segond 1910</span>
-              <span class="radio-tag">Balises Strong, Hébreu & Grec</span>
-            </div>
-          </label>
-          <label class="interlinear-radio-item" id="lbl-inter-darby">
-            <input type="radio" name="interlinear-version-radio" value="DARBY">
-            <div class="radio-details">
-              <span class="radio-name">Bible J.N. Darby</span>
-              <span class="radio-tag">Traduction littérale avec Strong</span>
-            </div>
-          </label>
-        </div>
-
-        <div class="pop-divider"></div>
-
-        <!-- Couches d'affichage -->
-        <div class="pop-section-label">Lignes affichées :</div>
-        <div class="interlinear-layers-grid">
-          <label class="display-opt-item">
-            <span>Texte français</span>
-            <input type="checkbox" id="inter-layer-surface" checked>
-          </label>
-          <label class="display-opt-item">
-            <span>Texte original (Héb./Gr.)</span>
-            <input type="checkbox" id="inter-layer-orig" checked>
-          </label>
-          <label class="display-opt-item">
-            <span>Translittération</span>
-            <input type="checkbox" id="inter-layer-translit" checked>
-          </label>
-          <label class="display-opt-item">
-            <span>Code Strong (H/G)</span>
-            <input type="checkbox" id="inter-layer-strong" checked>
-          </label>
-        </div>
-      </div>
-    </div>
 
     <!-- MENU CONTEXTUEL FLOTTANT (Clic droit & Double-clic) -->
     <div class="bible-context-menu hidden" id="bible-context-menu">
