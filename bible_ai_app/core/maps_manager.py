@@ -49,7 +49,11 @@ class MapsManager:
             if not actual_db_path:
                 logger.warning(f"Base de données de cartes introuvable dans les chemins candidats: {db_candidates}")
             else:
-                cls._conn = sqlite3.connect(actual_db_path, check_same_thread=False)
+                try:
+                    cls._conn = sqlite3.connect(actual_db_path, check_same_thread=False)
+                except sqlite3.OperationalError:
+                    norm = os.path.abspath(actual_db_path).replace("\\", "/")
+                    cls._conn = sqlite3.connect(f"file:///{norm}?mode=ro", uri=True, check_same_thread=False)
                 cls._conn.row_factory = sqlite3.Row
         return cls._conn
 

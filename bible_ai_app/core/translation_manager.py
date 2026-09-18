@@ -62,10 +62,8 @@ class TranslationManager:
     @classmethod
     def get_db_path(cls) -> str:
         if cls._db_path is None:
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            data_dir = os.path.join(base_dir, "data")
-            os.makedirs(data_dir, exist_ok=True)
-            cls._db_path = os.path.join(data_dir, "translations_cache.db")
+            from core.paths import get_user_data_path
+            cls._db_path = get_user_data_path("translations_cache.db")
             cls._init_db()
         return cls._db_path
 

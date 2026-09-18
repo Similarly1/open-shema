@@ -586,7 +586,7 @@ class PassageStudyManager:
         lang_detected = "greek"
         is_rtl = False
 
-        with sqlite3.connect(orig_mgr.db_path) as conn:
+        with orig_mgr.get_connection() as conn:
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
 
@@ -1489,7 +1489,7 @@ CONSIGNES STRICTES :
             if orig_mgr.is_installed():
                 b_usfm = STD_TO_USFM.get(norm_code, norm_code).upper()
                 lexicon = orig_mgr._get_strong_lexicon()
-                with sqlite3.connect(orig_mgr.db_path) as conn:
+                with orig_mgr.get_connection() as conn:
                     conn.row_factory = sqlite3.Row
                     cur = conn.cursor()
                     cur.execute("""

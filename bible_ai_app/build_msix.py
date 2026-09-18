@@ -276,6 +276,27 @@ def build_msix(rebuild_binary=False):
     if os.path.exists(src_cfg):
         shutil.copy2(src_cfg, os.path.join(root_data_dir, "config.json"))
 
+    # ── Assainissement strict des bases SQLite pour environnement MSIX lecture seule ──
+    import sqlite3
+    for root, _, files in os.walk(APP_DIR):
+        for f in files:
+            if f.endswith((".db-wal", ".db-shm")):
+                wal_path = os.path.join(root, f)
+                try:
+                    os.remove(wal_path)
+                    print(f"-> Résidu WAL/SHM supprimé : {wal_path}")
+                except Exception:
+                    pass
+            elif f.endswith((".db", ".sqlite")):
+                db_file_path = os.path.join(root, f)
+                try:
+                    conn = sqlite3.connect(db_file_path)
+                    conn.execute("PRAGMA journal_mode = DELETE;")
+                    conn.close()
+                except Exception as e:
+                    print(f"-> Avertissement assainissement DB {f}: {e}")
+    print("-> Toutes les bases SQLite intégrées au bundle ont été vérifiées (journal_mode=DELETE).")
+
     # Appel de MakeAppx pack
     if os.path.exists(OUTPUT_MSIX):
         try:

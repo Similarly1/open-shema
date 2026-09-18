@@ -5,14 +5,15 @@ import re
 import json
 from typing import Dict, List, Any, Optional
 
+from core.paths import resolve_data_path
+
 class StrongLexiconHelper:
     _lexicon_cache = None
-    _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     @classmethod
     def get_lexicon(cls) -> Dict[str, Any]:
         if cls._lexicon_cache is None:
-            lex_path = os.path.join(cls._base_dir, "data", "strong_lexicon.json")
+            lex_path = resolve_data_path("strong_lexicon.json")
             if os.path.exists(lex_path):
                 with open(lex_path, "r", encoding="utf-8") as f:
                     cls._lexicon_cache = json.load(f)
@@ -30,7 +31,7 @@ class StrongLexiconHelper:
             return None
             
         # Trouver le fichier LSG correspondant au livre
-        lsg_dir = os.path.join(cls._base_dir, "data", "bibles", "LSG")
+        lsg_dir = resolve_data_path("bibles", "LSG")
         if not os.path.exists(lsg_dir):
             return None
             

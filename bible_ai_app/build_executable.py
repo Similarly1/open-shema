@@ -218,6 +218,23 @@ def build():
         except Exception as e:
             print(f"Avertissement synchronisation runtimes webview : {e}")
 
+        # 6. Assainissement des bases SQLite (suppression résidus WAL/SHM et forçage DELETE journal_mode)
+        import sqlite3
+        for root, _, files in os.walk(dist_app_dir):
+            for f in files:
+                if f.endswith((".db-wal", ".db-shm")):
+                    try:
+                        os.remove(os.path.join(root, f))
+                    except Exception:
+                        pass
+                elif f.endswith((".db", ".sqlite")):
+                    try:
+                        conn = sqlite3.connect(os.path.join(root, f))
+                        conn.execute("PRAGMA journal_mode = DELETE;")
+                        conn.close()
+                    except Exception:
+                        pass
+
         print("\n[SUCCÈS] Build généré avec succès dans 'dist/OpenShema/' !")
         print("Pour tester : dist\\OpenShema\\OpenShema.exe\n")
     else:

@@ -37,13 +37,13 @@ STEPBIBLE_URLS = {
     "TAGNT_Act-Rev": "https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Translators%20Amalgamated%20OT%2BNT/TAGNT%20Act-Rev%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt",
 }
 
+from core.paths import resolve_data_path, get_user_data_path, get_bundle_data_path
+
 class OriginalLanguagesManager:
     """
     Gestionnaire central pour l'accès aux textes originaux hébreu/araméen (AT) et grec (NT).
     """
     _instance = None
-    _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    _db_path = os.path.join(_base_dir, "data", "original_languages.db")
     _lexicon_cache = None
 
     @classmethod
@@ -53,40 +53,82 @@ class OriginalLanguagesManager:
         return cls._instance
 
     def __init__(self):
-        self.db_path = self._db_path
-        self._ensure_db()
+        self.db_path = resolve_data_path("original_languages.db")
+        if not os.path.exists(self.db_path):
+            self._ensure_db()
 
     def _ensure_db(self):
         """Initialise le schéma SQLite si la base n'existe pas encore."""
+        if os.path.exists(self.db_path):
+            return
+        self.db_path = get_user_data_path("original_languages.db")
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("PRAGMA journal_mode = WAL;")
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS original_words (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    book_code TEXT NOT NULL,
-                    chapter INTEGER NOT NULL,
-                    verse INTEGER NOT NULL,
-                    word_idx INTEGER NOT NULL,
-                    original_text TEXT NOT NULL,
-                    transliteration TEXT,
-                    lemma TEXT,
-                    strong_code TEXT,
-                    morph_code TEXT,
-                    morph_desc_fr TEXT,
-                    gloss TEXT,
-                    lang TEXT
-                );
-            """)
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_orig_ref ON original_words(book_code, chapter, verse, word_idx);")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_orig_strong ON original_words(strong_code);")
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("PRAGMA journal_mode = DELETE;")
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS original_words (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        book_code TEXT NOT NULL,
+                        chapter INTEGER NOT NULL,
+                        verse INTEGER NOT NULL,
+                        word_idx INTEGER NOT NULL,
+                        original_text TEXT NOT NULL,
+                        transliteration TEXT,
+                        lemma TEXT,
+                        strong_code TEXT,
+                        morph_code TEXT,
+                        morph_desc_fr TEXT,
+                        gloss TEXT,
+                        lang TEXT
+                    );
+                """)
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_orig_ref ON original_words(book_code, chapter, verse, word_idx);")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_orig_strong ON original_words(strong_code);")
+        except Exception as e:
+            logger.warning("Erreur initialisation schéma original_languages.db: %s", e)
+
+    def get_connection(self) -> sqlite3.Connection:
+        """
+        Ouvre une connexion SQLite robuste, compatible avec les répertoires en lecture seule (MSIX).
+        """
+        if not os.path.exists(self.db_path):
+            self._ensure_db()
+
+        # 1. Ouverture en mode lecture seule via URI (recommandé et indispensable pour WindowsApps MSIX en lecture seule)
+        try:
+            norm_path = os.path.abspath(self.db_path).replace("\\", "/")
+            uri = f"file:///{norm_path}?mode=ro"
+            return sqlite3.connect(uri, uri=True)
+        except Exception:
+            pass
+
+        # 2. Tentative d'ouverture standard
+        try:
+            return sqlite3.connect(self.db_path)
+        except sqlite3.OperationalError:
+            pass
+
+        # 3. Fallback : si dans le bundle read-only et non lisible, copier vers user_data_dir
+        user_copy = get_user_data_path("original_languages.db")
+        if self.db_path != user_copy and os.path.exists(self.db_path):
+            try:
+                os.makedirs(os.path.dirname(user_copy), exist_ok=True)
+                import shutil
+                shutil.copy2(self.db_path, user_copy)
+                self.db_path = user_copy
+                return sqlite3.connect(self.db_path)
+            except Exception as copy_err:
+                logger.error("Impossible de copier original_languages.db vers user_data: %s", copy_err)
+
+        return sqlite3.connect(self.db_path)
 
     def is_installed(self) -> bool:
         """Vérifie si la base de données contient des données."""
         if not os.path.exists(self.db_path):
             return False
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self.get_connection() as conn:
                 cur = conn.cursor()
                 cur.execute("SELECT COUNT(*) FROM original_words LIMIT 1;")
                 count = cur.fetchone()[0]
@@ -99,7 +141,7 @@ class OriginalLanguagesManager:
         if not os.path.exists(self.db_path):
             return {"installed": False, "total_words": 0, "ot_words": 0, "nt_words": 0}
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self.get_connection() as conn:
                 cur = conn.cursor()
                 cur.execute("SELECT COUNT(*), COUNT(CASE WHEN lang='hebrew' THEN 1 END), COUNT(CASE WHEN lang='greek' THEN 1 END) FROM original_words;")
                 row = cur.fetchone()
@@ -277,7 +319,7 @@ class OriginalLanguagesManager:
         """
         Télécharge les 6 fichiers de STEPBible-Data et les importe dans SQLite.
         """
-        raw_dir = os.path.join(self._base_dir, "data", "stepbible_raw")
+        raw_dir = get_user_data_path("stepbible_raw")
         os.makedirs(raw_dir, exist_ok=True)
         
         # 1. Téléchargement des fichiers
@@ -293,6 +335,7 @@ class OriginalLanguagesManager:
         if progress_callback:
             progress_callback("Création et indexation de la base SQLite...", 0.45)
             
+        self.db_path = get_user_data_path("original_languages.db")
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("DROP TABLE IF EXISTS original_words;")
             self._ensure_db()
@@ -434,7 +477,7 @@ class OriginalLanguagesManager:
     def _get_strong_lexicon(self) -> Dict[str, Any]:
         """Charge en cache le lexique français Strong existant."""
         if self._lexicon_cache is None:
-            lex_path = os.path.join(self._base_dir, "data", "strong_lexicon.json")
+            lex_path = resolve_data_path("strong_lexicon.json")
             if os.path.exists(lex_path):
                 with open(lex_path, "r", encoding="utf-8") as f:
                     self._lexicon_cache = json.load(f)
@@ -452,7 +495,7 @@ class OriginalLanguagesManager:
         b_up = book_code.upper()
         lexicon = self._get_strong_lexicon()
         
-        with sqlite3.connect(self.db_path) as conn:
+        with self.get_connection() as conn:
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
             cur.execute("""
@@ -498,7 +541,7 @@ class OriginalLanguagesManager:
         """
         Génère la version Segond 1910 avec balises Strong & lemmes pour un verset.
         """
-        lsg_dir = os.path.join(self._base_dir, "data", "bibles", "LSG")
+        lsg_dir = resolve_data_path("bibles", "LSG")
         if not os.path.exists(lsg_dir):
             return ""
             
@@ -624,7 +667,7 @@ class OriginalLanguagesManager:
         if not self.is_installed():
             return 30
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self.get_connection() as conn:
                 cur = conn.cursor()
                 cur.execute("SELECT MAX(verse) FROM original_words WHERE book_code = ? AND chapter = ?;", (book_code.upper(), int(chapter)))
                 r = cur.fetchone()

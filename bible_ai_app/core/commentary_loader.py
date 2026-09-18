@@ -26,9 +26,22 @@ class CommentaryLoader:
         return cls._db_path
 
     @classmethod
-    def _ensure_master_db(cls):
-        """Initialise la base SQLite centrale et synchronise automatiquement les modules de commentaires individuels."""
+    def get_connection(cls) -> sqlite3.Connection:
+        """Retourne une connexion SQLite sûre, compatible lecture seule (MSIX)."""
         db_path = cls.get_db_path()
+        try:
+            norm_path = os.path.abspath(db_path).replace("\\", "/")
+            return sqlite3.connect(f"file:///{norm_path}?mode=ro", uri=True)
+        except Exception:
+            pass
+        return sqlite3.connect(db_path)
+
+    @classmethod
+    def _ensure_master_db(cls):
+        """Initialise la base SQLite centrale si elle n'existe pas encore."""
+        db_path = cls.get_db_path()
+        if os.path.exists(db_path):
+            return
         comm_dir = os.path.dirname(db_path)
         os.makedirs(comm_dir, exist_ok=True)
         try:
@@ -90,7 +103,7 @@ class CommentaryLoader:
             
         catalog = {}
         try:
-            with sqlite3.connect(db_path) as conn:
+            with cls.get_connection() as conn:
                 cur = conn.cursor()
                 cur.execute("""
                     SELECT commentary_id, commentary_name, COUNT(*), COUNT(DISTINCT book_code)
@@ -162,7 +175,7 @@ class CommentaryLoader:
         metas = []
         ids = []
 
-        with sqlite3.connect(db_path) as conn:
+        with cls.get_connection() as conn:
             cur = conn.cursor()
             cur.execute(query, params)
             rows = cur.fetchall()
@@ -255,7 +268,7 @@ class CommentaryLoader:
         metas = []
         ids = []
 
-        with sqlite3.connect(db_path) as conn:
+        with cls.get_connection() as conn:
             cur = conn.cursor()
             cur.execute(query, params)
             rows = cur.fetchall()
@@ -308,7 +321,7 @@ class CommentaryLoader:
         metas = []
         ids = []
 
-        with sqlite3.connect(db_path) as conn:
+        with cls.get_connection() as conn:
             cur = conn.cursor()
             cur.execute(query, params)
             rows = cur.fetchall()
