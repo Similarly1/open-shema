@@ -665,12 +665,16 @@ h1, h2, h3, h4, .font-title {
   margin-bottom: 24px;
   font-size: 0.85rem;
   color: var(--text-secondary);
+  text-decoration: none;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: all var(--transition-fast);
 }
 
-.hero-top-pill:hover {
+.hero-top-pill:hover,
+.hero-top-pill:focus {
+  text-decoration: none;
+  color: var(--text-primary);
   border-color: var(--accent-cyan);
   box-shadow: 0 6px 24px rgba(56, 189, 248, 0.22);
   transform: translateY(-1px);
