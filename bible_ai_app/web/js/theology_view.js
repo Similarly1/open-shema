@@ -386,6 +386,17 @@ const TheologyView = {
   },
 
   async selectBook(bookName, targetChapterId = null) {
+    // Si l'ouvrage demandé est en réalité un dictionnaire (ex: Vigouroux), basculer vers le dictionnaire
+    if (bookName && (bookName.toUpperCase() === 'VIGOUROUX' || bookName.toLowerCase().includes('vigouroux'))) {
+      if (typeof DictView !== 'undefined' && typeof DictView.openDictionary === 'function') {
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('dict');
+        }
+        DictView.openDictionary('vigouroux');
+        return;
+      }
+    }
+
     this.currentBook = bookName;
     this.showTranslatedVersion = false;
     this.showChapterSummary = false;
@@ -397,6 +408,16 @@ const TheologyView = {
     }
 
     const book = (this.books || []).find(b => b.name === bookName || b.id === bookName || b.title === bookName) || { name: bookName, title: bookName };
+
+    if (book && (book.type === 'Dictionnaire' || (book.type || '').toLowerCase().includes('dict'))) {
+      if (typeof DictView !== 'undefined' && typeof DictView.openDictionary === 'function') {
+        if (typeof App !== 'undefined' && App.switchView) {
+          App.switchView('dict');
+        }
+        DictView.openDictionary(book.dict_id || 'vigouroux');
+        return;
+      }
+    }
 
     // Mettre à jour l'en-tête du sélecteur actif
     this.updateActiveBookHeader(book);

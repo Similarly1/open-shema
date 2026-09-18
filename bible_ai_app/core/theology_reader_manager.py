@@ -34,15 +34,21 @@ class TheologyReaderManager:
 
     @classmethod
     def get_chroma_client(cls, persist_directory: Optional[str] = None):
+        if chromadb is None or Settings is None:
+            return None
         if cls._chroma_client is None:
-            if not persist_directory or persist_directory == "./data/chroma_db":
-                from core.paths import get_user_data_path
-                persist_directory = get_user_data_path("chroma_db")
-            os.makedirs(persist_directory, exist_ok=True)
-            cls._chroma_client = chromadb.PersistentClient(
-                path=persist_directory,
-                settings=Settings(anonymized_telemetry=False)
-            )
+            try:
+                if not persist_directory or persist_directory == "./data/chroma_db":
+                    from core.paths import get_user_data_path
+                    persist_directory = get_user_data_path("chroma_db")
+                os.makedirs(persist_directory, exist_ok=True)
+                cls._chroma_client = chromadb.PersistentClient(
+                    path=persist_directory,
+                    settings=Settings(anonymized_telemetry=False)
+                )
+            except Exception as e:
+                logger.warning(f"Impossible d'initialiser ChromaDB: {e}")
+                return None
         return cls._chroma_client
 
     @classmethod
@@ -94,8 +100,8 @@ class TheologyReaderManager:
                 or "hodge" in str(meta.get("title", "")).lower()
             )
             
-            # Ne pas inclure les Bibles simples dans les livres de théologie
-            if b_type in ["bible", "bibles", "audio"]:
+            # Ne pas inclure les Bibles simples ni les dictionnaires/lexiques dans les livres de théologie
+            if b_type in ["bible", "bibles", "audio", "dictionnaire", "dictionary", "lexique", "lexicon"] or meta.get("dict_id") or "vigouroux" in name.lower():
                 is_theology = False
 
             if is_theology:
@@ -414,42 +420,43 @@ class TheologyReaderManager:
         # 2. Fallback ChromaDB si aucun chapitre n'a été trouvé via l'EPUB
         if not chapters_dict:
             client = cls.get_chroma_client()
-            collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'bible_study_gemini_embedding_2']
+            if client:
+                collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'bible_study_gemini_embedding_2']
 
-            for col_name in collections_to_search:
-                try:
-                    col = client.get_collection(col_name)
-                    res = col.get(where={"name": book_name}, include=['metadatas'])
-                    if res and res.get('metadatas'):
-                        for m in res['metadatas']:
-                            cid = m.get('chapter_id')
-                            if cid is not None:
-                                try:
-                                    cid_int = int(cid)
-                                except (ValueError, TypeError):
-                                    cid_int = cid
+                for col_name in collections_to_search:
+                    try:
+                        col = client.get_collection(col_name)
+                        res = col.get(where={"name": book_name}, include=['metadatas'])
+                        if res and res.get('metadatas'):
+                            for m in res['metadatas']:
+                                cid = m.get('chapter_id')
+                                if cid is not None:
+                                    try:
+                                        cid_int = int(cid)
+                                    except (ValueError, TypeError):
+                                        cid_int = cid
+                                        
+                                    ctitle = m.get('chapter_title') or f"Chapitre {cid_int}"
+                                    ctitle = cls._clean_text_encoding(ctitle)
                                     
-                                ctitle = m.get('chapter_title') or f"Chapitre {cid_int}"
-                                ctitle = cls._clean_text_encoding(ctitle)
-                                
-                                b_code = m.get('book_code')
-                                b_name = get_french_book_name(b_code) if b_code else None
-                                
-                                if cid_int not in chapters_dict:
-                                    chapters_dict[cid_int] = {
-                                        "chapter_id": cid_int,
-                                        "title": ctitle,
-                                        "book_code": b_code,
-                                        "book_name": b_name,
-                                        "corpus_scope": m.get('corpus_scope', 'GLOBAL'),
-                                        "source_type": m.get('source_type', 'general'),
-                                        "depth": m.get('depth', 0),
-                                        "is_section_header": m.get('is_section_header', False),
-                                        "chunks_count": 0
-                                    }
-                                chapters_dict[cid_int]["chunks_count"] += 1
-                except Exception as e:
-                    logger.debug(f"[TheologyReaderManager] Recherche TOC ChromaDB {col_name} : {e}")
+                                    b_code = m.get('book_code')
+                                    b_name = get_french_book_name(b_code) if b_code else None
+                                    
+                                    if cid_int not in chapters_dict:
+                                        chapters_dict[cid_int] = {
+                                            "chapter_id": cid_int,
+                                            "title": ctitle,
+                                            "book_code": b_code,
+                                            "book_name": b_name,
+                                            "corpus_scope": m.get('corpus_scope', 'GLOBAL'),
+                                            "source_type": m.get('source_type', 'general'),
+                                            "depth": m.get('depth', 0),
+                                            "is_section_header": m.get('is_section_header', False),
+                                            "chunks_count": 0
+                                        }
+                                    chapters_dict[cid_int]["chunks_count"] += 1
+                    except Exception as e:
+                        logger.debug(f"[TheologyReaderManager] Recherche TOC ChromaDB {col_name} : {e}")
 
         NON_SECTION_KEYWORDS = [
             "abbreviation", "abbreviations", "abreviation", "abreviations",
@@ -674,49 +681,50 @@ class TheologyReaderManager:
         # 2. Fallback ChromaDB si le fichier source n'est pas sur le disque
         if not chunks:
             client = cls.get_chroma_client()
-            collections_to_search = []
-            try:
-                for c in client.list_collections():
-                    c_name = c.name if hasattr(c, 'name') else str(c)
-                    collections_to_search.append(c_name)
-            except Exception:
-                collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
-
-            for col_name in collections_to_search:
+            if client:
+                collections_to_search = []
                 try:
-                    col = client.get_collection(col_name)
-                    # Requête ChromaDB
-                    res = col.get(
-                        where={"$and": [{"name": book_name}, {"chapter_id": cid_query}]},
-                        include=['metadatas', 'documents']
-                    )
-                    if res and res.get('ids') and len(res['ids']) > 0:
-                        for i in range(len(res['ids'])):
-                            c_id = res['ids'][i]
-                            m = res['metadatas'][i]
-                            doc = res['documents'][i]
-                            
-                            if not chapter_meta and m:
-                                chapter_meta = m
-                                
-                            # Versets référencés
-                            rv = m.get('referenced_verses', '')
-                            if rv:
-                                for v_item in str(rv).split(','):
-                                    v_clean = v_item.strip()
-                                    if v_clean:
-                                        all_referenced_verses.add(v_clean)
-                                        
-                            rb = m.get('referenced_books', '')
-                            if rb:
-                                for b_item in str(rb).split(','):
-                                    b_clean = b_item.strip()
-                                    if b_clean:
-                                        all_referenced_books.add(b_clean)
+                    for c in client.list_collections():
+                        c_name = c.name if hasattr(c, 'name') else str(c)
+                        collections_to_search.append(c_name)
+                except Exception:
+                    collections_to_search = ['bible_study_bge_multilingual_gemma2_Infomaniak', 'study_library', 'bible_study_gemini_embedding_2']
 
-                            chunks.append((c_id, m, doc))
-                except Exception as e:
-                    logger.debug(f"[TheologyReaderManager] Recherche content {col_name} : {e}")
+                for col_name in collections_to_search:
+                    try:
+                        col = client.get_collection(col_name)
+                        # Requête ChromaDB
+                        res = col.get(
+                            where={"$and": [{"name": book_name}, {"chapter_id": cid_query}]},
+                            include=['metadatas', 'documents']
+                        )
+                        if res and res.get('ids') and len(res['ids']) > 0:
+                            for i in range(len(res['ids'])):
+                                c_id = res['ids'][i]
+                                m = res['metadatas'][i]
+                                doc = res['documents'][i]
+                                
+                                if not chapter_meta and m:
+                                    chapter_meta = m
+                                    
+                                # Versets référencés
+                                rv = m.get('referenced_verses', '')
+                                if rv:
+                                    for v_item in str(rv).split(','):
+                                        v_clean = v_item.strip()
+                                        if v_clean:
+                                            all_referenced_verses.add(v_clean)
+                                            
+                                rb = m.get('referenced_books', '')
+                                if rb:
+                                    for b_item in str(rb).split(','):
+                                        b_clean = b_item.strip()
+                                        if b_clean:
+                                            all_referenced_books.add(b_clean)
+
+                                chunks.append((c_id, m, doc))
+                    except Exception as e:
+                        logger.debug(f"[TheologyReaderManager] Recherche content {col_name} : {e}")
 
         # Déterminer l'ordre des chunks
         def extract_chunk_idx(item):
@@ -1022,6 +1030,8 @@ Règles de style :
             return []
 
         client = cls.get_chroma_client()
+        if not client:
+            return []
         results = []
         q_lower = query.lower().strip()
 
