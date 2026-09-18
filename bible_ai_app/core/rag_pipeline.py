@@ -138,8 +138,8 @@ class RAGPipeline:
         if not documents:
             return documents
 
-        curation_model = curation_model or self.config.get("curator_model") or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
-        fallback_model = fallback_model or self.config.get("curator_fallback_model") or self.config.get("rag_curation_fallback_model", "gemini-3.5-flash-lite")
+        curation_model = curation_model or self.config.get("curator_model") or self.config.get("rag_curation_model", "gemini-3.5-flash-lite")
+        fallback_model = fallback_model or self.config.get("curator_fallback_model") or self.config.get("rag_curation_fallback_model", "gemini-3.1-flash-lite")
 
         raw_excerpts = []
         for i, doc in enumerate(documents, 1):
@@ -384,8 +384,8 @@ class RAGPipeline:
             t_rerank_ms = 0.0
 
         # 3. Curation de contexte par LLM intermédiaire
-        curation_model_used = curation_model or self.config.get("curator_model") or self.config.get("rag_curation_model", "mistralai/Ministral-3-14B-Instruct-2512")
-        fallback_model_used = fallback_model or self.config.get("curator_fallback_model") or self.config.get("rag_curation_fallback_model", "gemini-3.5-flash-lite")
+        curation_model_used = curation_model or self.config.get("curator_model") or self.config.get("rag_curation_model", "gemini-3.5-flash-lite")
+        fallback_model_used = fallback_model or self.config.get("curator_fallback_model") or self.config.get("rag_curation_fallback_model", "gemini-3.1-flash-lite")
         t_curation_ms = 0.0
         if enable_curation and reranked_docs:
             _notify("curation", f"Curation du contexte ({curation_model_used.split('/')[-1]})...", "running")

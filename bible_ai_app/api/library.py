@@ -118,7 +118,8 @@ class LibraryMixin:
 
         # Intégrer également tous les dictionnaires enregistrés dans DictionaryManager
         dict_registry = DictionaryManager.get_all_dictionaries()
-        covers_dir = os.path.join(current_dir, "data", "covers")
+        from core.paths import get_user_data_path, get_bundle_data_path
+        covers_dirs = [get_user_data_path("covers"), get_bundle_data_path("covers")]
         
         for d in dict_registry:
             d_id = d.get("id")
@@ -139,14 +140,17 @@ class LibraryMixin:
                 elif d.get("description"):
                     matched_book["description"] = d.get("description")
             else:
-                # Chercher une couverture automatique dans data/covers/
+                # Chercher une couverture automatique dans covers/
                 cov_path = None
-                if os.path.exists(covers_dir):
-                    for fn in os.listdir(covers_dir):
-                        fn_l = fn.lower()
-                        if (d_id in fn_l) or ("calmet" in d_id and "calmet" in fn_l) or ("vigo" in d_id and "vigo" in fn_l) or ("nouveau" in d_id and "nouveau" in fn_l):
-                            cov_path = os.path.join(covers_dir, fn)
-                            break
+                for c_dir in covers_dirs:
+                    if os.path.exists(c_dir):
+                        for fn in os.listdir(c_dir):
+                            fn_l = fn.lower()
+                            if (d_id in fn_l) or ("calmet" in d_id and "calmet" in fn_l) or ("vigo" in d_id and "vigo" in fn_l) or ("nouveau" in d_id and "nouveau" in fn_l):
+                                cov_path = os.path.join(c_dir, fn)
+                                break
+                    if cov_path:
+                        break
                 
                 author_name = d.get("author") or ("Dom Calmet" if d_id == "calmet" else ("F. Vigouroux" if d_id == "vigouroux" else ("Anatole Bailly" if d_id == "bailly" else ("James Strong" if d_id == "strong" else "Collectif"))))
                 year_val = d.get("year") or ("1728" if d_id == "calmet" else ("1912" if d_id == "vigouroux" else ("1901" if d_id == "bailly" else ("1890" if d_id == "strong" else ""))))
@@ -216,7 +220,8 @@ class LibraryMixin:
         if book_name in registry:
             info = registry[book_name]
             folder_name = info.get("folder_name", book_name.replace(" ", "_"))
-            json_dir = os.path.join(current_dir, "data", "bibles", folder_name)
+            from core.paths import get_user_data_path
+            json_dir = BibleJsonLoader.find_bible_dir_by_name(folder_name) or get_user_data_path("bibles", folder_name)
             if os.path.exists(json_dir):
                 try:
                     shutil.rmtree(json_dir)
@@ -265,17 +270,21 @@ class LibraryMixin:
 
     def get_dictionaries(self) -> List[Dict[str, Any]]:
         dicts = DictionaryManager.get_all_dictionaries()
-        covers_dir = os.path.join(current_dir, "data", "covers")
+        from core.paths import get_user_data_path, get_bundle_data_path
+        covers_dirs = [get_user_data_path("covers"), get_bundle_data_path("covers")]
         for d in dicts:
             d_id = d.get("id", "").lower()
             d_name = d.get("name", "").lower()
             cov_path = None
-            if os.path.exists(covers_dir):
-                for fn in os.listdir(covers_dir):
-                    fn_l = fn.lower()
-                    if (d_id and d_id in fn_l) or ("nouveau" in d_id and "nouveau" in fn_l) or ("calmet" in d_id and "calmet" in fn_l) or ("vigo" in d_id and "vigo" in fn_l) or ("strong" in d_id and "strong" in fn_l) or ("bailly" in d_id and "bailly" in fn_l):
-                        cov_path = os.path.join(covers_dir, fn)
-                        break
+            for c_dir in covers_dirs:
+                if os.path.exists(c_dir):
+                    for fn in os.listdir(c_dir):
+                        fn_l = fn.lower()
+                        if (d_id and d_id in fn_l) or ("nouveau" in d_id and "nouveau" in fn_l) or ("calmet" in d_id and "calmet" in fn_l) or ("vigo" in d_id and "vigo" in fn_l) or ("strong" in d_id and "strong" in fn_l) or ("bailly" in d_id and "bailly" in fn_l):
+                            cov_path = os.path.join(c_dir, fn)
+                            break
+                if cov_path:
+                    break
             if cov_path:
                 data_url = get_cover_data_url(cov_path)
                 d["cover_path"] = cov_path

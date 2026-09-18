@@ -32,8 +32,11 @@ class TheologyReaderManager:
     _bible_book_index = None
 
     @classmethod
-    def get_chroma_client(cls, persist_directory: str = "./data/chroma_db"):
+    def get_chroma_client(cls, persist_directory: Optional[str] = None):
         if cls._chroma_client is None:
+            if not persist_directory or persist_directory == "./data/chroma_db":
+                from core.paths import get_user_data_path
+                persist_directory = get_user_data_path("chroma_db")
             os.makedirs(persist_directory, exist_ok=True)
             cls._chroma_client = chromadb.PersistentClient(
                 path=persist_directory,
@@ -50,8 +53,8 @@ class TheologyReaderManager:
         cls._passage_theology_cache.clear()
         cls._bible_book_index = None
         try:
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            cache_path = os.path.join(base_dir, "data", "cache", "theology_bible_book_index.json")
+            from core.paths import get_user_data_path
+            cache_path = get_user_data_path("cache", "theology_bible_book_index.json")
             if os.path.exists(cache_path):
                 os.remove(cache_path)
         except Exception as _silent_e:
@@ -998,8 +1001,8 @@ Règles de style :
             return cls._bible_book_index
 
         import json
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        cache_path = os.path.join(base_dir, "data", "cache", "theology_bible_book_index.json")
+        from core.paths import get_user_data_path
+        cache_path = get_user_data_path("cache", "theology_bible_book_index.json")
         if os.path.exists(cache_path):
             try:
                 with open(cache_path, "r", encoding="utf-8") as f:

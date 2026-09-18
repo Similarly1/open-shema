@@ -34,6 +34,7 @@ from api._utils import (
     _BACKUP_MANIFEST_VERSION, _BACKUP_COMPONENTS
 )
 current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from core.paths import get_user_data_dir, get_user_data_path, resolve_data_path
 from api.window import get_active_window, get_global_window
 
 
@@ -414,7 +415,7 @@ class SettingsMixin:
         if isinstance(save_path, (list, tuple)):
             save_path = save_path[0]
 
-        data_dir = os.path.join(current_dir, "data")
+        data_dir = get_user_data_dir()
         tmp_zip = save_path + ".tmp"
 
         try:
@@ -471,7 +472,7 @@ class SettingsMixin:
             return {"cancelled": True}
             
         zip_path = pick[0]
-        data_dir = os.path.join(current_dir, "data")
+        data_dir = get_user_data_dir()
 
         try:
             with zipfile.ZipFile(zip_path, "r") as zf:

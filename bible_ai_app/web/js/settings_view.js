@@ -12,9 +12,11 @@ const SettingsView = {
   activeModelsModalProviderTab: 'google',
   modelsModalSearchQuery: '',
   ALL_MODELS_CATALOG: [
-    // Google Gemini 3.x & 2.x & 1.5
-    { id: 'gemini-3.7-flash', name: 'Google Gemini 3.7 Flash', desc: 'Recommandé — Dernière génération, raisonnement hybride ultra-performant', provider: 'google' },
-    { id: 'gemini-3.5-flash-lite', name: 'Google Gemini 3.5 Flash Lite', desc: 'Recommandé en secours — Ultra-rapide, économique & léger', provider: 'google' },
+    // Google Gemini (Flash latest & Flash Lite latest recommandés par défaut)
+    { id: 'gemini-flash-latest', name: 'Google Gemini Flash (Dernière version stable)', desc: 'Recommandé — Alias officiel Google vers la dernière version Flash stable', provider: 'google' },
+    { id: 'gemini-flash-lite-latest', name: 'Google Gemini Flash Lite (Dernière version stable)', desc: 'Recommandé en secours — Alias officiel Google vers la version Lite rapide', provider: 'google' },
+    { id: 'gemini-3.7-flash', name: 'Google Gemini 3.7 Flash', desc: 'Génération 3.7, raisonnement hybride ultra-performant', provider: 'google' },
+    { id: 'gemini-3.5-flash-lite', name: 'Google Gemini 3.5 Flash Lite', desc: 'Ultra-rapide, économique & léger', provider: 'google' },
     { id: 'gemini-3.5-flash', name: 'Google Gemini 3.5 Flash', desc: 'Modèle polyvalent haute vitesse', provider: 'google' },
     { id: 'gemini-3.6-flash', name: 'Google Gemini 3.6 Flash', desc: 'Génération 3.x stable & rapide', provider: 'google' },
     { id: 'gemini-3.1-flash-lite', name: 'Google Gemini 3.1 Flash Lite', desc: 'Cadence élevée et faible latence', provider: 'google' },
@@ -28,7 +30,6 @@ const SettingsView = {
     { id: 'gemini-1.5-flash', name: 'Google Gemini 1.5 Flash', desc: 'Modèle rapide stable (1M tokens)', provider: 'google' },
     { id: 'gemini-1.5-pro', name: 'Google Gemini 1.5 Pro', desc: 'Grand contexte (2M tokens)', provider: 'google' },
     { id: 'gemini-1.5-flash-8b', name: 'Google Gemini 1.5 Flash 8B', desc: 'Modèle léger haute cadence', provider: 'google' },
-    { id: 'gemini-flash-latest', name: 'Google Gemini Flash (Dernière version stable)', desc: 'Alias officiel Google vers la dernière version Flash stable', provider: 'google' },
     { id: 'gemini-pro-latest', name: 'Google Gemini Pro (Dernière version stable)', desc: 'Alias officiel Google vers la dernière version Pro stable', provider: 'google' },
     { id: 'gemma-4-31b-it', name: 'Google Gemma 4 31B', desc: 'Grand modèle ouvert Google', provider: 'google' },
     { id: 'gemma-4-26b-a4b-it', name: 'Google Gemma 4 26B', desc: 'Modèle compact Google', provider: 'google' },
@@ -60,11 +61,6 @@ const SettingsView = {
       name: 'Bible',
       sub: 'Lecteur biblique multi-versions synchronisé',
       icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M12 6v7"></path><path d="M9.5 8.5h5"></path><path d="M4 19.5a2.5 2.5 0 0 1 2.5-2.5H20"></path></svg>`
-    },
-    'passage-study': {
-      name: 'Guide de Passage',
-      sub: 'Étude exégétique 360° du péricope biblique',
-      icon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>`
     },
     commentaries: {
       name: 'Commentaires',
@@ -129,9 +125,9 @@ const SettingsView = {
   },
 
   NAV_PRESETS: {
-    all: ['bible', 'passage-study', 'commentaries', 'theology', 'articles', 'dict', 'library', 'search', 'ai', 'notes', 'sermons', 'maps', 'about'],
+    all: ['bible', 'commentaries', 'theology', 'articles', 'dict', 'library', 'search', 'ai', 'notes', 'sermons', 'maps', 'about'],
     essential: ['bible', 'notes', 'search'],
-    exegete: ['bible', 'passage-study', 'commentaries', 'theology', 'dict', 'search'],
+    exegete: ['bible', 'commentaries', 'theology', 'dict', 'search'],
     preacher: ['bible', 'sermons', 'commentaries', 'notes']
   },
 
@@ -1018,6 +1014,15 @@ Schéma JSON attendu :
           App.showToast("Intelligence Artificielle activée ! Veuillez renseigner votre clé API (Gemini gratuit, Mistral ou Infomaniak).");
         } else {
           App.showToast("Intelligence Artificielle activée ! Clé configurée active.");
+          if (gemKey && (!this.discoveredGeminiModels || this.discoveredGeminiModels.length === 0)) {
+            this.fetchGeminiModels(true);
+          }
+          if (misKey && (!this.discoveredMistralModels || this.discoveredMistralModels.length === 0)) {
+            this.fetchMistralModels(true);
+          }
+          if (infoTok && (!this.discoveredInfomaniakModels || this.discoveredInfomaniakModels.length === 0)) {
+            this.fetchInfomaniakModels(true);
+          }
         }
 
         setTimeout(() => {
@@ -1423,13 +1428,121 @@ Schéma JSON attendu :
       this.save();
     });
 
+    // Gestion de l'affichage/masquage des clés API (Icône Œil SVG)
+    const setupEyeToggle = (btnId, inputId) => {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      if (!btn || !input) return;
+      btn.addEventListener('click', () => {
+        const isPassword = input.getAttribute('type') === 'password';
+        input.setAttribute('type', isPassword ? 'text' : 'password');
+        btn.setAttribute('title', isPassword ? 'Masquer la clé' : 'Afficher la clé');
+        btn.innerHTML = isPassword
+          ? `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
+          : `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+      });
+    };
+
+    setupEyeToggle('btn-toggle-show-gemini-key', 'cfg-gemini-key');
+    setupEyeToggle('btn-toggle-show-mistral-key', 'cfg-mistral-key');
+    setupEyeToggle('btn-toggle-show-infomaniak-token', 'cfg-infomaniak-token');
+
+    // Boutons d'actualisation manuelle directe des modèles
+    document.getElementById('btn-fetch-gemini-models')?.addEventListener('click', () => {
+      this.fetchGeminiModels(false);
+    });
+    document.getElementById('btn-fetch-mistral-models')?.addEventListener('click', () => {
+      this.fetchMistralModels(false);
+    });
+    document.getElementById('btn-fetch-infomaniak-models')?.addEventListener('click', () => {
+      this.fetchInfomaniakModels(false);
+    });
+
+    // Auto-actualisation des modèles lors de la saisie / collage d'une clé API
+    const setupAutoFetch = (inputId, fetchFn) => {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const trigger = () => {
+        const val = input.value.trim();
+        if (val && val.length > 5) {
+          fetchFn(true);
+        }
+        this.updateProviderStatusBadges();
+      };
+      input.addEventListener('blur', trigger);
+      input.addEventListener('paste', () => setTimeout(trigger, 150));
+    };
+
+    setupAutoFetch('cfg-gemini-key', (silent) => this.fetchGeminiModels(silent));
+    setupAutoFetch('cfg-mistral-key', (silent) => this.fetchMistralModels(silent));
+    setupAutoFetch('cfg-infomaniak-token', (silent) => this.fetchInfomaniakModels(silent));
+    setupAutoFetch('cfg-infomaniak-pid', (silent) => this.fetchInfomaniakModels(silent));
+
     ['cfg-gemini-key', 'cfg-mistral-key', 'cfg-infomaniak-token', 'cfg-infomaniak-pid'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('change', () => {
           this.save();
+          this.updateProviderStatusBadges();
         });
       }
+    });
+
+    // Synchronisation et cascade du Modèle Principal Global
+    document.getElementById('cfg-global-ai-model')?.addEventListener('change', (e) => {
+      const selectedModel = e.target.value;
+      if (!selectedModel) return;
+      const primarySelectIds = [
+        'cfg-chat-model', 'cfg-synthesis-model', 'cfg-translation-model', 'cfg-summary-model',
+        'cfg-title-model', 'cfg-notes-ai-model', 'cfg-sermon-restructure-model',
+        'cfg-sermon-evaluation-model', 'cfg-mindmap-ai-model',
+        'cfg-audio-axes-model', 'cfg-audio-script-model', 'cfg-library-advisor-model'
+      ];
+      primarySelectIds.forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) sel.value = selectedModel;
+      });
+
+      // Le curateur de contexte requiert impérativement un modèle ultra-léger et rapide
+      const curatorSel = document.getElementById('cfg-curator-model');
+      const curatorFallbackSel = document.getElementById('cfg-curator-fallback-model');
+      if (curatorSel) {
+        if (selectedModel.startsWith('mistralai/') || selectedModel.startsWith('swiss-ai/') || selectedModel.startsWith('google/gemma') || selectedModel.startsWith('Qwen/')) {
+          curatorSel.value = 'mistralai/Mistral-Small-4-119B-2603';
+          if (curatorFallbackSel) curatorFallbackSel.value = 'mistralai/Ministral-3-14B-Instruct-2512';
+        } else if (selectedModel.startsWith('mistral-') || selectedModel.startsWith('open-mistral') || selectedModel.startsWith('codestral') || selectedModel.startsWith('ministral-')) {
+          curatorSel.value = 'mistral-small-latest';
+          if (curatorFallbackSel) curatorFallbackSel.value = 'mistral-small-latest';
+        } else {
+          // Google Gemini : Flash Lite ultra-rapides
+          curatorSel.value = 'gemini-3.5-flash-lite';
+          if (curatorFallbackSel) curatorFallbackSel.value = 'gemini-3.1-flash-lite';
+        }
+      }
+
+      const aiOptModel = document.getElementById('ai-opt-model');
+      if (aiOptModel) aiOptModel.value = selectedModel;
+      this.save(true);
+      App.showToast(`Modèle principal global appliqué : ${selectedModel}`);
+    });
+
+    // Synchronisation et cascade du Modèle de Secours Global
+    document.getElementById('cfg-global-ai-fallback-model')?.addEventListener('change', (e) => {
+      const selectedFallback = e.target.value;
+      if (!selectedFallback) return;
+      const fallbackSelectIds = [
+        'cfg-chat-fallback-model', 'cfg-synthesis-fallback-model', 'cfg-translation-fallback-model',
+        'cfg-summary-fallback-model', 'cfg-title-fallback-model', 'cfg-notes-ai-fallback-model',
+        'cfg-sermon-restructure-fallback-model', 'cfg-sermon-evaluation-fallback-model',
+        'cfg-mindmap-ai-fallback-model',
+        'cfg-audio-axes-fallback-model', 'cfg-audio-script-fallback-model', 'cfg-library-advisor-fallback-model'
+      ];
+      fallbackSelectIds.forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) sel.value = selectedFallback;
+      });
+      this.save(true);
+      App.showToast(`Modèle de secours global appliqué : ${selectedFallback}`);
     });
 
     // STEPBible
@@ -1885,6 +1998,13 @@ Schéma JSON attendu :
 
     this.renderAllModelSelects();
 
+    if (c.global_ai_model && document.getElementById('cfg-global-ai-model')) {
+      document.getElementById('cfg-global-ai-model').value = c.global_ai_model;
+    }
+    if (c.global_ai_fallback_model && document.getElementById('cfg-global-ai-fallback-model')) {
+      document.getElementById('cfg-global-ai-fallback-model').value = c.global_ai_fallback_model;
+    }
+
     if (c.chat_model && document.getElementById('cfg-chat-model')) {
       document.getElementById('cfg-chat-model').value = c.chat_model;
     }
@@ -2030,6 +2150,18 @@ Schéma JSON attendu :
     if (c.mistral_api_key) document.getElementById('cfg-mistral-key').value = c.mistral_api_key;
     if (c.infomaniak_token) document.getElementById('cfg-infomaniak-token').value = c.infomaniak_token;
     if (c.infomaniak_product_id) document.getElementById('cfg-infomaniak-pid').value = c.infomaniak_product_id;
+    this.updateProviderStatusBadges();
+
+    // Actualisation automatique en arrière-plan au chargement si des clés existent mais qu'aucun modèle n'a encore été découvert
+    if (c.gemini_api_key && (!this.discoveredGeminiModels || this.discoveredGeminiModels.length === 0)) {
+      this.fetchGeminiModels(true);
+    }
+    if (c.mistral_api_key && (!this.discoveredMistralModels || this.discoveredMistralModels.length === 0)) {
+      this.fetchMistralModels(true);
+    }
+    if (c.infomaniak_token && c.infomaniak_product_id && (!this.discoveredInfomaniakModels || this.discoveredInfomaniakModels.length === 0)) {
+      this.fetchInfomaniakModels(true);
+    }
 
     // Chargement des préférences de notifications IA
     if (typeof NotificationManager !== 'undefined') {
@@ -2068,6 +2200,8 @@ Schéma JSON attendu :
   },
 
   MODEL_PAIR_CONFIG_KEYS: {
+    'cfg-global-ai-model': 'global_ai_model',
+    'cfg-global-ai-fallback-model': 'global_ai_fallback_model',
     'cfg-chat-model': 'chat_model',
     'cfg-chat-fallback-model': 'chat_fallback_model',
     'cfg-synthesis-model': 'synthesis_model',
@@ -2396,6 +2530,8 @@ Schéma JSON attendu :
 
   renderAllModelSelects() {
     const selectIds = [
+      'cfg-global-ai-model',
+      'cfg-global-ai-fallback-model',
       'cfg-chat-model',
       'cfg-chat-fallback-model',
       'cfg-synthesis-model',
@@ -2420,6 +2556,8 @@ Schéma JSON attendu :
       'cfg-audio-axes-fallback-model',
       'cfg-audio-script-model',
       'cfg-audio-script-fallback-model',
+      'cfg-library-advisor-model',
+      'cfg-library-advisor-fallback-model',
       'ai-opt-model'
     ];
 
@@ -2474,6 +2612,12 @@ Schéma JSON attendu :
       if (cfgKey) {
         targetVal = this.getSelectedModel(cfgKey) || this.config[cfgKey] || currentVal;
       }
+      if (!targetVal) {
+        if (id === 'cfg-global-ai-model') targetVal = this.config.global_ai_model || 'gemini-flash-latest';
+        else if (id === 'cfg-global-ai-fallback-model') targetVal = this.config.global_ai_fallback_model || 'gemini-flash-lite-latest';
+        else if (id === 'cfg-curator-model') targetVal = this.config.curator_model || 'gemini-3.5-flash-lite';
+        else if (id === 'cfg-curator-fallback-model') targetVal = this.config.curator_fallback_model || 'gemini-3.1-flash-lite';
+      }
 
       if (targetVal && enabledModels.some(m => m.id === targetVal)) {
         selectEl.value = targetVal;
@@ -2509,20 +2653,97 @@ Schéma JSON attendu :
     }
   },
 
-  async fetchGeminiModels() {
-    const btn = document.getElementById('btn-modal-fetch-provider');
-    const icon = document.getElementById('svg-modal-fetch-provider-icon');
+  updateProviderStatusBadges() {
+    // 1. Google Gemini
+    const geminiKey = document.getElementById('cfg-gemini-key')?.value?.trim() || this.config.gemini_api_key || '';
+    const badgeGoogle = document.getElementById('badge-provider-status-google');
+    if (badgeGoogle) {
+      if (geminiKey) {
+        const count = (this.discoveredGeminiModels || []).length;
+        badgeGoogle.className = 'ai-provider-status-badge connected';
+        badgeGoogle.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="badge-provider-text-google">Connecté (${count > 0 ? count + ' modèles' : 'Prêt'})</span>
+        `;
+      } else {
+        badgeGoogle.className = 'ai-provider-status-badge';
+        badgeGoogle.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+          <span id="badge-provider-text-google">Non configuré</span>
+        `;
+      }
+    }
+
+    // 2. Mistral AI
+    const mistralKey = document.getElementById('cfg-mistral-key')?.value?.trim() || this.config.mistral_api_key || '';
+    const badgeMistral = document.getElementById('badge-provider-status-mistral');
+    if (badgeMistral) {
+      if (mistralKey) {
+        const count = (this.discoveredMistralModels || []).length;
+        badgeMistral.className = 'ai-provider-status-badge connected';
+        badgeMistral.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="badge-provider-text-mistral">Connecté (${count > 0 ? count + ' modèles' : 'Prêt'})</span>
+        `;
+      } else {
+        badgeMistral.className = 'ai-provider-status-badge';
+        badgeMistral.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+          <span id="badge-provider-text-mistral">Non configuré</span>
+        `;
+      }
+    }
+
+    // 3. Infomaniak Swiss AI
+    const infoToken = document.getElementById('cfg-infomaniak-token')?.value?.trim() || this.config.infomaniak_token || '';
+    const badgeInfo = document.getElementById('badge-provider-status-infomaniak');
+    if (badgeInfo) {
+      if (infoToken) {
+        const count = (this.discoveredInfomaniakModels || []).length;
+        badgeInfo.className = 'ai-provider-status-badge connected';
+        badgeInfo.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="badge-provider-text-infomaniak">Connecté (${count > 0 ? count + ' modèles' : 'Prêt'})</span>
+        `;
+      } else {
+        badgeInfo.className = 'ai-provider-status-badge';
+        badgeInfo.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+          <span id="badge-provider-text-infomaniak">Non configuré</span>
+        `;
+      }
+    }
+  },
+
+  async fetchGeminiModels(silent = false) {
+    const btnModal = document.getElementById('btn-modal-fetch-provider');
+    const iconModal = document.getElementById('svg-modal-fetch-provider-icon');
+    const btnDirect = document.getElementById('btn-fetch-gemini-models');
+    const iconDirect = document.getElementById('svg-btn-fetch-gemini');
     const keyInput = document.getElementById('cfg-gemini-key');
     const apiKey = keyInput?.value?.trim() || this.config.gemini_api_key || '';
 
     if (!apiKey) {
-      App.showToast('Veuillez renseigner votre clé API Google Gemini dans les paramètres.');
-      keyInput?.focus();
+      if (!silent) {
+        App.showToast('Veuillez renseigner votre clé API Google Gemini dans les paramètres.');
+        keyInput?.focus();
+      }
       return;
     }
 
-    if (btn) btn.disabled = true;
-    if (icon) icon.classList.add('spin-clockwise');
+    if (btnModal) btnModal.disabled = true;
+    if (iconModal) iconModal.classList.add('spin-clockwise');
+    if (btnDirect) btnDirect.disabled = true;
+    if (iconDirect) iconDirect.classList.add('spin-clockwise');
+
+    const badgeGoogle = document.getElementById('badge-provider-status-google');
+    if (badgeGoogle) {
+      badgeGoogle.className = 'ai-provider-status-badge loading';
+      badgeGoogle.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-clockwise"><circle cx="12" cy="12" r="9" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+        <span>Synchronisation...</span>
+      `;
+    }
 
     try {
       const res = await API.call('fetch_gemini_models', { api_key: apiKey });
@@ -2530,37 +2751,95 @@ Schéma JSON attendu :
         this.discoveredGeminiModels = res.models;
         this.setLocalStorageDiscoveredModels('google', res.models);
         this.config.discovered_gemini_models = res.models;
+
+        // Définir les modèles par défaut officiels demandés
+        if (!this.config.global_ai_model || this.config.global_ai_model === 'gemini-3.7-flash') {
+          this.config.global_ai_model = 'gemini-flash-latest';
+          this.setSelectedModel('global_ai_model', 'gemini-flash-latest');
+        }
+        if (!this.config.global_ai_fallback_model || this.config.global_ai_fallback_model === 'gemini-3.5-flash-lite') {
+          this.config.global_ai_fallback_model = 'gemini-flash-lite-latest';
+          this.setSelectedModel('global_ai_fallback_model', 'gemini-flash-lite-latest');
+        }
+        if (!this.config.curator_model || this.config.curator_model === 'mistralai/Ministral-3-14B-Instruct-2512') {
+          this.config.curator_model = 'gemini-3.5-flash-lite';
+          this.setSelectedModel('curator_model', 'gemini-3.5-flash-lite');
+        }
+        if (!this.config.curator_fallback_model || this.config.curator_fallback_model === 'gemini-flash-lite-latest') {
+          this.config.curator_fallback_model = 'gemini-3.1-flash-lite';
+          this.setSelectedModel('curator_fallback_model', 'gemini-3.1-flash-lite');
+        }
+
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
         this.saveDiscoveredAndDisabledModels();
-        App.showToast(`✓ ${res.models.length} modèles Gemini récupérés avec succès depuis Google !`);
+        this.updateProviderStatusBadges();
+
+        if (!silent) {
+          App.showToast(`${res.models.length} modèles Gemini synchronisés avec succès.`);
+        }
       } else {
-        App.showToast(`Erreur Google API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+        if (badgeGoogle) {
+          badgeGoogle.className = 'ai-provider-status-badge error';
+          badgeGoogle.innerHTML = `
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Erreur clé</span>
+          `;
+        }
+        if (!silent) {
+          App.showToast(`Erreur Google API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+        }
       }
     } catch (e) {
       console.error('Erreur fetch_gemini_models', e);
-      App.showToast(`Erreur de connexion : ${e}`);
+      if (badgeGoogle) {
+        badgeGoogle.className = 'ai-provider-status-badge error';
+        badgeGoogle.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span>Erreur connexion</span>
+        `;
+      }
+      if (!silent) {
+        App.showToast(`Erreur de connexion : ${e}`);
+      }
     } finally {
-      if (btn) btn.disabled = false;
-      if (icon) icon.classList.remove('spin-clockwise');
+      if (btnModal) btnModal.disabled = false;
+      if (iconModal) iconModal.classList.remove('spin-clockwise');
+      if (btnDirect) btnDirect.disabled = false;
+      if (iconDirect) iconDirect.classList.remove('spin-clockwise');
     }
   },
 
-  async fetchMistralModels() {
-    const btn = document.getElementById('btn-modal-fetch-provider');
-    const icon = document.getElementById('svg-modal-fetch-provider-icon');
+  async fetchMistralModels(silent = false) {
+    const btnModal = document.getElementById('btn-modal-fetch-provider');
+    const iconModal = document.getElementById('svg-modal-fetch-provider-icon');
+    const btnDirect = document.getElementById('btn-fetch-mistral-models');
+    const iconDirect = document.getElementById('svg-btn-fetch-mistral');
     const keyInput = document.getElementById('cfg-mistral-key');
     const apiKey = keyInput?.value?.trim() || this.config.mistral_api_key || '';
 
     if (!apiKey) {
-      App.showToast('Veuillez renseigner votre clé API Mistral AI dans les paramètres.');
-      keyInput?.focus();
+      if (!silent) {
+        App.showToast('Veuillez renseigner votre clé API Mistral AI dans les paramètres.');
+        keyInput?.focus();
+      }
       return;
     }
 
-    if (btn) btn.disabled = true;
-    if (icon) icon.classList.add('spin-clockwise');
+    if (btnModal) btnModal.disabled = true;
+    if (iconModal) iconModal.classList.add('spin-clockwise');
+    if (btnDirect) btnDirect.disabled = true;
+    if (iconDirect) iconDirect.classList.add('spin-clockwise');
+
+    const badgeMistral = document.getElementById('badge-provider-status-mistral');
+    if (badgeMistral) {
+      badgeMistral.className = 'ai-provider-status-badge loading';
+      badgeMistral.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-clockwise"><circle cx="12" cy="12" r="9" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+        <span>Synchronisation...</span>
+      `;
+    }
 
     try {
       const res = await API.call('fetch_mistral_models', { api_key: apiKey });
@@ -2568,39 +2847,96 @@ Schéma JSON attendu :
         this.discoveredMistralModels = res.models;
         this.setLocalStorageDiscoveredModels('mistral', res.models);
         this.config.discovered_mistral_models = res.models;
+
+        if (!this.config.global_ai_model) {
+          this.config.global_ai_model = 'mistral-large-latest';
+          this.setSelectedModel('global_ai_model', 'mistral-large-latest');
+        }
+        if (!this.config.global_ai_fallback_model) {
+          this.config.global_ai_fallback_model = 'mistral-small-latest';
+          this.setSelectedModel('global_ai_fallback_model', 'mistral-small-latest');
+        }
+        if (!this.config.curator_model || this.config.curator_model === 'mistralai/Ministral-3-14B-Instruct-2512') {
+          this.config.curator_model = 'mistral-small-latest';
+          this.setSelectedModel('curator_model', 'mistral-small-latest');
+        }
+        if (!this.config.curator_fallback_model) {
+          this.config.curator_fallback_model = 'mistral-small-latest';
+          this.setSelectedModel('curator_fallback_model', 'mistral-small-latest');
+        }
+
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
         this.saveDiscoveredAndDisabledModels();
-        App.showToast(`✓ ${res.models.length} modèles Mistral récupérés avec succès depuis Mistral AI !`);
+        this.updateProviderStatusBadges();
+
+        if (!silent) {
+          App.showToast(`${res.models.length} modèles Mistral synchronisés avec succès.`);
+        }
       } else {
-        App.showToast(`Erreur Mistral API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+        if (badgeMistral) {
+          badgeMistral.className = 'ai-provider-status-badge error';
+          badgeMistral.innerHTML = `
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Erreur clé</span>
+          `;
+        }
+        if (!silent) {
+          App.showToast(`Erreur Mistral API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+        }
       }
     } catch (e) {
       console.error('Erreur fetch_mistral_models', e);
-      App.showToast(`Erreur de connexion : ${e}`);
+      if (badgeMistral) {
+        badgeMistral.className = 'ai-provider-status-badge error';
+        badgeMistral.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span>Erreur connexion</span>
+        `;
+      }
+      if (!silent) {
+        App.showToast(`Erreur de connexion : ${e}`);
+      }
     } finally {
-      if (btn) btn.disabled = false;
-      if (icon) icon.classList.remove('spin-clockwise');
+      if (btnModal) btnModal.disabled = false;
+      if (iconModal) iconModal.classList.remove('spin-clockwise');
+      if (btnDirect) btnDirect.disabled = false;
+      if (iconDirect) iconDirect.classList.remove('spin-clockwise');
     }
   },
 
-  async fetchInfomaniakModels() {
-    const btn = document.getElementById('btn-modal-fetch-provider');
-    const icon = document.getElementById('svg-modal-fetch-provider-icon');
+  async fetchInfomaniakModels(silent = false) {
+    const btnModal = document.getElementById('btn-modal-fetch-provider');
+    const iconModal = document.getElementById('svg-modal-fetch-provider-icon');
+    const btnDirect = document.getElementById('btn-fetch-infomaniak-models');
+    const iconDirect = document.getElementById('svg-btn-fetch-infomaniak');
     const tokenInput = document.getElementById('cfg-infomaniak-token');
     const pidInput = document.getElementById('cfg-infomaniak-pid');
     const token = tokenInput?.value?.trim() || this.config.infomaniak_token || '';
     const pid = pidInput?.value?.trim() || this.config.infomaniak_product_id || '251';
 
     if (!token) {
-      App.showToast('Veuillez renseigner votre token Infomaniak dans les paramètres.');
-      tokenInput?.focus();
+      if (!silent) {
+        App.showToast('Veuillez renseigner votre token Infomaniak dans les paramètres.');
+        tokenInput?.focus();
+      }
       return;
     }
 
-    if (btn) btn.disabled = true;
-    if (icon) icon.classList.add('spin-clockwise');
+    if (btnModal) btnModal.disabled = true;
+    if (iconModal) iconModal.classList.add('spin-clockwise');
+    if (btnDirect) btnDirect.disabled = true;
+    if (iconDirect) iconDirect.classList.add('spin-clockwise');
+
+    const badgeInfo = document.getElementById('badge-provider-status-infomaniak');
+    if (badgeInfo) {
+      badgeInfo.className = 'ai-provider-status-badge loading';
+      badgeInfo.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-clockwise"><circle cx="12" cy="12" r="9" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+        <span>Synchronisation...</span>
+      `;
+    }
 
     try {
       const res = await API.call('fetch_infomaniak_models', { token, product_id: pid });
@@ -2608,20 +2944,62 @@ Schéma JSON attendu :
         this.discoveredInfomaniakModels = res.models;
         this.setLocalStorageDiscoveredModels('infomaniak', res.models);
         this.config.discovered_infomaniak_models = res.models;
+
+        if (!this.config.global_ai_model) {
+          this.config.global_ai_model = 'mistralai/Mistral-Small-4-119B-2603';
+          this.setSelectedModel('global_ai_model', 'mistralai/Mistral-Small-4-119B-2603');
+        }
+        if (!this.config.global_ai_fallback_model) {
+          this.config.global_ai_fallback_model = 'mistralai/Ministral-3-14B-Instruct-2512';
+          this.setSelectedModel('global_ai_fallback_model', 'mistralai/Ministral-3-14B-Instruct-2512');
+        }
+        if (!this.config.curator_model || this.config.curator_model === 'mistralai/Ministral-3-14B-Instruct-2512') {
+          this.config.curator_model = 'mistralai/Mistral-Small-4-119B-2603';
+          this.setSelectedModel('curator_model', 'mistralai/Mistral-Small-4-119B-2603');
+        }
+        if (!this.config.curator_fallback_model) {
+          this.config.curator_fallback_model = 'mistralai/Ministral-3-14B-Instruct-2512';
+          this.setSelectedModel('curator_fallback_model', 'mistralai/Ministral-3-14B-Instruct-2512');
+        }
+
         this.renderModelsModalList();
         this.renderAllModelSelects();
         this.updateModelsSummaryBadges();
         this.saveDiscoveredAndDisabledModels();
-        App.showToast(`✓ ${res.models.length} modèles Infomaniak récupérés avec succès !`);
+        this.updateProviderStatusBadges();
+
+        if (!silent) {
+          App.showToast(`${res.models.length} modèles Infomaniak synchronisés avec succès.`);
+        }
       } else {
-        App.showToast(`Erreur Infomaniak API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+        if (badgeInfo) {
+          badgeInfo.className = 'ai-provider-status-badge error';
+          badgeInfo.innerHTML = `
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Erreur token</span>
+          `;
+        }
+        if (!silent) {
+          App.showToast(`Erreur Infomaniak API : ${res?.error || 'Impossible de récupérer les modèles'}`);
+        }
       }
     } catch (e) {
       console.error('Erreur fetch_infomaniak_models', e);
-      App.showToast(`Erreur de connexion : ${e}`);
+      if (badgeInfo) {
+        badgeInfo.className = 'ai-provider-status-badge error';
+        badgeInfo.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span>Erreur connexion</span>
+        `;
+      }
+      if (!silent) {
+        App.showToast(`Erreur de connexion : ${e}`);
+      }
     } finally {
-      if (btn) btn.disabled = false;
-      if (icon) icon.classList.remove('spin-clockwise');
+      if (btnModal) btnModal.disabled = false;
+      if (iconModal) iconModal.classList.remove('spin-clockwise');
+      if (btnDirect) btnDirect.disabled = false;
+      if (iconDirect) iconDirect.classList.remove('spin-clockwise');
     }
   },
 
@@ -3323,6 +3701,7 @@ Schéma JSON attendu :
       this.config = newCfg;
       App.applySidebarConfig(newCfg.sidebar_menu, true);
       this.updateAllPromptStatusBadges();
+      this.updateProviderStatusBadges();
       App.applyTheme(newCfg.theme, newCfg.theme_palette, newCfg.reading_bg);
       App.applyFontFamily(newCfg.font_family);
       if (typeof NotesView !== 'undefined') {

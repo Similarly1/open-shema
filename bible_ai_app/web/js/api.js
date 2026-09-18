@@ -233,6 +233,10 @@ const API = {
     return await this.call('maximize_detached_window', viewId);
   },
 
+  async startWindowDrag(viewId) {
+    return await this.call('start_window_drag', viewId);
+  },
+
   async isDetachedWindowOpen(viewId) {
     return await this.call('is_detached_window_open', viewId);
   },

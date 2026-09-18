@@ -228,17 +228,22 @@ class BibleJsonLoader:
             try:
                 base_dir = cls.get_bibles_dir()
                 clean_name = str(bible_name).lower().replace(" ", "_")
-                cand_sqlite = os.path.join(base_dir, f"bible_{clean_name}.sqlite")
-                cand_sqlite_alt = os.path.join(base_dir, f"bible_{clean_name}1910.sqlite")
-                cand_sqlite_lsg = os.path.join(base_dir, "bible_lsg.sqlite")
-                
+                cands = [
+                    os.path.join(base_dir, f"bible_{clean_name}.sqlite"),
+                    os.path.join(base_dir, f"bible_bible_{clean_name}.sqlite"),
+                    os.path.join(base_dir, f"bible_{clean_name}1910.sqlite"),
+                ]
+                if clean_name in ("lsg", "louis_segond"):
+                    cands.extend([
+                        os.path.join(base_dir, "bible_lsg1910.sqlite"),
+                        os.path.join(base_dir, "bible_lsg.sqlite")
+                    ])
+
                 sqlite_path = None
-                if os.path.exists(cand_sqlite):
-                    sqlite_path = cand_sqlite
-                elif os.path.exists(cand_sqlite_alt):
-                    sqlite_path = cand_sqlite_alt
-                elif clean_name in ("lsg", "louis_segond") and os.path.exists(cand_sqlite_lsg):
-                    sqlite_path = cand_sqlite_lsg
+                for c in cands:
+                    if os.path.exists(c) and os.path.getsize(c) > 1000:
+                        sqlite_path = c
+                        break
 
                 if sqlite_path:
                     import sqlite3
@@ -246,13 +251,38 @@ class BibleJsonLoader:
                     os.makedirs(dest_json_dir, exist_ok=True)
                     conn = sqlite3.connect(sqlite_path)
                     cur = conn.cursor()
-                    cur.execute("SELECT book, chapter, verse, text FROM verses ORDER BY id ASC")
+
+                    # Détection des colonnes disponibles
+                    cols = [col[1] for col in cur.execute("PRAGMA table_info(verses)").fetchall()]
+                    has_strong = "text_strong" in cols
+                    has_book_id = "book_id" in cols
+                    has_books_table = bool(cur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='books'").fetchone())
+
+                    books_id_map = {}
+                    if has_book_id and has_books_table:
+                        for b_row in cur.execute("SELECT id, code FROM books").fetchall():
+                            books_id_map[b_row[0]] = b_row[1].capitalize()
+
+                    query = "SELECT "
+                    if has_book_id and books_id_map:
+                        query += "book_id, "
+                    else:
+                        query += "book, "
+                    query += "chapter, verse, "
+                    if has_strong:
+                        query += "COALESCE(NULLIF(text_strong, ''), text) "
+                    else:
+                        query += "text "
+                    query += "FROM verses ORDER BY id ASC"
+
+                    cur.execute(query)
                     all_rows = cur.fetchall()
                     conn.close()
 
                     verses_by_book = {}
                     for row in all_rows:
-                        b_code, ch, v_num, txt = row[0], int(row[1]), int(row[2]), row[3]
+                        raw_b, ch, v_num, txt = row[0], int(row[1]), int(row[2]), row[3]
+                        b_code = books_id_map.get(raw_b, raw_b)
                         if b_code not in verses_by_book:
                             verses_by_book[b_code] = {}
                         if str(ch) not in verses_by_book[b_code]:

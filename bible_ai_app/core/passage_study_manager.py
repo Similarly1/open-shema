@@ -364,11 +364,42 @@ class PassageStudyManager:
                 "comparaisons_suggerees": meta.get("comparaisons_suggerees", [])
             }
 
-        # Presets de comparaison méthodologiques fondés sur les catégories
+        # Presets de comparaison méthodologiques fondés sur les catégories avec sigles courts
+        short_names_map = {
+            "Segond_21": "S21",
+            "Parole_Vivante": "PV",
+            "Prophetie_Vivante": "PViv",
+            "PDV2017": "PDV",
+            "DARBY": "DARBY",
+            "CAHEN": "Cahen",
+            "BENFS": "BFC",
+            "NEG79": "NEG",
+            "JXLFR": "JXL",
+            "LAU": "Lausanne",
+            "OST": "OST",
+            "BDJ": "BDJ",
+            "TOB": "TOB",
+            "BDS": "BDS",
+            "NFC": "NFC",
+            "NBS": "NBS",
+            "LSG": "LSG"
+        }
+
+        def _get_short_code(code: str) -> str:
+            if not code:
+                return ""
+            if code in short_names_map:
+                return short_names_map[code]
+            meta = versions_metadata.get(code, {})
+            reg_code = meta.get("code")
+            if reg_code and len(reg_code) <= 6:
+                return reg_code
+            return code
+
         raw_presets = [
             {
                 "id": "lit_dyn",
-                "label": "Littérale vs Dynamique",
+                "label": "DARBY vs BDS",
                 "badge": "Exégèse",
                 "v2": "DARBY" if "DARBY" in available_version_names else "LAU",
                 "v3": "BDS" if "BDS" in available_version_names else "NFC",
@@ -376,15 +407,15 @@ class PassageStudyManager:
             },
             {
                 "id": "interconf",
-                "label": "Jérusalem vs TOB",
-                "badge": "Interconfessionnel",
+                "label": "BDJ vs TOB",
+                "badge": "Interconf.",
                 "v2": "BDJ" if "BDJ" in available_version_names else "NCL",
                 "v3": "TOB" if "TOB" in available_version_names else "NFC",
                 "description": "Rapprochement entre l'érudition catholique (Bible de Jérusalem) et la concertation œcuménique (TOB)"
             },
             {
                 "id": "segond_semeur",
-                "label": "Segond 21 vs Semeur",
+                "label": "S21 vs BDS",
                 "badge": "Contemporain",
                 "v2": "Segond_21" if "Segond_21" in available_version_names else "NBS",
                 "v3": "BDS" if "BDS" in available_version_names else "Parole_Vivante",
@@ -392,7 +423,7 @@ class PassageStudyManager:
             },
             {
                 "id": "hist_mod",
-                "label": "Ostervald vs Segond 21",
+                "label": "OST vs S21",
                 "badge": "Histoire",
                 "v2": "OST" if "OST" in available_version_names else "DARBY",
                 "v3": "Segond_21" if "Segond_21" in available_version_names else "NBS",
@@ -400,7 +431,7 @@ class PassageStudyManager:
             },
             {
                 "id": "courant_paraph",
-                "label": "Français Courant vs Parole Vivante",
+                "label": "NFC vs PV",
                 "badge": "Dynamique",
                 "v2": "NFC" if "NFC" in available_version_names else "PDV2017",
                 "v3": "Parole_Vivante" if "Parole_Vivante" in available_version_names else "BENFS",
@@ -418,6 +449,14 @@ class PassageStudyManager:
                     v3 = ""
                 p["v2"] = v2
                 p["v3"] = v3
+                s2 = _get_short_code(v2)
+                s3 = _get_short_code(v3)
+                if s2 and s3:
+                    p["label"] = f"{s2} vs {s3}"
+                elif s2:
+                    p["label"] = s2
+                elif s3:
+                    p["label"] = s3
                 valid_presets.append(p)
 
         # 3. TEXTE ORIGINAL INTÉGRAL (Hébreu Massorétique WLC ou Grec NA28/SBLGNT)
@@ -1555,8 +1594,8 @@ CONSIGNES STRICTES :
         if cls._bibleproject_cache is not None:
             return cls._bibleproject_cache
         try:
-            base_dir = os.path.dirname(os.path.dirname(__file__))
-            json_path = os.path.join(base_dir, "data", "bibleproject_fr.json")
+            from core.paths import resolve_data_path
+            json_path = resolve_data_path("bibleproject_fr.json")
             if os.path.exists(json_path):
                 with open(json_path, "r", encoding="utf-8") as f:
                     cls._bibleproject_cache = json.load(f)

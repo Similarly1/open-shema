@@ -377,6 +377,7 @@ REVERSE_BOOK_MAPPING = {
     "Oba": "Abdias", "Jon": "Jonas", "Mic": "Michée", "Nah": "Nahum", "Hab": "Habacuc",
     "Zep": "Sophonie", "Hag": "Aggée", "Zec": "Zacharie", "Mal": "Malachie",
     "Mat": "Matthieu", "Mar": "Marc", "Luk": "Luc", "Joh": "Jean", "Act": "Actes",
+    "MAT": "Matthieu", "MRK": "Marc", "MAR": "Marc", "LUK": "Luc", "JHN": "Jean", "JOH": "Jean",
     "Rom": "Romains", "1Co": "1 Corinthiens", "2Co": "2 Corinthiens", "Gal": "Galates",
     "Eph": "Éphésiens", "Phi": "Philippiens", "Col": "Colossiens", "1Th": "1 Thessaloniciens",
     "2Th": "2 Thessaloniciens", "1Ti": "1 Timothée", "2Ti": "2 Timothée", "Tit": "Tite",

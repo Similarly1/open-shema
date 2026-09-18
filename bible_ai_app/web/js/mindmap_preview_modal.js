@@ -138,6 +138,11 @@ const MindMapPreviewModal = {
         this.canvasContainer.appendChild(noteMmContainer);
         noteMmContainer.classList.remove('hidden');
         noteMmContainer.classList.add('is-preview-mode');
+
+        const dock = noteMmContainer.querySelector('#mindmap-dock, .mindmap-dock') || document.getElementById('mindmap-dock');
+        if (dock) {
+          dock.classList.add('hidden');
+        }
       }
 
       if (typeof MindMapView !== 'undefined') {
@@ -351,6 +356,11 @@ const MindMapPreviewModal = {
       // Si l'utilisateur retourne sur l'onglet Notes avec une note mindmap ouverte, restaurer la vue
       if (typeof NotesView !== 'undefined' && NotesView.currentNote && NotesView.currentNote.type === 'mindmap') {
         MindMapView.render(NotesView.currentNote);
+      } else {
+        const dock = document.getElementById('mindmap-dock');
+        if (dock && (typeof MindMapView === 'undefined' || MindMapView.viewMode !== 'outline')) {
+          dock.classList.remove('hidden');
+        }
       }
     }
   },

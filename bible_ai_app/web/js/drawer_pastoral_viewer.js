@@ -603,18 +603,8 @@ const DrawerPastoralViewer = {
 
     contentEl.querySelector('#btn-drawer-pastoral-open-study')?.addEventListener('click', () => {
       const bestRef = (primPassages && primPassages[0]) || verseRef || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
-      if (typeof App !== 'undefined' && App.switchView) {
-        App.switchView('passage-study');
-        setTimeout(() => {
-          if (typeof PassageStudyView !== 'undefined') {
-            if (PassageStudyView.loadPassage) {
-              PassageStudyView.loadPassage(bestRef);
-            }
-            if (PassageStudyView.switchTab) {
-              PassageStudyView.switchTab('pastoral');
-            }
-          }
-        }, 120);
+      if (typeof BibleComparisonHub !== 'undefined') {
+        BibleComparisonHub.openMatrix(bestRef);
       }
     });
   },

@@ -2265,7 +2265,7 @@ const DictView = {
 
   async renderWikipedia(container, exactTitle = null) {
     const query = exactTitle || this.currentEntryData?.title || this.activeSlug || 'Bible';
-    container.innerHTML = `<div style="padding: 30px; color: var(--text-muted); text-align: center;"><div class="synth-spinner" style="width:24px; height:24px; border-width:2px; margin: 0 auto 12px auto;"></div>Chargement de l'article Wikipédia pour « ${query} »...</div>`;
+    container.innerHTML = `<div style="padding: 40px; display: flex; justify-content: center; align-items: center;"><div class="synth-spinner" style="width: 28px; height: 28px; border-width: 2.5px;"></div></div>`;
 
     try {
       const data = await API.call('get_wikipedia_summary', query, exactTitle);
@@ -2286,13 +2286,17 @@ const DictView = {
         <div class="wiki-top-nav" style="margin-bottom: 16px;">
           ${candidates.length > 1 ? `
             <div class="wiki-cloud-box">
-              <div class="wiki-cloud-label" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">Articles connexes :</div>
-              <div class="wiki-pills-bar" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                ${candidates.map(c => `
-                  <button class="dict-source-pill ${c.title.toLowerCase() === currentTitle.toLowerCase() ? 'active' : ''}" data-title="${c.title}">
-                    ${c.title}
-                  </button>
-                `).join('')}
+              <div class="wiki-cloud-label">Articles connexes :</div>
+              <div class="wiki-pills-bar">
+                ${candidates.map(c => {
+                  const isActive = c.title.toLowerCase() === currentTitle.toLowerCase();
+                  const tooltipText = (c.snippet ? `${c.title} — ${c.snippet}` : c.title).replace(/"/g, '&quot;');
+                  return `
+                    <button class="wiki-pill tier-${c.tier || 'md'} ${isActive ? 'active' : ''}" data-title="${c.title.replace(/"/g, '&quot;')}" title="${tooltipText}">
+                      ${c.title}
+                    </button>
+                  `;
+                }).join('')}
               </div>
             </div>
           ` : ''}

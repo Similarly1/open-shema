@@ -2844,10 +2844,10 @@ const MindMapView = {
   updateViewModeUI() {
     const isOutline = this.viewMode === 'outline';
 
-    // 0. Masquer le bandeau inférieur d'outils (dock) en mode plan
+    // 0. Masquer le bandeau inférieur d'outils (dock) en mode plan ou en lecture seule
     const dock = document.getElementById('mindmap-dock') || this.container?.querySelector('.mindmap-dock');
     if (dock) {
-      dock.classList.toggle('hidden', isOutline);
+      dock.classList.toggle('hidden', isOutline || !!this.isReadOnly);
     }
 
     // Niveau 2 : Affichage des outils du plan dans la sous-barre
@@ -3597,6 +3597,10 @@ const MindMapView = {
     if (!this.viewportG) return;
     if (this.container) {
       this.container.classList.toggle('is-read-only', !!this.isReadOnly);
+    }
+    const dock = document.getElementById('mindmap-dock') || this.container?.querySelector('.mindmap-dock');
+    if (dock && this.isReadOnly) {
+      dock.classList.add('hidden');
     }
     this.viewportG.innerHTML = '';
 

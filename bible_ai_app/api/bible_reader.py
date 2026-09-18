@@ -92,14 +92,17 @@ class BibleReaderMixin:
                 if is_empty_or_missing:
                     f_path = meta.get("file_path")
                     if not f_path or not os.path.exists(f_path):
-                        cand_sqlite = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}.sqlite")
-                        cand_sqlite_alt = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}1910.sqlite")
-                        cand_json = os.path.join(current_dir, "data", "bibles", f"{name.lower()}.json")
-                        cand_json_alt = os.path.join(current_dir, "data", "bibles", f"bible_{folder.lower()}.json")
-                        cand_json_ost = os.path.join(current_dir, "data", "bibles", f"bible-ostervald-1877.json")
-                        for cand in [cand_sqlite, cand_sqlite_alt, cand_json, cand_json_alt, cand_json_ost]:
-                            if os.path.exists(cand):
-                                f_path = cand
+                        from core.paths import resolve_data_path
+                        for cand in [
+                            f"bible_{folder.lower()}.sqlite",
+                            f"bible_{folder.lower()}1910.sqlite",
+                            f"{name.lower()}.json",
+                            f"bible_{folder.lower()}.json",
+                            "bible-ostervald-1877.json"
+                        ]:
+                            p = resolve_data_path("bibles", cand)
+                            if os.path.exists(p):
+                                f_path = p
                                 break
                     
                     if f_path and os.path.exists(f_path):
@@ -138,7 +141,8 @@ class BibleReaderMixin:
         """Extrait les 66 livres d'une Bible SQLite vers des fichiers JSON modulaires (ultra-rapide en mémoire)."""
         import sqlite3
         import time
-        dest_json_dir = os.path.join(current_dir, "data", "bibles", abbr)
+        from core.paths import get_user_data_path
+        dest_json_dir = get_user_data_path("bibles", abbr)
         os.makedirs(dest_json_dir, exist_ok=True)
         
         # Retry connection to bypass temporary file locks from Antivirus (Windows Defender)
@@ -303,8 +307,14 @@ class BibleReaderMixin:
         
         # Pré-chargement de la version d'interlinéaire inversé
         interlinear_book_data = None
-        target_inter = interlinear_version or "LSG"
-        if target_inter != bible_name:
+        raw_inter = str(interlinear_version or "LSG").strip().upper()
+        target_inter = "DARBY" if "DARBY" in raw_inter else "LSG"
+
+        current_has_strong = any(
+            '<w' in str(v) and 'strong=' in str(v) 
+            for v in list(verses_dict.values())[:3]
+        )
+        if not current_has_strong or target_inter != bible_name:
             interlinear_book_data = BibleJsonLoader.load_book(target_inter, book_code)
             if not interlinear_book_data and target_inter != "LSG":
                 interlinear_book_data = BibleJsonLoader.load_book("LSG", book_code)
@@ -360,16 +370,16 @@ class BibleReaderMixin:
                 if '<w' in inter_v_raw and 'strong=' in inter_v_raw:
                     words_data = parse_reverse_interlinear_verse(inter_v_raw)
 
-            # 3. Fallback de découpage en tokens simples
+            # 3. Fallback de découpage en tokens simples (sans orig fantaisiste)
             if not words_data:
                 for token in v_text.split():
                     clean_tok = token.strip(" ,;:.?!«»()\"'’")
                     if clean_tok:
                         words_data.append({
                             "surface": token,
-                            "orig": clean_tok,
+                            "orig": "",
                             "translit": "",
-                            "lemma": clean_tok,
+                            "lemma": "",
                             "strong": "",
                             "morph": "",
                             "lang": "fr"

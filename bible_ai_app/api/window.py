@@ -277,9 +277,47 @@ def on_commentary_shown(*args, **kwargs):
 
 
 class WindowMixin:
-    def get_window_state(self):
-        global _IS_MAXIMIZED, _IS_FULLSCREEN
+    def get_window_state(self, view_id: str = None) -> Dict[str, Any]:
+        global _IS_MAXIMIZED, _IS_FULLSCREEN, _DETACHED_MAXIMIZED
+        if view_id:
+            clean_view = str(view_id).replace("view-", "")
+            if clean_view in _DETACHED_MAXIMIZED:
+                return {"is_maximized": _DETACHED_MAXIMIZED[clean_view], "is_fullscreen": False}
         return {"is_maximized": _IS_MAXIMIZED, "is_fullscreen": _IS_FULLSCREEN}
+
+    def start_window_drag(self, view_id: str = None) -> Dict[str, Any]:
+        """Déclenche le déplacement natif Windows (Aero drag) pour la fenêtre active ou détachée."""
+        global _GLOBAL_WINDOW, _DETACHED_WINDOWS, _DETACHED_LOCK
+        hwnd = None
+        target_win = None
+        if view_id:
+            clean_view = str(view_id).replace("view-", "")
+            with _DETACHED_LOCK:
+                target_win = _DETACHED_WINDOWS.get(clean_view)
+
+        if not target_win:
+            target_win = _GLOBAL_WINDOW
+
+        if target_win and hasattr(target_win, 'native') and target_win.native:
+            try:
+                hwnd = target_win.native.Handle.ToInt32()
+            except Exception:
+                pass
+
+        if not hwnd and user32:
+            try:
+                hwnd = user32.GetForegroundWindow()
+            except Exception:
+                pass
+
+        if hwnd and user32:
+            try:
+                user32.ReleaseCapture()
+                user32.SendMessageW(hwnd, 0x00A1, 2, 0)  # WM_NCLBUTTONDOWN, HTCAPTION = 2
+                return {"success": True}
+            except Exception as e:
+                logger.debug(f"start_window_drag error: {e}")
+        return {"success": False}
 
     def show_system_notification(self, title: str = "Open Shema", message: str = "") -> Dict[str, Any]:
         """Affiche une notification native Windows Toast / Balloon en tâche de fond."""
@@ -846,6 +884,12 @@ class WindowMixin:
                             user32.SetWindowLongW(hwnd, GWL_STYLE, current_style | WS_THICKFRAME)
                             twx, twy, tww, twh = target_bounds
                             user32.SetWindowPos(hwnd, 0, twx, twy, tww, twh, 0x0040 | 0x0020)
+                    is_max = _DETACHED_MAXIMIZED.get(clean_view, False)
+                    if win:
+                        try:
+                            win.evaluate_js(f"window.App && window.App.updateWindowState && window.App.updateWindowState({str(is_max).lower()})")
+                        except Exception:
+                            pass
                 except Exception as sh_err:
                     logger.warning(f"Erreur on_detached_shown [{clean_view}]: {sh_err}")
 

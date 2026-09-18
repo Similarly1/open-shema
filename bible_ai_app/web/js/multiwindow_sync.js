@@ -58,12 +58,14 @@ const MultiwindowSync = {
           const v = parseInt(data.verse, 10) || 1;
           const activeView = App.activeView || App.detachedViewId;
 
-          if (activeView === 'passage-study' && typeof PassageStudyView !== 'undefined' && PassageStudyView.loadPassage) {
-            PassageStudyView.loadPassage(`${data.bookFrench || b} ${ch}`);
-          } else if (activeView === 'commentaries' && typeof CommentariesView !== 'undefined' && CommentariesView.loadCommentariesForPassage) {
+          if (activeView === 'commentaries' && typeof CommentariesView !== 'undefined' && CommentariesView.loadCommentariesForPassage) {
             CommentariesView.loadCommentariesForPassage(b, ch, v);
           } else if (activeView === 'articles' && typeof ArticlesView !== 'undefined' && ArticlesView.loadDrawerArticles) {
             ArticlesView.loadDrawerArticles(b, ch);
+          } else if (activeView === 'bible' && typeof BibleReader !== 'undefined' && BibleReader.navigateTo) {
+            if (BibleReader._isPreloaded && (BibleReader.currentBook !== b || BibleReader.currentChapter !== ch)) {
+              BibleReader.navigateTo(b, ch, v);
+            }
           }
         }
         break;

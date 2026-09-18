@@ -1,6 +1,8 @@
 import os
 import json
 import logging
+import threading
+import shutil
 
 logger = logging.getLogger(__name__)
 from core.paths import get_user_data_path, resolve_data_path, ensure_data_directories
@@ -559,21 +561,23 @@ DEFAULT_CURATOR_SYSTEM_PROMPT = """Vous êtes un assistant expert en épuration 
 Votre rôle est d'analyser ces extraits bruts et de produire pour chacun une synthèse ultra-dense et précise en conservant fidèlement toutes les définitions théologiques, arguments et références bibliques, tout en supprimant les bavardages et informations redondantes."""
 
 DEFAULTS = {
-    "curator_model": "mistralai/Ministral-3-14B-Instruct-2512",
-    "curator_fallback_model": "gemini-3.5-flash-lite",
-    "rag_curation_model": "mistralai/Ministral-3-14B-Instruct-2512",
-    "rag_curation_fallback_model": "gemini-3.5-flash-lite",
+    "global_ai_model": "gemini-flash-latest",
+    "global_ai_fallback_model": "gemini-flash-lite-latest",
+    "curator_model": "gemini-3.5-flash-lite",
+    "curator_fallback_model": "gemini-3.1-flash-lite",
+    "rag_curation_model": "gemini-3.5-flash-lite",
+    "rag_curation_fallback_model": "gemini-3.1-flash-lite",
     "curator_system_prompt": DEFAULT_CURATOR_SYSTEM_PROMPT,
-    "mindmap_ai_model": "gemini-3.7-flash",
-    "mindmap_ai_fallback_model": "gemini-3.5-flash-lite",
+    "mindmap_ai_model": "gemini-flash-latest",
+    "mindmap_ai_fallback_model": "gemini-flash-lite-latest",
     "mindmap_system_prompt": DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT,
     "mistral_api_key": "",
     "gemini_api_key": "",
     "infomaniak_token": "",
     "infomaniak_product_id": "251",
     "embedding_provider": "local",
-    "chat_model": "gemini-3.7-flash",
-    "chat_fallback_model": "gemini-3.5-flash-lite",
+    "chat_model": "gemini-flash-latest",
+    "chat_fallback_model": "gemini-flash-lite-latest",
     "theme": "dark",
     "theme_palette": "dark-slate",
     "first_run": True,
@@ -588,10 +592,10 @@ DEFAULTS = {
     "interlinear_show_translit": True,
     "interlinear_show_strong": True,
     "google_books_api_key": "",
-    "metadata_classifier_model": "gemini-3.5-flash-lite",
+    "metadata_classifier_model": "gemini-flash-lite-latest",
     "dict_polish_model": "mistralai/Mistral-Small-4-119B-2603",
-    "translation_model": "gemini-3.7-flash",
-    "translation_fallback_model": "gemini-3.5-flash-lite",
+    "translation_model": "gemini-flash-latest",
+    "translation_fallback_model": "gemini-flash-lite-latest",
     "translation_system_prompt": DEFAULT_TRANSLATION_SYSTEM_PROMPT,
     "max_original_verses_for_llm": 10,
     "show_section_titles": True,
@@ -599,30 +603,27 @@ DEFAULTS = {
     "full_width_reading": False,
     "notes_directory": "",
     "highlights_file": "",
-    "include_notes_in_ai": True,
+    "include_notes_in_ai": False,
     "include_upvr_in_ai": True,
     "enable_ai": True,
-    "synthesis_model": "gemini-3.7-flash",
-    "synthesis_fallback_model": "gemini-3.5-flash-lite",
+    "synthesis_model": "gemini-flash-latest",
+    "synthesis_fallback_model": "gemini-flash-lite-latest",
     "synthesis_max_verses": 5,
     "synthesis_system_prompt": DEFAULT_SYNTHESIS_SYSTEM_PROMPT,
     "intro_synthesis_system_prompt": DEFAULT_INTRO_SYNTHESIS_SYSTEM_PROMPT,
-    "summary_model": "gemini-3.7-flash",
-    "summary_fallback_model": "gemini-3.5-flash-lite",
+    "summary_model": "gemini-flash-latest",
+    "summary_fallback_model": "gemini-flash-lite-latest",
     "summary_word_count": 300,
-    "title_model": "gemini-3.7-flash",
-    "title_fallback_model": "gemini-3.5-flash-lite",
-    "notes_ai_model": "gemini-3.7-flash",
-    "notes_ai_fallback_model": "gemini-3.5-flash-lite",
-    "sermon_restructure_model": "gemini-3.7-flash",
-    "sermon_restructure_fallback_model": "gemini-3.5-flash-lite",
+    "title_model": "gemini-flash-latest",
+    "title_fallback_model": "gemini-flash-lite-latest",
+    "notes_ai_model": "gemini-flash-latest",
+    "notes_ai_fallback_model": "gemini-flash-lite-latest",
+    "sermon_restructure_model": "gemini-flash-latest",
+    "sermon_restructure_fallback_model": "gemini-flash-lite-latest",
     "sermon_restructure_system_prompt": DEFAULT_SERMON_RESTRUCTURE_SYSTEM_PROMPT,
-    "sermon_evaluation_model": "gemini-3.7-flash",
-    "sermon_evaluation_fallback_model": "gemini-3.5-flash-lite",
+    "sermon_evaluation_model": "gemini-flash-latest",
+    "sermon_evaluation_fallback_model": "gemini-flash-lite-latest",
     "prompt_sermon_evaluation": DEFAULT_SERMON_EVALUATION_SYSTEM_PROMPT,
-    "mindmap_ai_model": "gemini-3.7-flash",
-    "mindmap_ai_fallback_model": "gemini-3.5-flash-lite",
-    "mindmap_system_prompt": DEFAULT_MINDMAP_TRANSFORM_SYSTEM_PROMPT,
     "discovered_gemini_models": [],
     "discovered_mistral_models": [],
     "discovered_infomaniak_models": [],
@@ -638,14 +639,14 @@ DEFAULTS = {
     "prompt_note_title": DEFAULT_NOTE_TITLE_SYSTEM_PROMPT,
     "prompt_note_tags": DEFAULT_NOTE_TAGS_SYSTEM_PROMPT,
     # Conseiller de lecture & Équilibrage bibliographique
-    "library_advisor_model": "gemini-3.7-flash",
-    "library_advisor_fallback_model": "gemini-3.5-flash-lite",
+    "library_advisor_model": "gemini-flash-latest",
+    "library_advisor_fallback_model": "gemini-flash-lite-latest",
     "prompt_library_advisor": DEFAULT_LIBRARY_ADVISOR_SYSTEM_PROMPT,
     # Studio Audio (Podcasts & Chroniques Théologiques)
-    "audio_studio_axes_model": "gemini-3.7-flash",
-    "audio_studio_axes_fallback_model": "gemini-3.5-flash-lite",
-    "audio_studio_script_model": "gemini-3.7-flash",
-    "audio_studio_script_fallback_model": "gemini-3.5-flash-lite",
+    "audio_studio_axes_model": "gemini-flash-latest",
+    "audio_studio_axes_fallback_model": "gemini-flash-lite-latest",
+    "audio_studio_script_model": "gemini-flash-latest",
+    "audio_studio_script_fallback_model": "gemini-flash-lite-latest",
     "prompt_audio_studio_axes": DEFAULT_AUDIO_STUDIO_AXES_SYSTEM_PROMPT,
     "prompt_audio_studio_dialogue": DEFAULT_AUDIO_STUDIO_DIALOGUE_PROMPT,
     "prompt_audio_studio_solo": DEFAULT_AUDIO_STUDIO_SOLO_PROMPT,
@@ -711,7 +712,6 @@ DEFAULTS = {
     # Personnalisation et ordre des éléments du menu latéral (sidebar)
     "sidebar_menu": [
         {"id": "bible", "visible": True},
-        {"id": "passage-study", "visible": True},
         {"id": "commentaries", "visible": True},
         {"id": "theology", "visible": True},
         {"id": "articles", "visible": True},
@@ -759,12 +759,55 @@ def load_config(use_cache: bool = True):
     else:
         try:
             with open(cfg_file, "r", encoding="utf-8") as f:
-                config = json.load(f)
+                content = f.read()
+            try:
+                config = json.loads(content)
+            except json.JSONDecodeError as decode_err:
+                # Récupération résiliente en cas de données excédentaires après le JSON valide (ex: Extra data)
+                content_stripped = content.strip()
+                recovered = False
+                if content_stripped:
+                    try:
+                        recovered_obj, end_idx = json.JSONDecoder().raw_decode(content_stripped)
+                        if isinstance(recovered_obj, dict):
+                            logger.warning(
+                                "config.json contenait des données excédentaires après le JSON valide (fin à %d/%d caractères). Récupération automatique réussie.",
+                                end_idx, len(content_stripped)
+                            )
+                            config = recovered_obj
+                            recovered = True
+                            # Assainir immédiatement le fichier sur disque
+                            try:
+                                save_config(config)
+                            except Exception:
+                                pass
+                    except Exception:
+                        pass
+                if not recovered:
+                    raise decode_err
         except (json.JSONDecodeError, OSError) as e:
-            logger.warning(
-                "config.json illisible (%s). Utilisation des valeurs par défaut.", e
-            )
-            config = dict(DEFAULTS)
+            # En cas d'échec total, tenter de restaurer depuis la sauvegarde .bak
+            bak_file = cfg_file + ".bak"
+            recovered_from_bak = False
+            if os.path.exists(bak_file):
+                try:
+                    with open(bak_file, "r", encoding="utf-8") as bf:
+                        bak_config = json.load(bf)
+                    if isinstance(bak_config, dict):
+                        logger.warning(
+                            "config.json illisible (%s). Configuration restaurée depuis la sauvegarde %s.",
+                            e, bak_file
+                        )
+                        config = bak_config
+                        recovered_from_bak = True
+                except Exception:
+                    pass
+
+            if not recovered_from_bak:
+                logger.warning(
+                    "config.json illisible (%s). Utilisation des valeurs par défaut.", e
+                )
+                config = dict(DEFAULTS)
 
     # Synchroniser les alias de modèle curateur pour rétrocompatibilité
     if "rag_curation_model" in config and "curator_model" not in config:
@@ -782,6 +825,19 @@ def load_config(use_cache: bool = True):
         if key not in config:
             config[key] = default_val
 
+    # Migration / Nettoyage des anciennes vues obsolètes
+    if "sidebar_menu" in config and isinstance(config["sidebar_menu"], list):
+        filtered_menu = [
+            item for item in config["sidebar_menu"]
+            if (item.get("id") if isinstance(item, dict) else item) != "passage-study"
+        ]
+        if len(filtered_menu) != len(config["sidebar_menu"]):
+            config["sidebar_menu"] = filtered_menu
+            try:
+                save_config(config)
+            except Exception:
+                pass
+
     # Injecter automatiquement les secrets depuis le trousseau
     try:
         from core.secrets_manager import load_secrets_into_config
@@ -794,37 +850,61 @@ def load_config(use_cache: bool = True):
     _config_cache_ts = now
     return dict(config)
 
+_save_config_lock = threading.Lock()
+
 def save_config(config_dict):
-    """Sauvegarde la configuration sur disque.
+    """Sauvegarde la configuration sur disque de façon atomique et thread-safe.
 
     Sécurité : purge automatiquement les clés secrètes avant écriture pour garantir
     qu'une clé API injectée en mémoire via load_secrets_into_config() ne soit jamais
     persistée en clair dans config.json, même si l'appelant l'a oublié.
+    Garantit l'atomicité de l'écriture via fichier temporaire et os.replace pour
+    éviter toute corruption de fichier ou résidus en fin de document.
     """
     global _config_cache, _config_cache_ts
     target_path = get_config_path()
-    try:
-        # Purge des secrets avant écriture (filet de sécurité systématique)
+    with _save_config_lock:
+        tmp_path = target_path + ".tmp"
         try:
-            from core.secrets_manager import _SECRET_KEYS
-            clean_dict = dict(config_dict)
-            for k in _SECRET_KEYS:
-                if clean_dict.get(k):
-                    clean_dict[k] = ""
-        except Exception:
-            clean_dict = dict(config_dict)
+            # Purge des secrets avant écriture (filet de sécurité systématique)
+            try:
+                from core.secrets_manager import _SECRET_KEYS
+                clean_dict = dict(config_dict)
+                for k in _SECRET_KEYS:
+                    if clean_dict.get(k):
+                        clean_dict[k] = ""
+            except Exception:
+                clean_dict = dict(config_dict)
 
-        os.makedirs(os.path.dirname(target_path), exist_ok=True)
-        with open(target_path, "w", encoding="utf-8") as f:
-            json.dump(clean_dict, f, indent=4)
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                json.dump(clean_dict, f, indent=4)
+                f.flush()
+                os.fsync(f.fileno())
 
-        # Invalider le cache pour que le prochain load_config() recharge depuis le disque
-        _config_cache = None
-        _config_cache_ts = 0.0
+            # Sauvegarde de secours .bak avant remplacement atomique
+            bak_path = target_path + ".bak"
+            if os.path.exists(target_path):
+                try:
+                    shutil.copy2(target_path, bak_path)
+                except Exception:
+                    pass
 
-    except OSError as e:
-        logger.error(
-            "Impossible de sauvegarder la configuration (%s) : %s. "
-            "Vérifiez les droits d'écriture sur le dossier utilisateur.",
-            target_path, e
-        )
+            # Remplacement atomique
+            os.replace(tmp_path, target_path)
+
+            # Invalider le cache pour que le prochain load_config() recharge depuis le disque
+            _config_cache = None
+            _config_cache_ts = 0.0
+
+        except OSError as e:
+            logger.error(
+                "Impossible de sauvegarder la configuration (%s) : %s. "
+                "Vérifiez les droits d'écriture sur le dossier utilisateur.",
+                target_path, e
+            )
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except Exception:
+                    pass

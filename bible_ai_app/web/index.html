@@ -23,6 +23,7 @@
       try {
         if (window.location.search && window.location.search.indexOf('mode=detached') !== -1) {
           document.documentElement.classList.add('window-detached-mode');
+          window.__IS_DETACHED_MODE__ = true;
         }
       } catch (e) {}
     })();
@@ -1153,6 +1154,12 @@
   </style>
 </head>
 <body class="theme-dark window-maximized">
+  <script>
+    if (window.__IS_DETACHED_MODE__) {
+      document.body.classList.add('window-detached-mode');
+      document.body.classList.remove('window-maximized');
+    }
+  </script>
   <!-- BARRE DE TITRE UNIFIÉE AVEC RECHERCHE, ONGLETS ET CONTRÔLES WINDOWS -->
   <header class="app-window-titlebar" id="app-window-titlebar">
     <!-- GAUCHE : Zone de recherche rapide + bouton replier menu (sans bouton éclair) -->
@@ -1276,15 +1283,6 @@
             </svg>
           </span>
           <span class="nav-label">Bible</span>
-        </button>
-        <button class="nav-item" data-nav-id="passage-study" data-view="passage-study" id="nav-passage-study" title="Guide de Passage (Étude exégétique 360°)">
-          <span class="nav-icon">
-            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-            </svg>
-          </span>
-          <span class="nav-label">Guide de Passage</span>
         </button>
         <button class="nav-item" data-nav-id="commentaries" data-view="commentaries" id="nav-commentaries" title="Commentaires exégétiques">
           <span class="nav-icon">
@@ -1733,15 +1731,84 @@
               <span class="pill-arrow">▾</span>
             </button>
 
-            <button class="tool-btn" id="btn-toggle-split" title="Mode Double Colonne / Comparaison">
-              <span class="btn-icon" style="display: inline-flex; align-items: center;">
-                <svg class="btn-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="8" height="18" x="3" y="3" rx="1.5"/>
-                  <rect width="8" height="18" x="13" y="3" rx="1.5"/>
-                </svg>
-              </span>
-              <span class="btn-text">Double Vue</span>
-            </button>
+            <!-- Hub Unifié Comparer ▾ -->
+            <div class="reader-dropdown-wrap" style="position: relative; display: inline-flex;">
+              <button class="tool-btn" id="btn-reader-compare-menu" title="Outils de comparaison et synopse">
+                <span class="btn-icon" style="display: inline-flex; align-items: center;">
+                  <svg class="btn-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
+                  </svg>
+                </span>
+                <span class="btn-text">Comparer</span>
+                <span class="pill-arrow">▾</span>
+                <span id="badge-gospel-available" class="badge-dot-gospel hidden" title="Harmonie des Évangiles disponible sur ce passage"></span>
+              </button>
+
+              <!-- Popover Menu Comparer Déroulant -->
+              <div id="reader-compare-popover" class="compare-popover hidden">
+                <div class="compare-popover-header">
+                  <span class="compare-popover-title">Modes de comparaison</span>
+                </div>
+                <div class="compare-popover-items">
+                  <!-- 1. Double Vue (2 colonnes) avec Switch interactif -->
+                  <div class="compare-popover-card" id="btn-compare-opt-split">
+                    <div class="compare-card-left">
+                      <span class="compare-item-icon compare-icon-split">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="18" x="3" y="3" rx="1.5"/><rect width="8" height="18" x="13" y="3" rx="1.5"/></svg>
+                      </span>
+                      <div class="compare-item-info">
+                        <span class="compare-item-label">Double Vue (2 colonnes)</span>
+                        <span class="compare-item-desc">Lecture parallèle côte-à-côte</span>
+                      </div>
+                    </div>
+                    <div class="compare-card-right">
+                      <label class="compare-toggle-switch" title="Activer / désactiver la Double Vue">
+                        <input type="checkbox" id="compare-split-switch" tabindex="-1">
+                        <span class="toggle-track">
+                          <span class="toggle-thumb"></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- 2. Matrice Multi-Traductions -->
+                  <div role="button" tabindex="0" class="compare-popover-card" id="btn-compare-opt-matrix">
+                    <div class="compare-card-left">
+                      <span class="compare-item-icon compare-icon-matrix">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                      </span>
+                      <div class="compare-item-info">
+                        <span class="compare-item-label">Comparer les versions</span>
+                        <span class="compare-item-desc">Tableau multi-versions & variantes</span>
+                      </div>
+                    </div>
+                    <div class="compare-card-right">
+                      <span class="compare-card-arrow">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- 3. Harmonie des Évangiles -->
+                  <div role="button" tabindex="0" class="compare-popover-card" id="btn-compare-opt-synopsis">
+                    <div class="compare-card-left">
+                      <span class="compare-item-icon compare-icon-synopsis">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                      </span>
+                      <div class="compare-item-info">
+                        <span class="compare-item-label">Harmonie des Évangiles</span>
+                        <span class="compare-item-desc" id="compare-gospel-desc">Synopse en 4 colonnes</span>
+                      </div>
+                    </div>
+                    <div class="compare-card-right">
+                      <span class="compare-item-badge-gospel" id="compare-gospel-badge-text">Évangiles</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <button class="tool-btn active hidden" id="btn-toggle-sync-scroll" title="Synchroniser le défilement des deux Bibles (alignement premier verset visible)">
               <span class="btn-icon" style="display: inline-flex; align-items: center;">
@@ -1788,7 +1855,7 @@
               <div class="pane-actions">
                 <span id="pane-1-vintage-badge" class="vintage-epoch-pill hidden"></span>
                 <button class="pane-action-btn" id="pane-1-select-bible" title="Changer de version biblique">
-                  <span id="pane-1-bible-name">TOB 2010</span> ▾
+                  <span id="pane-1-bible-name">Bible</span> ▾
                 </button>
               </div>
             </div>
@@ -1822,6 +1889,38 @@
               </div>
             </div>
           </article>
+        </div>
+
+        <!-- OVERLAY DU STUDIO DE COMPARAISON & SYNOPSE -->
+        <div id="reader-comparison-overlay" class="reader-comparison-overlay hidden">
+          <div class="comp-overlay-backdrop" id="comp-overlay-backdrop"></div>
+          <div class="comp-overlay-window" id="comp-overlay-window">
+            <header class="comp-overlay-header">
+              <div class="comp-overlay-title-group">
+                <span class="comp-overlay-icon" id="comp-overlay-mode-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                </span>
+                <div>
+                  <h3 class="comp-overlay-title" id="comp-overlay-title">Comparaison des versions</h3>
+                  <div class="comp-overlay-subtitle" id="comp-overlay-subtitle">Chargement...</div>
+                </div>
+              </div>
+
+              <!-- Contrôles d'en-tête de comparaison -->
+              <div class="comp-overlay-header-actions">
+                <button type="button" class="tool-btn icon-only" id="btn-comp-overlay-fullscreen" title="Agrandir / Plein écran">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+                <button type="button" class="tool-btn icon-only" id="btn-comp-overlay-close" title="Fermer (Échap)">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            </header>
+
+            <div class="comp-overlay-body" id="comp-overlay-body">
+              <!-- Injecté dynamiquement : Matrice multi-versions OU Harmonie des Évangiles -->
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2389,7 +2488,7 @@
               <div class="card-title">Intégration dans les Réponses de l'Assistant IA</div>
               <div class="checkbox-group">
                 <label class="custom-checkbox">
-                  <input type="checkbox" id="cfg-include-notes-ai" checked>
+                  <input type="checkbox" id="cfg-include-notes-ai">
                   <span>Inclure les notes personnelles dans le contexte de l'assistant IA</span>
                 </label>
                 <p style="font-size: 11px; color: var(--text-muted); margin-left: 24px; margin-top: 4px;">
@@ -2577,6 +2676,173 @@
             </div>
 
             <div class="ai-sub-config" id="sec-ai-sub-config">
+              
+              <!-- Carte 1 : Fournisseurs & Clés API (En tête) -->
+              <div class="settings-card" id="card-ai-providers">
+                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #3b82f6);"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01M12 12h.01"/></svg>
+                    <span>Fournisseurs &amp; Clés API</span>
+                  </div>
+                  <span style="font-size: 11.5px; font-weight: 500; color: var(--text-secondary);">Synchronisation en direct</span>
+                </div>
+                <p class="card-desc" style="margin-bottom: 14px;">
+                  Renseignez votre clé API. Les modèles compatibles sont immédiatement vérifiés et synchronisés en direct depuis le fournisseur.
+                </p>
+
+                <div class="ai-providers-grid">
+                  <!-- Fournisseur 1 : Google Gemini -->
+                  <div class="ai-provider-card" id="provider-card-google">
+                    <div class="ai-provider-header">
+                      <div class="ai-provider-brand">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #4285F4;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                        <div>
+                          <div class="ai-provider-title">Google Gemini</div>
+                          <div class="ai-provider-desc">Flash (recommandé) &amp; Flash Lite ultra-rapides</div>
+                        </div>
+                      </div>
+                      <div class="ai-provider-status-badge" id="badge-provider-status-google">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+                        <span id="badge-provider-text-google">Non configuré</span>
+                      </div>
+                    </div>
+                    <div class="ai-input-action-group">
+                      <div class="ai-key-input-wrapper">
+                        <input type="password" id="cfg-gemini-key" class="text-field full-w" placeholder="Collez votre clé Google AI Studio (AIzaSy...)">
+                        <button type="button" class="ai-key-toggle-btn" id="btn-toggle-show-gemini-key" title="Afficher ou masquer la clé">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                      </div>
+                      <button type="button" class="btn-secondary btn-sm" id="btn-fetch-gemini-models" style="display: flex; align-items: center; gap: 6px; white-space: nowrap; height: 36px; padding: 0 12px;">
+                        <svg id="svg-btn-fetch-gemini" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>Actualiser</span>
+                      </button>
+                    </div>
+                    <div class="ai-provider-footer">
+                      <a href="https://aistudio.google.com/app/apikey" target="_blank" class="ai-provider-link">
+                        <span>Obtenir une clé API gratuite sur Google AI Studio</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Fournisseur 2 : Mistral AI -->
+                  <div class="ai-provider-card" id="provider-card-mistral">
+                    <div class="ai-provider-header">
+                      <div class="ai-provider-brand">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #FF7000;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <div>
+                          <div class="ai-provider-title">Mistral AI</div>
+                          <div class="ai-provider-desc">Modèles souverains européens — Large, Small, Codestral</div>
+                        </div>
+                      </div>
+                      <div class="ai-provider-status-badge" id="badge-provider-status-mistral">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+                        <span id="badge-provider-text-mistral">Non configuré</span>
+                      </div>
+                    </div>
+                    <div class="ai-input-action-group">
+                      <div class="ai-key-input-wrapper">
+                        <input type="password" id="cfg-mistral-key" class="text-field full-w" placeholder="Collez votre clé API Mistral">
+                        <button type="button" class="ai-key-toggle-btn" id="btn-toggle-show-mistral-key" title="Afficher ou masquer la clé">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                      </div>
+                      <button type="button" class="btn-secondary btn-sm" id="btn-fetch-mistral-models" style="display: flex; align-items: center; gap: 6px; white-space: nowrap; height: 36px; padding: 0 12px;">
+                        <svg id="svg-btn-fetch-mistral" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>Actualiser</span>
+                      </button>
+                    </div>
+                    <div class="ai-provider-footer">
+                      <a href="https://console.mistral.ai/api-keys/" target="_blank" class="ai-provider-link">
+                        <span>Obtenir une clé sur La Plateforme Mistral AI</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Fournisseur 3 : Infomaniak Swiss AI -->
+                  <div class="ai-provider-card" id="provider-card-infomaniak">
+                    <div class="ai-provider-header">
+                      <div class="ai-provider-brand">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #E53935;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                        <div>
+                          <div class="ai-provider-title">Infomaniak Swiss AI</div>
+                          <div class="ai-provider-desc">Hébergement souverain suisse (Mistral Small, Ministral)</div>
+                        </div>
+                      </div>
+                      <div class="ai-provider-status-badge" id="badge-provider-status-infomaniak">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+                        <span id="badge-provider-text-infomaniak">Non configuré</span>
+                      </div>
+                    </div>
+                    <div class="ai-input-action-group">
+                      <div class="ai-key-input-wrapper" style="flex: 2;">
+                        <input type="password" id="cfg-infomaniak-token" class="text-field full-w" placeholder="Token API Infomaniak">
+                        <button type="button" class="ai-key-toggle-btn" id="btn-toggle-show-infomaniak-token" title="Afficher ou masquer le token">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                      </div>
+                      <div style="flex: 1;">
+                        <input type="text" id="cfg-infomaniak-pid" class="text-field full-w" placeholder="Product ID (ex: 251)">
+                      </div>
+                      <button type="button" class="btn-secondary btn-sm" id="btn-fetch-infomaniak-models" style="display: flex; align-items: center; gap: 6px; white-space: nowrap; height: 36px; padding: 0 12px;">
+                        <svg id="svg-btn-fetch-infomaniak" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>Actualiser</span>
+                      </button>
+                    </div>
+                    <div class="ai-provider-footer">
+                      <a href="https://manager.infomaniak.com" target="_blank" class="ai-provider-link">
+                        <span>Console Infomaniak AI Tools</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Carte 2 : Modèles Globaux (Sélection Unique & Directe) -->
+              <div class="settings-card ai-global-card" id="card-ai-global-models">
+                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue, #3b82f6);"><circle cx="12" cy="12" r="10"/><path d="m12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    <span>Modèles d'Intelligence Artificielle (Par Défaut)</span>
+                  </div>
+                  <span class="prompt-status-badge is-default" style="font-size: 11px;">Configuration Globale</span>
+                </div>
+                <p class="card-desc" style="margin-bottom: 16px;">
+                  Ces modèles sont automatiquement appliqués à l'ensemble des modules de l'application (Assistant d'étude, Synthèses exégétiques, Traductions, Notes, Prédication et Audio).
+                </p>
+
+                <div class="form-row two-cols">
+                  <div class="form-group">
+                    <label for="cfg-global-ai-model" style="font-weight: 600;">Modèle Principal Global :</label>
+                    <select id="cfg-global-ai-model" class="select-field full-w ai-model-select">
+                      <option value="gemini-flash-latest" selected>Google Gemini Flash (Dernière version stable)</option>
+                    </select>
+                    <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Utilisé en priorité pour toutes vos requêtes exégétiques et analyses.</p>
+                  </div>
+                  <div class="form-group">
+                    <label for="cfg-global-ai-fallback-model" style="font-weight: 600;">Modèle de Secours Global (Fallback) :</label>
+                    <select id="cfg-global-ai-fallback-model" class="select-field full-w ai-model-select">
+                      <option value="gemini-flash-lite-latest" selected>Google Gemini Flash Lite (Dernière version stable)</option>
+                    </select>
+                    <p class="field-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Relais automatique en cas de dépassement de quota (429) ou latence réseau.</p>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                  <button type="button" class="btn-secondary btn-sm" id="btn-open-models-visibility-modal" style="display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>Gérer les modèles visibles &amp; quotas RPD</span>
+                  </button>
+                  <span style="font-size: 11.5px; color: var(--text-secondary);" id="badge-models-active-count">Modèles synchronisés</span>
+                </div>
+              </div>
+
               <!-- Carte Profil Théologique & Herméneutique -->
               <div class="settings-card theological-profile-card">
                 <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
@@ -2613,7 +2879,7 @@
                   </div>
                 </div>
 
-                <!-- Ligne Passeport Herméneutique (Même design que les cartes de system prompts) -->
+                <!-- Ligne Passeport Herméneutique -->
                 <div class="prompt-setting-card" id="prompt-card-theological-profile" style="margin-top: 14px; border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.04);">
                   <div class="prompt-card-main">
                     <div class="prompt-card-header">
@@ -2640,38 +2906,20 @@
                 </div>
               </div>
 
-              <!-- Carte Compacte : Gestion des Modèles Visibles & Quotas -->
-              <div class="prompt-setting-card" id="card-models-visibility-compact" style="margin-bottom: 20px; border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.03);">
-                <div class="prompt-card-main">
-                  <div class="prompt-card-header">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                      <strong class="prompt-card-title">Modèles Actifs &amp; Visibilité (Filtre Quotas RPD)</strong>
-                    </div>
-                    <span class="prompt-status-badge is-custom" id="badge-models-active-count">0 modèle(s) actif(s)</span>
+              <!-- Accordéon 1 : Personnalisation Détaillée par Fonctionnalité (13 Outils) -->
+              <details class="settings-accordion-details" id="details-per-tool-models">
+                <summary class="settings-accordion-summary">
+                  <div class="accordion-title-group">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #3b82f6);"><line x1="4" x2="20" y1="21" y2="21"/><line x1="4" x2="20" y1="14" y2="14"/><line x1="4" x2="20" y1="7" y2="7"/><circle cx="8" cy="21" r="2"/><circle cx="16" cy="14" r="2"/><circle cx="10" cy="7" r="2"/></svg>
+                    <span>Personnalisation Détaillée par Fonctionnalité (13 Outils)</span>
+                    <span class="prompt-status-badge is-default" style="font-size: 10.5px; padding: 2px 8px;">Optionnel</span>
                   </div>
-                  <p class="prompt-card-desc">Cochez ou décochez les modèles IA (Gemini 3.x/2.x, Mistral, Infomaniak) pour masquer ceux à 0 RPD ou inutilisés dans tous les menus déroulants.</p>
-                </div>
-                <div class="prompt-card-actions">
-                  <button type="button" class="btn-secondary btn-sm" id="btn-open-models-visibility-modal">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M12 20h9"></path>
-                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                    <span>Gérer les modèles</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="settings-card">
-                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
-                  <span>Modèles d'Intelligence Artificielle</span>
-                  <span style="font-size: 11.5px; font-weight: 500; color: var(--text-secondary);">Assignation par fonctionnalité</span>
-                </div>
-                <p class="card-desc" style="margin-bottom: 16px;">Configurez le modèle principal et le modèle de secours (fallback automatique) pour chaque fonctionnalité exégétique.</p>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="settings-accordion-body">
+                  <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Définissez des modèles spécifiques pour certaines tâches si vous souhaitez déroger aux modèles globaux définis ci-dessus.
+                  </p>
               
                 <!-- Bloc 1 : Assistant & Chat Biblique -->
                 <div class="ai-model-feature-block">
@@ -3358,36 +3606,36 @@
                     </div>
                     <span class="ai-model-feature-badge">Pipeline RAG</span>
                   </div>
+
+                  <div class="ai-curator-hint-box" style="margin: 8px 0 14px 0; padding: 10px 14px; background: rgba(59, 130, 246, 0.07); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; font-size: 12px; color: var(--text-secondary); line-height: 1.45; display: flex; align-items: flex-start; gap: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary, #3b82f6); flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <div>
+                      <strong style="color: var(--text-primary); font-weight: 600;">Recommandation vitale de performance :</strong>
+                      Le curateur analyse et synthétise chaque extrait de commentaire avant la rédaction finale. Il est impératif d'utiliser un <strong>modèle ultra-léger et rapide</strong> (ex: <em>Gemini 3.5 Flash Lite</em>, <em>Gemini 3.1 Flash Lite</em> ou <em>Mistral Small</em>). Utiliser un modèle lourd multiplierait considérablement le temps d'attente (jusqu'à plusieurs minutes par réponse) !
+                    </div>
+                  </div>
+
                   <div class="form-row two-cols">
                     <div class="form-group">
                       <label for="cfg-curator-model">Modèle curateur principal :</label>
                       <select id="cfg-curator-model" class="select-field full-w ai-model-select" data-pair="curator">
-                        <optgroup label="── Infomaniak Swiss AI ──">
-                          <option value="mistralai/Ministral-3-14B-Instruct-2512" selected>Infomaniak Ministral 14B (Recommandé)</option>
-                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
-                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
-                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
-                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
-                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
-                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
-                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
-                        </optgroup>
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
+                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite (Recommandé)</option>
+                          <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
+                          <option value="gemini-flash-lite-latest">Google Gemini Flash Lite Latest</option>
+                          <option value="gemini-flash-latest">Google Gemini Flash Latest</option>
                           <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
-                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
-                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
+                          <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
-                          <option value="mistral-small-latest">Mistral Small (Rapide)</option>
-                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="mistral-small-latest">Mistral Small (Rapide — Recommandé)</option>
                           <option value="open-mistral-nemo">Mistral Nemo</option>
-                          <option value="codestral-latest">Mistral Codestral</option>
+                          <option value="ministral-8b-latest">Ministral 8B</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral Small (Recommandé)</option>
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
+                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
                         </optgroup>
                       </select>
                     </div>
@@ -3395,30 +3643,20 @@
                       <label for="cfg-curator-fallback-model">Modèle de secours (Fallback) :</label>
                       <select id="cfg-curator-fallback-model" class="select-field full-w ai-model-select" data-pair="curator">
                         <optgroup label="── Google Gemini ──">
-                          <option value="gemini-3.5-flash-lite" selected>Google Gemini 3.5 Flash Lite</option>
-                          <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-                          <option value="gemini-3.7-flash">Google Gemini 3.7 Flash</option>
+                          <option value="gemini-3.1-flash-lite" selected>Google Gemini 3.1 Flash Lite (Recommandé en secours)</option>
+                          <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash Lite</option>
+                          <option value="gemini-flash-lite-latest">Google Gemini Flash Lite Latest</option>
+                          <option value="gemini-2.5-flash-lite">Google Gemini 2.5 Flash Lite</option>
                           <option value="gemini-2.0-flash-lite">Google Gemini 2.0 Flash Lite</option>
-                          <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                          <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
-                          <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
-                          <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
-                        </optgroup>
-                        <optgroup label="── Infomaniak Swiss AI ──">
-                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B</option>
-                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral 119B</option>
-                          <option value="Qwen/Qwen3.5-397B-A17B-FP8">Infomaniak Qwen 3.5 397B</option>
-                          <option value="Qwen/Qwen3.5-122B-A10B-FP8">Infomaniak Qwen 3.5 122B</option>
-                          <option value="swiss-ai/Apertus-v1.5-70B">Infomaniak Apertus 70B</option>
-                          <option value="google/gemma-4-31B-it">Infomaniak Gemma 31B</option>
-                          <option value="moonshotai/Kimi-K2.6">Infomaniak Kimi K2.6</option>
-                          <option value="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8">Infomaniak Nemotron 30B</option>
                         </optgroup>
                         <optgroup label="── Mistral AI ──">
-                          <option value="mistral-small-latest">Mistral Small</option>
-                          <option value="mistral-large-latest">Mistral Large</option>
+                          <option value="mistral-small-latest">Mistral Small (Rapide — Recommandé)</option>
                           <option value="open-mistral-nemo">Mistral Nemo</option>
-                          <option value="codestral-latest">Mistral Codestral</option>
+                          <option value="ministral-8b-latest">Ministral 8B</option>
+                        </optgroup>
+                        <optgroup label="── Infomaniak Swiss AI ──">
+                          <option value="mistralai/Ministral-3-14B-Instruct-2512">Infomaniak Ministral 14B (Recommandé en secours)</option>
+                          <option value="mistralai/Mistral-Small-4-119B-2603">Infomaniak Mistral Small</option>
                         </optgroup>
                       </select>
                     </div>
@@ -3515,19 +3753,21 @@
                   </p>
                 </div>
 
-              <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
-              
-              <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                <span>Prompts Système Personnalisés</span>
-              </div>
-              <p class="card-desc">Consultez et personnalisez confortablement les instructions fondamentales envoyées aux modèles d'IA pour chaque mode d'étude et fonctionnalité.</p>
+                </div>
+              </details>
+
+              <!-- Accordéon 2 : Directives & Prompts Système Personnalisés -->
+              <details class="settings-accordion-details" id="details-system-prompts">
+                <summary class="settings-accordion-summary">
+                  <div class="accordion-title-group">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>Directives &amp; Prompts Système Personnalisés</span>
+                    <span class="prompt-status-badge is-default" style="font-size: 10.5px; padding: 2px 8px;">Avancé</span>
+                  </div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="settings-accordion-body">
+                  <p class="card-desc" style="margin-top: 0; margin-bottom: 14px;">Consultez et personnalisez confortablement les instructions fondamentales envoyées aux modèles d'IA pour chaque mode d'étude et fonctionnalité.</p>
 
               <!-- SOUS-SECTION 1 : MODES DE CHAT & D'ANALYSE IA -->
               <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 18px 0 10px 0; display: flex; align-items: center; gap: 6px;">
@@ -4077,32 +4317,9 @@
                   </div>
                   <textarea id="cfg-prompt-library-advisor" style="display: none;"></textarea>
                 </div>
-              </div>
-
-              <div class="form-divider" style="margin: 20px 0 16px 0;"></div>
-              <div class="card-title">Clés API</div>
-
-              <div class="form-row two-cols">
-                <div class="form-group">
-                  <label>Clé API Gemini :</label>
-                  <input type="password" id="cfg-gemini-key" class="text-field full-w" placeholder="Clé Google AI Studio">
-                </div>
-                <div class="form-group">
-                  <label>Clé API Mistral :</label>
-                  <input type="password" id="cfg-mistral-key" class="text-field full-w" placeholder="Clé La Plateforme Mistral">
                 </div>
               </div>
-
-              <div class="form-row two-cols">
-                <div class="form-group">
-                  <label>Token Infomaniak AI :</label>
-                  <input type="password" id="cfg-infomaniak-token" class="text-field full-w" placeholder="Token API">
-                </div>
-                <div class="form-group">
-                  <label>Product ID Infomaniak :</label>
-                  <input type="text" id="cfg-infomaniak-pid" class="text-field full-w" placeholder="ex: 251">
-                </div>
-              </div>
+            </details>
 
               <!-- Carte : Notifications de fin de génération IA -->
               <div class="settings-card" id="card-ai-notifications" style="margin-top: 18px;">
@@ -4251,7 +4468,6 @@
             </div>
           </div>
           <!-- Fin de la Section IA -->
-          </div>
 
           <!-- Section 5b : Articles & Blogs Théologiques -->
           <div class="settings-section" id="sec-articles">
@@ -4916,8 +5132,8 @@
                     </label>
                     <select id="ai-opt-thinking-level" class="select-field full-w" style="font-size: 12.5px; height: 36px; padding: 0 8px; border-radius: 6px;">
                       <option value="off">Désactivé (Direct)</option>
-                      <option value="low">Faible (1K)</option>
-                      <option value="medium" selected>Moyen (4K)</option>
+                      <option value="low" selected>Faible (1K)</option>
+                      <option value="medium">Moyen (4K)</option>
                       <option value="high">Élevé (16K)</option>
                     </select>
                   </div>
@@ -4930,9 +5146,9 @@
                     <span>Profondeur / Style</span>
                   </label>
                   <select id="ai-opt-depth" class="select-field full-w" style="font-size: 13px; height: 36px; padding: 0 10px; border-radius: 6px;">
-                    <option value="academic" selected>Académique & Approfondi</option>
+                    <option value="academic">Académique & Approfondi</option>
                     <option value="pastoral">Pastoral & Équilibré</option>
-                    <option value="concise">Synthétique & Concis</option>
+                    <option value="concise" selected>Synthétique & Concis</option>
                   </select>
                 </div>
 
@@ -4948,7 +5164,7 @@
                       <span>Reranking sémantique local (BGE-M3)</span>
                     </label>
                     <label style="font-size: 12.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
-                      <input type="checkbox" id="ai-opt-curator" style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
+                      <input type="checkbox" id="ai-opt-curator" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;">
                       <span>LLM Curateur intermédiaire</span>
                     </label>
                   </div>
@@ -5007,7 +5223,7 @@
                       <input type="checkbox" id="ai-opt-src-articles" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Articles</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--text-primary);">
-                      <input type="checkbox" id="ai-opt-src-notes" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Notes (.md)</span>
+                      <input type="checkbox" id="ai-opt-src-notes" style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Notes (.md)</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 7px; cursor: pointer; color: var(--text-primary);" title="Corpus pastoral Un pasteur vous répond (Florent Varak)">
                       <input type="checkbox" id="ai-opt-src-upvr" checked style="accent-color: var(--accent-orange); width: 15px; height: 15px;"> <span>Textes UPVR</span>
@@ -8245,156 +8461,7 @@
       </div>
 
       <!-- ===================================================== -->
-      <!-- VUE K : GUIDE DE PASSAGE (ÉTUDE EXÉGÉTIQUE À 360°)     -->
-      <!-- ===================================================== -->
-      <div class="app-view" id="view-passage-study">
-        <!-- BARRE SUPÉRIEURE : Recherche, Navigation & Actions -->
-        <header class="view-header ps-view-header">
-          <div class="ps-header-left">
-            <div class="ps-search-group">
-              <svg class="ps-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.3-4.3"></path>
-              </svg>
-              <input type="text" id="ps-search-input" class="search-field ps-search-field" placeholder="Entrez un passage (ex: Philippiens 2:5-11, Romains 8:1-17, Genèse 22)..." autocomplete="off">
-              <button class="tool-btn icon-only" id="btn-ps-search" title="Analyser ce passage">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
-
-            <!-- Suggestions de passages rapides -->
-            <div class="ps-quick-chips">
-              <button type="button" class="ps-quick-chip" data-ref="Philippiens 2:5-11">Phil 2:5-11</button>
-              <button type="button" class="ps-quick-chip" data-ref="Romains 8:1-17">Rom 8:1-17</button>
-              <button type="button" class="ps-quick-chip" data-ref="Genèse 22:1-19">Gen 22</button>
-              <button type="button" class="ps-quick-chip" data-ref="Psaume 23">Psaume 23</button>
-              <button type="button" class="ps-quick-chip" data-ref="Jean 3:16-21">Jean 3:16-21</button>
-              <button type="button" class="ps-quick-chip" data-ref="Éphésiens 2:1-10">Eph 2:1-10</button>
-            </div>
-          </div>
-
-          <div class="ps-header-center">
-            <div class="ps-pericope-nav-group">
-              <button class="tool-btn icon-only" id="btn-ps-prev-pericope" title="Péricope précédente">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-              </button>
-              <div class="ps-headline-box">
-                <div class="ps-headline-ref" id="ps-header-ref">Philippiens 2:5–11</div>
-                <div class="ps-headline-title hidden" id="ps-header-pericope">L'abaissement et l'élévation de Jésus-Christ</div>
-              </div>
-              <button class="tool-btn icon-only" id="btn-ps-next-pericope" title="Péricope suivante">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="view-actions ps-header-actions">
-            <button class="tool-btn" id="btn-ps-sync-bible" title="Prendre le passage actif du lecteur Bible">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-              <span>Synchroniser Bible</span>
-            </button>
-            <button class="tool-btn primary" id="btn-ps-export-note" title="Enregistrer l'étude complète du passage dans vos notes Markdown">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Exporter en Note</span>
-            </button>
-          </div>
-        </header>
-
-        <!-- BARRE D'ONGLETS THÉMATIQUES DU PASSAGE -->
-        <nav class="ps-nav-tabs-bar">
-          <button type="button" class="ps-nav-tab active" data-tab="scripture">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            <span>Texte & Synoptique</span>
-          </button>
-          <button type="button" class="ps-nav-tab" data-tab="original">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h14Z"/><path d="M16 17v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
-            <span>Langue Originale</span>
-          </button>
-          <button type="button" class="ps-nav-tab" data-tab="commentaries">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span>Commentaires & Synthèse</span>
-          </button>
-          <button type="button" class="ps-nav-tab" data-tab="encyclopedia">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>Contexte & Lieux</span>
-          </button>
-          <button type="button" class="ps-nav-tab" data-tab="pastoral">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
-            <span>Questions Pastorales</span>
-          </button>
-          <button type="button" class="ps-nav-tab ai-feature-only" data-tab="ai">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-            <span>Atelier Exégèse IA</span>
-          </button>
-          <button type="button" class="ps-nav-tab" data-tab="notes">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span>Notes Personnelles</span>
-          </button>
-        </nav>
-
-        <!-- ESPACE DE TRAVAIL DU GUIDE DE PASSAGE -->
-        <div class="ps-workspace-scroll" id="ps-workspace-scroll">
-          <!-- LOADER GLOBAL -->
-          <div class="ps-global-loader hidden" id="ps-global-loader">
-            <div class="ps-loader-content">
-              <div class="ps-spinner"></div>
-              <div class="ps-loader-text">Chargement et agrégation des données du passage...</div>
-            </div>
-          </div>
-
-          <!-- PANNEAU 1 : TEXTE & SYNOPTIQUE -->
-          <div class="ps-tab-panel active" id="ps-panel-scripture">
-            <div class="ps-panel-container" id="ps-content-scripture">
-              <!-- Injecté dynamiquement par PassageStudyView -->
-            </div>
-          </div>
-
-          <!-- PANNEAU 2 : LANGUE ORIGINALE -->
-          <div class="ps-tab-panel" id="ps-panel-original">
-            <div class="ps-panel-container" id="ps-content-original">
-              <!-- Injecté dynamiquement par PassageStudyView -->
-            </div>
-          </div>
-
-          <!-- PANNEAU 3 : COMMENTAIRES & SYNTHÈSE -->
-          <div class="ps-tab-panel" id="ps-panel-commentaries">
-            <div class="ps-panel-container" id="ps-content-commentaries">
-              <!-- Injecté dynamiquement par PassageStudyView -->
-            </div>
-          </div>
-
-          <!-- PANNEAU 4 : CONTEXTE & LIEUX -->
-          <div class="ps-tab-panel" id="ps-panel-encyclopedia">
-            <div class="ps-panel-container" id="ps-content-encyclopedia">
-              <!-- Injecté dynamiquement par PassageStudyView -->
-            </div>
-          </div>
-
-          <!-- PANNEAU 5 : QUESTIONS PASTORALES (ASK PASTOR JOHN) -->
-          <div class="ps-tab-panel" id="ps-panel-pastoral">
-            <div class="ps-panel-container" id="ps-content-pastoral">
-              <!-- Injecté dynamiquement par PassageStudyView -->
-            </div>
-          </div>
-
-          <!-- PANNEAU 6 : ATELIER EXÉGÈSE IA -->
-          <div class="ps-tab-panel ai-feature-only" id="ps-panel-ai">
-            <div class="ps-panel-container" id="ps-content-ai">
-              <!-- Injecté dynamiquement par PassageStudyView -->
-            </div>
-          </div>
-
-          <!-- PANNEAU 7 : NOTES PERSONNELLES -->
-          <div class="ps-tab-panel" id="ps-panel-notes">
-            <div class="ps-panel-container" id="ps-content-notes">
-              <!-- Injecté dynamiquement par PassageStudyView -->
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===================================================== -->
-      <!-- VUE K : ARTICLES & BLOGS THÉOLOGIQUES -->
+      <!-- VUE : ARTICLES & BLOGS THÉOLOGIQUES                   -->
       <!-- ===================================================== -->
       <div class="app-view" id="view-articles">
         <div class="articles-view-container">
@@ -12062,7 +12129,7 @@ Recevons ce don gratuit dans la prière.</code></pre>
   <script src="js/dict_view.js?v=3.3"></script>
   <script src="js/leaflet.js"></script>
   <script src="js/maps_view.js"></script>
-  <script src="js/passage_study_view.js?v=5.1"></script>
+  <script src="js/bible_comparison_hub.js?v=5.2"></script>
   <script src="js/selection_context_menu.js"></script>
   <script src="js/highlighter.js"></script>
   <script src="js/theological_profile_modal.js"></script>

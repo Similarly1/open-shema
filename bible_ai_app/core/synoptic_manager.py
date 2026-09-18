@@ -18,6 +18,25 @@ GOSPEL_ABBR = {
     "LUK": "Lc",
     "JHN": "Jn"
 }
+GOSPEL_FRENCH = {
+    "MAT": "Matthieu",
+    "MRK": "Marc",
+    "LUK": "Luc",
+    "JHN": "Jean",
+    "Mat": "Matthieu",
+    "Mar": "Marc",
+    "Luk": "Luc",
+    "Joh": "Jean"
+}
+
+def format_gospel_ref_fr(raw_ref: str) -> str:
+    """Convertit une référence USFM comme 'MAT 9:1-8' ou 'MRK 2:1-12' en notation française 'Mt 9:1-8' ou 'Mc 2:1-12'."""
+    if not raw_ref:
+        return ""
+    txt = raw_ref.strip()
+    for eng_code, fr_abbr in GOSPEL_ABBR.items():
+        txt = re.sub(rf'^{eng_code}\b', fr_abbr, txt, flags=re.IGNORECASE)
+    return txt
 
 def normalize_gospel_code(b_code: Optional[str]) -> Optional[str]:
     """Normalise n'importe quel code de livre (USFM, standard interne ou français) vers MAT, MRK, LUK ou JHN."""
@@ -152,10 +171,10 @@ class SynopticManager:
                             short_badge += f":{other_data['start_v']}-{other_data['end_v']}"
                     parallels.append({
                         "book": other_b,
-                        "french_book": get_french_book_name(other_b),
+                        "french_book": GOSPEL_FRENCH.get(other_b, get_french_book_name(other_b)),
                         "abbr": GOSPEL_ABBR.get(other_b, other_b),
-                        "ref": other_data["ref"],
-                        "primary_ref": other_data.get("primary_ref", other_data["ref"]),
+                        "ref": format_gospel_ref_fr(other_data["ref"]),
+                        "primary_ref": format_gospel_ref_fr(other_data.get("primary_ref", other_data["ref"])),
                         "short_badge": short_badge,
                         "start_ch": other_data["start_ch"],
                         "start_v": other_data["start_v"],
@@ -408,9 +427,10 @@ class SynopticManager:
             g_ref = pericope.get(b_code, {}).get("ref", "")
             columns_meta.append({
                 "book": b_code,
-                "french_name": get_french_book_name(b_code),
+                "french_name": GOSPEL_FRENCH.get(b_code, get_french_book_name(b_code)),
                 "abbr": GOSPEL_ABBR.get(b_code, b_code),
-                "ref": g_ref,
+                "ref": format_gospel_ref_fr(g_ref),
+                "ref_raw": g_ref,
                 "is_pivot": (b_code == pivot)
             })
 

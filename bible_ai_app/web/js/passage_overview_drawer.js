@@ -121,13 +121,8 @@ const PassageOverviewDrawer = {
     document.getElementById('btn-overview-action-study')?.addEventListener('click', (e) => {
       e.stopPropagation();
       const refStr = this.currentData?.reference || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
-      if (typeof App !== 'undefined' && App.switchView) {
-        App.switchView('passage-study');
-        setTimeout(() => {
-          if (typeof PassageStudyView !== 'undefined' && PassageStudyView.loadPassage) {
-            PassageStudyView.loadPassage(refStr);
-          }
-        }, 150);
+      if (typeof BibleComparisonHub !== 'undefined') {
+        BibleComparisonHub.openMatrix(refStr);
       }
     });
 
@@ -1663,13 +1658,8 @@ const PassageOverviewDrawer = {
     container.querySelector('#btn-card-launch-study')?.addEventListener('click', (e) => {
       e.stopPropagation();
       const refStr = data.reference || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
-      if (typeof App !== 'undefined' && App.switchView) {
-        App.switchView('passage-study');
-        setTimeout(() => {
-          if (typeof PassageStudyView !== 'undefined' && PassageStudyView.loadPassage) {
-            PassageStudyView.loadPassage(refStr);
-          }
-        }, 150);
+      if (typeof BibleComparisonHub !== 'undefined') {
+        BibleComparisonHub.openMatrix(refStr);
       }
     });
   },
@@ -2016,18 +2006,8 @@ const PassageOverviewDrawer = {
       e.stopPropagation();
       closeModal();
       const bestRef = (primPassages && primPassages[0]) || verseRef || this.currentData?.reference || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
-      if (typeof App !== 'undefined' && App.switchView) {
-        App.switchView('passage-study');
-        setTimeout(() => {
-          if (typeof PassageStudyView !== 'undefined') {
-            if (PassageStudyView.loadPassage) {
-              PassageStudyView.loadPassage(bestRef);
-            }
-            if (PassageStudyView.switchTab) {
-              PassageStudyView.switchTab('pastoral');
-            }
-          }
-        }, 150);
+      if (typeof BibleComparisonHub !== 'undefined') {
+        BibleComparisonHub.openMatrix(bestRef);
       }
     });
 

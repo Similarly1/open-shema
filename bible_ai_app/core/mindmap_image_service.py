@@ -99,7 +99,7 @@ def suggest_image_prompt(
 
     # Ordre des modèles à essayer pour la rédaction du prompt
     models_to_try = [
-        config.get("curator_model") or "mistralai/Ministral-3-14B-Instruct-2512",
+        config.get("curator_model") or "gemini-3.5-flash-lite",
         "mistralai/Ministral-3-14B-Instruct-2512",
         "gemini-2.5-flash",
         "gemini-2.0-flash",

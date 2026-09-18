@@ -26,10 +26,11 @@ const App = {
         this.isDetachedMode = true;
         this.detachedViewId = detachedView.replace('view-', '');
         document.body.classList.add('window-detached-mode');
+        document.body.classList.remove('window-maximized');
+        this.isWindowMaximized = false;
 
         const titleMap = {
           'bible': 'Bible',
-          'passage-study': 'Guide de Passage',
           'commentaries': 'Commentaires exégétiques',
           'theology': 'Théologie & Études',
           'articles': 'Articles de Blogs',
@@ -406,21 +407,35 @@ const App = {
     // Double clic sur la barre de titre pour Agrandir / Restaurer
     const titlebar = document.getElementById('app-window-titlebar');
     titlebar?.addEventListener('dblclick', async (e) => {
-      if (e.target.closest('button, .win-control-btn')) return;
-      const res = await API.call('maximize_window');
-      if (res && typeof res.is_maximized === 'boolean') {
-        this.updateWindowState(res.is_maximized);
+      if (e.target.closest('button, input, select, textarea, .win-control-btn, .quick-passage-box')) return;
+      if (this.isDetachedMode && this.detachedViewId) {
+        const res = await API.maximizeDetachedWindow(this.detachedViewId);
+        if (res && typeof res.is_maximized === 'boolean') {
+          this.updateWindowState(res.is_maximized);
+        }
+      } else {
+        const res = await API.call('maximize_window');
+        if (res && typeof res.is_maximized === 'boolean') {
+          this.updateWindowState(res.is_maximized);
+        }
       }
     });
 
-    // Capture mousedown sur la barre de titre : bloquer tout déplacement par glisser si la fenêtre est agrandie
+    // Mousedown sur la barre de titre : drag natif Windows avec support Aero Snap
     titlebar?.addEventListener('mousedown', (e) => {
+      if (e.target.closest('button, input, select, textarea, .win-control-btn, .quick-passage-box, .btn-detach-nav')) {
+        return;
+      }
       if (this.isWindowMaximized || document.body.classList.contains('window-maximized')) {
-        if (!e.target.closest('button, .win-control-btn')) {
-          e.stopPropagation();
+        e.stopPropagation();
+        return;
+      }
+      if (e.button === 0) {
+        if (typeof API !== 'undefined' && API.startWindowDrag) {
+          API.startWindowDrag(this.isDetachedMode ? this.detachedViewId : null);
         }
       }
-    }, true);
+    });
 
     // 6. Lancement du préchargement global unifié dès que l'API bridge est connectée
     API.onReady(async () => {
@@ -542,7 +557,6 @@ const App = {
   getDefaultSidebarConfig() {
     return [
       { id: 'bible', visible: true },
-      { id: 'passage-study', visible: true },
       { id: 'commentaries', visible: true },
       { id: 'theology', visible: true },
       { id: 'articles', visible: true },
@@ -634,7 +648,6 @@ const App = {
     );
     const titleMap = {
       'bible': 'Bible',
-      'passage-study': 'Guide de Passage',
       'commentaries': 'Commentaires exégétiques',
       'theology': 'Théologie & Études',
       'articles': 'Articles de Blogs',
@@ -678,6 +691,19 @@ const App = {
         e.stopPropagation();
         e.preventDefault();
         try {
+          if (viewId === 'bible' || viewId === 'view-bible') {
+            try {
+              const target = {
+                book: (typeof BibleReader !== 'undefined' && BibleReader.currentBook) || 'Gen',
+                chapter: (typeof BibleReader !== 'undefined' && BibleReader.currentChapter) || 1,
+                verse: (typeof BibleReader !== 'undefined' && BibleReader.selectedVerse) || 1,
+                bible1: (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) || null,
+                bible2: (typeof BibleReader !== 'undefined' && BibleReader.currentBible2) || null,
+                timestamp: Date.now()
+              };
+              localStorage.setItem('open_shema_detached_bible_target', JSON.stringify(target));
+            } catch (err) {}
+          }
           if (typeof App !== 'undefined' && App.showToast) {
             App.showToast(`Ouverture de ${title} dans une nouvelle fenêtre...`, 2000);
           }
@@ -883,10 +909,33 @@ const App = {
   async runPreloadPipeline() {
     if (this._isPreloadingDone) return;
 
-    // En mode détaché, bascule ultra-rapide sans préchargement lourd ni splash screen
+    // En mode détaché, synchroniser l'état de la fenêtre et précharger les données indispensables
     if (this.isDetachedMode && this.detachedViewId) {
       this._isPreloadingDone = true;
       this.hideSplash();
+
+      try {
+        const state = await API.call('get_window_state', this.detachedViewId);
+        if (state && typeof state.is_maximized === 'boolean') {
+          this.updateWindowState(state.is_maximized);
+        } else {
+          this.updateWindowState(false);
+        }
+      } catch (e) {
+        this.updateWindowState(false);
+      }
+
+      // Préchargement indispensable si la vue détachée est 'bible'
+      if (this.detachedViewId === 'bible') {
+        try {
+          if (typeof BibleReader !== 'undefined' && BibleReader.preloadInitialData) {
+            await BibleReader.preloadInitialData();
+          }
+        } catch (e) {
+          console.error('[App] Erreur préchargement BibleReader détaché:', e);
+        }
+      }
+
       this.switchView(this.detachedViewId);
       return;
     }
@@ -1014,7 +1063,11 @@ const App = {
 
     const drawerEl = document.getElementById('right-drawer');
 
-    if (cleanViewName === 'library') {
+    if (cleanViewName === 'bible') {
+      if (typeof BibleReader !== 'undefined' && BibleReader.preloadInitialData && !BibleReader._isPreloaded) {
+        BibleReader.preloadInitialData();
+      }
+    } else if (cleanViewName === 'library') {
       if (drawerEl) drawerEl.classList.add('collapsed');
       LibraryView.loadBooks();
     } else if (cleanViewName === 'settings') {
@@ -1040,11 +1093,6 @@ const App = {
       if (drawerEl) drawerEl.classList.add('collapsed');
       if (typeof DictView !== 'undefined') {
         DictView.onViewActivated();
-      }
-    } else if (cleanViewName === 'passage-study') {
-      if (drawerEl) drawerEl.classList.add('collapsed');
-      if (typeof PassageStudyView !== 'undefined') {
-        PassageStudyView.onViewActivated();
       }
     } else if (cleanViewName === 'articles') {
       if (drawerEl) drawerEl.classList.add('collapsed');
@@ -1094,9 +1142,9 @@ const App = {
   },
 
   openPassageStudy(passageRef) {
-    this.switchView('passage-study');
-    if (typeof PassageStudyView !== 'undefined') {
-      PassageStudyView.loadPassage(passageRef);
+    this.switchView('bible');
+    if (typeof BibleComparisonHub !== 'undefined') {
+      BibleComparisonHub.openMatrix(passageRef);
     }
   },
 

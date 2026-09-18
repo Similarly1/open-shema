@@ -97,7 +97,8 @@ from core.secrets_manager import migrate_secrets_from_config, load_secrets_into_
 from core.native_notifications import send_windows_toast
 
 # ── Constantes ───────────────────────────────────────────────────────────────
-BIBLES_REGISTRY_FILE = os.path.join(current_dir, "data", "bibles_registry.json")
+from core.paths import resolve_data_path
+BIBLES_REGISTRY_FILE = resolve_data_path("bibles_registry.json")
 
 BIBLE_CANONICAL_INFO = {
     "Colombe":   ("Bible à la Colombe (1978)", "COL"),
@@ -188,7 +189,7 @@ def get_cover_data_url(cover_path: Optional[str]) -> Optional[str]:
     actual_path = cover_path
     if not os.path.exists(actual_path):
         base_name = os.path.basename(cover_path)
-        cand = os.path.join(current_dir, "data", "covers", base_name)
+        cand = resolve_data_path("covers", base_name)
         if os.path.exists(cand):
             actual_path = cand
         else:

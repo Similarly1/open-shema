@@ -755,7 +755,8 @@ class AiMixin:
         dedup_sources = []
         seen_source_keys = set()
         books_registry = load_books_metadata()
-        covers_dir = os.path.join(current_dir, "data", "covers")
+        from core.paths import get_user_data_path, get_bundle_data_path
+        covers_dirs = [get_user_data_path("covers"), get_bundle_data_path("covers")]
 
         for chunk in context_chunks:
             meta = chunk.get("metadata") if isinstance(chunk, dict) else {}
@@ -823,16 +824,20 @@ class AiMixin:
                                 cover_data_url = get_cover_data_url(cov_p)
                                 break
                             
-                # 2. Si non trouvé, chercher dans le dossier covers
-                if not cover_data_url and os.path.exists(covers_dir):
+                # 2. Si non trouvé, chercher dans les dossiers covers
+                if not cover_data_url:
                     clean_s = re.sub(r'[^a-zA-Z0-9]', '', s_name).lower()
-                    for fn in os.listdir(covers_dir):
-                        clean_fn = re.sub(r'[^a-zA-Z0-9]', '', fn).lower()
-                        if len(clean_s) >= 4 and (clean_s in clean_fn or clean_fn in clean_s):
-                            cov_p = os.path.join(covers_dir, fn)
-                            cover_data_url = get_cover_data_url(cov_p)
-                            if cover_data_url:
-                                break
+                    for c_dir in covers_dirs:
+                        if os.path.exists(c_dir):
+                            for fn in os.listdir(c_dir):
+                                clean_fn = re.sub(r'[^a-zA-Z0-9]', '', fn).lower()
+                                if len(clean_s) >= 4 and (clean_s in clean_fn or clean_fn in clean_s):
+                                    cov_p = os.path.join(c_dir, fn)
+                                    cover_data_url = get_cover_data_url(cov_p)
+                                    if cover_data_url:
+                                        break
+                        if cover_data_url:
+                            break
 
                 dedup_sources.append({
                     "title": s_name,

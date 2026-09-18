@@ -44,6 +44,13 @@ def is_running_as_package() -> bool:
         _IS_PACKAGE_CACHED = True
         return True
 
+    # Vérification par chemin d'installation WindowsApps (Microsoft Store / MSIX)
+    bundle_lower = (bundle_dir or "").lower()
+    exe_lower = (sys.executable or "").lower()
+    if "windowsapps" in bundle_lower or "windowsapps" in exe_lower:
+        _IS_PACKAGE_CACHED = True
+        return True
+
     if os.name != "nt":
         _IS_PACKAGE_CACHED = False
         return False
@@ -137,11 +144,11 @@ def get_user_data_dir() -> str:
         _USER_DATA_DIR_CACHED = dev_data
         return dev_data
 
-    # 2. Mode portable : présence du marqueur .portable OU présence d'un dossier data/ local à côté de l'exécutable (hors conteneur MSIX)
+    # 2. Mode portable : présence du marqueur .portable OU présence d'un dossier data/ local à côté de l'exécutable (hors conteneur MSIX / WindowsApps)
     b_dir = get_bundle_dir()
     portable_marker = os.path.join(b_dir, ".portable")
     local_data = os.path.join(b_dir, "data")
-    if (os.path.exists(portable_marker) or os.path.exists(local_data)) and not is_running_as_package():
+    if (os.path.exists(portable_marker) or os.path.exists(local_data)) and not is_running_as_package() and "windowsapps" not in (b_dir or "").lower():
         os.makedirs(local_data, exist_ok=True)
         _USER_DATA_DIR_CACHED = local_data
         return local_data

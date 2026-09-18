@@ -610,14 +610,13 @@ const SelectionContextMenu = {
     if (passageRef) {
       if (typeof App !== 'undefined' && typeof App.openPassageStudy === 'function') {
         App.openPassageStudy(passageRef);
-      } else if (typeof PassageStudyView !== 'undefined') {
-        PassageStudyView.loadPassage(passageRef);
-        if (typeof App !== 'undefined') App.switchView('passage-study');
+      } else if (typeof BibleComparisonHub !== 'undefined') {
+        BibleComparisonHub.openMatrix(passageRef);
       }
-      App.showToast(`Ouverture du Guide de Passage : ${passageRef}`);
+      App.showToast(`Comparaison du passage : ${passageRef}`);
     } else {
       if (typeof App !== 'undefined' && App.showToast) {
-        App.showToast("Sélectionnez une référence biblique (ex: Jean 3:16) pour ouvrir le Guide de Passage", "warning");
+        App.showToast("Sélectionnez une référence biblique (ex: Jean 3:16) pour comparer les versions", "warning");
       }
     }
   },

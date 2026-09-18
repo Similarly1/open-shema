@@ -34,6 +34,14 @@ from api._utils import (
     _BACKUP_MANIFEST_VERSION, _BACKUP_COMPONENTS
 )
 current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from core.paths import (
+    get_user_data_dir,
+    get_user_data_path,
+    get_bundle_data_dir,
+    get_bundle_data_path,
+    resolve_data_path,
+    is_running_as_package
+)
 from api.window import get_active_window, get_global_window
 
 
@@ -109,7 +117,7 @@ class ImportMixin:
         src_path = result[0]
         try:
             import time, uuid
-            covers_dir = os.path.join(current_dir, "data", "covers")
+            covers_dir = get_user_data_path("covers")
             os.makedirs(covers_dir, exist_ok=True)
             clean_base = re.sub(r'[^a-zA-Z0-9._-]', '_', os.path.basename(src_path))
             dest_filename = f"user_{uuid.uuid4().hex[:6]}_{clean_base}"
@@ -133,7 +141,7 @@ class ImportMixin:
             if ext == "jpeg": ext = "jpg"
 
             img_bytes = base64.b64decode(encoded)
-            covers_dir = os.path.join(current_dir, "data", "covers")
+            covers_dir = get_user_data_path("covers")
             os.makedirs(covers_dir, exist_ok=True)
             clean_id = re.sub(r'[^a-zA-Z0-9._-]', '_', book_id or 'cover')
             dest_filename = f"clip_{uuid.uuid4().hex[:6]}_{clean_id}.{ext}"
@@ -157,7 +165,7 @@ class ImportMixin:
             if data is None:
                 return {"success": False, "error": "Aucune image dans le presse-papier. Copiez d'abord une image (Clic droit > Copier l'image ou capture d'écran)."}
                 
-            covers_dir = os.path.join(current_dir, "data", "covers")
+            covers_dir = get_user_data_path("covers")
             os.makedirs(covers_dir, exist_ok=True)
             clean_id = re.sub(r'[^a-zA-Z0-9._-]', '_', book_id or 'cover')
             dest_filename = f"clip_{uuid.uuid4().hex[:6]}_{clean_id}.png"
@@ -241,7 +249,7 @@ class ImportMixin:
 
     def get_community_logos_books(self) -> List[Dict[str, Any]]:
         """Renvoie la liste complète des livres personnels de la communauté Logos (section Books du wiki)."""
-        json_path = os.path.join(current_dir, "data", "logos_community_books.json")
+        json_path = resolve_data_path("logos_community_books.json")
         if os.path.exists(json_path):
             try:
                 with open(json_path, "r", encoding="utf-8") as f:
@@ -252,7 +260,7 @@ class ImportMixin:
 
     def get_gutenberg_theology_books(self) -> List[Dict[str, Any]]:
         """Renvoie les classiques chrétiens du Projet Gutenberg indexés localement."""
-        json_path = os.path.join(current_dir, "data", "gutenberg_theology_books.json")
+        json_path = resolve_data_path("gutenberg_theology_books.json")
         if os.path.exists(json_path):
             try:
                 with open(json_path, "r", encoding="utf-8") as f:
@@ -263,7 +271,7 @@ class ImportMixin:
 
     def get_ccel_theology_books(self) -> List[Dict[str, Any]]:
         """Renvoie les classiques de la Christian Classics Ethereal Library indexés localement."""
-        json_path = os.path.join(current_dir, "data", "ccel_theology_books.json")
+        json_path = resolve_data_path("ccel_theology_books.json")
         if os.path.exists(json_path):
             try:
                 with open(json_path, "r", encoding="utf-8") as f:
@@ -293,7 +301,7 @@ class ImportMixin:
             fmt = str(book_data.get("format") or "EPUB").lower()
 
             # Dossier temporaire pour les imports
-            import_cache_dir = os.path.join(current_dir, "data", "temp_imports")
+            import_cache_dir = get_user_data_path("temp_imports")
             os.makedirs(import_cache_dir, exist_ok=True)
 
             safe_title = re.sub(r'[^\w\s-]', '', title).strip().replace(' ', '_')[:40]
@@ -454,7 +462,7 @@ class ImportMixin:
             cover_url = module_data.get("cover_url")
             if cover_url:
                 try:
-                    covers_dir = os.path.join(current_dir, "data", "covers")
+                    covers_dir = get_user_data_path("covers")
                     os.makedirs(covers_dir, exist_ok=True)
                     cover_ext = os.path.splitext(cover_url.split("?")[0])[1] or ".png"
                     local_cover_file = f"{m_abbr}{cover_ext}"
@@ -463,7 +471,7 @@ class ImportMixin:
                         cover_url,
                         headers={"User-Agent": "OpenShemaApp/1.0"}
                     )
-                    with urllib.request.urlopen(req_cov, timeout=15) as cov_resp, open(cover_dest, "wb") as cov_out:
+                    with urllib.request.urlopen(req_cov, timeout=15, context=make_relaxed_ssl_context(cover_url)) as cov_resp, open(cover_dest, "wb") as cov_out:
                         shutil.copyfileobj(cov_resp, cov_out)
                     cover_path = cover_dest
                 except Exception as cov_err:
@@ -484,31 +492,21 @@ class ImportMixin:
 
             if candidate_ill_urls:
                 try:
-                    dict_dest_dirs = [os.path.join(current_dir, "data", "dictionaries")]
-                    if getattr(sys, 'frozen', False):
-                        exe_data_dict = os.path.join(os.path.dirname(sys.executable), "data", "dictionaries")
-                        if exe_data_dict not in dict_dest_dirs:
-                            dict_dest_dirs.append(exe_data_dict)
-                    for ddir in dict_dest_dirs:
-                        os.makedirs(ddir, exist_ok=True)
-                    target_json = os.path.join(dict_dest_dirs[0], "vigouroux_illustrations.json")
+                    dict_dest_dir = get_user_data_path("dictionaries")
+                    os.makedirs(dict_dest_dir, exist_ok=True)
+                    target_json = os.path.join(dict_dest_dir, "vigouroux_illustrations.json")
 
                     downloaded = False
                     for ill_url in candidate_ill_urls:
                         try:
                             req_ill = urllib.request.Request(ill_url, headers={"User-Agent": "OpenShemaApp/1.0"})
-                            with urllib.request.urlopen(req_ill, timeout=30, context=ctx) as ill_resp, open(target_json, "wb") as ill_out:
+                            with urllib.request.urlopen(req_ill, timeout=30, context=make_relaxed_ssl_context(ill_url)) as ill_resp, open(target_json, "wb") as ill_out:
                                 shutil.copyfileobj(ill_resp, ill_out)
                             downloaded = True
                             logger.info(f"Index d'illustrations téléchargé avec succès depuis {ill_url}")
                             break
                         except Exception as try_err:
                             logger.debug(f"Échec téléchargement index depuis {ill_url}: {try_err}")
-
-                    if downloaded:
-                        for extra_d in dict_dest_dirs[1:]:
-                            try: shutil.copy2(target_json, os.path.join(extra_d, "vigouroux_illustrations.json"))
-                            except Exception: pass
                 except Exception as ill_err:
                     logger.warning(f"Erreur globale téléchargement index illustrations : {ill_err}")
 
@@ -520,13 +518,21 @@ class ImportMixin:
                 try:
                     import zipfile
                     import tempfile
-                    img_dest_dirs = [os.path.join(current_dir, "web", "img", "vigouroux")]
-                    if getattr(sys, 'frozen', False):
-                        exe_img_dir = os.path.join(os.path.dirname(sys.executable), "_internal", "web", "img", "vigouroux")
-                        if exe_img_dir not in img_dest_dirs:
-                            img_dest_dirs.append(exe_img_dir)
-                    for idir in img_dest_dirs:
-                        os.makedirs(idir, exist_ok=True)
+                    
+                    # Cible principale : dossier utilisateur inscriptible
+                    user_img_dir = get_user_data_path("illustrations", "vigouroux")
+                    os.makedirs(user_img_dir, exist_ok=True)
+                    
+                    # Cibles optionnelles (mode développement si accessible en écriture)
+                    candidate_dirs = [user_img_dir]
+                    dev_web_dir = os.path.join(current_dir, "web", "img", "vigouroux")
+                    try:
+                        if not is_running_as_package() and os.path.isdir(os.path.dirname(dev_web_dir)):
+                            os.makedirs(dev_web_dir, exist_ok=True)
+                            if dev_web_dir not in candidate_dirs:
+                                candidate_dirs.append(dev_web_dir)
+                    except Exception:
+                        pass
 
                     logger.info(f"Téléchargement du pack d'images ({m_title}) depuis {images_zip_url}...")
                     req_zip = urllib.request.Request(images_zip_url, headers={"User-Agent": "OpenShemaApp/1.0"})
@@ -534,7 +540,7 @@ class ImportMixin:
                     tmp_zip_path = tmp_zip.name
                     tmp_zip.close()
 
-                    with urllib.request.urlopen(req_zip, timeout=180, context=ctx) as z_resp, open(tmp_zip_path, "wb") as z_out:
+                    with urllib.request.urlopen(req_zip, timeout=180, context=make_relaxed_ssl_context(images_zip_url)) as z_resp, open(tmp_zip_path, "wb") as z_out:
                         shutil.copyfileobj(z_resp, z_out)
 
                     # Extraction sécurisée : validation de chaque entrée ZIP pour prévenir le Zip Slip
@@ -551,17 +557,16 @@ class ImportMixin:
                         zf.extractall(dest_dir)
 
                     with zipfile.ZipFile(tmp_zip_path, "r") as zf:
-                        _safe_extractall_imgs(zf, img_dest_dirs[0])
-                        for extra_idir in img_dest_dirs[1:]:
+                        for c_dir in candidate_dirs:
                             try:
-                                _safe_extractall_imgs(zf, extra_idir)
-                            except Exception:
-                                pass
+                                _safe_extractall_imgs(zf, c_dir)
+                            except Exception as c_err:
+                                logger.debug(f"Échec extraction images dans {c_dir}: {c_err}")
                     try:
                         os.remove(tmp_zip_path)
                     except OSError:
                         pass
-                    logger.info(f"Pack d'images extrait avec succès dans {img_dest_dirs[0]}")
+                    logger.info(f"Pack d'images extrait avec succès dans {user_img_dir}")
                 except Exception as zip_err:
                     logger.warning(f"Erreur lors du téléchargement/extraction du pack d'images : {zip_err}")
 
@@ -626,12 +631,12 @@ class ImportMixin:
                 installed.add(f"dict-{d_id.lower()}")
 
         # 3. Fichiers spécifiques indispensables sur disque
-        if os.path.exists(os.path.join(data_dir, "bibleproject_fr.json")):
+        if os.path.exists(resolve_data_path("bibleproject_fr.json")):
             installed.add("dataset-bibleproject-fr")
             installed.add("bp-fr")
             installed.add("bibleproject")
 
-        if os.path.exists(os.path.join(data_dir, "strong_lexicon.json")):
+        if os.path.exists(resolve_data_path("strong_lexicon.json")):
             installed.add("dict-strong-fr")
             installed.add("strong")
 
@@ -842,7 +847,7 @@ class ImportMixin:
                 import base64
                 header, b64_data = raw_cover.split(",", 1)
                 img_data = base64.b64decode(b64_data)
-                covers_dir = os.path.join(current_dir, "data", "covers")
+                covers_dir = get_user_data_path("covers")
                 os.makedirs(covers_dir, exist_ok=True)
                 slug_name = re.sub(r'[^a-zA-Z0-9_-]', '_', name).strip('_')
                 dest_path = os.path.join(covers_dir, f"{slug_name}.png")
@@ -852,7 +857,7 @@ class ImportMixin:
             except Exception as e:
                 logger.warning(f"Erreur enregistrement Smart Cover: {e}")
         elif raw_cover and os.path.exists(raw_cover):
-            covers_dir = os.path.abspath(os.path.join(current_dir, "data", "covers"))
+            covers_dir = get_user_data_path("covers")
             os.makedirs(covers_dir, exist_ok=True)
             if not os.path.abspath(raw_cover).startswith(covers_dir):
                 slug_name = re.sub(r'[^a-zA-Z0-9_-]', '_', name).strip('_')

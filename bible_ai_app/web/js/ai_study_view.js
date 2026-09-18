@@ -417,7 +417,7 @@ const AIStudyView = {
         }
 
         // Synchroniser l'état du corpus Notes (.md) avec la configuration
-        const isNotesIncluded = typeof cfg.include_notes_in_ai !== 'undefined' ? (cfg.include_notes_in_ai !== false) : true;
+        const isNotesIncluded = typeof cfg.include_notes_in_ai !== 'undefined' ? (cfg.include_notes_in_ai === true) : false;
         const chkNotes = document.getElementById('ai-opt-src-notes');
         if (chkNotes && this.currentMode !== 'free_chat') {
           chkNotes.checked = isNotesIncluded;
@@ -1131,15 +1131,15 @@ const AIStudyView = {
       }
       if (depthSelect) depthSelect.value = 'pastoral';
     } else {
-      // Dans les modes d'étude approfondie : corpus, reranking et raisonnement activés
+      // Dans les modes d'étude approfondie : corpus, reranking, curateur et raisonnement configurés selon les défauts
       if (chkBibles) chkBibles.checked = true;
       if (chkComms) chkComms.checked = true;
       if (chkDict) chkDict.checked = true;
       if (chkArticles) chkArticles.checked = true;
       if (chkNotes) {
         const isNotesIncluded = (typeof SettingsView !== 'undefined' && SettingsView.config && typeof SettingsView.config.include_notes_in_ai !== 'undefined')
-          ? SettingsView.config.include_notes_in_ai !== false
-          : true;
+          ? SettingsView.config.include_notes_in_ai === true
+          : false;
         chkNotes.checked = isNotesIncluded;
       }
       if (chkUpvr) {
@@ -1149,15 +1149,16 @@ const AIStudyView = {
         chkUpvr.checked = isUpvrIncluded;
       }
       if (chkRerank) chkRerank.checked = true;
-      if (thinkingSelect && thinkingSelect.value === 'off') {
-        thinkingSelect.value = 'medium';
+      if (chkCurator) chkCurator.checked = true;
+      if (thinkingSelect && (!thinkingSelect.value || thinkingSelect.value === 'off')) {
+        thinkingSelect.value = 'low';
       }
       if (ctxSlider && ctxSlider.value == 0) {
         ctxSlider.value = 1;
         this.updateContextDepthSliderUI();
       }
-      if (depthSelect && depthSelect.value === 'pastoral' && modeKey !== 'sermon') {
-        depthSelect.value = 'academic';
+      if (depthSelect && (!depthSelect.value || depthSelect.value === 'pastoral' || depthSelect.value === 'academic') && modeKey !== 'sermon') {
+        depthSelect.value = 'concise';
       }
     }
 
@@ -1492,18 +1493,18 @@ const AIStudyView = {
   },
 
   getOptions() {
-    const model = document.getElementById('ai-opt-model')?.value || 'gemini-2.5-flash';
-    const depth = document.getElementById('ai-opt-depth')?.value || 'academic';
-    const thinkingLevel = document.getElementById('ai-opt-thinking-level')?.value || 'medium';
+    const model = document.getElementById('ai-opt-model')?.value || (typeof SettingsView !== 'undefined' && (SettingsView.config?.global_ai_model || SettingsView.config?.chat_model)) || 'gemini-flash-latest';
+    const depth = document.getElementById('ai-opt-depth')?.value || 'concise';
+    const thinkingLevel = document.getElementById('ai-opt-thinking-level')?.value || 'low';
     
-    let thinkingBudget = 4096;
+    let thinkingBudget = 1024;
     if (thinkingLevel === 'off') thinkingBudget = 0;
     else if (thinkingLevel === 'low') thinkingBudget = 1024;
     else if (thinkingLevel === 'medium') thinkingBudget = 4096;
     else if (thinkingLevel === 'high') thinkingBudget = 16384;
 
-    const enableReranking = document.getElementById('ai-opt-reranking')?.checked ?? false;
-    const enableCurator = document.getElementById('ai-opt-curator')?.checked ?? false;
+    const enableReranking = document.getElementById('ai-opt-reranking')?.checked ?? true;
+    const enableCurator = document.getElementById('ai-opt-curator')?.checked ?? true;
 
     // Slider de profondeur de contexte (0=Éclair, 1=Rapide, 2=Approfondi, 3=Exhaustif)
     const depthLevels = [800, 2400, 6000, 14000]; // en caractères (~200 / 600 / 1500 / 3500 tokens)
@@ -1512,13 +1513,13 @@ const AIStudyView = {
     const maxExcerptChars = depthLevels[Math.min(ctxLevel, depthLevels.length - 1)];
 
     const sources = {
-      bibles: document.getElementById('ai-opt-src-bibles')?.checked ?? false,
-      commentaries: document.getElementById('ai-opt-src-comms')?.checked ?? false,
-      dictionaries: document.getElementById('ai-opt-src-dict')?.checked ?? false,
-      articles: document.getElementById('ai-opt-src-articles')?.checked ?? false,
+      bibles: document.getElementById('ai-opt-src-bibles')?.checked ?? true,
+      commentaries: document.getElementById('ai-opt-src-comms')?.checked ?? true,
+      dictionaries: document.getElementById('ai-opt-src-dict')?.checked ?? true,
+      articles: document.getElementById('ai-opt-src-articles')?.checked ?? true,
       notes: document.getElementById('ai-opt-src-notes')?.checked ?? false,
-      upvr: document.getElementById('ai-opt-src-upvr')?.checked ?? false,
-      pastoral: document.getElementById('ai-opt-src-upvr')?.checked ?? false
+      upvr: document.getElementById('ai-opt-src-upvr')?.checked ?? true,
+      pastoral: document.getElementById('ai-opt-src-upvr')?.checked ?? true
     };
 
     return {
@@ -1541,7 +1542,7 @@ const AIStudyView = {
       const el = document.getElementById('cfg-curator-model');
       if (el && el.value) cur = el.value;
     }
-    if (!cur) cur = 'mistralai/Ministral-3-14B-Instruct-2512';
+    if (!cur) cur = 'gemini-3.5-flash-lite';
     return cur.split('/').pop().replace(/-instruct/i, '');
   },
 

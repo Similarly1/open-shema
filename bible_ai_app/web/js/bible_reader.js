@@ -257,7 +257,7 @@ const TabsManager = {
     });
   },
 
-  async setupInitialTabs(bibles) {
+  async setupInitialTabs(bibles, initialBook = null, initialChapter = null, initialVerse = null) {
     if (!bibles || bibles.length === 0) return;
     const validBibleNames = bibles.map(b => b.name || b.id);
 
@@ -265,24 +265,33 @@ const TabsManager = {
     if (this.tabs && this.tabs.length > 0) {
       this.tabs = this.tabs.filter(t => validBibleNames.includes(t.bibleName));
       if (this.tabs.length > 0) {
+        if (initialBook && initialChapter) {
+          this.tabs[0].book = initialBook;
+          this.tabs[0].chapter = initialChapter;
+        }
         return await this.activateTab(this.tabs[0].id);
       }
     }
     this.tabs = [];
 
-    const b1 = bibles[0].name || bibles[0].id;
-    const b2 = bibles.length > 1 ? (bibles[1].name || bibles[1].id) : b1;
+    const b1 = (typeof BibleReader !== 'undefined' && BibleReader.currentBible1) ? BibleReader.currentBible1 : (bibles[0].name || bibles[0].id);
+    const b2 = (typeof BibleReader !== 'undefined' && BibleReader.currentBible2 && BibleReader.currentBible2 !== b1) 
+      ? BibleReader.currentBible2 
+      : (bibles.length > 1 ? (bibles[1].name || bibles[1].id) : b1);
 
-    const firstBook1 = (typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
+    const firstBook1 = initialBook || ((typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
       ? BibleReader.getFirstBookForBible(b1) 
-      : 'Gen';
-    const firstBook2 = (typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
-      ? BibleReader.getFirstBookForBible(b2) 
-      : 'Gen';
+      : 'Gen');
+    const firstChapter1 = initialChapter || 1;
 
-    this.createTab(b1, firstBook1, 1, '#EA580C', false, false, b1);
+    const firstBook2 = initialBook || ((typeof BibleReader !== 'undefined' && typeof BibleReader.getFirstBookForBible === 'function') 
+      ? BibleReader.getFirstBookForBible(b2) 
+      : 'Gen');
+    const firstChapter2 = initialChapter || 1;
+
+    this.createTab(b1, firstBook1, firstChapter1, '#EA580C', false, false, 'LSG');
     if (bibles.length > 1) {
-      this.createTab(b2, firstBook2, 1, '#2563EB', false, false, b2);
+      this.createTab(b2, firstBook2, firstChapter2, '#2563EB', false, false, 'LSG');
     }
     if (this.tabs.length > 0) {
       return await this.activateTab(this.tabs[0].id);
@@ -374,7 +383,11 @@ const TabsManager = {
     BibleReader.currentBook = targetBook;
     BibleReader.currentChapter = targetChapter;
     BibleReader.pane1IsInterlinear = !!target.isInterlinear;
-    BibleReader.pane1InterlinearVersion = target.interlinearVersion || 'LSG';
+    const validInter = (target.interlinearVersion && ['LSG', 'DARBY'].includes(target.interlinearVersion.toUpperCase())) 
+      ? target.interlinearVersion.toUpperCase() 
+      : 'LSG';
+    BibleReader.pane1InterlinearVersion = validInter;
+    target.interlinearVersion = validInter;
 
     // Mettre à jour l'état visuel du bouton et du menu Interlinéaire
     const interBtn = document.getElementById('btn-toggle-interlinear');
@@ -525,6 +538,12 @@ const DisplayOptions = {
 
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (typeof BibleComparisonHub !== 'undefined' && typeof BibleComparisonHub.closePopover === 'function') {
+        BibleComparisonHub.closePopover();
+      }
+      if (typeof InterlinearMenu !== 'undefined' && typeof InterlinearMenu.closePopover === 'function') {
+        InterlinearMenu.closePopover();
+      }
       try {
         const cfg = await API.getSettings() || {};
         updateActiveSwatch(cfg.reading_bg || 'auto');
@@ -708,6 +727,11 @@ const DisplayOptions = {
 const InterlinearMenu = {
   currentTargetPane: '1',
 
+  closePopover() {
+    const popover = document.getElementById('interlinear-options-popover');
+    if (popover) popover.classList.add('hidden');
+  },
+
   init() {
     const btn = document.getElementById('btn-toggle-interlinear');
     const popover = document.getElementById('interlinear-options-popover');
@@ -720,6 +744,11 @@ const InterlinearMenu = {
 
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (typeof BibleComparisonHub !== 'undefined' && typeof BibleComparisonHub.closePopover === 'function') {
+        BibleComparisonHub.closePopover();
+      }
+      const dispPopover = document.getElementById('display-options-popover');
+      if (dispPopover) dispPopover.classList.add('hidden');
       this.syncPopoverUI();
       popover.classList.toggle('hidden');
     });
@@ -750,6 +779,12 @@ const InterlinearMenu = {
     if (masterSwitch) {
       masterSwitch.addEventListener('change', (e) => {
         const checked = e.target.checked;
+        if (!BibleReader.pane1InterlinearVersion || !['LSG', 'DARBY'].includes(BibleReader.pane1InterlinearVersion.toUpperCase())) {
+          BibleReader.pane1InterlinearVersion = 'LSG';
+        }
+        if (!BibleReader.pane2InterlinearVersion || !['LSG', 'DARBY'].includes(BibleReader.pane2InterlinearVersion.toUpperCase())) {
+          BibleReader.pane2InterlinearVersion = 'DARBY';
+        }
         if (this.currentTargetPane === '1') {
           BibleReader.pane1IsInterlinear = checked;
         } else if (this.currentTargetPane === '2') {
@@ -3553,7 +3588,7 @@ const LexiconViewer = {
     if (bpStudy) {
       const bpBtn = document.createElement('button');
       bpBtn.className = `lex-source-pill lex-source-pill-bp ${this.activeSourceIndex === bpIdx ? 'active' : ''}`;
-      bpBtn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px; color:#c084fc;"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>BibleProject</span>`;
+      bpBtn.innerHTML = `<span class="lex-bp-pill-label" style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>BibleProject</span>`;
       bpBtn.addEventListener('click', () => {
         this.activeSourceIndex = bpIdx;
         this.render();
@@ -4348,7 +4383,7 @@ const LexiconViewer = {
   },
 
   async renderWikipedia(container, exactTitle = null) {
-    container.innerHTML = `<div style="padding: 24px; color: var(--text-muted); text-align: center;">Chargement de l'article Wikipédia pour « ${exactTitle || this.currentTerm} »...</div>`;
+    container.innerHTML = `<div style="padding: 40px; display: flex; justify-content: center; align-items: center;"><div class="synth-spinner" style="width: 28px; height: 28px; border-width: 2.5px;"></div></div>`;
 
     try {
       const data = await API.call('get_wikipedia_summary', this.currentTerm, exactTitle);
@@ -4391,11 +4426,15 @@ const LexiconViewer = {
             <div class="wiki-cloud-box">
               <div class="wiki-cloud-label">Articles connexes :</div>
               <div class="wiki-pills-bar">
-                ${candidates.map(c => `
-                  <button class="wiki-pill tier-${c.tier || 'md'} ${c.title.toLowerCase() === currentTitle.toLowerCase() ? 'active' : ''}" data-title="${c.title}" title="${c.snippet || c.title}">
-                    ${c.title}
-                  </button>
-                `).join('')}
+                ${candidates.map(c => {
+                  const isActive = c.title.toLowerCase() === currentTitle.toLowerCase();
+                  const tooltipText = (c.snippet ? `${c.title} — ${c.snippet}` : c.title).replace(/"/g, '&quot;');
+                  return `
+                    <button class="wiki-pill tier-${c.tier || 'md'} ${isActive ? 'active' : ''}" data-title="${c.title.replace(/"/g, '&quot;')}" title="${tooltipText}">
+                      ${c.title}
+                    </button>
+                  `;
+                }).join('')}
               </div>
             </div>
           ` : ''}
@@ -4657,14 +4696,42 @@ const BibleReader = {
     this._isPreloading = true;
     try {
       this.installedBibles = await API.getInstalledBibles() || [];
+
+      // Vérifier si une cible spécifique de passage/Bible a été demandée (ex: fenêtre détachée)
+      let detachedTarget = null;
+      try {
+        const raw = localStorage.getItem('open_shema_detached_bible_target');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && (Date.now() - (parsed.timestamp || 0)) < 60000) {
+            detachedTarget = parsed;
+          }
+        }
+      } catch (e) {}
+
       if (this.installedBibles.length > 0) {
-        this.currentBible1 = this.installedBibles[0].name;
-        if (this.installedBibles.length > 1) {
+        if (detachedTarget && detachedTarget.bible1 && this.installedBibles.some(b => b.name === detachedTarget.bible1 || b.id === detachedTarget.bible1)) {
+          this.currentBible1 = detachedTarget.bible1;
+        } else {
+          this.currentBible1 = this.installedBibles[0].name;
+        }
+
+        if (detachedTarget && detachedTarget.bible2 && this.installedBibles.some(b => b.name === detachedTarget.bible2 || b.id === detachedTarget.bible2)) {
+          this.currentBible2 = detachedTarget.bible2;
+        } else if (this.installedBibles.length > 1) {
           this.currentBible2 = this.installedBibles[1].name;
         }
-        await TabsManager.setupInitialTabs(this.installedBibles);
+
+        const targetBook = (detachedTarget && detachedTarget.book) || this.currentBook || 'Gen';
+        const targetChapter = (detachedTarget && detachedTarget.chapter) || this.currentChapter || 1;
+        const targetVerse = (detachedTarget && detachedTarget.verse) || 1;
+
+        await TabsManager.setupInitialTabs(this.installedBibles, targetBook, targetChapter, targetVerse);
       } else {
-        await this.navigateTo(this.currentBook || 'Gen', this.currentChapter || 1);
+        const targetBook = (detachedTarget && detachedTarget.book) || this.currentBook || 'Gen';
+        const targetChapter = (detachedTarget && detachedTarget.chapter) || this.currentChapter || 1;
+        const targetVerse = (detachedTarget && detachedTarget.verse) || 1;
+        await this.navigateTo(targetBook, targetChapter, targetVerse);
       }
       this._isPreloaded = true;
     } catch (err) {
@@ -5153,6 +5220,9 @@ const BibleReader = {
     if (workspace) workspace.classList.toggle('split-view', this.isSplitView);
     if (paneRight) paneRight.classList.toggle('hidden', !this.isSplitView);
     if (btnSplit) btnSplit.classList.toggle('active', this.isSplitView);
+    if (typeof BibleComparisonHub !== 'undefined') {
+      BibleComparisonHub.updateSplitStatus(this.isSplitView);
+    }
 
     if (this.isSplitView) {
       if (btnSync) {
@@ -5450,6 +5520,10 @@ const BibleReader = {
     this.currentBook = finalBookCode;
     this.currentChapter = finalChapterNum;
     this.loadedChapters = [{ book: finalBookCode, chapter: finalChapterNum }];
+
+    if (typeof BibleComparisonHub !== 'undefined') {
+      BibleComparisonHub.updateGospelState(finalBookCode);
+    }
 
     const info = getBookInfo(finalBookCode);
     const targetVerse = finalVerseNum ? parseInt(finalVerseNum, 10) : null;
@@ -5927,11 +6001,9 @@ const BibleReader = {
               </div>
             `;
           });
-          const badgeText = paneInterVersion === 'DARBY' ? 'Bible Darby (Interlinéaire Inversé)' : 'Louis Segond 1910 (Interlinéaire Inversé)';
           vSpan.innerHTML = `
             <div class="verse-interlinear-header">
               <sup class="verse-num">${v.verse}</sup>
-              <span class="verse-interlinear-badge">${badgeText}</span>
               ${marginBadgeHtml}
             </div>
             <div class="verse-interlinear-grid">${wordsHtml}</div>

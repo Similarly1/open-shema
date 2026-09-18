@@ -341,10 +341,12 @@ class DictionaryManager:
                     
         dict_slug = dict_id.replace("-", "_")
         for ext in [".sqlite", ".json"]:
-            if os.path.exists(os.path.join(base_dir, "data", "dictionaries", f"dict_{dict_slug}{ext}")) or \
-               os.path.exists(os.path.join(base_dir, "data", "dictionaries", f"{dict_slug}{ext}")) or \
-               os.path.exists(os.path.join(base_dir, "data", f"{dict_slug}{ext}")):
-                return True
+            for fname in [f"dict_{dict_slug}{ext}", f"{dict_slug}{ext}"]:
+                if os.path.exists(resolve_data_path("dictionaries", fname)) or \
+                   os.path.exists(resolve_data_path(fname)) or \
+                   os.path.exists(os.path.join(base_dir, "data", "dictionaries", fname)) or \
+                   os.path.exists(os.path.join(base_dir, "data", fname)):
+                    return True
                 
         return False
 
@@ -684,8 +686,8 @@ class DictionaryManager:
     def get_vigouroux_illustrations(cls, word_or_title: str) -> list:
         """Récupère la liste des gravures Vigouroux associées à un mot-clé."""
         if cls._vigouroux_illustrations is None:
-            data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "dictionaries")
-            json_path = os.path.join(data_dir, "vigouroux_illustrations.json")
+            from core.paths import resolve_data_path
+            json_path = resolve_data_path("dictionaries", "vigouroux_illustrations.json")
             if os.path.exists(json_path):
                 try:
                     with open(json_path, "r", encoding="utf-8") as f:

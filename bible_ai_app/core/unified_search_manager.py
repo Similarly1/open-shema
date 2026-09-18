@@ -24,11 +24,11 @@ class UnifiedSearchManager:
     """Gestionnaire de recherche unifiée pour le Hub Open Shema."""
 
     def __init__(self):
+        from core.paths import resolve_data_path
         self.ebook_manager = EbookFinderManager()
-        self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.logos_books_path = os.path.join(self.current_dir, "data", "logos_community_books.json")
-        self.gutenberg_books_path = os.path.join(self.current_dir, "data", "gutenberg_theology_books.json")
-        self.ccel_books_path = os.path.join(self.current_dir, "data", "ccel_theology_books.json")
+        self.logos_books_path = resolve_data_path("logos_community_books.json")
+        self.gutenberg_books_path = resolve_data_path("gutenberg_theology_books.json")
+        self.ccel_books_path = resolve_data_path("ccel_theology_books.json")
 
     def get_local_ccel_books(self, query: str = "") -> List[Dict[str, Any]]:
         """Renvoie les classiques chrétiens de CCEL indexés localement."""
