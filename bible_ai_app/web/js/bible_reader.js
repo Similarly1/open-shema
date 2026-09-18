@@ -1980,6 +1980,14 @@ const CommentarySynthesizerUI = {
     this.togglePanel(false);
   },
 
+  openPanel(forceOpen = true) {
+    return this.togglePanel(forceOpen);
+  },
+
+  openModal() {
+    return this.togglePanel(true);
+  },
+
   enterFullResultMode() {
     const panel = document.getElementById('comm-synthesis-panel');
     const singleView = document.getElementById('commentary-single-view');

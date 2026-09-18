@@ -110,12 +110,21 @@ const PassageOverviewDrawer = {
     // Boutons d'action globale
     document.getElementById('btn-overview-action-synth')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
-      setTimeout(() => {
-        if (typeof CommentarySynthesizerUI !== 'undefined') {
-          CommentarySynthesizerUI.openModal();
-        }
-      }, 100);
+      if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.toggleSynthesisPanel === 'function') {
+        CommentaryWindow.switchTab('commentaries');
+        setTimeout(() => CommentaryWindow.toggleSynthesisPanel(true), 80);
+      } else {
+        document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
+        setTimeout(() => {
+          if (typeof CommentarySynthesizerUI !== 'undefined') {
+            if (typeof CommentarySynthesizerUI.openModal === 'function') {
+              CommentarySynthesizerUI.openModal();
+            } else if (typeof CommentarySynthesizerUI.togglePanel === 'function') {
+              CommentarySynthesizerUI.togglePanel(true);
+            }
+          }
+        }, 100);
+      }
     });
 
     document.getElementById('btn-overview-action-study')?.addEventListener('click', (e) => {
@@ -287,7 +296,21 @@ const PassageOverviewDrawer = {
   },
 
   /**
-   * Affiche l'infobulle flottante au survol d'une ressource (avec image / couverture)
+   * Vérifie dynamiquement l'orientation réelle d'une image chargée
+   */
+  checkImageOrientation(img) {
+    if (!img || !img.naturalWidth || !img.naturalHeight) return;
+    const ratio = img.naturalWidth / img.naturalHeight;
+    if (ratio > 1.25) {
+      const wrap = img.closest('.popover-portrait-wrap');
+      if (wrap) {
+        wrap.classList.add('popover-is-landscape');
+      }
+    }
+  },
+
+  /**
+   * Affiche l'infobulle flottante au survol d'une ressource (avec image / couverture adaptée)
    */
   async showPopover(itemEl) {
     if (!this.popoverEl) this.initPopover();
@@ -304,23 +327,86 @@ const PassageOverviewDrawer = {
     const action = itemEl.dataset.action || '';
     const bName = itemEl.dataset.bookName || '';
     const chId = itemEl.dataset.chapterId || '';
+    const duration = itemEl.dataset.ttDuration || '';
 
-    if (!excerpt && !author && !title && !bName) return;
+    if (!excerpt && !author && !title && !bName && !imgUrl) return;
 
+    const isVideo = action === 'open-bp-video' || cat.includes('Vidéo') || !!itemEl.dataset.ytId;
+    const isPoster = action === 'open-bp-poster' || cat.includes('Poster') || cat.includes('Affiche') || cat.includes('Structure');
+
+    // Détermination de l'orientation de l'image (paysage vs portrait)
+    let layout = itemEl.dataset.ttLayout || '';
+    if (!layout) {
+      if (isVideo || cat === 'Article' || (cat === 'Lieu' && imgUrl)) {
+        layout = 'landscape';
+      } else if (isPoster || cat === 'Livre' || cat === 'Commentaire') {
+        layout = 'portrait';
+      } else if (imgUrl) {
+        layout = 'portrait';
+      } else {
+        layout = 'none';
+      }
+    }
+
+    // Icône de catégorie
     let catIcon = this.icons.commentary;
-    if (cat === 'Article') catIcon = this.icons.article;
+    if (isVideo) catIcon = this.icons.video;
+    else if (isPoster) catIcon = this.icons.study;
+    else if (cat === 'Article') catIcon = this.icons.article;
     else if (cat === 'Livre') catIcon = this.icons.book;
     else if (cat === 'Note') catIcon = this.icons.note;
     else if (cat === 'Lieu') catIcon = this.icons.map;
     else if (cat === 'Pastoral' || cat === 'Éthique') catIcon = this.icons.pastoral;
 
+    // Titres et sous-titres hiérarchisés
+    let mainTitle = '';
+    let subTitle = '';
+    if (isVideo || isPoster || cat === 'Article') {
+      mainTitle = title || author || 'Ressource';
+      subTitle = (author && author !== title) ? author : (isPoster ? 'Structure littéraire &amp; découpage' : '');
+    } else if (cat === 'Commentaire') {
+      mainTitle = author || title || 'Commentaire';
+      subTitle = (title && title !== author) ? title : '';
+    } else {
+      mainTitle = author || title || bName || 'Ressource';
+      subTitle = (author && title && author !== title) ? title : '';
+    }
+
+    // Résumé / Extrait par défaut si vide
+    if (!excerpt) {
+      if (isVideo) {
+        excerpt = `Panorama vidéo BibleProject explorant la structure littéraire, le contexte historique et les thèmes théologiques de <strong>${this.escapeHtml(mainTitle)}</strong>.`;
+      } else if (isPoster) {
+        excerpt = `Schéma de structure littéraire et trame narrative haute résolution de <strong>${this.escapeHtml(mainTitle)}</strong>. Analyse visuelle de l'organisation du texte.`;
+      }
+    }
+
+    // Hint du footer personnalisé
+    const hintText = itemEl.dataset.ttHint || (
+      isVideo ? 'Cliquer pour regarder la vidéo' :
+      isPoster ? 'Cliquer pour zoomer en plein écran' :
+      (cat === 'Pastoral' ? 'Cliquer pour écouter / consulter' : 'Cliquer pour ouvrir dans l\'onglet')
+    );
+    const hintIcon = isVideo ? this.icons.video : (isPoster ? `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>` : this.icons.arrowRight);
+
     let coverHtml = '';
     let bannerHtml = '';
 
-    if (cat === 'Article') {
-      if (imgUrl) {
-        bannerHtml = `<div class="popover-landscape-banner"><img src="${imgUrl}" class="popover-landscape-img" alt=""></div>`;
-      }
+    if (layout === 'landscape' && imgUrl) {
+      bannerHtml = `
+        <div class="popover-landscape-banner ${isVideo ? 'is-video' : ''}">
+          <img src="${imgUrl}" class="popover-landscape-img" alt="${this.escapeHtml(mainTitle)}" loading="lazy">
+          ${isVideo ? `
+            <div class="popover-video-play-overlay">
+              <div class="popover-video-play-icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+              </div>
+            </div>
+            ${duration ? `<span class="popover-video-duration-pill">${this.escapeHtml(duration)}</span>` : ''}
+          ` : ''}
+        </div>
+      `;
+      coverHtml = '';
     } else if (cat === 'Note') {
       coverHtml = '';
     } else if (cat === 'Pastoral' || cat === 'Éthique') {
@@ -337,6 +423,18 @@ const PassageOverviewDrawer = {
       } else {
         coverHtml = `<div class="popover-cover-wrap"><div class="popover-cover-fallback pastoral" style="background: transparent; border: none; padding: 0;"><svg viewBox="0 0 24 24" width="46" height="46" style="border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.3); vertical-align: middle;" xml:space="preserve"><rect width="24" height="24" rx="3.5" fill="#C6000E"/><polygon fill="#000000" points="4.6,4.6 19.4,4.6 19.4,19.4 16.6,19.4 16.6,22.3 12,19.4 4.6,19.4"/><path fill="#FFFFFF" d="M10.3,9.5l-2-2.1L7.5,8.3l2,2H7.4v1h3.9V7.4h-1V9.5L10.3,9.5L10.3,9.5z M13.7,9.5l2-2.1l0.9,0.9l-2.1,2h2.1v1 h-3.9V7.4h1V9.5L13.7,9.5L13.7,9.5z M10.3,14.5l-2,2l-0.9-0.9l2-2H7.4v-1h3.9v3.9h-1V14.5L10.3,14.5L10.3,14.5z M13.7,14.5l2,2 l0.9-0.9l-2.1-2h2.1v-1h-3.9v3.9h1V14.5L13.7,14.5L13.7,14.5z"/></svg></div></div>`;
       }
+    } else if (layout === 'portrait') {
+      coverHtml = imgUrl
+        ? `<div class="popover-portrait-wrap ${isPoster ? 'is-poster' : ''}">
+             <img src="${imgUrl}" class="popover-portrait-img" alt="${this.escapeHtml(mainTitle)}" loading="lazy" onload="PassageOverviewDrawer.checkImageOrientation(this)">
+             ${isPoster ? `
+               <div class="popover-poster-zoom-pill">
+                 <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                 <span>HD</span>
+               </div>
+             ` : ''}
+           </div>`
+        : `<div class="popover-portrait-wrap"><div class="popover-cover-fallback ${cat.toLowerCase()}">${catIcon}</div></div>`;
     } else {
       coverHtml = imgUrl
         ? `<div class="popover-cover-wrap"><img src="${imgUrl}" class="popover-cover-img" alt=""></div>`
@@ -369,7 +467,7 @@ const PassageOverviewDrawer = {
           ${coverHtml}
           <div class="popover-header-content">
             <div class="popover-meta-row">
-              <span class="popover-cat-badge">${catIcon} <span>${this.escapeHtml(cat)}</span></span>
+              <span class="popover-cat-badge ${isVideo ? 'is-video' : ''}">${catIcon} <span>${this.escapeHtml(cat)}</span></span>
               ${badge ? `
                 <span class="popover-source-badge ${logoUrl ? 'has-logo' : ''}">
                   ${logoUrl ? `<img src="${logoUrl}" class="popover-source-logo" alt="">` : ''}
@@ -377,8 +475,8 @@ const PassageOverviewDrawer = {
                 </span>` : ''}
             </div>
             <div class="popover-title-row">
-              <div class="popover-main-title">${this.escapeHtml(author)}</div>
-              ${title ? `<div class="popover-sub-title">${this.escapeHtml(title)}</div>` : ''}
+              <div class="popover-main-title">${this.escapeHtml(mainTitle)}</div>
+              ${subTitle ? `<div class="popover-sub-title">${this.escapeHtml(subTitle)}</div>` : ''}
             </div>
           </div>
         </div>
@@ -386,14 +484,14 @@ const PassageOverviewDrawer = {
           ${bodyContentHtml}
         </div>
         <div class="popover-footer">
-          <span class="popover-hint">${this.icons.arrowRight} <span>Cliquer pour ouvrir dans l'onglet</span></span>
+          <span class="popover-hint">${hintIcon} <span>${this.escapeHtml(hintText)}</span></span>
         </div>
       </div>
     `;
 
     const rect = itemEl.getBoundingClientRect();
     const popoverWidth = 380;
-    const estPopoverHeight = 220;
+    const estPopoverHeight = bannerHtml ? 310 : 230;
     const isSecondaryWindow = !!document.getElementById('comm-win-titlebar');
 
     let left = 16;
@@ -590,8 +688,6 @@ const PassageOverviewDrawer = {
         `;
       }
 
-      // H. Section Actions Rapides & IA
-      finalHtml += this.renderQuickActionsSection(data);
       root.innerHTML = finalHtml;
       this.attachCardEventListeners(root, data);
       return;
@@ -659,9 +755,6 @@ const PassageOverviewDrawer = {
         </div>
       `;
     }
-
-    // G. Section Actions Rapides & IA
-    finalHtml += this.renderQuickActionsSection(data);
 
     root.innerHTML = finalHtml;
     this.attachCardEventListeners(root, data);
@@ -764,6 +857,8 @@ const PassageOverviewDrawer = {
       // 1. Vidéos du livre / chapitre
       videos.forEach((v) => {
         const thumbUrl = v.thumbnail || `https://i.ytimg.com/vi/${v.yt_id}/hqdefault.jpg`;
+        const durBadge = v.duration || 'Panorama';
+        const vDesc = v.description || `Panorama vidéo BibleProject explorant la structure littéraire, le contexte historique et les thèmes majeurs de ${v.title}.`;
         bodyHtml += `
           <div class="overview-bp-video-item"
                data-action="open-bp-video"
@@ -773,7 +868,11 @@ const PassageOverviewDrawer = {
                data-tt-category="BibleProject"
                data-tt-title="${this.escapeHtml(v.title)}"
                data-tt-image="${thumbUrl}"
-               data-tt-excerpt="${this.escapeHtml(v.description || '')}">
+               data-tt-layout="landscape"
+               data-tt-badge="${this.escapeHtml(durBadge)}"
+               data-tt-duration="${this.escapeHtml(v.duration || '')}"
+               data-tt-hint="Cliquer pour regarder la vidéo"
+               data-tt-excerpt="${this.escapeHtml(vDesc)}">
             <div class="bp-preview-thumb">
               <img src="${thumbUrl}" alt="${this.escapeHtml(v.title)}" loading="lazy">
               <div class="bp-preview-play-icon">
@@ -798,9 +897,12 @@ const PassageOverviewDrawer = {
                data-pdf-url="${p.pdf_url}"
                data-title="${this.escapeHtml(p.title)}"
                data-tt-category="BibleProject"
+               data-tt-badge="Affiche HD"
                data-tt-title="${this.escapeHtml(p.title)}"
                data-tt-image="${p.image_url}"
-               data-tt-excerpt="Structure littéraire et schéma narratif haute définition.">
+               data-tt-layout="portrait"
+               data-tt-hint="Cliquer pour zoomer en plein écran"
+               data-tt-excerpt="Structure littéraire et schéma narratif haute définition. Analyse visuelle de l'organisation et du découpage du texte.">
             <div class="bp-poster-mini-thumb loading">
               <img src="${p.image_url}" alt="${this.escapeHtml(p.title)}" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.remove('loading');" onerror="this.classList.add('loaded'); this.parentElement.classList.remove('loading');">
               <div class="bp-poster-zoom-mini">
@@ -826,16 +928,22 @@ const PassageOverviewDrawer = {
         `;
         relatedThemes.slice(0, 4).forEach((th) => {
           const thumbUrl = th.thumbnail || `https://i.ytimg.com/vi/${th.yt_id}/hqdefault.jpg`;
+          const thDur = th.duration || 'Thème';
+          const thDesc = th.description || `Série thématique BibleProject explorant ce grand motif biblique à travers l'ensemble des Écritures.`;
           bodyHtml += `
             <div class="overview-bp-video-item"
                  data-action="open-bp-video"
                  data-yt-id="${th.yt_id}"
                  data-title="${this.escapeHtml(th.title)}"
                  data-desc="${this.escapeHtml(th.description || '')}"
-                 data-tt-category="BibleProject (Thème)"
+                 data-tt-category="BibleProject"
+                 data-tt-badge="${this.escapeHtml(thDur)}"
+                 data-tt-duration="${this.escapeHtml(th.duration || '')}"
                  data-tt-title="${this.escapeHtml(th.title)}"
                  data-tt-image="${thumbUrl}"
-                 data-tt-excerpt="${this.escapeHtml(th.description || 'Série thématique BibleProject')}">
+                 data-tt-layout="landscape"
+                 data-tt-hint="Cliquer pour regarder la vidéo"
+                 data-tt-excerpt="${this.escapeHtml(thDesc)}">
               <div class="bp-preview-thumb">
                 <img src="${thumbUrl}" alt="${this.escapeHtml(th.title)}" loading="lazy">
                 <div class="bp-preview-play-icon">
@@ -942,6 +1050,8 @@ const PassageOverviewDrawer = {
                data-tt-category="Commentaire"
                data-tt-author="${this.escapeHtml(author)}"
                data-tt-title="${this.escapeHtml(title)}"
+               data-tt-layout="portrait"
+               data-tt-hint="Cliquer pour ouvrir dans l'onglet Commentaires"
                data-tt-excerpt="${this.escapeHtml(excerptHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
@@ -1022,10 +1132,12 @@ const PassageOverviewDrawer = {
                data-article-id="${this.escapeHtml(art.id)}"
                data-cover-key="${this.escapeHtml(coverKey)}"
                data-tt-category="Article"
-               data-tt-author="${this.escapeHtml(title)}"
-               data-tt-title="${this.escapeHtml(art.author ? 'Par ' + art.author : '')}"
+               data-tt-title="${this.escapeHtml(title)}"
+               data-tt-author="${this.escapeHtml(art.author ? 'Par ' + art.author : '')}"
                data-tt-badge="${this.escapeHtml(src)}"
                data-tt-logo="${logoUrl || ''}"
+               data-tt-layout="landscape"
+               data-tt-hint="Cliquer pour lire l'article"
                data-tt-excerpt="${this.escapeHtml(summaryHtml)}">
             <div class="clean-article-row">
               <div class="clean-article-content">
@@ -1097,6 +1209,8 @@ const PassageOverviewDrawer = {
                data-tt-category="Livre"
                data-tt-author="${this.escapeHtml(bTitle)}"
                data-tt-title="${this.escapeHtml(chTitle)}"
+               data-tt-layout="portrait"
+               data-tt-hint="Cliquer pour ouvrir le chapitre"
                data-tt-excerpt="${this.escapeHtml(snippetHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
@@ -1178,6 +1292,7 @@ const PassageOverviewDrawer = {
                data-tt-title="${this.escapeHtml(titleFr)}"
                data-tt-badge="${sourceBrand}"
                data-tt-logo="${logoPath}"
+               data-tt-hint="Cliquer pour écouter / consulter l'épisode"
                data-tt-excerpt="${this.escapeHtml(theseHtml)}">
             <div class="clean-article-row">
               <div class="clean-article-content">
@@ -1249,6 +1364,7 @@ const PassageOverviewDrawer = {
                data-note-id="${this.escapeHtml(n.id)}"
                data-tt-category="Note"
                data-tt-author="${this.escapeHtml(n.title || 'Note')}"
+               data-tt-hint="Cliquer pour afficher la note"
                data-tt-excerpt="${this.escapeHtml(snippetHtml)}">
             <div class="clean-item-header">
               <span class="clean-author-name">${this.escapeHtml(n.title || 'Note')}</span>
@@ -1318,6 +1434,7 @@ const PassageOverviewDrawer = {
                data-tt-category="Lieu"
                data-tt-author="${this.escapeHtml(p.name)}"
                data-tt-title="${this.escapeHtml(p.type || 'Lieu biblique')}"
+               data-tt-hint="Cliquer pour localiser sur l'Atlas"
                data-tt-excerpt="${this.escapeHtml(descHtml)}">
             <div class="clean-item-header">
               <div class="clean-item-title-group">
@@ -1344,25 +1461,6 @@ const PassageOverviewDrawer = {
         </header>
         <div class="sec-body">${bodyHtml}</div>
       </section>
-    `;
-  },
-
-  /**
-   * Section Actions Rapides & IA (Épurée en barre fine)
-   */
-  renderQuickActionsSection(data) {
-    return `
-      <div class="overview-quick-actions-bar">
-        <button class="btn-action-synth" id="btn-card-launch-synth" title="Synthèse IA comparative des commentaires">
-          <span class="action-btn-svg">${this.icons.sparkle}</span>
-          <span>Synthèse IA</span>
-        </button>
-
-        <button class="btn-action-study" id="btn-card-launch-study" title="Ouvrir la vue complète d'étude de passage">
-          <span class="action-btn-svg">${this.icons.study}</span>
-          <span>Étude complète</span>
-        </button>
-      </div>
     `;
   },
 
@@ -1639,29 +1737,6 @@ const PassageOverviewDrawer = {
       });
     });
 
-    // 8. Boutons d'actions rapides du bas de carte
-    container.querySelector('#btn-card-launch-synth')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (typeof CommentaryWindow !== 'undefined' && typeof CommentaryWindow.toggleSynthesisPanel === 'function') {
-        CommentaryWindow.switchTab('commentaries');
-        setTimeout(() => CommentaryWindow.toggleSynthesisPanel(true), 80);
-      } else {
-        document.querySelector('.drawer-tab[data-drawer-tab="commentaries"]')?.click();
-        setTimeout(() => {
-          if (typeof CommentarySynthesizerUI !== 'undefined') {
-            CommentarySynthesizerUI.openModal();
-          }
-        }, 100);
-      }
-    });
-
-    container.querySelector('#btn-card-launch-study')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const refStr = data.reference || `${this.currentBook} ${this.currentChapter}:${this.currentVerse}`;
-      if (typeof BibleComparisonHub !== 'undefined') {
-        BibleComparisonHub.openMatrix(refStr);
-      }
-    });
   },
 
   /**

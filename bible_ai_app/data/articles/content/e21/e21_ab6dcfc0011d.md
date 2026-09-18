@@ -60,4 +60,4 @@ Je terminerai par les paroles de Paul en 1 Corinthiens 15:58 :
 
 On vous voit. Continuez.
 
-<div class="article-author-bio-card"><div class="article-author-bio-avatar"><img src="https://media.thegospelcoalition.org/wp-content/uploads/sites/5/2026/09/14065206/DLYohn-Headshot-2019-4x3-e1645037056619-300x300.jpg" alt="" class="article-author-bio-img" loading="lazy"></div><div class="article-author-bio-content"><p>**Denise Lee Yohn** est la cofondatrice du [Bay Area Center for Faith, Work & Tech](https://www.faithworktech.org/) , ainsi que conférencière, consultante et auteure spécialisée en leadership de marque. Elle accompagne les leaders chrétiens dans l’exercice de leur vocation professionnelle à travers ses écrits et ses interventions dans les églises, lors d’événements et de conférences, notamment Women, Work & Calling et Boldly.</p></div></div>
+Lire la suite : [Travailler sans reconnaissance : trouver la motivation quand personne ne semble le remarquer](https://evangile21.thegospelcoalition.org/article/travailler-sans-reconnaissance-trouver-la-motivation-quand-personne-ne-semble-le-remarquer/) sur [Evangile 21](https://evangile21.thegospelcoalition.org) .
