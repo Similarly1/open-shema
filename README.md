@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Similarly1/open-shema/releases/tag/v0.3.0"><img src="https://img.shields.io/badge/Version-v0.3.0-blue.svg" alt="Version v0.3.0"></a>
+  <a href="https://github.com/Similarly1/open-shema/releases/tag/v0.4.0"><img src="https://img.shields.io/badge/Version-v0.4.0-blue.svg" alt="Version v0.4.0"></a>
   <a href="https://apps.microsoft.com/detail/9NXC16S8DHT3"><img src="https://img.shields.io/badge/Microsoft%20Store-Disponible-0078D4?logo=windows&logoColor=white" alt="Disponible sur Microsoft Store"></a>
   <img src="https://img.shields.io/badge/Taille-~321%20Mo%20(All%C3%A9g%C3%A9e)-green" alt="Taille allégée">
   <img src="https://img.shields.io/badge/Licence-MIT-blue.svg" alt="License MIT">
@@ -287,7 +287,7 @@ Open Shema a été pensé pour que **l'utilisateur ne soit jamais prisonnier de 
 - **Avantages :** Installation certifiée en un clic, mises à jour silencieuses et automatiques gérées par Windows, intégration propre au menu Démarrer.
 
 ### ⚡ 2. Version Portable Autonome (.zip depuis GitHub)
-- **Téléchargement direct :** Téléchargez l'archive [`OpenShema.zip` (~321 Mo)](https://github.com/Similarly1/open-shema/releases/download/v0.3.0/OpenShema.zip) depuis la [Release v0.3.0](https://github.com/Similarly1/open-shema/releases/tag/v0.3.0).
+- **Téléchargement direct :** Téléchargez l'archive [`OpenShema.zip`](https://github.com/Similarly1/open-shema/releases/download/v0.4.0/OpenShema.zip) depuis la [Release v0.4.0](https://github.com/Similarly1/open-shema/releases/tag/v0.4.0).
 - **Aucune installation requise :** Décompressez l'archive où vous le souhaitez (disque dur, clé USB, dossier personnel).
 - **Lancement immédiat :** Double-cliquez sur `OpenShema.exe` pour démarrer.
 - **Mises à jour :** L'application intègre son propre système de vérification et de mise à jour automatique.

@@ -177,11 +177,11 @@ class InstallerAPI:
             "is_fallback": True,
             "has_local_build": has_local,
             "local_archive_path": local_pkg if has_local else None,
-            "tag": "v0.3.0",
-            "name": "Open Shema v0.3.0",
-            "download_url": f"https://github.com/{repo}/releases/download/v0.3.0/OpenShema.zip",
-            "size_str": "~330 Mo",
-            "notes": "Version complète d'Open Shema incluant le moteur biblique, les cartes mentales et l'assistant IA."
+            "tag": "v0.4.0",
+            "name": "Open Shema v0.4.0",
+            "download_url": f"https://github.com/{repo}/releases/download/v0.4.0/OpenShema.zip",
+            "size_str": "~585 Mo",
+            "notes": "Version complète d'Open Shema avec hub de comparaison de bibles, synopse, studio audio/podcasts et assistant IA."
         }
 
         url = f"https://api.github.com/repos/{repo}/releases"
