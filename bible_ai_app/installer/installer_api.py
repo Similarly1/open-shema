@@ -177,9 +177,9 @@ class InstallerAPI:
             "is_fallback": True,
             "has_local_build": has_local,
             "local_archive_path": local_pkg if has_local else None,
-            "tag": "v0.4.0",
-            "name": "Open Shema v0.4.0",
-            "download_url": f"https://github.com/{repo}/releases/download/v0.4.0/OpenShema.zip",
+            "tag": "v0.4.1",
+            "name": "Open Shema v0.4.1",
+            "download_url": f"https://github.com/{repo}/releases/download/v0.4.1/OpenShema.zip",
             "size_str": "~585 Mo",
             "notes": "Version complète d'Open Shema avec hub de comparaison de bibles, synopse, studio audio/podcasts et assistant IA."
         }
