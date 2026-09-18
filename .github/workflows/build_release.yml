@@ -39,6 +39,11 @@ jobs:
         run: |
           python installer/build_installer.py
 
+      - name: Build Microsoft Store Package (OpenShema.msix)
+        working-directory: bible_ai_app
+        run: |
+          python build_msix.py
+
       - name: Upload Artifacts to Workflow
         uses: actions/upload-artifact@v4
         with:
@@ -46,6 +51,7 @@ jobs:
           path: |
             bible_ai_app/dist/OpenShemaSetup.exe
             bible_ai_app/dist/OpenShema.zip
+            bible_ai_app/dist/OpenShema.msix
 
       - name: Publish to GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -54,5 +60,6 @@ jobs:
           files: |
             bible_ai_app/dist/OpenShemaSetup.exe
             bible_ai_app/dist/OpenShema.zip
+            bible_ai_app/dist/OpenShema.msix
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
