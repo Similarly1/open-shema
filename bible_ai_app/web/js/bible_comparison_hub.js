@@ -886,6 +886,9 @@ const BibleComparisonHub = {
       single: "Récit Unique"
     };
 
+    const tradClass = `ps-tradition-${matrix.tradition_type || 'single'}`;
+    const tradLabel = traditionLabels[matrix.tradition_type] || matrix.tradition_type || 'Synoptique';
+
     const frenchGospelNames = {
       'MAT': 'Matthieu', 'MRK': 'Marc', 'LUK': 'Luc', 'JHN': 'Jean',
       'Mat': 'Matthieu', 'Mar': 'Marc', 'Luk': 'Luc', 'Joh': 'Jean'
