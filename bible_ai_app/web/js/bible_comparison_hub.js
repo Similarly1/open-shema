@@ -71,8 +71,11 @@ const BibleComparisonHub = {
     expand: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
     search: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
     bookText: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>',
-    listRefs: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'
+    listRefs: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+    compress: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/></svg>'
   },
+
+  sidebarWasAutoCollapsed: false,
 
   GOSPEL_BOOKS: ['Mat', 'Mar', 'Luk', 'Joh', 'MAT', 'MRK', 'LUK', 'JHN'],
 
@@ -158,11 +161,15 @@ const BibleComparisonHub = {
       this.closeOverlay();
     });
 
-    // Plein écran
+    // Plein écran / Agrandir
     this.btnFullscreenOverlayEl?.addEventListener('click', () => {
-      this.overlayWindowEl?.classList.toggle('fullscreen');
-      const isFull = this.overlayWindowEl?.classList.contains('fullscreen');
-      this.btnFullscreenOverlayEl.classList.toggle('active', isFull);
+      this.toggleFullscreen();
+    });
+
+    // Double-clic sur l'en-tête pour agrandir / restaurer
+    this.overlayWindowEl?.querySelector('.comp-overlay-header')?.addEventListener('dblclick', (e) => {
+      if (e.target.closest('button')) return;
+      this.toggleFullscreen();
     });
 
     // Touche Échap
@@ -306,16 +313,62 @@ const BibleComparisonHub = {
     }
   },
 
+  toggleFullscreen() {
+    if (!this.overlayWindowEl) return;
+    this.overlayWindowEl.classList.toggle('fullscreen');
+    const isFull = this.overlayWindowEl.classList.contains('fullscreen');
+
+    if (this.overlayEl) {
+      this.overlayEl.classList.toggle('is-fullscreen', isFull);
+    }
+
+    if (this.btnFullscreenOverlayEl) {
+      this.btnFullscreenOverlayEl.classList.toggle('active', isFull);
+      this.btnFullscreenOverlayEl.title = isFull ? 'Restaurer la taille normale' : 'Agrandir / Plein écran';
+      this.btnFullscreenOverlayEl.innerHTML = isFull ? this.ICONS.compress : this.ICONS.expand;
+    }
+
+    // Réduire automatiquement le volet gauche du menu principal en écran agrandi
+    if (typeof App !== 'undefined' && App.setSidebarCollapsed) {
+      const sidebar = document.getElementById('sidebar');
+      const isSidebarAlreadyCollapsed = sidebar && sidebar.classList.contains('collapsed');
+
+      if (isFull) {
+        if (!isSidebarAlreadyCollapsed) {
+          this.sidebarWasAutoCollapsed = true;
+          App.setSidebarCollapsed(true, true);
+        }
+      } else {
+        if (this.sidebarWasAutoCollapsed) {
+          this.sidebarWasAutoCollapsed = false;
+          App.setSidebarCollapsed(false, true);
+        }
+      }
+    }
+  },
+
   closeOverlay() {
     this.isOpen = false;
     this.activeMode = null;
     if (this.overlayEl) {
       this.overlayEl.classList.add('hidden');
+      this.overlayEl.classList.remove('is-fullscreen');
       document.body.classList.remove('modal-open');
     }
     if (this.overlayWindowEl?.classList.contains('fullscreen')) {
       this.overlayWindowEl.classList.remove('fullscreen');
-      this.btnFullscreenOverlayEl?.classList.remove('active');
+      if (this.btnFullscreenOverlayEl) {
+        this.btnFullscreenOverlayEl.classList.remove('active');
+        this.btnFullscreenOverlayEl.title = 'Agrandir / Plein écran';
+        this.btnFullscreenOverlayEl.innerHTML = this.ICONS.expand;
+      }
+    }
+    // Restaurer le volet gauche s'il avait été replié automatiquement par l'agrandissement
+    if (this.sidebarWasAutoCollapsed) {
+      this.sidebarWasAutoCollapsed = false;
+      if (typeof App !== 'undefined' && App.setSidebarCollapsed) {
+        App.setSidebarCollapsed(false, true);
+      }
     }
   },
 

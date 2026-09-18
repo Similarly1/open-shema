@@ -22226,6 +22226,11 @@ body.theme-light .ps-syn-ref-pill {
   animation: compOverlayFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.reader-comparison-overlay.is-fullscreen,
+.reader-comparison-overlay:has(.comp-overlay-window.fullscreen) {
+  padding: 0 !important;
+}
+
 .reader-comparison-overlay.hidden {
   display: none !important;
 }
