@@ -222,6 +222,8 @@ def build_msix(rebuild_binary=False):
         os.path.join(internal_dir, "_tcl_data"),
         os.path.join(internal_dir, "_tk_data"),
         os.path.join(internal_dir, "clr_loader", "ffi", "dlls", "x86"),
+        os.path.join(internal_dir, "web", "img", "_vigouroux_staged_temp"),
+        os.path.join(internal_dir, "docx", "templates", "default-docx-template"),
     ]
     for f in files_to_purge:
         if os.path.exists(f):

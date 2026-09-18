@@ -71,7 +71,7 @@ def build():
 
     # Mise à l'écart temporaire des gravures Vigouroux (193 Mo) pour ne pas gonfler le build de base
     vigouroux_img_dir = os.path.join(current_dir, "web", "img", "vigouroux")
-    temp_vigouroux_dir = os.path.join(current_dir, "web", "img", "_vigouroux_staged_temp")
+    temp_vigouroux_dir = os.path.join(current_dir, "_vigouroux_staged_temp")
     has_vigouroux_backup = False
 
     if os.path.exists(vigouroux_img_dir):
@@ -191,6 +191,7 @@ def build():
             os.path.join(dist_app_dir, "_internal", "_tcl_data"),
             os.path.join(dist_app_dir, "_internal", "_tk_data"),
             os.path.join(dist_app_dir, "_internal", "clr_loader", "ffi", "dlls", "x86"),
+            os.path.join(dist_app_dir, "_internal", "docx", "templates", "default-docx-template"),
         ]
         for f in files_to_purge:
             if os.path.exists(f):
