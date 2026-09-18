@@ -57,7 +57,7 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 1. [🌟 Fonctionnalités Principales](#-fonctionnalités-principales)
    - [📖 1. Lecteur Biblique, Langues Originales & Hub de Comparaison / Synopse](#-1-lecteur-biblique-langues-originales--hub-de-comparaison--synopse)
    - [📚 2. Dictionnaires Historiques & Lexiques Originaux](#-2-dictionnaires-historiques--lexiques-originaux)
-   - [💬 3. Bibliothèque de Commentaires & Multi-Fenêtrage](#-3-bibliothèque-de-commentaires--multi-fenêtrage)
+   - [💬 3. Bibliothèque de Commentaires & Multi-Fenêtrage Universel Multi-Écran](#-3-bibliothèque-de-commentaires--multi-fenêtrage-universel-multi-écran)
    - [🔬 4. Atelier de Passage, Péricopes & Cartographie](#-4-atelier-de-passage-péricopes--cartographie)
    - [🎙️ 5. Studio de Prédication, Podcasts Audio & Corpus UPVR](#-5-studio-de-prédication-podcasts-audio--corpus-upvr)
    - [📖 6. Espace Théologie & Flux d'Articles](#-6-espace-théologie--flux-darticles)
@@ -100,8 +100,11 @@ Son nom s'inspire du grand commandement biblique du *Shema Israël* (Deutéronom
 
 ---
 
-### 💬 3. Bibliothèque de Commentaires & Multi-Fenêtrage
+### 💬 3. Bibliothèque de Commentaires & Multi-Fenêtrage Universel Multi-Écran
 
+* **🖥️ Ouverture Universelle dans une Nouvelle Fenêtre (Multi-Écran)** :
+  * **Chaque page ou vue** de l'application (Commentaires, Hub de Comparaison, Dictionnaires, Studio Audio & Podcasts, Ebooks théologiques, Cartes mentales) peut désormais être **ouverte et détachée dans une fenêtre indépendante** en un seul clic.
+  * Idéal pour les configurations à deux ou trois écrans : répartissez vos outils d'étude librement sur votre bureau sans encombrer la vue principale et sans aucune latence.
 * **Corpus Exégétique et Homilétique** :
   * Navigation structurée à travers des commentaires historiques, pastoraux et contemporains verset par verset.
 * **Multi-Fenêtrage Synchronisé en Direct** :
