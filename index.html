@@ -194,11 +194,6 @@
                   <span>Bible</span>
                 </div>
 
-                <div class="sidebar-item" data-nav="guide">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-                  <span>Guide de Passage</span>
-                </div>
-
                 <div class="sidebar-item" data-nav="commentaires">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                   <span>Commentaires</span>
@@ -234,8 +229,13 @@
                   <span>Assistant d'Étude</span>
                 </div>
 
+                <div class="sidebar-item" data-nav="audio">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                  <span>Studio Audio</span>
+                </div>
+
                 <div class="sidebar-item" data-nav="notes">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4-12 12H6v-4L18 2z"></path></svg>
                   <span>Notes</span>
                 </div>
 
@@ -309,9 +309,10 @@
                     <span class="tbar-chevron">▾</span>
                   </button>
 
-                  <button class="tbar-tool-btn" title="Afficher deux versions côte à côte">
+                  <button class="tbar-tool-btn" title="Comparer des versions ou synchroniser">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
-                    <span>Double Vue</span>
+                    <span>Comparer</span>
+                    <span class="tbar-chevron">▾</span>
                   </button>
 
                   <div class="tbar-zoom-ctrl">
@@ -334,24 +335,24 @@
               <!-- Toile de Lecture Parchemin Sépia Réelle (Identique à la capture) -->
               <div class="real-sepia-canvas" id="hero-sepia-canvas">
                 
-                <!-- Fil d'Ariane & Sélecteur de Traduction (100% LIBRES DE DROITS) -->
+                <!-- Fil d'Ariane & Sélecteur de Traduction -->
                 <div class="canvas-meta-bar">
                   <div class="canvas-breadcrumb">GENÈSE &gt; CHAPITRE 1</div>
                   
                   <div class="canvas-version-selector" id="canvas-version-selector">
                     <div class="canvas-version-current" id="canvas-version-current">
                       <span class="canvas-version-tag-icon">⚲</span>
-                      <span id="canvas-version-label">Néo-Crampon Libre</span>
+                      <span id="canvas-version-label">Bible J.N. Darby (avec Strong)</span>
                       <span class="canvas-version-chevron">▾</span>
                     </div>
 
-                    <!-- Menu déroulant des 6 traductions libres de droits -->
+                    <!-- Menu déroulant des traductions -->
                     <div class="canvas-version-dropdown" id="canvas-version-dropdown">
-                      <div class="version-opt active" data-v="crampon">Néo-Crampon Libre (1923)</div>
+                      <div class="version-opt active" data-v="darby">Bible J.N. Darby (avec Strong)</div>
                       <div class="version-opt" data-v="lsg">Louis Segond 1910 (Codes Strong)</div>
+                      <div class="version-opt" data-v="crampon">Néo-Crampon Libre (1923)</div>
                       <div class="version-opt" data-v="ostervald">J.-F. Ostervald (1881/1900)</div>
                       <div class="version-opt" data-v="oltramare">Hugues Oltramare (1874)</div>
-                      <div class="version-opt" data-v="darby">J.N. Darby (1885)</div>
                       <div class="version-opt" data-v="sblgnt">SBL Greek New Testament (Libre)</div>
                     </div>
                   </div>
@@ -360,52 +361,55 @@
                 <!-- Grand Titre de Chapitre Typographique -->
                 <h1 class="canvas-chapter-title">CHAPITRE 1</h1>
 
-                <!-- Texte des Versets en Paragraphe Fluide avec Verset 1 Surligné -->
+                <!-- Texte des Versets en Paragraphe Fluide avec Verset 1 Surligné (Bible Darby) -->
                 <div class="canvas-verses-body" id="hero-verses-container">
                   <span class="verse-unit highlighted" data-verse="1">
-                    <sup class="verse-sup">1</sup><span class="verse-words">Au Commencement Dieu créa le ciel et la terre.</span>
+                    <sup class="verse-sup">1</sup><span class="verse-words">Au commencement Dieu créa les cieux et la terre.</span>
                   </span>
                   <span class="verse-unit" data-verse="2">
-                    <sup class="verse-sup">2</sup><span class="verse-words">La terre était informe et vide ; les ténèbres couvraient l'abîme, et l'Esprit de Dieu se mouvait au-dessus des eaux.</span>
+                    <sup class="verse-sup">2</sup><span class="verse-words">Et la terre était désolation et vide, et il y avait des ténèbres sur la face de l'abîme. Et l'Esprit de Dieu planait sur la face des eaux.</span>
                   </span>
                   <span class="verse-unit" data-verse="3">
-                    <sup class="verse-sup">3</sup><span class="verse-words">Dieu dit : « Que la lumière soit ! » et la lumière fut.</span>
+                    <sup class="verse-sup">3</sup><span class="verse-words">Et Dieu dit : Que la lumière soit. Et la lumière fut.</span>
                   </span>
                   <span class="verse-unit" data-verse="4">
-                    <sup class="verse-sup">4</sup><span class="verse-words">Et Dieu vit que la lumière était bonne ; et Dieu sépara la lumière et les ténèbres.</span>
+                    <sup class="verse-sup">4</sup><span class="verse-words">Et Dieu vit la lumière, qu'elle était bonne ; et Dieu sépara la lumière d'avec les ténèbres.</span>
                   </span>
                   <span class="verse-unit" data-verse="5">
-                    <sup class="verse-sup">5</sup><span class="verse-words">Dieu appela la lumière jour, et les ténèbres Nuit. Et il y eut un soir, et il y eut un matin ; ce fut le premier jour.</span>
+                    <sup class="verse-sup">5</sup><span class="verse-words">Et Dieu appela la lumière Jour ; et les ténèbres, il les appela Nuit. Et il y eut soir, et il y eut matin : – premier jour.</span>
                   </span>
                   <span class="verse-unit" data-verse="6">
-                    <sup class="verse-sup">6</sup><span class="verse-words">Dieu dit : « Qu'il y ait un firmament entre les eaux, et qu'il sépare les eaux d'avec les eaux. »</span>
+                    <sup class="verse-sup">6</sup><span class="verse-words">Et Dieu dit : Qu'il y ait une étendue entre les eaux, et qu'elle sépare les eaux d'avec les eaux.</span>
                   </span>
                   <span class="verse-unit" data-verse="7">
-                    <sup class="verse-sup">7</sup><span class="verse-words">Et Dieu fit le firmament, et il sépara les eaux qui sont au-dessous du firmament d'avec les eaux qui sont au-dessus du firmament. Et cela fut ainsi.</span>
+                    <sup class="verse-sup">7</sup><span class="verse-words">Et Dieu fit l'étendue, et sépara les eaux qui sont au-dessous de l'étendue d'avec les eaux qui sont au-dessus de l'étendue. Et il fut ainsi.</span>
                   </span>
                   <span class="verse-unit" data-verse="8">
-                    <sup class="verse-sup">8</sup><span class="verse-words">Dieu appela le firmament Ciel. Et il y eut un soir et il y eut un matin ; ce fut le second jour.</span>
+                    <sup class="verse-sup">8</sup><span class="verse-words">Et Dieu appela l'étendue Cieux. Et il y eut soir, et il y eut matin : – second jour.</span>
                   </span>
                   <span class="verse-unit" data-verse="9">
-                    <sup class="verse-sup">9</sup><span class="verse-words">Dieu dit : « Que les eaux qui sont au-dessous du ciel se rassemblent en un seul lieu, et que le sec paraisse. » Et cela fut ainsi.</span>
+                    <sup class="verse-sup">9</sup><span class="verse-words">Et Dieu dit : Que les eaux qui sont au-dessous des cieux se rassemblent en un seul lieu, et que le sec paraisse. Et il fut ainsi.</span>
                   </span>
                   <span class="verse-unit" data-verse="10">
-                    <sup class="verse-sup">10</sup><span class="verse-words">Dieu appela le sec Terre, et il appela Mer l'amas des eaux. Et Dieu vit que cela était bon.</span>
+                    <sup class="verse-sup">10</sup><span class="verse-words">Et Dieu appela le sec Terre, et le rassemblement des eaux, il l'appela Mers. Et Dieu vit que cela était bon.</span>
                   </span>
                   <span class="verse-unit" data-verse="11">
-                    <sup class="verse-sup">11</sup><span class="verse-words">Puis Dieu dit : « Que la terre fasse pousser du gazon, des herbes portant semence, des arbres à fruit produisant, selon leur espèce, du fruit ayant en soi sa semence, sur la terre. » Et cela fut ainsi.</span>
+                    <sup class="verse-sup">11</sup><span class="verse-words">Et Dieu dit : Que la terre produise l'herbe, la plante portant de la semence, l'arbre fruitier produisant du fruit selon son espèce, ayant sa semence en soi sur la terre. Et il fut ainsi.</span>
                   </span>
                   <span class="verse-unit" data-verse="12">
-                    <sup class="verse-sup">12</sup><span class="verse-words">Et la terre fit sortir du gazon, des herbes portant semence selon leur espèce, et des arbres produisant, selon leur espèce, du fruit ayant en soi sa semence. Et Dieu vit que cela était bon.</span>
+                    <sup class="verse-sup">12</sup><span class="verse-words">Et la terre produisit l'herbe, la plante portant de la semence selon son espèce, et l'arbre produisant du fruit ayant sa semence en soi selon son espèce. Et Dieu vit que cela était bon.</span>
                   </span>
                   <span class="verse-unit" data-verse="13">
-                    <sup class="verse-sup">13</sup><span class="verse-words">Et il y eut un soir, et il y eut un matin ; ce fut le troisième jour.</span>
+                    <sup class="verse-sup">13</sup><span class="verse-words">Et il y eut soir, et il y eut matin : – troisième jour.</span>
                   </span>
                   <span class="verse-unit" data-verse="14">
-                    <sup class="verse-sup">14</sup><span class="verse-words">Dieu dit : « Qu'il y ait des luminaires dans le firmament du ciel pour séparer le jour et la nuit ; qu'ils soient des signes, qu'ils marquent les époques, les jours et les années,</span>
+                    <sup class="verse-sup">14</sup><span class="verse-words">Et Dieu dit : Qu'il y ait des luminaires dans l'étendue des cieux pour séparer le jour d'avec la nuit, et qu'ils soient pour signes, et pour saisons [déterminées], et pour jours et pour années ;</span>
                   </span>
                   <span class="verse-unit" data-verse="15">
-                    <sup class="verse-sup">15</sup><span class="verse-words">et qu'ils servent de luminaires dans le firmament du ciel pour éclairer la terre. » Et cela fut ainsi.</span>
+                    <sup class="verse-sup">15</sup><span class="verse-words">et qu'ils soient pour luminaires dans l'étendue des cieux pour donner de la lumière sur la terre. Et il fut ainsi.</span>
+                  </span>
+                  <span class="verse-unit" data-verse="16">
+                    <sup class="verse-sup">16</sup><span class="verse-words">Et Dieu fit les deux grands luminaires, le grand luminaire pour dominer sur le jour, et le petit luminaire pour dominer sur la nuit ; et les étoiles.</span>
                   </span>
                 </div>
 
