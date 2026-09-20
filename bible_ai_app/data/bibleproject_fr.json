@@ -35,28 +35,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-gen-1-11",
-          "title": "Structure littéraire : Genèse 1-11",
-          "chapters": [
-            1,
-            11
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_1-11/GENESE_FR_FULL(1).png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_1-11/GENESE_FR_FULL(1).png"
-        },
-        {
-          "id": "poster-gen-12-50",
-          "title": "Structure littéraire : Genèse 12-50",
-          "chapters": [
-            12,
-            50
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_12-50/GENESE_FR_FULL(1).png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/genesis_12-50/GENESE_FR_FULL(1).png"
-        }
-      ]
+      "posters": []
     },
     "EXO": {
       "name": "Exode",
@@ -87,28 +66,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-exo-1-18",
-          "title": "Structure littéraire : Exode 1-18",
-          "chapters": [
-            1,
-            18
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_1-18/Exode_FR_Full.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_1-18/Exode_FR_Full.png"
-        },
-        {
-          "id": "poster-exo-19-40",
-          "title": "Structure littéraire : Exode 19-40",
-          "chapters": [
-            19,
-            40
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_19-40/Exode_FR_Full.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/exodus_19-40/Exode_FR_Full.png"
-        }
-      ]
+      "posters": []
     },
     "LEV": {
       "name": "Lévitique",
@@ -127,18 +85,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-lev-1-999",
-          "title": "Structure littéraire : Lévitique",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/leviticus/Lévitique_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/leviticus/Lévitique_FR.png"
-        }
-      ]
+      "posters": []
     },
     "NUM": {
       "name": "Nombres",
@@ -157,18 +104,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-num-1-999",
-          "title": "Structure littéraire : Nombres",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/numbers/Nombres_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/numbers/Nombres_FR.png"
-        }
-      ]
+      "posters": []
     },
     "DEU": {
       "name": "Deutéronome",
@@ -187,18 +123,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-deu-1-999",
-          "title": "Structure littéraire : Deutéronome",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/deuteronomy/Deutéronome_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/deuteronomy/Deutéronome_FR.png"
-        }
-      ]
+      "posters": []
     },
     "JOS": {
       "name": "Josué",
@@ -217,18 +142,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jos-1-999",
-          "title": "Structure littéraire : Josué",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joshua/JOSUE_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joshua/JOSUE_FR.png"
-        }
-      ]
+      "posters": []
     },
     "JDG": {
       "name": "Juges",
@@ -247,18 +161,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jdg-1-999",
-          "title": "Structure littéraire : Juges",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/judges/SB_JUGES_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/judges/SB_JUGES_FR.png"
-        }
-      ]
+      "posters": []
     },
     "RUT": {
       "name": "Ruth",
@@ -277,18 +180,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-rut-1-999",
-          "title": "Structure littéraire : Ruth",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ruth/Ruth_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ruth/Ruth_FR.png"
-        }
-      ]
+      "posters": []
     },
     "1SA": {
       "name": "1 Samuel",
@@ -319,28 +211,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-1sa-11-12",
-          "title": "Structure littéraire : 1 Samuel 11-12",
-          "chapters": [
-            11,
-            12
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg"
-        },
-        {
-          "id": "poster-1sa-11-12",
-          "title": "Structure littéraire : 1 Samuel 11-12",
-          "chapters": [
-            11,
-            12
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "2SA": {
       "name": "2 Samuel",
@@ -371,28 +242,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-2sa-11-12",
-          "title": "Structure littéraire : 2 Samuel 11-12",
-          "chapters": [
-            11,
-            12
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F1_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg"
-        },
-        {
-          "id": "poster-2sa-11-12",
-          "title": "Structure littéraire : 2 Samuel 11-12",
-          "chapters": [
-            11,
-            12
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_samuel%2FRS_11-12_Samuel_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "1KI": {
       "name": "1 Rois",
@@ -411,18 +261,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-1ki-1-2",
-          "title": "Structure littéraire : 1 Rois 1-2",
-          "chapters": [
-            1,
-            2
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.png"
-        }
-      ]
+      "posters": []
     },
     "2KI": {
       "name": "2 Rois",
@@ -441,18 +280,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-2ki-1-2",
-          "title": "Structure littéraire : 2 Rois 1-2",
-          "chapters": [
-            1,
-            2
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_kings/ROIS_FR.png"
-        }
-      ]
+      "posters": []
     },
     "1CH": {
       "name": "1 Chroniques",
@@ -471,18 +299,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-1ch-1-2",
-          "title": "Structure littéraire : 1 Chroniques 1-2",
-          "chapters": [
-            1,
-            2
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.png"
-        }
-      ]
+      "posters": []
     },
     "2CH": {
       "name": "2 Chroniques",
@@ -501,18 +318,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-2ch-1-2",
-          "title": "Structure littéraire : 2 Chroniques 1-2",
-          "chapters": [
-            1,
-            2
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/1_2_chronicles/Chroniques_REDUX_FR.png"
-        }
-      ]
+      "posters": []
     },
     "EZR": {
       "name": "Esdras",
@@ -531,18 +337,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-ezr-1-999",
-          "title": "Structure littéraire : Esdras",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.png"
-        }
-      ]
+      "posters": []
     },
     "NEH": {
       "name": "Néhémie",
@@ -561,18 +356,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-neh-1-999",
-          "title": "Structure littéraire : Néhémie",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ezra-nehemiah/Esdras-Nehemie_FR.png"
-        }
-      ]
+      "posters": []
     },
     "EST": {
       "name": "Esther",
@@ -591,18 +375,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-est-1-999",
-          "title": "Structure littéraire : Esther",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/esther/Esther_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/esther/Esther_FR.png"
-        }
-      ]
+      "posters": []
     },
     "JOB": {
       "name": "Job",
@@ -621,18 +394,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-job-1-999",
-          "title": "Structure littéraire : Job",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/job/SB-17_Job_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/job/SB-17_Job_FR.png"
-        }
-      ]
+      "posters": []
     },
     "PSA": {
       "name": "Psaumes",
@@ -651,18 +413,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-psa-1-999",
-          "title": "Structure littéraire : Psaumes",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/psalms/Psaumes_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/psalms/Psaumes_FR.png"
-        }
-      ]
+      "posters": []
     },
     "PRO": {
       "name": "Proverbes",
@@ -681,18 +432,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-pro-1-999",
-          "title": "Structure littéraire : Proverbes",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/proverbs/Proverbes_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/proverbs/Proverbes_FR.png"
-        }
-      ]
+      "posters": []
     },
     "ECC": {
       "name": "Ecclésiaste",
@@ -711,18 +451,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-ecc-1-999",
-          "title": "Structure littéraire : Ecclésiaste",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ecclesiastes/Ecclésiaste_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/ecclesiastes/Ecclésiaste_FR.png"
-        }
-      ]
+      "posters": []
     },
     "SNG": {
       "name": "Cantique des Cantiques",
@@ -741,18 +470,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-sng-1-999",
-          "title": "Structure littéraire : Cantique des Cantiques",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/song_of_songs/Cantiques_Des_Cantiques.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/song_of_songs/Cantiques_Des_Cantiques.png"
-        }
-      ]
+      "posters": []
     },
     "ISA": {
       "name": "Ésaïe",
@@ -802,18 +520,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jer-1-999",
-          "title": "Structure littéraire : Jérémie",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jeremiah/Jeremie_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jeremiah/Jeremie_FR.png"
-        }
-      ]
+      "posters": []
     },
     "LAM": {
       "name": "Lamentations",
@@ -832,18 +539,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-lam-1-999",
-          "title": "Structure littéraire : Lamentations",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/lamentations/Lamentations_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/lamentations/Lamentations_FR.png"
-        }
-      ]
+      "posters": []
     },
     "EZK": {
       "name": "Ézéchiel",
@@ -874,28 +570,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-ezk-1-33",
-          "title": "Structure littéraire : Ézéchiel 1-33",
-          "chapters": [
-            1,
-            33
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_1-33%2FRS26_27_Ezechiel_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_1-33%2FRS26_27_Ezechiel_FR_POSTER.jpg"
-        },
-        {
-          "id": "poster-ezk-34-48",
-          "title": "Structure littéraire : Ézéchiel 34-48",
-          "chapters": [
-            34,
-            48
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_34-48%2FRS26_27_Ezechiel_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fezekiel_34-48%2FRS26_27_Ezechiel_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "DAN": {
       "name": "Daniel",
@@ -914,18 +589,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-dan-1-999",
-          "title": "Structure littéraire : Daniel",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fdaniel%2FRS28_Daniel_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fdaniel%2FRS28_Daniel_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "HOS": {
       "name": "Osée",
@@ -944,18 +608,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-hos-1-999",
-          "title": "Structure littéraire : Osée",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/hosea/Osée_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/hosea/Osée_FR.png"
-        }
-      ]
+      "posters": []
     },
     "JOL": {
       "name": "Joël",
@@ -974,18 +627,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jol-1-999",
-          "title": "Structure littéraire : Joël",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joel/Joël_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/joel/Joël_FR.png"
-        }
-      ]
+      "posters": []
     },
     "AMO": {
       "name": "Amos",
@@ -1004,18 +646,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-amo-1-999",
-          "title": "Structure littéraire : Amos",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/amos/Amos_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/amos/Amos_FR.png"
-        }
-      ]
+      "posters": []
     },
     "OBA": {
       "name": "Abdias",
@@ -1034,18 +665,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-oba-1-999",
-          "title": "Structure littéraire : Abdias",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/obadiah/Abdias_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/obadiah/Abdias_FR.png"
-        }
-      ]
+      "posters": []
     },
     "JON": {
       "name": "Jonas",
@@ -1064,18 +684,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jon-1-999",
-          "title": "Structure littéraire : Jonas",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jonah/Jonas_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/jonah/Jonas_FR.png"
-        }
-      ]
+      "posters": []
     },
     "MIC": {
       "name": "Michée",
@@ -1094,18 +703,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-mic-1-999",
-          "title": "Structure littéraire : Michée",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/micah/Michee_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/micah/Michee_FR.png"
-        }
-      ]
+      "posters": []
     },
     "NAM": {
       "name": "Nahum",
@@ -1124,18 +722,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-nam-1-999",
-          "title": "Structure littéraire : Nahum",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/nahum/Nahum_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/nahum/Nahum_FR.png"
-        }
-      ]
+      "posters": []
     },
     "HAB": {
       "name": "Habacuc",
@@ -1154,18 +741,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-hab-1-999",
-          "title": "Structure littéraire : Habacuc",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/habakkuk/Habacuc_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/habakkuk/Habacuc_FR.png"
-        }
-      ]
+      "posters": []
     },
     "ZEP": {
       "name": "Sophonie",
@@ -1184,18 +760,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-zep-1-999",
-          "title": "Structure littéraire : Sophonie",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/zephaniah/Sophonie_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/zephaniah/Sophonie_FR.png"
-        }
-      ]
+      "posters": []
     },
     "HAG": {
       "name": "Aggée",
@@ -1214,18 +779,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-hag-1-999",
-          "title": "Structure littéraire : Aggée",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/haggai/Aggée_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/haggai/Aggée_FR.png"
-        }
-      ]
+      "posters": []
     },
     "ZEC": {
       "name": "Zacharie",
@@ -1244,18 +798,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-zec-1-999",
-          "title": "Structure littéraire : Zacharie",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fzechariah%2FRS39_Zacharie_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fzechariah%2FRS39_Zacharie_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "MAL": {
       "name": "Malachie",
@@ -1274,18 +817,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-mal-1-999",
-          "title": "Structure littéraire : Malachie",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/malachi/Malachie_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/old_testament/malachi/Malachie_FR.png"
-        }
-      ]
+      "posters": []
     },
     "MAT": {
       "name": "Matthieu",
@@ -1316,28 +848,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-mat-1-13",
-          "title": "Structure littéraire : Matthieu 1-13",
-          "chapters": [
-            1,
-            13
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_1-13%2FRS_42-43_Matthieu_POSTER_FR.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_1-13%2FRS_42-43_Matthieu_POSTER_FR.jpg"
-        },
-        {
-          "id": "poster-mat-14-28",
-          "title": "Structure littéraire : Matthieu 14-28",
-          "chapters": [
-            14,
-            28
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_14-28%2FRS_42-43_Matthieu_POSTER_FR.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmatthew_14-28%2FRS_42-43_Matthieu_POSTER_FR.jpg"
-        }
-      ]
+      "posters": []
     },
     "MRK": {
       "name": "Marc",
@@ -1356,18 +867,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-mrk-1-999",
-          "title": "Structure littéraire : Marc",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmark%2FRS_44_Marc_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fmark%2FRS_44_Marc_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "LUK": {
       "name": "Luc",
@@ -1398,28 +898,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-luk-1-9",
-          "title": "Structure littéraire : Luc 1-9",
-          "chapters": [
-            1,
-            9
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_1-9%2FRS_47-48_Luc_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_1-9%2FRS_47-48_Luc_FR_POSTER.jpg"
-        },
-        {
-          "id": "poster-luk-10-24",
-          "title": "Structure littéraire : Luc 10-24",
-          "chapters": [
-            10,
-            24
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_10-24%2FRS_47-48_Luc_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fluke_10-24%2FRS_47-48_Luc_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "JHN": {
       "name": "Jean",
@@ -1462,28 +941,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jhn-1-12",
-          "title": "Structure littéraire : Jean 1-12",
-          "chapters": [
-            1,
-            12
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_1-12%2FRS_45-46_Jean_FR_Poster.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_1-12%2FRS_45-46_Jean_FR_Poster.jpg"
-        },
-        {
-          "id": "poster-jhn-13-21",
-          "title": "Structure littéraire : Jean 13-21",
-          "chapters": [
-            13,
-            21
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_13-21%2FRS_45-46_Jean_FR_Poster.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fjohn_13-21%2FRS_45-46_Jean_FR_Poster.jpg"
-        }
-      ]
+      "posters": []
     },
     "ACT": {
       "name": "Actes",
@@ -1514,28 +972,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-act-1-12",
-          "title": "Structure littéraire : Actes 1-12",
-          "chapters": [
-            1,
-            12
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_1-12/ACTES_FR_FULL.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_1-12/ACTES_FR_FULL.png"
-        },
-        {
-          "id": "poster-act-13-28",
-          "title": "Structure littéraire : Actes 13-28",
-          "chapters": [
-            13,
-            28
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_13-28/ACTES_FR_FULL.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/acts_13-28/ACTES_FR_FULL.png"
-        }
-      ]
+      "posters": []
     },
     "ROM": {
       "name": "Romains",
@@ -1566,62 +1003,19 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-rom-1-4",
-          "title": "Structure littéraire : Romains 1-4",
-          "chapters": [
-            1,
-            4
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_1-4%2FRS_50-51_Romains_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_1-4%2FRS_50-51_Romains_FR_POSTER.jpg"
-        },
-        {
-          "id": "poster-rom-5-16",
-          "title": "Structure littéraire : Romains 5-16",
-          "chapters": [
-            5,
-            16
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_5-16%2FRS_50-51_Romains_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fromans_5-16%2FRS_50-51_Romains_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "1CO": {
       "name": "1 Corinthiens",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-1co-1-999",
-          "title": "Structure littéraire : 1 Corinthiens",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_corinthians/1Corinthiens_FR_FULL.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_corinthians/1Corinthiens_FR_FULL.png"
-        }
-      ]
+      "posters": []
     },
     "2CO": {
       "name": "2 Corinthiens",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-2co-1-999",
-          "title": "Structure littéraire : 2 Corinthiens",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_corinthians/2_Corinthiens_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_corinthians/2_Corinthiens_FR.png"
-        }
-      ]
+      "posters": []
     },
     "GAL": {
       "name": "Galates",
@@ -1640,18 +1034,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-gal-1-999",
-          "title": "Structure littéraire : Galates",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fgalatians%2FRS_54_GALATES_Poster_FR.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fgalatians%2FRS_54_GALATES_Poster_FR.jpg"
-        }
-      ]
+      "posters": []
     },
     "EPH": {
       "name": "Éphésiens",
@@ -1670,18 +1053,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-eph-1-999",
-          "title": "Structure littéraire : Éphésiens",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/ephesians/Ephesiens_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/ephesians/Ephesiens_FR.png"
-        }
-      ]
+      "posters": []
     },
     "PHP": {
       "name": "Philippiens",
@@ -1700,18 +1072,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-php-1-999",
-          "title": "Structure littéraire : Philippiens",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philippians/Philippiens_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philippians/Philippiens_FR.png"
-        }
-      ]
+      "posters": []
     },
     "COL": {
       "name": "Colossiens",
@@ -1730,52 +1091,19 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-col-1-999",
-          "title": "Structure littéraire : Colossiens",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fcolossians%2FRS_57_Colossiens_FR_POSTER.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Fcolossians%2FRS_57_Colossiens_FR_POSTER.jpg"
-        }
-      ]
+      "posters": []
     },
     "1TH": {
       "name": "1 Thessaloniciens",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-1th-1-999",
-          "title": "Structure littéraire : 1 Thessaloniciens",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_thessalonians/1_Thessaloniciens_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_thessalonians/1_Thessaloniciens_FR.png"
-        }
-      ]
+      "posters": []
     },
     "2TH": {
       "name": "2 Thessaloniciens",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-2th-1-999",
-          "title": "Structure littéraire : 2 Thessaloniciens",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_thessalonians%2FRS_59b_2_Thessaloniciens_POSTER_FR.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2F2_thessalonians%2FRS_59b_2_Thessaloniciens_POSTER_FR.jpg"
-        }
-      ]
+      "posters": []
     },
     "1TI": {
       "name": "1 Timothée",
@@ -1806,18 +1134,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-tit-1-999",
-          "title": "Structure littéraire : Tite",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/titus/Tite_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/titus/Tite_FR.png"
-        }
-      ]
+      "posters": []
     },
     "PHM": {
       "name": "Philémon",
@@ -1836,18 +1153,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-phm-1-999",
-          "title": "Structure littéraire : Philémon",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philemon/Philémon_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/philemon/Philémon_FR.png"
-        }
-      ]
+      "posters": []
     },
     "HEB": {
       "name": "Hébreux",
@@ -1866,18 +1172,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-heb-1-999",
-          "title": "Structure littéraire : Hébreux",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/hebrews/Hebreux_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/hebrews/Hebreux_FR.png"
-        }
-      ]
+      "posters": []
     },
     "JAS": {
       "name": "Jacques",
@@ -1896,103 +1191,37 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jas-1-999",
-          "title": "Structure littéraire : Jacques",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/james/Jacques_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/james/Jacques_FR.png"
-        }
-      ]
+      "posters": []
     },
     "1PE": {
       "name": "1 Pierre",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-1pe-1-999",
-          "title": "Structure littéraire : 1 Pierre",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_peter/1_Pierre_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1_peter/1_Pierre_FR.png"
-        }
-      ]
+      "posters": []
     },
     "2PE": {
       "name": "2 Pierre",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-2pe-1-999",
-          "title": "Structure littéraire : 2 Pierre",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_peter/2_Pierre_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/2_peter/2_Pierre_FR.png"
-        }
-      ]
+      "posters": []
     },
     "1JN": {
       "name": "1 Jean",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-1jn-1-3",
-          "title": "Structure littéraire : 1 Jean 1-3",
-          "chapters": [
-            1,
-            3
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png"
-        }
-      ]
+      "posters": []
     },
     "2JN": {
       "name": "2 Jean",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-2jn-1-3",
-          "title": "Structure littéraire : 2 Jean 1-3",
-          "chapters": [
-            1,
-            3
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png"
-        }
-      ]
+      "posters": []
     },
     "3JN": {
       "name": "3 Jean",
       "testament": "NT",
       "videos": [],
-      "posters": [
-        {
-          "id": "poster-3jn-1-3",
-          "title": "Structure littéraire : 3 Jean 1-3",
-          "chapters": [
-            1,
-            3
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/1-3_john/Jean123_FR.png"
-        }
-      ]
+      "posters": []
     },
     "JUD": {
       "name": "Jude",
@@ -2011,18 +1240,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-jud-1-999",
-          "title": "Structure littéraire : Jude",
-          "chapters": [
-            1,
-            999
-          ],
-          "image_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/jude/Jude_FR.png",
-          "pdf_url": "https://d2vxzjjzuh0t18.cloudfront.net/fra/watch/book_overviews/new_testament/jude/Jude_FR.png"
-        }
-      ]
+      "posters": []
     },
     "REV": {
       "name": "Apocalypse",
@@ -2053,28 +1271,7 @@
           "description": ""
         }
       ],
-      "posters": [
-        {
-          "id": "poster-rev-1-11",
-          "title": "Structure littéraire : Apocalypse 1-11",
-          "chapters": [
-            1,
-            11
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_1-11%2FRS_69-70_Apocalypse_POSTER_FR.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_1-11%2FRS_69-70_Apocalypse_POSTER_FR.jpg"
-        },
-        {
-          "id": "poster-rev-12-22",
-          "title": "Structure littéraire : Apocalypse 12-22",
-          "chapters": [
-            12,
-            22
-          ],
-          "image_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_12-22%2FRS_69-70_Apocalypse_POSTER_FR.jpg",
-          "pdf_url": "https://tbp-arc-assets.s3.us-west-2.amazonaws.com/localized%2Ffra%2Fposter%2Frevelation_12-22%2FRS_69-70_Apocalypse_POSTER_FR.jpg"
-        }
-      ]
+      "posters": []
     }
   },
   "themes": [
