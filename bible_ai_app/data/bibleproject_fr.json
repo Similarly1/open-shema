@@ -35,7 +35,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-gen-1-11",
+          "title": "Structure littéraire : Genèse 1-11",
+          "chapters": [
+            1,
+            11
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/genese-1-11-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/genese-1-11-panorama.fr.png"
+        }
+      ]
     },
     "EXO": {
       "name": "Exode",
@@ -66,7 +77,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-exo-1-18",
+          "title": "Structure littéraire : Exode 1-18",
+          "chapters": [
+            1,
+            18
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/exode-1-18-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/exode-1-18-panorama.fr.png"
+        }
+      ]
     },
     "LEV": {
       "name": "Lévitique",
@@ -85,7 +107,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-lev-1-999",
+          "title": "Structure littéraire : Lévitique",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/levitique-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/levitique-panorama.fr.png"
+        }
+      ]
     },
     "NUM": {
       "name": "Nombres",
@@ -104,7 +137,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-num-1-999",
+          "title": "Structure littéraire : Nombres",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/nombres-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/nombres-panorama.fr.png"
+        }
+      ]
     },
     "DEU": {
       "name": "Deutéronome",
@@ -123,7 +167,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-deu-1-999",
+          "title": "Structure littéraire : Deutéronome",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/deuteronome-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/deuteronome-panorama.fr.png"
+        }
+      ]
     },
     "JOS": {
       "name": "Josué",
@@ -142,7 +197,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jos-1-999",
+          "title": "Structure littéraire : Josué",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/josue-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/josue-panorama.fr.png"
+        }
+      ]
     },
     "JDG": {
       "name": "Juges",
@@ -161,7 +227,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jdg-1-999",
+          "title": "Structure littéraire : Juges",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/juges-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/juges-panorama.fr.png"
+        }
+      ]
     },
     "RUT": {
       "name": "Ruth",
@@ -180,7 +257,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-rut-1-999",
+          "title": "Structure littéraire : Ruth",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ruth-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ruth-panorama.fr.png"
+        }
+      ]
     },
     "1SA": {
       "name": "1 Samuel",
@@ -211,7 +299,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-1sa-1-999",
+          "title": "Structure littéraire : 1 Samuel",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-samuel-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-samuel-panorama.fr.jpg"
+        }
+      ]
     },
     "2SA": {
       "name": "2 Samuel",
@@ -242,7 +341,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-2sa-1-999",
+          "title": "Structure littéraire : 2 Samuel",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-samuel-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-samuel-panorama.fr.jpg"
+        }
+      ]
     },
     "1KI": {
       "name": "1 Rois",
@@ -261,7 +371,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-1ki-1-2",
+          "title": "Structure littéraire : 1 Rois 1-2",
+          "chapters": [
+            1,
+            2
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-rois-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-rois-panorama.fr.png"
+        }
+      ]
     },
     "2KI": {
       "name": "2 Rois",
@@ -280,7 +401,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-2ki-1-2",
+          "title": "Structure littéraire : 2 Rois 1-2",
+          "chapters": [
+            1,
+            2
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-rois-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-rois-panorama.fr.png"
+        }
+      ]
     },
     "1CH": {
       "name": "1 Chroniques",
@@ -299,7 +431,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-1ch-1-2",
+          "title": "Structure littéraire : 1 Chroniques 1-2",
+          "chapters": [
+            1,
+            2
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-chroniques-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-chroniques-panorama.fr.png"
+        }
+      ]
     },
     "2CH": {
       "name": "2 Chroniques",
@@ -318,7 +461,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-2ch-1-2",
+          "title": "Structure littéraire : 2 Chroniques 1-2",
+          "chapters": [
+            1,
+            2
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-chroniques-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-2-chroniques-panorama.fr.png"
+        }
+      ]
     },
     "EZR": {
       "name": "Esdras",
@@ -337,7 +491,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-ezr-1-999",
+          "title": "Structure littéraire : Esdras",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esdras-nehemie-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esdras-nehemie-panorama.fr.png"
+        }
+      ]
     },
     "NEH": {
       "name": "Néhémie",
@@ -356,7 +521,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-neh-1-999",
+          "title": "Structure littéraire : Néhémie",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esdras-nehemie-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esdras-nehemie-panorama.fr.png"
+        }
+      ]
     },
     "EST": {
       "name": "Esther",
@@ -375,7 +551,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-est-1-999",
+          "title": "Structure littéraire : Esther",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esther-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esther-panorama.fr.png"
+        }
+      ]
     },
     "JOB": {
       "name": "Job",
@@ -394,7 +581,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-job-1-999",
+          "title": "Structure littéraire : Job",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/job-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/job-panorama.fr.png"
+        }
+      ]
     },
     "PSA": {
       "name": "Psaumes",
@@ -413,7 +611,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-psa-1-999",
+          "title": "Structure littéraire : Psaumes",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/psaumes-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/psaumes-panorama.fr.png"
+        }
+      ]
     },
     "PRO": {
       "name": "Proverbes",
@@ -432,7 +641,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-pro-1-999",
+          "title": "Structure littéraire : Proverbes",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/proverbes-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/proverbes-panorama.fr.png"
+        }
+      ]
     },
     "ECC": {
       "name": "Ecclésiaste",
@@ -451,7 +671,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-ecc-1-999",
+          "title": "Structure littéraire : Ecclésiaste",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ecclesiaste-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ecclesiaste-panorama.fr.png"
+        }
+      ]
     },
     "SNG": {
       "name": "Cantique des Cantiques",
@@ -470,7 +701,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-sng-1-999",
+          "title": "Structure littéraire : Cantique des Cantiques",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/cantique-des-cantiques-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/cantique-des-cantiques-panorama.fr.png"
+        }
+      ]
     },
     "ISA": {
       "name": "Ésaïe",
@@ -501,7 +743,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-isa-1-39",
+          "title": "Structure littéraire : Ésaïe 1-39",
+          "chapters": [
+            1,
+            39
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esaie-1-39-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/esaie-1-39-panorama.fr.jpg"
+        }
+      ]
     },
     "JER": {
       "name": "Jérémie",
@@ -520,7 +773,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jer-1-999",
+          "title": "Structure littéraire : Jérémie",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jeremie-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jeremie-panorama.fr.png"
+        }
+      ]
     },
     "LAM": {
       "name": "Lamentations",
@@ -539,7 +803,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-lam-1-999",
+          "title": "Structure littéraire : Lamentations",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/lamentations-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/lamentations-panorama.fr.png"
+        }
+      ]
     },
     "EZK": {
       "name": "Ézéchiel",
@@ -570,7 +845,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-ezk-1-33",
+          "title": "Structure littéraire : Ézéchiel 1-33",
+          "chapters": [
+            1,
+            33
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ezechiel-1-33-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ezechiel-1-33-panorama.fr.jpg"
+        }
+      ]
     },
     "DAN": {
       "name": "Daniel",
@@ -589,7 +875,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-dan-1-999",
+          "title": "Structure littéraire : Daniel",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/daniel-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/daniel-panorama.fr.jpg"
+        }
+      ]
     },
     "HOS": {
       "name": "Osée",
@@ -608,7 +905,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-hos-1-999",
+          "title": "Structure littéraire : Osée",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/osee-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/osee-panorama.fr.png"
+        }
+      ]
     },
     "JOL": {
       "name": "Joël",
@@ -627,7 +935,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jol-1-999",
+          "title": "Structure littéraire : Joël",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/joel-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/joel-panorama.fr.png"
+        }
+      ]
     },
     "AMO": {
       "name": "Amos",
@@ -646,7 +965,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-amo-1-999",
+          "title": "Structure littéraire : Amos",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/amos-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/amos-panorama.fr.png"
+        }
+      ]
     },
     "OBA": {
       "name": "Abdias",
@@ -665,7 +995,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-oba-1-999",
+          "title": "Structure littéraire : Abdias",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/abdias-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/abdias-panorama.fr.png"
+        }
+      ]
     },
     "JON": {
       "name": "Jonas",
@@ -684,7 +1025,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jon-1-999",
+          "title": "Structure littéraire : Jonas",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jonas-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jonas-panorama.fr.png"
+        }
+      ]
     },
     "MIC": {
       "name": "Michée",
@@ -703,7 +1055,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-mic-1-999",
+          "title": "Structure littéraire : Michée",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/michee-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/michee-panorama.fr.png"
+        }
+      ]
     },
     "NAM": {
       "name": "Nahum",
@@ -722,7 +1085,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-nam-1-999",
+          "title": "Structure littéraire : Nahum",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/nahum-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/nahum-panorama.fr.png"
+        }
+      ]
     },
     "HAB": {
       "name": "Habacuc",
@@ -741,7 +1115,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-hab-1-999",
+          "title": "Structure littéraire : Habacuc",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/habacuc-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/habacuc-panorama.fr.png"
+        }
+      ]
     },
     "ZEP": {
       "name": "Sophonie",
@@ -760,7 +1145,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-zep-1-999",
+          "title": "Structure littéraire : Sophonie",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/sophonie-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/sophonie-panorama.fr.png"
+        }
+      ]
     },
     "HAG": {
       "name": "Aggée",
@@ -779,7 +1175,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-hag-1-999",
+          "title": "Structure littéraire : Aggée",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/aggee-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/aggee-panorama.fr.png"
+        }
+      ]
     },
     "ZEC": {
       "name": "Zacharie",
@@ -798,7 +1205,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-zec-1-999",
+          "title": "Structure littéraire : Zacharie",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/zacharie-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/zacharie-panorama.fr.jpg"
+        }
+      ]
     },
     "MAL": {
       "name": "Malachie",
@@ -817,7 +1235,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-mal-1-999",
+          "title": "Structure littéraire : Malachie",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/malachie-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/malachie-panorama.fr.png"
+        }
+      ]
     },
     "MAT": {
       "name": "Matthieu",
@@ -848,7 +1277,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-mat-1-13",
+          "title": "Structure littéraire : Matthieu 1-13",
+          "chapters": [
+            1,
+            13
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/matthieu-1-13-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/matthieu-1-13-panorama.fr.jpg"
+        }
+      ]
     },
     "MRK": {
       "name": "Marc",
@@ -867,7 +1307,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-mrk-1-999",
+          "title": "Structure littéraire : Marc",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/levangile-selon-marc-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/levangile-selon-marc-panorama.fr.jpg"
+        }
+      ]
     },
     "LUK": {
       "name": "Luc",
@@ -898,7 +1349,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-luk-1-9",
+          "title": "Structure littéraire : Luc 1-9",
+          "chapters": [
+            1,
+            9
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/luc-1-9-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/luc-1-9-panorama.fr.jpg"
+        }
+      ]
     },
     "JHN": {
       "name": "Jean",
@@ -941,7 +1403,28 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jhn-1-3",
+          "title": "Structure littéraire : Jean 1-3",
+          "chapters": [
+            1,
+            3
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-3-jean-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-3-jean-panorama.fr.png"
+        },
+        {
+          "id": "poster-jhn-1-12",
+          "title": "Structure littéraire : Jean 1-12",
+          "chapters": [
+            1,
+            12
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jean-1-12-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jean-1-12-panorama.fr.jpg"
+        }
+      ]
     },
     "ACT": {
       "name": "Actes",
@@ -972,7 +1455,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-act-1-12",
+          "title": "Structure littéraire : Actes 1-12",
+          "chapters": [
+            1,
+            12
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/actes-1-12-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/actes-1-12-panorama.fr.png"
+        }
+      ]
     },
     "ROM": {
       "name": "Romains",
@@ -1003,7 +1497,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-rom-1-4",
+          "title": "Structure littéraire : Romains 1-4",
+          "chapters": [
+            1,
+            4
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/romains-1-4-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/romains-1-4-panorama.fr.jpg"
+        }
+      ]
     },
     "1CO": {
       "name": "1 Corinthiens",
@@ -1034,7 +1539,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-gal-1-999",
+          "title": "Structure littéraire : Galates",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/galates-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/galates-panorama.fr.jpg"
+        }
+      ]
     },
     "EPH": {
       "name": "Éphésiens",
@@ -1053,7 +1569,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-eph-1-999",
+          "title": "Structure littéraire : Éphésiens",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ephesiens-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/ephesiens-panorama.fr.png"
+        }
+      ]
     },
     "PHP": {
       "name": "Philippiens",
@@ -1072,7 +1599,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-php-1-999",
+          "title": "Structure littéraire : Philippiens",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/philippiens-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/philippiens-panorama.fr.png"
+        }
+      ]
     },
     "COL": {
       "name": "Colossiens",
@@ -1091,7 +1629,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-col-1-999",
+          "title": "Structure littéraire : Colossiens",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/colossiens-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/colossiens-panorama.fr.jpg"
+        }
+      ]
     },
     "1TH": {
       "name": "1 Thessaloniciens",
@@ -1134,7 +1683,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-tit-1-999",
+          "title": "Structure littéraire : Tite",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/tite-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/tite-panorama.fr.png"
+        }
+      ]
     },
     "PHM": {
       "name": "Philémon",
@@ -1153,7 +1713,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-phm-1-999",
+          "title": "Structure littéraire : Philémon",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/philemon-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/philemon-panorama.fr.png"
+        }
+      ]
     },
     "HEB": {
       "name": "Hébreux",
@@ -1172,7 +1743,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-heb-1-999",
+          "title": "Structure littéraire : Hébreux",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/hebreux-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/hebreux-panorama.fr.png"
+        }
+      ]
     },
     "JAS": {
       "name": "Jacques",
@@ -1191,7 +1773,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jas-1-999",
+          "title": "Structure littéraire : Jacques",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jacques-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jacques-panorama.fr.png"
+        }
+      ]
     },
     "1PE": {
       "name": "1 Pierre",
@@ -1240,7 +1833,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-jud-1-999",
+          "title": "Structure littéraire : Jude",
+          "chapters": [
+            1,
+            999
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jude-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jude-panorama.fr.png"
+        }
+      ]
     },
     "REV": {
       "name": "Apocalypse",
@@ -1271,7 +1875,18 @@
           "description": ""
         }
       ],
-      "posters": []
+      "posters": [
+        {
+          "id": "poster-rev-1-11",
+          "title": "Structure littéraire : Apocalypse 1-11",
+          "chapters": [
+            1,
+            11
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/apocalypse-1-11-panorama.fr.jpg",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/apocalypse-1-11-panorama.fr.jpg"
+        }
+      ]
     }
   },
   "themes": [
@@ -2183,7 +2798,7 @@
       "id": "theme-fAtTege_8Uw",
       "title": "Voici ceux qui vivent une bonne et belle vie (selon Jésus) • Commentaire visuel",
       "yt_id": "fAtTege_8Uw",
-      "duration": "10:38",
+      "duration": "10:39",
       "thumbnail": "https://i.ytimg.com/vi/fAtTege_8Uw/hqdefault.jpg",
       "description": "",
       "related_books": []
@@ -2232,7 +2847,7 @@
       "id": "theme-JVCL1zZrEgU",
       "title": "Ce que Jésus enseigne sur la richesse et les biens (Commentaire visuel)",
       "yt_id": "JVCL1zZrEgU",
-      "duration": "5:41",
+      "duration": "5:42",
       "thumbnail": "https://i.ytimg.com/vi/JVCL1zZrEgU/hqdefault.jpg",
       "description": "",
       "related_books": []
