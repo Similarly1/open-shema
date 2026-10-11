@@ -1405,16 +1405,6 @@
       ],
       "posters": [
         {
-          "id": "poster-jhn-1-3",
-          "title": "Structure littéraire : Jean 1-3",
-          "chapters": [
-            1,
-            3
-          ],
-          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-3-jean-panorama.fr.png",
-          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-3-jean-panorama.fr.png"
-        },
-        {
           "id": "poster-jhn-1-12",
           "title": "Structure littéraire : Jean 1-12",
           "chapters": [
@@ -1423,6 +1413,16 @@
           ],
           "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jean-1-12-panorama.fr.jpg",
           "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/jean-1-12-panorama.fr.jpg"
+        },
+        {
+          "id": "poster-jhn-1-3",
+          "title": "Structure littéraire : Jean 1-3",
+          "chapters": [
+            1,
+            3
+          ],
+          "image_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-3-jean-panorama.fr.png",
+          "pdf_url": "https://d1bsmz3sdihplr.cloudfront.net/media/posters/1-3-jean-panorama.fr.png"
         }
       ]
     },
